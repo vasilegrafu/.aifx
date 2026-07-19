@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }} — {{ type_name }}</title>
 {% if cdn_href %}
-  <link rel="stylesheet" href="{{ skill_href }}/css/docs-html.css"
-        onerror="this.onerror=null;this.href='{{ cdn_href }}/css/docs-html.css'">
-  <script src="{{ skill_href }}/js/docs-html.js" defer
-          onerror="var s=document.createElement('script');s.src='{{ cdn_href }}/js/docs-html.js';s.defer=true;document.head.appendChild(s)"></script>
+  <link rel="stylesheet" href="{{ cdn_href }}/css/docs-html.css">
+  <script src="{{ cdn_href }}/js/docs-html.js" defer></script>
 {% else %}
   <link rel="stylesheet" href="{{ skill_href }}/css/docs-html.css">
   <script src="{{ skill_href }}/js/docs-html.js" defer></script>

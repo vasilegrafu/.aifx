@@ -22,37 +22,38 @@ exactly this — take it, keep it, modify it.
 Done. Claude Code discovers it next session. Your copy is frozen — it never
 changes unless you update it yourself.
 
-### Option B — mount (tracked, always updatable)
+### Option B — clone once, link everywhere (always updatable)
 
-Mount the repo once, then *link* the assets you want beside your own skills.
-Nothing you already have is touched.
+One shared clone on your machine serves ALL your projects through links.
+Nothing you already have is touched — your own skills stay beside the links.
 
-**1. Mount** (inside a git project; a plain `git clone` works too):
+**1. Clone** once, anywhere (a good spot: next to your projects):
 
 ```bash
-git submodule add https://github.com/vasilegrafu/.claudefx.git .claudefx
+git clone https://github.com/vasilegrafu/.claudefx.git
 ```
 
-**2. Link each skill you want** into `.claude/skills`, next to your own:
+**2. Link each skill you want** into every project's `.claude/skills`,
+next to your own:
 
 ```bat
 :: Windows (junction — no admin rights needed)
-mklink /J .claude\skills\<skill-name> .claudefx\skills\<skill-name>
+mklink /J <project>\.claude\skills\<skill-name> <path-to>\.claudefx\skills\<skill-name>
 ```
 
 ```bash
 # macOS / Linux (symlink)
-ln -s ../../.claudefx/skills/<skill-name> .claude/skills/<skill-name>
+ln -s <path-to>/.claudefx/skills/<skill-name> <project>/.claude/skills/<skill-name>
 ```
 
 **3. Verify** — open Claude Code in the project: the skill appears in its
 skills list.
 
-**Update later**:
+**Update later** — one pull updates every project at once:
 
 ```bash
-git -C .claudefx pull            # latest
-git -C .claudefx checkout v1.0.0 # or pin a released version
+git -C <path-to>/.claudefx pull            # latest
+git -C <path-to>/.claudefx checkout v1.1.0 # or pin a released version
 ```
 
 ## Requirements

@@ -14,6 +14,26 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 1.1.0 — 2026-07-19
+
+Multi-domain expansion + CDN-only documents.
+
+- Catalog grows 38 → 59 doc-types across ten domain folders
+  (`doc-types/<domain>/<name>/`): general, software, finance, investing,
+  accounting, research, economics, engineering, tools, fallback; the builder
+  discovers recursively and `--list` groups by domain.
+- New components: financial-table, journal-entry, scenarios, pros-cons,
+  swot-grid, badge (`business.css`) and formula (`math.css`).
+- New `math` feature: LaTeX rendered at view time by KaTeX 0.16.11 (lazy CDN);
+  formulas are LaTeX text, never images.
+- Charts documented: mermaid `xychart-beta` / `pie` through the standard
+  diagram viewport.
+- MINOR head-generation change: composed documents now carry version-pinned
+  CDN hrefs ONLY (no local paths, no onerror fallback) — fully portable;
+  the gallery keeps local refs. Existing documents keep working unchanged.
+
+---
+
 ## 1.0.0 — 2026-07-19
 
 First versioned release of the two-asset, single-include design system.

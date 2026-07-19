@@ -238,7 +238,7 @@ def compose_showcase() -> str:
         date=datetime.date.today().isoformat(),
         version="12.0",
         skill_href=skill_href(COMPONENTS_DIR),   # gallery lives in components/
-        cdn_href=cdn_href(),
+        cdn_href="",   # skill-internal document: ALWAYS local relative refs
         body_class="")
 
 
