@@ -56,32 +56,6 @@ git -C <path-to>/.claudefx pull            # latest
 git -C <path-to>/.claudefx checkout v1.1.0 # or pin a released version
 ```
 
-## Requirements
-
-What you need depends on how much you use — from nothing extra at all, up to a
-small Python toolchain for the generator-based skills.
-
-### 1. Claude Code — always
-
-The host: skills and agents are instructions *for* Claude Code, so without it
-this repository is just text.
-
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-Or use the desktop app / IDE extension — any form works the same.
-
-### 2. git — for Option B (and updates)
-
-Why: mounting the repo as a submodule, pulling new versions, and pinning a
-release are all git operations. (Option A — plain copying — technically needs
-no git at all.)
-
-- **Windows**: `winget install Git.Git` or [git-scm.com](https://git-scm.com)
-- **macOS**: `xcode-select --install` or `brew install git`
-- **Linux**: `sudo apt install git` (or your distro's package manager)
-
 ## License
 
 [MIT](LICENSE) — use it, copy it, ship it.
