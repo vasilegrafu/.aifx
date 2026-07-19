@@ -294,8 +294,10 @@ add it as `components/<new>/{usage.md, component.html.j2}`.
 
 ### `release [major|minor|patch]` — publish a design-system version
 This skill lives in `github.com/vasilegrafu/.claudefx` — a standalone public
-repo mounted as a git submodule at `solution.atlas/.claudefx`, and ALSO the
-CDN origin (jsDelivr serves its tags). There is no sync step: releasing IS
+repo, checked out ONCE as a shared clone (on this machine:
+`D:\Dev.Work\.claudefx`) that solutions consume via junctions/symlinks into
+their `.claude/skills/`; the same repo is ALSO the CDN origin (jsDelivr
+serves its tags). There is no sync step: releasing IS
 tagging this repo. The version lives ONLY in `version.json` + `version.md`
 (skill root). When the user asks for a release:
 1. Read `version.json`; bump per semver (`version.md` documents the contract:
@@ -307,9 +309,7 @@ tagging this repo. The version lives ONLY in `version.json` + `version.md`
    `git push origin main --tags`. A published tag is IMMUTABLE — never move or
    re-tag; any fix is a new version. Verify with a HEAD request to
    `https://cdn.jsdelivr.net/gh/vasilegrafu/.claudefx@X.Y.Z/skills/docs-html/css/docs-html.css`.
-4. Commit the updated submodule pointer in the parent repo
-   (`D:/Dev.Work/project.finance`).
-5. Report the new version and the two CDN URLs.
+4. Report the new version and the two CDN URLs.
 Never bump the version as a side effect of other work — only on an explicit
 release. Day-to-day skill commits to `main` are fine without a release; tags
 pin what documents fall back to.
