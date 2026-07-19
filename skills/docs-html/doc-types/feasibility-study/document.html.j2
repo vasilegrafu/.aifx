@@ -1,0 +1,38 @@
+{# type-name: Feasibility Study #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("context", "Context"),
+      ("options", "Options"),
+      ("technical", "Technical feasibility"),
+      ("economic", "Economic feasibility"),
+      ("operational", "Operational feasibility"),
+      ("recommendation", "Recommendation"),
+  ]) }}
+
+  {% call c.section("context", "Context") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("options", "Options") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("technical", "Technical feasibility") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("economic", "Economic feasibility") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("operational", "Operational feasibility") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("recommendation", "Recommendation") %}
+    {% call c.callout(type="decision") %}{% call c.prose() %}{% raw %}{{recommended option in one sentence}}{% endraw %}{% endcall %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{why}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

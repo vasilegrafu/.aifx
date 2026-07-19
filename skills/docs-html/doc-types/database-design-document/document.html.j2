@@ -1,0 +1,34 @@
+{# type-name: Database Design Document #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("overview", "Overview"),
+      ("er-model", "ER model"),
+      ("tables", "Tables"),
+      ("indexes", "Keys &amp; indexes"),
+      ("migrations", "Migrations &amp; retention"),
+  ]) }}
+
+  {% call c.section("overview", "Overview") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("er-model", "ER model") %}
+    {% call c.diagram_mermaid() %}{% raw %}erDiagram
+  {{ENTITY ||--o{ OTHER : relation}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("tables", "Tables") %}
+    {% call c.subsection("{{table-slug}}", "{{table_name}}") %}{% endcall %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("indexes", "Keys &amp; indexes") %}
+    {% call c.code_block(path="indexes.sql", lang="sql") %}{% raw %}{{CREATE INDEX ...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("migrations", "Migrations &amp; retention") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

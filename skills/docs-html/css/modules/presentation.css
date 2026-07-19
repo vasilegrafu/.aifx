@@ -1,0 +1,54 @@
+/* docs-html — presentation: sequential 16:9 pages, like a PowerPoint
+   deck read one page after another. Pure CSS — readers scroll or press
+   PageDown/PageUp; pages snap into view. Requires base.css.
+   Used only by <body class="presentation">. */
+
+html { scroll-snap-type: y proximity; }
+
+body.presentation { background: #eef1f5; counter-reset: page; }
+body.presentation main { max-width: none; padding-left: 0; padding-right: 0; }
+
+/* ---------- page ---------- */
+body.presentation section.page {
+  counter-increment: page;
+  scroll-snap-align: center;
+  position: relative;
+  width: min(96vw, 75rem);
+  aspect-ratio: 16 / 9;
+  margin: 2.5vh auto;
+  padding: 3.5rem 5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;              /* content must fit — like a real slide */
+  display: flex;
+  flex-direction: column;
+  font-size: 1.3rem;
+  line-height: 1.6;
+}
+
+/* page number, bottom-right of every page */
+body.presentation section.page::after {
+  content: counter(page);
+  position: absolute; bottom: 1rem; right: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: .82rem; color: var(--fg-soft);
+}
+
+/* ---------- typography on pages ---------- */
+body.presentation section.page h1 { font-size: 2.9rem; }
+body.presentation section.page h2 {
+  font-size: 2rem;
+  margin-top: 0;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: .45rem;
+}
+body.presentation section.page li { margin: .5rem 0; }
+body.presentation section.page pre { font-size: 1rem; }
+
+/* ---------- title page ---------- */
+body.presentation section.page.page-title { justify-content: center; }
+body.presentation section.page-title .doc-meta {
+  border: none; padding: 0; margin: 0;
+}
+body.presentation section.page-title .doc-meta::before { margin-bottom: 3rem; }

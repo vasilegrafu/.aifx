@@ -1,0 +1,42 @@
+{# type-name: Release Notes #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("highlights", "Highlights"),
+      ("added", "Added"),
+      ("changed", "Changed"),
+      ("fixed", "Fixed"),
+      ("deprecated", "Deprecated &amp; removed"),
+      ("upgrade", "Upgrade notes"),
+      ("known-issues", "Known issues"),
+  ]) }}
+
+  {% call c.section("highlights", "Highlights") %}
+    {% call c.lead() %}{% raw %}{{the one or two things that matter most this release}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("added", "Added") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("changed", "Changed") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("fixed", "Fixed") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("deprecated", "Deprecated &amp; removed") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("upgrade", "Upgrade notes") %}
+    {% call c.callout(type="warning") %}{% call c.prose() %}{% raw %}{{breaking change}} — {{what to do}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("known-issues", "Known issues") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+{% endblock %}

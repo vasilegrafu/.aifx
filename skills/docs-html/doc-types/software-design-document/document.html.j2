@@ -1,0 +1,39 @@
+{# type-name: Software Design Document #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("overview", "Overview"),
+      ("components", "Components"),
+      ("data", "Data design"),
+      ("interfaces", "Interfaces"),
+      ("decisions", "Design decisions"),
+      ("errors", "Error handling"),
+  ]) }}
+
+  {% call c.section("overview", "Overview") %}
+    {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  {{context diagram}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("components", "Components") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("data", "Data design") %}
+    {% call c.diagram_mermaid() %}{% raw %}erDiagram
+  {{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("interfaces", "Interfaces") %}
+    {% call c.code_block(path="{{path}}", lang="{{lang}}") %}{% raw %}{{signature / contract}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("decisions", "Design decisions") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("errors", "Error handling") %}
+    {% call c.callout(type="warning") %}{% call c.prose() %}{% raw %}{{failure}} — {{response}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

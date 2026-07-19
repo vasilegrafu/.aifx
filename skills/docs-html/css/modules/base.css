@@ -1,0 +1,148 @@
+/* docs-html — base: fonts, tokens, typography, layout.
+   Required by EVERY document; all other CSS files in this directory assume
+   base.css is linked first. Light theme only. No animations.
+   Brand identity comes from brand.css (imported below). */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("brand.css");
+
+/* ---------- tokens ---------- */
+:root {
+  --font-text: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --bg: #ffffff;
+  --bg-soft: #f7f9fb;
+  --fg: #182338;
+  --fg-soft: #5b6b81;
+  --border: #dde3ea;
+  --accent: var(--brand-accent, #1f4e8c);
+  --accent-soft: #edf3fa;
+
+  --note: var(--accent);
+  --note-bg: var(--accent-soft);
+  --warning: #8a5a00;
+  --warning-bg: #faf3e0;
+  --decision: #15693b;
+  --decision-bg: #e9f6ee;
+  --risk: #b42331;
+  --risk-bg: #fbeceb;
+  --todo-bg: #fdf3cf;
+  --code-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(24, 35, 56, .10);
+
+  /* External spacing of every component block: exactly this, vertical only.
+     Components never set horizontal margins — alignment comes from <main>. */
+  --block-gap: 1rem;
+}
+
+/* ---------- layout ---------- */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 16px/1.55 var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+/* The reading column: ONE element, <main>, carries the geometry (width cap,
+   centering, gutters). Everything inside is normal flow, so every component
+   sits flush on the same left edge — no component can break the alignment.
+   The .doc-toolbar lives outside <main> (chrome, position:fixed). */
+main {
+  display: block;
+  max-width: 64rem;              /* 1024px — page / portrait mode (default) */
+  margin: 0 auto;
+  padding-left: 1.0rem;
+  padding-right: 1.0rem;
+}
+
+/* ---------- view modes: page (default) vs full-width ---------- */
+/* Toggled by the doc-toolbar buttons built into every document (base.html.j2).
+   Wide mode lets the content fill the viewport instead of the 1024px column. */
+body.wide main {
+  max-width: none;
+}
+
+/* ---------- doc-toolbar: the view-mode toggle, fixed top-right ---------- */
+.doc-toolbar {
+  position: fixed;
+  top: .8rem;
+  right: .9rem;
+  z-index: 100;
+  display: flex;
+  gap: .25rem;
+  max-width: none;              /* escape the body > * column rules above */
+  margin: 0;
+  padding: .2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  box-shadow: var(--shadow);
+}
+.doc-toolbar button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-soft);
+  font-size: 1rem;
+  line-height: 1;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: .35rem;
+  cursor: pointer;
+}
+.doc-toolbar button:hover { background: var(--bg-soft); color: var(--fg); }
+/* The active button reflects the current mode — driven purely by the body
+   class, so no script has to keep it in sync. */
+body:not(.wide) .doc-toolbar [data-w="page"],
+body.wide .doc-toolbar [data-w="wide"] { background: var(--accent-soft); color: var(--accent); }
+@media print { .doc-toolbar { display: none; } }
+
+/* ---------- type scale ---------- */
+h1 {
+  font-size: 2rem; font-weight: 800; line-height: 1.15;
+  letter-spacing: -.022em; margin: 0 0 .4rem;
+}
+h2 {
+  font-size: 1.3rem; font-weight: 700; line-height: 1.3;
+  letter-spacing: -.012em;
+  margin: 2.2rem 0 .8rem; padding-bottom: .4rem;
+  border-bottom: 1px solid var(--border);
+}
+h3 {
+  font-size: 1.05rem; font-weight: 650; letter-spacing: -.006em;
+  margin: 1.6rem 0 .55rem;
+}
+h4 {
+  font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--fg-soft);
+  margin: 1.3rem 0 .4rem;
+}
+p, ul, ol, dl { margin: .6rem 0; }
+/* Prose list indent capped at 1rem (browser default ≈2.5rem sat far right of
+   the column edge). Components (toc, steps, checklist, timeline) override. */
+ul, ol { padding-left: 1rem; }
+li { margin: .2rem 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+strong { font-weight: 650; }
+hr { border: none; border-top: 1px solid var(--border); margin: var(--block-gap) 0; }
+img { max-width: 100%; }
+code, pre, kbd, samp { font-family: var(--font-mono); }
+
+/* micro-label: the small-caps label used across components */
+.micro-label, .toc-title {
+  font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--fg-soft);
+}
+
+/* ---------- opt-in section numbering: <body class="numbered"> ---------- */
+body.numbered { counter-reset: h2; }
+body.numbered section > h2 { counter-increment: h2; counter-reset: h3; }
+body.numbered section > h2::before { content: counter(h2) ". "; color: var(--fg-soft); }
+body.numbered section section > h3 { counter-increment: h3; }
+body.numbered section section > h3::before { content: counter(h2) "." counter(h3) " "; color: var(--fg-soft); }

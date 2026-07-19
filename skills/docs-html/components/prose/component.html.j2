@@ -1,0 +1,3 @@
+{% macro prose(text="") %}
+  <p>{{ caller() if caller else text }}</p>
+{% endmacro %}

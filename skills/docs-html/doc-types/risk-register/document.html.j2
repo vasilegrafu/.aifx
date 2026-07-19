@@ -1,0 +1,22 @@
+{# type-name: Risk Register #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("summary", "Summary"),
+      ("register", "Register"),
+      ("scale", "Scoring scale"),
+  ]) }}
+
+  {% call c.section("summary", "Summary") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("register", "Register") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]], wide=true) }}
+  {% endcall %}
+
+  {% call c.section("scale", "Scoring scale") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

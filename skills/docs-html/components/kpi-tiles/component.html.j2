@@ -1,0 +1,11 @@
+{% macro kpi_tiles(tiles) %}
+  <div class="kpi-tiles">
+  {% for t in tiles %}
+    <div class="kpi">
+      <span class="kpi-value">{{ t[0] }}</span>
+      <span class="kpi-label">{{ t[1] }}</span>
+      <span class="kpi-trend {{ t[2] }}">{{ t[3] }}</span>
+    </div>
+  {% endfor %}
+  </div>
+{% endmacro %}

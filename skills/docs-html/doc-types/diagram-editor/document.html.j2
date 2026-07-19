@@ -1,0 +1,6 @@
+{# type-name: Diagram Editor #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  hello[Hello] --> world[World]{% endraw %}{% endcall %}
+{% endblock %}

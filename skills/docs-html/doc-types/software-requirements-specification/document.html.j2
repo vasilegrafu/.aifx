@@ -1,0 +1,51 @@
+{# type-name: Software Requirements Specification #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("purpose", "Purpose & scope"),
+      ("summary", "Executive summary"),
+      ("overall", "Overall description"),
+      ("functional", "Functional requirements"),
+      ("non-functional", "Non-functional requirements"),
+      ("interfaces", "External interfaces"),
+      ("constraints", "Constraints"),
+      ("references", "References"),
+      ("glossary", "Glossary"),
+  ]) }}
+
+  {% call c.section("purpose", "Purpose & scope") %}
+    {{ c.todo_marker("what this SRS covers and, explicitly, what it does not") }}
+  {% endcall %}
+
+  {% call c.section("summary", "Executive summary") %}
+    {{ c.lead("the system in 1-2 sentences: what it does, for whom") }}
+  {% endcall %}
+
+  {% call c.section("overall", "Overall description") %}
+    {{ c.diagram_mermaid("flowchart LR\n  user([User]) --> system[System] --> data[(Data)]") }}
+  {% endcall %}
+
+  {% call c.section("functional", "Functional requirements") %}
+    {{ c.requirement(id="REQ-001", priority="must", label="Must") }}
+  {% endcall %}
+
+  {% call c.section("non-functional", "Non-functional requirements") %}
+    {{ c.requirement(id="REQ-100", priority="should", label="Should") }}
+  {% endcall %}
+
+  {% call c.section("interfaces", "External interfaces") %}
+    {{ c.facts([("interface name", "protocol, endpoint, purpose")]) }}
+  {% endcall %}
+
+  {% call c.section("constraints", "Constraints") %}
+    {{ c.bullets(["a regulatory, platform, technology, or timeline constraint"]) }}
+  {% endcall %}
+
+  {% call c.section("references", "References") %}
+    {{ c.references([("ref-29148", "ISO/IEC/IEEE 29148:2018, Requirements engineering.")]) }}
+  {% endcall %}
+
+  {% call c.section("glossary", "Glossary") %}
+    {{ c.glossary([("term-x", "term", "definition")]) }}
+  {% endcall %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{# type-name: Product Requirements Document #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("problem", "Problem"),
+      ("goals-nongoals", "Goals &amp; non-goals"),
+      ("users", "Users"),
+      ("requirements", "Requirements"),
+      ("metrics", "Success metrics"),
+      ("open-questions", "Open questions"),
+  ]) }}
+
+  {% call c.section("problem", "Problem") %}
+    {% call c.lead() %}{% raw %}{{one-sentence problem statement}}{% endraw %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("goals-nongoals", "Goals &amp; non-goals") %}
+    {% call c.subsection("goals", "Goals") %}{% endcall %}
+    {{ c.bullets(["{{...}}"]) }}
+    {% call c.subsection("non-goals", "Non-goals") %}{% endcall %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("users", "Users") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("requirements", "Requirements") %}
+    {{ c.requirement(id="REQ-001", priority="must", label="Must") }}
+  {% endcall %}
+
+  {% call c.section("metrics", "Success metrics") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("open-questions", "Open questions") %}
+    {% call c.todo_marker() %}{% raw %}{{question}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

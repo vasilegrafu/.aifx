@@ -1,0 +1,7 @@
+{% macro checklist(items) %}
+  <ul class="checklist">
+  {% for state, text in items %}
+    <li data-state="{{ state }}">{{ text }}</li>
+  {% endfor %}
+  </ul>
+{% endmacro %}

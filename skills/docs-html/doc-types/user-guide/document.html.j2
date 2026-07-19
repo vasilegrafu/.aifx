@@ -1,0 +1,72 @@
+{# type-name: User Guide #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("intro", "Introduction"),
+      ("getting-started", "Getting started"),
+      ("tasks", "Common tasks"),
+      ("reference", "Settings reference"),
+      ("troubleshooting", "Troubleshooting"),
+      ("faq", "FAQ"),
+      ("glossary", "Glossary"),
+  ]) }}
+
+  {% call c.section("intro", "Introduction") %}
+    {% call c.lead() %}{% raw %}{{what the product does for the reader, in one or two plain sentences}}{% endraw %}{% endcall %}
+    {% call c.prose() %}This guide is for {% raw %}{{who the reader is}}{% endraw %}. It assumes {% raw %}{{prerequisites — an account, access, etc.}}{% endraw %}.{% endcall %}
+  {% endcall %}
+
+  {% call c.section("getting-started", "Getting started") %}
+    {{ c.steps([
+        "{{first thing the user does — sign in, open the app}}",
+        "{{next step}}",
+        "{{you are ready when …}}",
+    ]) }}
+    {{ c.figure(src="{{screenshot.png}}", alt="{{what the screenshot shows}}",
+                caption="The main screen after signing in.") }}
+  {% endcall %}
+
+  {% call c.section("tasks", "Common tasks") %}
+    {% call c.subsection("task-1", "{{Do the first common task}}") %}
+      {{ c.steps([
+          "{{step}}",
+          "{{step}}",
+      ]) }}
+    {% endcall %}
+    {% call c.subsection("task-2", "{{Do the second common task}}") %}
+      {{ c.steps([
+          "{{step}}",
+          "{{step}}",
+      ]) }}
+      {% call c.callout(type="note") %}{% call c.prose() %}{% raw %}{{a tip or shortcut that helps here}}{% endraw %}{% endcall %}{% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("reference", "Settings reference") %}
+    {{ c.table(["Setting", "What it does", "Default"], [
+        ["{{setting}}", "{{effect in the user's terms}}", "{{default}}"],
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("troubleshooting", "Troubleshooting") %}
+    {{ c.table(["You see", "Likely cause", "What to do"], [
+        ["{{symptom the user observes}}", "{{cause}}", "{{fix}}"],
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("faq", "FAQ") %}
+    {% call c.collapsible(summary="{{A question users ask?}}") %}
+      {% call c.prose() %}{% raw %}{{the answer}}{% endraw %}{% endcall %}
+    {% endcall %}
+    {% call c.collapsible(summary="{{Another question?}}") %}
+      {% call c.prose() %}{% raw %}{{the answer}}{% endraw %}{% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("glossary", "Glossary") %}
+    {{ c.glossary([
+        ("term-1", "{{term}}", "{{plain-language definition}}"),
+    ]) }}
+  {% endcall %}
+
+{% endblock %}

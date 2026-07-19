@@ -1,0 +1,33 @@
+{# type-name: Test Summary Report #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("summary", "Summary"),
+      ("results", "Results"),
+      ("defects", "Open defects"),
+      ("assessment", "Assessment"),
+      ("signoff", "Sign-off"),
+  ]) }}
+
+  {% call c.section("summary", "Summary") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("results", "Results") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("defects", "Open defects") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("assessment", "Assessment") %}
+    {% call c.callout(type="decision") %}{% call c.prose() %}{% raw %}{{Go / No-go}} — {{one-sentence justification}}{% endraw %}{% endcall %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{reasoning}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("signoff", "Sign-off") %}
+    {{ c.approval_block([("{{name}}", "{{role}}")]) }}
+  {% endcall %}
+
+{% endblock %}

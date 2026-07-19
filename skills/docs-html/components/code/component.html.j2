@@ -1,0 +1,3 @@
+{% macro code(lang="") %}
+  <pre><code{% if lang %} data-lang="{{ lang }}"{% endif %}>{{ caller() }}</code></pre>
+{% endmacro %}

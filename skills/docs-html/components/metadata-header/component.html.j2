@@ -1,0 +1,11 @@
+{% macro metadata_header(type_name, title, author="", date="", version="0.1") %}
+  <header class="doc-meta">
+    <p class="doc-type">{{ type_name }}</p>
+    <h1>{{ title }}</h1>
+    <dl>
+      <dt>Author</dt>         <dd>{{ author }}</dd>
+      <dt>Date</dt>           <dd>{{ date }}</dd>
+      <dt>Version</dt>        <dd>{{ version }}</dd>
+    </dl>
+  </header>
+{% endmacro %}

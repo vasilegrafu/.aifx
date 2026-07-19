@@ -1,0 +1,55 @@
+/* docs-html — content: tables, plain code, figures, collapsibles.
+   Requires base.css. Link when the document uses any of: table, code-block,
+   figure, collapsible. (Professional code chrome + syntax tokens live in
+   code.css.) */
+
+/* ---------- table ---------- */
+table { border-collapse: collapse; margin: var(--block-gap) 0; width: 100%; font-size: .95rem; }
+th, td {
+  border: none; border-bottom: 1px solid var(--border);
+  padding: .55rem .8rem .55rem 0;
+  text-align: left; vertical-align: top;
+}
+thead th {
+  font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--fg-soft);
+  border-bottom: 2px solid var(--border);
+}
+table.wide { display: block; overflow-x: auto; }   /* many columns → the table scrolls, not the page */
+
+/* ---------- plain code ---------- */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .8rem 1rem;
+  overflow-x: auto;
+  font-size: .85rem; line-height: 1.5;
+}
+code { font-size: .88em; }
+:not(pre) > code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: .1em .38em;
+  font-size: .84em;
+}
+pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+/* ---------- figure ---------- */
+/* Left-aligned like every other component — the shared edge is the design. */
+figure { margin: var(--block-gap) 0; }
+figure img { border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); }
+figcaption { font-size: .85rem; color: var(--fg-soft); margin-top: .6rem; }
+
+/* ---------- collapsible ---------- */
+details {
+  margin: var(--block-gap) 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .55rem .9rem;
+  background: var(--bg-soft);
+}
+summary { cursor: pointer; font-weight: 600; font-size: .95rem; }
+details[open] summary { margin-bottom: .6rem; }

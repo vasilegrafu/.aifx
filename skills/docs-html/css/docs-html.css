@@ -1,0 +1,31 @@
+/* docs-html.css — the single stylesheet every document links.
+
+   One line in the document (`<link rel="stylesheet" href=".../css/docs-html.css">`)
+   pulls in the whole design system. The modules live in css/modules/ and are
+   authored separately for maintainability; this entry file is the only thing a
+   document references.
+
+   @layer sets the cascade order once, up front, so it no longer depends on
+   @import order or per-rule specificity: later layers win. All of the design
+   system is layered, and documents carry no unlayered author CSS (no <style>,
+   no style=), so this reproduces the old fixed link order while making the
+   cascade robust to adding or reordering modules.
+
+   base.css itself @imports brand.css (organization identity) and the web fonts;
+   those come along automatically. */
+
+@layer base, metadata, toc, content, callouts, lists, blocks, code,
+       diagrams, gallery, presentation, print;
+
+@import url("modules/base.css")         layer(base);
+@import url("modules/metadata.css")     layer(metadata);
+@import url("modules/toc.css")          layer(toc);
+@import url("modules/content.css")      layer(content);
+@import url("modules/callouts.css")     layer(callouts);
+@import url("modules/lists.css")        layer(lists);
+@import url("modules/blocks.css")       layer(blocks);
+@import url("modules/code.css")         layer(code);
+@import url("modules/diagrams.css")     layer(diagrams);
+@import url("modules/gallery.css")      layer(gallery);
+@import url("modules/presentation.css") layer(presentation);
+@import url("modules/print.css")        layer(print);

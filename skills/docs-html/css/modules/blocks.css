@@ -1,0 +1,220 @@
+/* docs-html — blocks: professional structured-content components.
+   Requires base.css. Link when the document uses any of: requirement card,
+   kpi-tiles, timeline, glossary, revision-note, or ISO front/back matter
+   (executive-summary lead, references, appendices).
+
+   These are the "formal document" building blocks — requirements
+   specifications, test plans, status reports, roadmaps, standards. */
+
+/* ---------- requirement card (IEEE/ISO 29148 style) ---------- */
+article.requirement {
+  margin: var(--block-gap) 0;
+  padding: .8rem 1rem .9rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+article.requirement > header {
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: .7rem;
+  margin-bottom: .7rem;
+}
+article.requirement .req-id {
+  font-family: var(--font-mono);
+  font-size: .78rem; font-weight: 700;
+  color: var(--accent); background: var(--accent-soft);
+  padding: .1em .5em; border-radius: 4px;
+}
+article.requirement > header h3 { margin: 0; font-size: 1.05rem; flex: 1 1 auto; }
+
+.req-priority {
+  font-size: .66rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  padding: .12em .55em; border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.priority-must   { color: var(--risk); }
+.priority-should { color: var(--accent); }
+.priority-could  { color: var(--warning); }
+.priority-wont   { color: var(--fg-soft); }
+
+article.requirement dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .35rem 1.2rem;
+  margin: 0; font-size: .95rem;
+}
+article.requirement dt {
+  font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--fg-soft);
+  padding-top: .15rem;
+}
+article.requirement dd { margin: 0; }
+
+/* ---------- acceptance-criteria: Given / When / Then scenario ---------- */
+.acceptance {
+  margin: var(--block-gap) 0;
+  padding: .7rem 1rem .8rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--decision);
+  border-radius: 8px;
+}
+.acceptance .ac-head {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: .6rem;
+  margin-bottom: .55rem;
+}
+.acceptance .ac-id {
+  font-family: var(--font-mono);
+  font-size: .78rem; font-weight: 700;
+  color: var(--decision); background: var(--decision-bg);
+  padding: .1em .5em; border-radius: 4px;
+}
+.acceptance .ac-title { font-size: 1rem; font-weight: 600; }
+.acceptance dl.gwt {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .3rem .9rem;
+  margin: 0; font-size: .95rem;
+}
+.acceptance dl.gwt dt {
+  font-family: var(--font-mono);
+  font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  text-align: right;
+  padding-top: .1rem;
+}
+.acceptance dl.gwt dd { margin: 0; }
+.acceptance .kw-given { color: var(--fg-soft); }
+.acceptance .kw-when  { color: var(--accent); }
+.acceptance .kw-then  { color: var(--decision); }
+
+/* ---------- kpi-tiles: dashboard metric grid ---------- */
+.kpi-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: .85rem;
+  margin: var(--block-gap) 0;
+}
+.kpi {
+  padding: .9rem 1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.kpi-value {
+  display: block;
+  font-size: 2rem; font-weight: 800; line-height: 1.1;
+  letter-spacing: -.02em;
+}
+.kpi-label {
+  display: block; margin-top: .35rem;
+  font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--fg-soft);
+}
+.kpi-trend { display: inline-block; margin-top: .5rem; font-size: .78rem; font-weight: 600; }
+.kpi-trend.up   { color: var(--decision); }
+.kpi-trend.down { color: var(--risk); }
+.kpi-trend.flat { color: var(--fg-soft); }
+
+/* ---------- timeline: milestones / roadmap / release history ---------- */
+ol.timeline {
+  list-style: none;
+  margin: var(--block-gap) 0;   /* no left shift — the rail sits on the column edge */
+  padding-left: 0;
+  border-left: 2px solid var(--border);
+}
+ol.timeline > li {
+  position: relative;
+  margin: 0;
+  padding: .1rem 0 1.4rem 1.6rem;
+}
+ol.timeline > li:last-child { padding-bottom: 0; }
+ol.timeline > li::before {
+  content: "";
+  position: absolute; left: -.52rem; top: .38rem;
+  width: .85rem; height: .85rem;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+ol.timeline > li[data-state="done"]::before    { background: var(--accent); }
+ol.timeline > li[data-state="current"]::before  { border-color: var(--decision); box-shadow: 0 0 0 3px var(--decision-bg); }
+ol.timeline .when {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--fg-soft);
+}
+ol.timeline h3 { margin: .1rem 0 .3rem; font-size: 1rem; }
+ol.timeline p  { margin: .2rem 0; }
+
+/* ---------- glossary ---------- */
+dl.glossary { margin: var(--block-gap) 0; }
+dl.glossary dt {
+  margin-top: 1rem;
+  font-size: .98rem; font-weight: 700; color: var(--fg);
+}
+dl.glossary dt:first-child { margin-top: 0; }
+dl.glossary dd { margin: .15rem 0 0; }
+
+/* inline first-use definition: <dfn>Term</dfn> */
+dfn {
+  font-style: normal; font-weight: 650;
+  border-bottom: 1px dotted var(--fg-soft);
+  cursor: help;
+}
+
+/* ---------- revision-note: inline "what changed" annotation ---------- */
+.revision-note {
+  margin: var(--block-gap) 0;
+  padding: .5rem .9rem;
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+  font-size: .9rem;
+}
+.revision-note::before {
+  content: "Revision " attr(data-rev);
+  display: block;
+  font-size: .64rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--accent);
+  margin-bottom: .15rem;
+}
+
+/* ---------- front matter: executive-summary lead ---------- */
+.lead { font-size: 1.1rem; line-height: 1.6; }
+
+/* ---------- back matter: references ---------- */
+ol.references {
+  list-style: none;
+  counter-reset: ref;
+  padding-left: 0;
+  font-size: .92rem;
+}
+ol.references > li {
+  counter-increment: ref;
+  position: relative;
+  padding: .3rem 0 .3rem 2.6rem;
+}
+ol.references > li::before {
+  content: "[" counter(ref) "]";
+  position: absolute; left: 0; top: .3rem;
+  font-family: var(--font-mono);
+  font-size: .82rem; font-weight: 600;
+  color: var(--fg-soft);
+}
+
+/* ---------- back matter: appendices, auto-lettered ---------- */
+/* Wrap appendix sections in <div class="appendices"> so numbering is
+   isolated from the body's section numbering. */
+.appendices { counter-reset: appendix; }
+.appendices > section.appendix { counter-increment: appendix; }
+.appendices > section.appendix > h2::before {
+  content: "Appendix " counter(appendix, upper-alpha) ". ";
+  color: var(--fg-soft);
+}

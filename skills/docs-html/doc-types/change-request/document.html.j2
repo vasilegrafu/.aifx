@@ -1,0 +1,37 @@
+{# type-name: Change Request #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("description", "Description"),
+      ("reason", "Reason"),
+      ("impact", "Impact analysis"),
+      ("rollout", "Rollout plan"),
+      ("rollback", "Rollback plan"),
+      ("approval", "Approval"),
+  ]) }}
+
+  {% call c.section("description", "Description") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("reason", "Reason") %}
+    {% call c.prose() %}{% raw %}{{why now}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("impact", "Impact analysis") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("rollout", "Rollout plan") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("rollback", "Rollback plan") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("approval", "Approval") %}
+    {{ c.approval_block([("{{name}}", "{{role}}")]) }}
+  {% endcall %}
+
+{% endblock %}

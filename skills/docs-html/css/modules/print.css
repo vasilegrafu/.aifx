@@ -1,0 +1,49 @@
+/* docs-html — print: Ctrl+P → clean paginated output ("Save as PDF").
+   The whole file is wrapped in @media print, so it is linked like any other
+   stylesheet and affects nothing on screen. Requires base.css.
+   Link it LAST in every document's head.
+
+   Corporate print features:
+   - the metadata header becomes a real COVER PAGE (own page). */
+
+@media print {
+  @page { size: A4; margin: 2cm 1.8cm; }
+
+  body { font-size: 11pt; }
+  main { max-width: none; padding-left: 0; padding-right: 0; }
+
+  /* ---------- cover page ---------- */
+  .doc-meta {
+    break-after: page;
+    padding-top: 22vh;
+    border-bottom: none;
+  }
+
+  /* ---------- links print as plain text; external targets show their URL ---------- */
+  a { color: var(--fg); text-decoration: none; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 8.5pt; color: var(--fg-soft); }
+
+  /* ---------- sensible page breaks ---------- */
+  h2, h3, h4 { break-after: avoid; }
+  nav.toc, pre, table, figure, dl.facts, figure.code,
+  aside.note, aside.warning, aside.decision, aside.risk { break-inside: avoid; }
+  tr { break-inside: avoid; }
+
+  /* collapsibles: print everything, including collapsed content */
+  details, details > * { display: block; }
+  details { border: none; background: none; padding: 0; }
+
+  /* ---------- presentations: one page per printed sheet ---------- */
+  body.presentation { background: #fff; }
+  body.presentation > section.page {
+    width: auto;
+    aspect-ratio: auto;
+    margin: 0;
+    padding: 0 0 1cm;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    break-after: page;
+  }
+  body.presentation > section.page::after { content: none; }
+}

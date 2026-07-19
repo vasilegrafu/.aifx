@@ -1,0 +1,27 @@
+{# type-name: Status Report #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("metrics", "Metrics"),
+      ("progress", "Progress"),
+      ("upcoming", "Upcoming"),
+      ("blockers", "Risks &amp; blockers"),
+  ]) }}
+
+  {% call c.section("metrics", "Metrics") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("progress", "Progress") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("upcoming", "Upcoming") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("blockers", "Risks &amp; blockers") %}
+    {% call c.callout(type="risk") %}{% call c.prose() %}{% raw %}{{blocker}} — needs: {{...}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

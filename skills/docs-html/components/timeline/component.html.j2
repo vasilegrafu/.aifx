@@ -1,0 +1,11 @@
+{% macro timeline(items) %}
+  <ol class="timeline">
+  {% for it in items %}
+    <li data-state="{{ it[0] }}">
+      <span class="when">{{ it[1] }}</span>
+      <h3>{{ it[2] }}</h3>
+      <p>{{ it[3] }}</p>
+    </li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

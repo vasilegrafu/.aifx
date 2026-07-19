@@ -1,0 +1,17 @@
+{# type-name: Test Case Specification #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("summary", "Summary"),
+      ("cases", "Test cases"),
+  ]) }}
+
+  {% call c.section("summary", "Summary") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("cases", "Test cases") %}
+    {{ c.requirement(id="TC-001", priority="must", label="P1") }}
+  {% endcall %}
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{# type-name: Architecture Decision Record #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("context", "Context"),
+      ("options-considered", "Options Considered"),
+      ("decision", "Decision"),
+      ("consequences", "Consequences"),
+  ]) }}
+
+  {% call c.section("context", "Context") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("options-considered", "Options Considered") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("decision", "Decision") %}
+    {% call c.callout(type="decision") %}{% call c.prose() %}{% raw %}{{the decision in one sentence}}{% endraw %}{% endcall %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{rationale}}{% endraw %}{% endcall %}
+    {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  {{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("consequences", "Consequences") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

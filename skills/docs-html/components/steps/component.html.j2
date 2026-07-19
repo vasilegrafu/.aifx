@@ -1,0 +1,7 @@
+{% macro steps(items) %}
+  <ol class="steps">
+  {% for s in items %}
+    <li>{{ s }}</li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

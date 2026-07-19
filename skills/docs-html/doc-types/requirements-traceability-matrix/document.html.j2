@@ -1,0 +1,17 @@
+{# type-name: Requirements Traceability Matrix #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("coverage", "Coverage"),
+      ("matrix", "Matrix"),
+  ]) }}
+
+  {% call c.section("coverage", "Coverage") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("matrix", "Matrix") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]], wide=true) }}
+  {% endcall %}
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{# type-name: Deployment Runbook #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("overview", "Overview"),
+      ("prechecks", "Pre-checks"),
+      ("deploy", "Deploy"),
+      ("verify", "Verification"),
+      ("rollback", "Rollback"),
+      ("contacts", "Contacts"),
+  ]) }}
+
+  {% call c.section("overview", "Overview") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("prechecks", "Pre-checks") %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+  {% call c.section("deploy", "Deploy") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("verify", "Verification") %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+  {% call c.section("rollback", "Rollback") %}
+    {% call c.callout(type="warning") %}{% call c.prose() %}{% raw %}Trigger rollback if: {{condition}}.{% endraw %}{% endcall %}{% endcall %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("contacts", "Contacts") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+{% endblock %}

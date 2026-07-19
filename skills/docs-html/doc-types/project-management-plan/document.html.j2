@@ -1,0 +1,40 @@
+{# type-name: Project Management Plan #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("overview", "Overview &amp; objectives"),
+      ("scope", "Scope"),
+      ("schedule", "Schedule &amp; milestones"),
+      ("team", "Team &amp; responsibilities"),
+      ("risks", "Risks"),
+      ("communication", "Communication"),
+  ]) }}
+
+  {% call c.section("overview", "Overview &amp; objectives") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("scope", "Scope") %}
+    {% call c.subsection("in-scope", "In scope") %}{% endcall %}
+    {{ c.bullets(["{{...}}"]) }}
+    {% call c.subsection("out-of-scope", "Out of scope") %}{% endcall %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("schedule", "Schedule &amp; milestones") %}
+    {{ c.timeline([("done", "{{when}}", "{{title}}", "{{...}}")]) }}
+  {% endcall %}
+
+  {% call c.section("team", "Team &amp; responsibilities") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("risks", "Risks") %}
+    {% call c.callout(type="risk") %}{% call c.prose() %}{% raw %}{{risk}} — mitigation: {{...}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("communication", "Communication") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+{% endblock %}

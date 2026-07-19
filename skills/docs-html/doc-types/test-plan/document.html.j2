@@ -1,0 +1,45 @@
+{# type-name: Test Plan #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("scope", "Scope"),
+      ("approach", "Approach"),
+      ("features", "Features to test"),
+      ("environment", "Environment"),
+      ("schedule", "Schedule"),
+      ("criteria", "Entry &amp; exit criteria"),
+      ("risks", "Risks"),
+  ]) }}
+
+  {% call c.section("scope", "Scope") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("approach", "Approach") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("features", "Features to test") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("environment", "Environment") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("schedule", "Schedule") %}
+    {{ c.timeline([("done", "{{when}}", "{{title}}", "{{...}}")]) }}
+  {% endcall %}
+
+  {% call c.section("criteria", "Entry &amp; exit criteria") %}
+    {% call c.subsection("entry-criteria", "Entry") %}{% endcall %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+    {% call c.subsection("exit-criteria", "Exit") %}{% endcall %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+  {% call c.section("risks", "Risks") %}
+    {% call c.callout(type="risk") %}{% call c.prose() %}{% raw %}{{test risk}} — {{mitigation}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{# type-name: Developer Setup Guide #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("prerequisites", "Prerequisites"),
+      ("setup", "Setup"),
+      ("running", "Running"),
+      ("tasks", "Common tasks"),
+      ("troubleshooting", "Troubleshooting"),
+  ]) }}
+
+  {% call c.section("prerequisites", "Prerequisites") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("setup", "Setup") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("running", "Running") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("tasks", "Common tasks") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("troubleshooting", "Troubleshooting") %}
+    {% call c.collapsible(summary="{{symptom}}") %}{% call c.prose() %}{% raw %}{{fix}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

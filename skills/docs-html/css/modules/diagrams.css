@@ -1,0 +1,245 @@
+/* docs-html — diagrams: Mermaid containers with pan + zoom.
+   Part of docs-html.css (loaded via @import). Applies when the document
+   contains <pre class="mermaid">; docs-html.js renders the diagram and then
+   makes it pan/zoomable (Panzoom from CDN).
+
+   Graceful degradation, pure CSS: before Mermaid renders — or if the CDN is
+   unreachable — the block shows its diagram source as a readable code box.
+   After render, Mermaid stamps data-processed="true" and the block becomes a
+   bounded, pannable viewport. */
+
+pre.mermaid {
+  margin: var(--block-gap) 0;
+  background: var(--code-bg);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: .9rem 1.1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: .85rem; line-height: 1.6;
+  white-space: pre;
+}
+
+/* Rendered: a bounded viewport. Natural-size diagrams show in full; taller or
+   wider ones are clipped to the box and panned/zoomed instead of shrunk.
+   The height is set inline by DiagramViewer (min(natural, 70vh)) so the
+   resize handle below can both shrink AND grow the box — a CSS max-height
+   would cap the growth. */
+pre.mermaid[data-processed="true"] {
+  position: relative;
+  display: flex;                   /* [editor panel |] canvas — side by side */
+  overflow: hidden;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  white-space: normal; font: inherit;
+}
+
+/* the diagram pane: clip box for panning and Panzoom's event surface (its
+   canvas:true binds to the SVG's parent = this element) */
+.mermaid-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;                /* Panzoom moves the SVG; no scrollbars */
+  touch-action: none;              /* let Panzoom own touch gestures */
+}
+
+/* useMaxWidth:false makes Mermaid emit the SVG at natural pixel size, so a
+   node's box is the same across every diagram. Panzoom drives the transform.
+   `> svg` (child, not descendant) — the toolbar's icon <svg>s also live inside
+   the canvas and must NOT get the diagram's grab cursor or sizing. */
+.mermaid-canvas > svg {
+  display: block;
+  max-width: none !important;
+  height: auto;
+  transform-origin: 0 0;
+  cursor: grab;
+}
+.mermaid-canvas > svg:active { cursor: grabbing; }
+
+/* per-diagram icon toolbar, top-right inside the viewport — one chip holding
+   flat SVG-icon buttons (injected by docs-html.js), same look as .doc-toolbar */
+.mermaid-tools {
+  position: absolute;
+  top: .5rem; right: .5rem;
+  z-index: 2;
+  display: flex; align-items: center; gap: .15rem;
+  padding: .2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  box-shadow: var(--shadow);
+  cursor: default;      /* the pre is the pan canvas (grab hand) — not the toolbar */
+}
+.mermaid-tools button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-soft);
+  width: 1.6rem; height: 1.6rem;
+  padding: 0;
+  border-radius: .35rem;
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.mermaid-tools button:hover { background: var(--bg-soft); color: var(--fg); }
+.mermaid-tools button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.mermaid-tools .zoom-label {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  color: var(--fg-soft);
+  min-width: 2.4rem;
+  text-align: center;
+}
+.mermaid-tools .sep {
+  width: 1px; height: 1.1rem;
+  background: var(--border);
+  margin: 0 .15rem;
+}
+
+/* resize handle: a full-width strip along the bottom edge with a centered
+   grip pill — drag vertically to resize the viewport (injected by
+   docs-html.js; carries panzoom-exclude so dragging it never pans). */
+.mermaid-resize {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 12px;
+  z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  cursor: ns-resize;
+}
+.mermaid-resize::after {
+  content: "";
+  width: 38px; height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.mermaid-resize:hover::after,
+.mermaid-resize.dragging::after { background: var(--accent); }
+
+/* source editor: the ✎ button opens a side PANEL left of the canvas — its own
+   flex column, never over the diagram (injected by docs-html.js; session-only,
+   the copy button is the path back into the document). Kept in fullscreen:
+   fullscreen + editor is the full editing workspace. */
+.mermaid-editor {
+  position: relative;              /* anchors its right-edge resize grip */
+  flex: 0 0 auto;
+  width: 325px;                    /* default; drag the grip to change */
+  min-width: 16rem;                /* 256px floor, matched by the drag clamp */
+  display: flex; flex-direction: column;
+  gap: .25rem;
+  padding: .35rem;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+}
+
+/* right-edge grip: drag horizontally to resize the panel */
+.mermaid-editor-resize {
+  position: absolute;
+  top: 0; bottom: 0; right: -6px;
+  width: 12px;
+  z-index: 3;                      /* straddles the divider, above the canvas */
+  display: flex; align-items: center; justify-content: center;
+  cursor: ew-resize;
+}
+.mermaid-editor-resize::after {
+  content: "";
+  width: 4px; height: 38px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.mermaid-editor-resize:hover::after,
+.mermaid-editor-resize.dragging::after { background: var(--accent); }
+/* the editing surface: a Prism-colored mirror behind a transparent-text
+   textarea with IDENTICAL metrics (same font, size, line-height, padding —
+   any drift misaligns caret and glyphs). The textarea text goes transparent
+   only in the .highlighted state (Prism actually loaded). */
+.mermaid-editor .editor-surface {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.mermaid-editor .editor-surface pre.editor-code {
+  display: none;                   /* until Prism is ready */
+  position: absolute; inset: 0;
+  margin: 0;
+  border: none; border-radius: 0;
+  background: none;
+  overflow: hidden;                /* follows the textarea's scroll via JS */
+}
+.mermaid-editor .editor-surface.highlighted pre.editor-code { display: block; }
+.mermaid-editor .editor-surface.highlighted textarea {
+  color: transparent;
+  caret-color: var(--fg);
+}
+.mermaid-editor .editor-surface pre.editor-code code {
+  display: block;
+  background: none; border: none; padding: 0;
+  font-size: inherit;
+}
+.mermaid-editor .editor-surface pre.editor-code,
+.mermaid-editor textarea {
+  padding: .3rem .45rem;
+  font-family: var(--font-mono);
+  font-size: .8rem; line-height: 1.45;
+  white-space: pre;
+}
+.mermaid-editor textarea {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  resize: none;
+  border: none;                    /* seamless: same surface as the panel */
+  background: transparent;         /* panel background shows through */
+  color: var(--fg);
+  outline: none;
+}
+/* Scrollbars. Chromium/Edge: the ::-webkit-scrollbar rules below give an
+   exact 5px bar with a 50%-transparent thumb — but ONLY apply when no
+   standard scrollbar property is set on the element, so the standard
+   properties live in a Firefox-only guard. */
+@supports (-moz-appearance: none) {
+  .mermaid-editor textarea {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--border) 50%, transparent) transparent;
+  }
+}
+.mermaid-editor textarea::-webkit-scrollbar { width: 5px; height: 5px; }
+.mermaid-editor textarea::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--border) 50%, transparent);
+  border-radius: 3px;
+}
+.mermaid-editor textarea::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--fg-soft) 50%, transparent);
+}
+.mermaid-editor textarea::-webkit-scrollbar-track,
+.mermaid-editor textarea::-webkit-scrollbar-corner { background: transparent; }
+.mermaid-editor .editor-error {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--risk);
+  white-space: pre-wrap;
+}
+.mermaid-editor .editor-error:empty { display: none; }
+.mermaid-editor .editor-hint {
+  margin: 0;
+  font-size: .68rem;
+  color: var(--fg-soft);
+}
+
+/* fullscreen: the viewport becomes the screen; pan/zoom keeps working */
+pre.mermaid:fullscreen {
+  border: none; border-radius: 0;
+  background: var(--bg);
+}
+pre.mermaid:fullscreen .mermaid-resize { display: none; }
+
+/* Print: freeze to a static, fully-visible diagram (no viewport clip, no tools). */
+@media print {
+  pre.mermaid[data-processed="true"] { overflow: visible; height: auto !important; border: none; }
+  .mermaid-canvas { overflow: visible; }
+  .mermaid-canvas > svg { transform: none !important; }
+  .mermaid-tools, .mermaid-resize, .mermaid-editor { display: none; }
+}

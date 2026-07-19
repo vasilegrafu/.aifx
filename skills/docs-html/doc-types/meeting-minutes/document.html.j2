@@ -1,0 +1,27 @@
+{# type-name: Meeting Minutes #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("attendees", "Attendees &amp; agenda"),
+      ("discussion", "Discussion"),
+      ("decisions", "Decisions"),
+      ("actions", "Action items"),
+  ]) }}
+
+  {% call c.section("attendees", "Attendees &amp; agenda") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("discussion", "Discussion") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("decisions", "Decisions") %}
+    {% call c.callout(type="decision") %}{% call c.prose() %}{% raw %}{{decision}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("actions", "Action items") %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{# type-name: Sprint Retrospective #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("metrics", "Metrics"),
+      ("well", "What went well"),
+      ("improve", "What didn't"),
+      ("actions", "Action items"),
+  ]) }}
+
+  {% call c.section("metrics", "Metrics") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("well", "What went well") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("improve", "What didn't") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("actions", "Action items") %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+{% endblock %}

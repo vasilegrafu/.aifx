@@ -1,0 +1,11 @@
+{% macro change_history(rows) %}
+  <table class="change-history">
+    <caption>Change history</caption>
+    <thead><tr><th>Version</th><th>Date</th><th>Author</th><th>Change</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr><td>{{ r[0] }}</td><td>{{ r[1] }}</td><td>{{ r[2] }}</td><td>{{ r[3] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

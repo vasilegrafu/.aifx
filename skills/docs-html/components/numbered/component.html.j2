@@ -1,0 +1,7 @@
+{% macro numbered(items) %}
+  <ol>
+  {% for s in items %}
+    <li>{{ s }}</li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

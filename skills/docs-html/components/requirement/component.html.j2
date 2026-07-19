@@ -1,0 +1,13 @@
+{% macro requirement(id="REQ-001", title="", priority="must", label="Must", description="", fit="") %}
+  <article class="requirement" id="{{ id }}">
+    <header>
+      <span class="req-id">{{ id }}</span>
+      <h3>{{ title or "{{title}}" }}</h3>
+      <span class="req-priority priority-{{ priority }}">{{ label }}</span>
+    </header>
+    <dl>
+      <dt>Description</dt><dd>{{ description or "{{what the system must do}}" }}</dd>
+      <dt>Fit criterion</dt><dd>{{ fit or "{{measurable pass/fail test}}" }}</dd>
+    </dl>
+  </article>
+{% endmacro %}

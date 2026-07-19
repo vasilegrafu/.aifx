@@ -1,0 +1,6 @@
+{% macro code_block(path="", lang="") %}
+  <figure class="code">
+    <figcaption>{{ path }} <span class="lang">{{ lang }}</span></figcaption>
+    <pre><code{% if lang %} data-lang="{{ lang }}"{% endif %}>{{ caller() }}</code></pre>
+  </figure>
+{% endmacro %}

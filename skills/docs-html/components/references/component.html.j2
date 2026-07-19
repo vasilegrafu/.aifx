@@ -1,0 +1,7 @@
+{% macro references(items) %}
+  <ol class="references">
+  {% for id, text in items %}
+    <li id="{{ id }}">{{ text }}</li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

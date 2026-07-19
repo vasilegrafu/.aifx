@@ -1,0 +1,17 @@
+{# type-name: User Story Backlog #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("epic-1", "{{Epic 1}}"),
+      ("epic-2", "{{Epic 2}}"),
+  ]) }}
+
+  {% call c.section("epic-1", "{{Epic 1 name}}") %}
+    {{ c.requirement(id="STORY-001", priority="must", label="Must") }}
+  {% endcall %}
+
+  {% call c.section("epic-2", "{{Epic 2 name}}") %}
+    {% call c.todo_marker() %}{% raw %}Stories for this epic.{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

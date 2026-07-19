@@ -1,0 +1,10 @@
+{% macro approval_block(rows) %}
+  <table class="approvals">
+    <thead><tr><th>Name</th><th>Role</th><th>Date</th><th>Signature</th></tr></thead>
+    <tbody>
+    {% for name, role in rows %}
+      <tr><td>{{ name }}</td><td>{{ role }}</td><td></td><td></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

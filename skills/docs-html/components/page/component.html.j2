@@ -1,0 +1,8 @@
+{% macro page(heading="", variant="") %}
+  <section class="page{% if variant %} page-{{ variant }}{% endif %}">
+  {% if heading %}
+    <h2>{{ heading }}</h2>
+  {% endif %}
+    {{ caller() }}
+  </section>
+{% endmacro %}

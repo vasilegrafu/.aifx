@@ -1,0 +1,91 @@
+/* docs-html — metadata: cover-style document header, status badges,
+   change history, approval block.
+   Requires base.css. Used by every document. */
+
+/* ---------- metadata-header: corporate title block ---------- */
+.doc-meta {
+  margin: 0 0 var(--block-gap);
+  /* vertical padding only — horizontal 0 keeps the cover text flush with the
+     column edge every other component sits on */
+  padding: 1.2rem 0 1.4rem;
+  border-top: 4px solid var(--accent);
+  border-bottom: 1px solid var(--border);
+}
+
+/* organization line — text comes from brand.css (--brand-name) */
+.doc-meta::before {
+  content: var(--brand-name, "");
+  display: block;
+  font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .16em;
+  color: var(--fg-soft);
+  margin-bottom: 1.5rem;
+}
+
+/* document-type kicker: <p class="doc-type">Architecture Decision Record</p> */
+.doc-meta .doc-type {
+  margin: 0 0 .5rem;
+  font-size: .8rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .16em;
+  color: var(--accent);
+}
+
+.doc-meta h1 { margin-bottom: 1.2rem; }
+
+/* Each field is a label|value pair on one line; the pairs stack vertically.
+   Column 1 (label) is sized to the widest label so all values align. */
+.doc-meta dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .45rem 1.2rem;
+  align-items: baseline;
+  margin: 0;
+}
+.doc-meta dt {
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--fg-soft);
+  margin: 0;
+}
+.doc-meta dd { margin: 0; font-size: .95rem; font-weight: 500; }
+
+/* ---------- change-history ---------- */
+.change-history {
+  font-size: .85rem;
+  border-collapse: collapse; width: 100%;
+  margin: var(--block-gap) 0;
+}
+.change-history th, .change-history td {
+  border: none; border-bottom: 1px solid var(--border);
+  padding: .45rem .9rem .45rem 0; text-align: left;
+}
+.change-history td:nth-child(1),
+.change-history td:nth-child(2) { white-space: nowrap; }
+.change-history th {
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--fg-soft);
+}
+.change-history caption {
+  text-align: left;
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--fg-soft);
+  padding-bottom: .4rem;
+}
+
+/* ---------- approval-block: signature grid for sign-off documents ---------- */
+table.approvals { border-collapse: collapse; width: 100%; margin: var(--block-gap) 0; }
+table.approvals th {
+  border: none; border-bottom: 2px solid var(--border);
+  padding: .45rem .6rem .45rem 0; text-align: left;
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--fg-soft);
+}
+table.approvals td {
+  border: none; border-bottom: 1px solid var(--border);
+  padding: 1.4rem .6rem .45rem 0;
+  vertical-align: bottom;
+  font-size: .95rem;
+}

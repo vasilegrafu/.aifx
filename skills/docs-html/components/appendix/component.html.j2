@@ -1,0 +1,6 @@
+{% macro appendix(id, heading) %}
+    <section class="appendix" id="{{ id }}">
+      <h2>{{ heading }}</h2>
+      {{ caller() }}
+    </section>
+{% endmacro %}

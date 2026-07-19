@@ -1,0 +1,38 @@
+{# type-name: Operations Runbook #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("overview", "Service overview"),
+      ("architecture", "Architecture"),
+      ("routine", "Routine tasks"),
+      ("alerts", "Alerts &amp; responses"),
+      ("recovery", "Recovery procedures"),
+      ("escalation", "Escalation"),
+  ]) }}
+
+  {% call c.section("overview", "Service overview") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("architecture", "Architecture") %}
+    {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  {{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("routine", "Routine tasks") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("alerts", "Alerts &amp; responses") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("recovery", "Recovery procedures") %}
+    {% call c.collapsible(summary="{{failure mode}}") %}{{ c.steps(["{{...}}"]) }}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("escalation", "Escalation") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+{% endblock %}

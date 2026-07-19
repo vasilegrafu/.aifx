@@ -1,0 +1,21 @@
+{# type-name: Presentation #}
+{# body-class: presentation #}
+{% extends "doc-types/base.html.j2" %}
+{% block cover %}{% endblock %}
+{% block content %}
+  {% call c.page(variant="title") %}
+{{ c.metadata_header(type_name, title, author, date, version) }}
+  {% endcall %}
+
+  {% call c.page("{{Agenda}}") %}
+    {{ c.bullets(["{{...}}", "{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.page("{{One idea per page}}") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.page("{{Next steps / asks}}") %}
+    {{ c.bullets(["{{...}}", "{{...}}"]) }}
+  {% endcall %}
+{% endblock %}

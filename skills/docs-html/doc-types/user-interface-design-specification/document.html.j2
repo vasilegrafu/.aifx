@@ -1,0 +1,33 @@
+{# type-name: User Interface Design Specification #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("principles", "Principles"),
+      ("screens", "Screens"),
+      ("components", "Components"),
+      ("flows", "Interaction flows"),
+      ("accessibility", "Accessibility"),
+  ]) }}
+
+  {% call c.section("principles", "Principles") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("screens", "Screens") %}
+    {{ c.figure(src="{{path-or-data-uri}}", alt="{{describe the screen}}", caption="{{screen name and purpose}}") }}
+  {% endcall %}
+
+  {% call c.section("components", "Components") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("flows", "Interaction flows") %}
+    {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  {{screen}} --> {{next screen}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("accessibility", "Accessibility") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+{% endblock %}

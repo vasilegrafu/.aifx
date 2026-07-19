@@ -1,0 +1,19 @@
+{% macro acceptance_criteria(id="AC-1", title="", given=[], when=[], then=[]) %}
+  <div class="acceptance" id="{{ id }}">
+    <div class="ac-head">
+      <span class="ac-id">{{ id }}</span>
+      {% if title %}<span class="ac-title">{{ title }}</span>{% endif %}
+    </div>
+    <dl class="gwt">
+    {% for clause in (given or ["{{precondition that holds before the action}}"]) %}
+      <dt class="kw-given">{{ "Given" if loop.first else "and" }}</dt><dd>{{ clause }}</dd>
+    {% endfor %}
+    {% for clause in (when or ["{{action the actor performs}}"]) %}
+      <dt class="kw-when">{{ "When" if loop.first else "and" }}</dt><dd>{{ clause }}</dd>
+    {% endfor %}
+    {% for clause in (then or ["{{observable, checkable outcome}}"]) %}
+      <dt class="kw-then">{{ "Then" if loop.first else "and" }}</dt><dd>{{ clause }}</dd>
+    {% endfor %}
+    </dl>
+  </div>
+{% endmacro %}

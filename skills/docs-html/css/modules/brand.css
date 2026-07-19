@@ -1,0 +1,16 @@
+/* docs-html — brand: organization identity.
+   THE ONLY FILE TO EDIT WHEN REBRANDING — every document in every project
+   follows it instantly. Imported by base.css (documents never link it
+   directly).
+
+   --brand-name    appears above the title of every document (small caps).
+                   Set to "" to hide it.
+   --brand-accent  the primary color: headings rule, links, kickers,
+                   steps, accents. Pick a corporate tone (deep navy,
+                   burgundy, forest…) — base.css derives soft tints from
+                   it where possible. */
+
+:root {
+  --brand-name: "solution.atlas";
+  --brand-accent: #1f4e8c;
+}

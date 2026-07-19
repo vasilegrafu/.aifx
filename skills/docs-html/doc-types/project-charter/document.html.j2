@@ -1,0 +1,80 @@
+{# type-name: Project Charter #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("purpose", "Purpose &amp; justification"),
+      ("objectives", "Objectives"),
+      ("scope", "Scope"),
+      ("stakeholders", "Stakeholders &amp; roles"),
+      ("milestones", "Milestones"),
+      ("budget", "Budget summary"),
+      ("assumptions", "Assumptions &amp; constraints"),
+      ("authorisation", "Authorisation"),
+  ]) }}
+
+  {% call c.section("purpose", "Purpose &amp; justification") %}
+    {% call c.lead() %}{% raw %}{{why this project exists and the business need it serves, in two sentences}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("objectives", "Objectives") %}
+    {% call c.prose() %}Each objective is measurable and time-bound.{% endcall %}
+    {{ c.checklist([
+        ("pending", "{{objective — the measurable outcome and its deadline}}"),
+        ("pending", "{{objective}}"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("scope", "Scope") %}
+    {% call c.subsection("scope-in", "In scope") %}
+      {{ c.bullets(["{{deliverable / area included}}"]) }}
+    {% endcall %}
+    {% call c.subsection("scope-out", "Out of scope") %}
+      {{ c.bullets(["{{explicitly excluded — prevents scope creep}}"]) }}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("stakeholders", "Stakeholders &amp; roles") %}
+    {{ c.facts([
+        ("Sponsor", "{{name — funds and authorises}}"),
+        ("Project manager", "{{name — single point of accountability}}"),
+    ]) }}
+    {{ c.table(["Stakeholder", "Role / interest", "Involvement"], [
+        ["{{name / group}}", "{{their stake}}", "{{consulted / informed / …}}"],
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("milestones", "Milestones") %}
+    {{ c.timeline([
+        ("done", "{{date}}", "{{Charter approved}}", "{{}}"),
+        ("current", "{{date}}", "{{milestone}}", "{{}}"),
+        ("", "{{date}}", "{{milestone}}", "{{}}"),
+        ("", "{{date}}", "{{Delivery}}", "{{}}"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("budget", "Budget summary") %}
+    {{ c.kpi_tiles([
+        ("{{$}}", "Total budget", "flat", "{{}}"),
+        ("{{n}}", "Team size", "flat", "{{}}"),
+        ("{{n mo}}", "Duration", "flat", "{{}}"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("assumptions", "Assumptions &amp; constraints") %}
+    {% call c.subsection("assumptions-list", "Assumptions") %}
+      {{ c.bullets(["{{assumption held true for planning}}"]) }}
+    {% endcall %}
+    {% call c.subsection("constraints-list", "Constraints") %}
+      {{ c.bullets(["{{fixed limit — budget, deadline, technology, regulation}}"]) }}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("authorisation", "Authorisation") %}
+    {% call c.prose() %}This charter authorises the project and the named project manager to proceed.{% endcall %}
+    {{ c.approval_block([
+        ("{{name}}", "Sponsor"),
+        ("{{name}}", "Project manager"),
+    ]) }}
+  {% endcall %}
+
+{% endblock %}

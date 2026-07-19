@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} — {{ type_name }}</title>
+{% if cdn_href %}
+  <link rel="stylesheet" href="{{ skill_href }}/css/docs-html.css"
+        onerror="this.onerror=null;this.href='{{ cdn_href }}/css/docs-html.css'">
+  <script src="{{ skill_href }}/js/docs-html.js" defer
+          onerror="var s=document.createElement('script');s.src='{{ cdn_href }}/js/docs-html.js';s.defer=true;document.head.appendChild(s)"></script>
+{% else %}
+  <link rel="stylesheet" href="{{ skill_href }}/css/docs-html.css">
+  <script src="{{ skill_href }}/js/docs-html.js" defer></script>
+{% endif %}
+</head>
+<body{% if body_class %} class="{{ body_class }}"{% endif %}>
+{% if body_class != "presentation" %}
+  <div class="doc-toolbar" role="group" aria-label="Document width">
+    <button type="button" data-w="page" aria-label="Page width" title="Page width (1024px)">▯</button>
+    <button type="button" data-w="wide" aria-label="Full width" title="Full width">▭</button>
+  </div>
+{% endif %}
+
+  <main>
+{% block cover %}
+{{ c.metadata_header(type_name, title, author, date, version) }}
+{% endblock %}
+{% block content %}{% endblock %}
+  </main>
+</body>
+</html>

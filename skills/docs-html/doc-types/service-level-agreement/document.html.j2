@@ -1,0 +1,38 @@
+{# type-name: Service Level Agreement #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("parties", "Parties &amp; services"),
+      ("levels", "Service levels"),
+      ("responsibilities", "Responsibilities"),
+      ("reporting", "Reporting"),
+      ("remedies", "Remedies"),
+      ("approval", "Approval"),
+  ]) }}
+
+  {% call c.section("parties", "Parties &amp; services") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("levels", "Service levels") %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("responsibilities", "Responsibilities") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("reporting", "Reporting") %}
+    {% call c.prose() %}{% raw %}{{cadence, format, who receives it}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("remedies", "Remedies") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("approval", "Approval") %}
+    {{ c.approval_block([("{{name}}", "{{role}}")]) }}
+  {% endcall %}
+
+{% endblock %}

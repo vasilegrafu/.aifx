@@ -1,0 +1,39 @@
+{# type-name: Coding Standards #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("scope", "Scope"),
+      ("naming", "Naming"),
+      ("formatting", "Formatting"),
+      ("patterns", "Patterns"),
+      ("testing", "Testing expectations"),
+      ("tooling", "Tooling"),
+  ]) }}
+
+  {% call c.section("scope", "Scope") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("naming", "Naming") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("formatting", "Formatting") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("patterns", "Patterns") %}
+    {% call c.code_block(path="Prefer", lang="{{lang}}") %}{% raw %}{{good example}}{% endraw %}{% endcall %}
+    {% call c.code_block(path="Avoid", lang="{{lang}}") %}{% raw %}{{bad example}}{% endraw %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{why}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("testing", "Testing expectations") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("tooling", "Tooling") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+{% endblock %}

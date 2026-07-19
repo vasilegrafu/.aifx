@@ -1,0 +1,69 @@
+{# type-name: Business Case #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("summary", "Executive summary"),
+      ("problem", "Problem &amp; opportunity"),
+      ("options", "Options considered"),
+      ("costs-benefits", "Costs &amp; benefits"),
+      ("financials", "Financial summary"),
+      ("risks", "Risks"),
+      ("recommendation", "Recommendation"),
+      ("approval", "Approval"),
+  ]) }}
+
+  {% call c.section("summary", "Executive summary") %}
+    {% call c.lead() %}{% raw %}{{the ask and the expected return, in three sentences}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("problem", "Problem &amp; opportunity") %}
+    {% call c.prose() %}{% raw %}{{the business problem or opportunity, quantified — what it costs to leave unaddressed}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("options", "Options considered") %}
+    {% call c.prose() %}Each option is weighed against the do-nothing baseline.{% endcall %}
+    {{ c.table(["Option", "Summary", "One-off cost", "Ongoing / yr"], [
+        ["Do nothing", "{{baseline consequence}}", "—", "{{cost of the status quo}}"],
+        ["{{option A}}", "{{summary}}", "{{$}}", "{{$}}"],
+        ["{{option B}}", "{{summary}}", "{{$}}", "{{$}}"],
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("costs-benefits", "Costs &amp; benefits") %}
+    {{ c.table(["Line item", "Type", "Year 1", "Year 2", "Year 3"], [
+        ["{{implementation}}", "Cost", "{{$}}", "{{$}}", "{{$}}"],
+        ["{{licences / ops}}", "Cost", "{{$}}", "{{$}}", "{{$}}"],
+        ["{{efficiency saving}}", "Benefit", "{{$}}", "{{$}}", "{{$}}"],
+        ["{{revenue uplift}}", "Benefit", "{{$}}", "{{$}}", "{{$}}"],
+    ]) }}
+    {% call c.callout(type="note") %}{% call c.prose() %}Non-quantified benefits (not in the figures above): {% raw %}{{e.g. improved compliance posture, reduced key-person risk}}{% endraw %}.{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("financials", "Financial summary") %}
+    {{ c.kpi_tiles([
+        ("{{x%}}", "3-yr ROI", "up", "{{vs target}}"),
+        ("{{n mo}}", "Payback period", "flat", "{{}}"),
+        ("{{$}}", "3-yr net benefit", "up", "{{}}"),
+        ("{{$}}", "Year-1 investment", "flat", "{{}}"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("risks", "Risks") %}
+    {{ c.table(["Risk", "Likelihood", "Impact", "Mitigation"], [
+        ["{{risk}}", "{{L/M/H}}", "{{L/M/H}}", "{{mitigation}}"],
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("recommendation", "Recommendation") %}
+    {% call c.callout(type="decision") %}{% call c.prose() %}{% raw %}{{recommended option and the funding ask, in one sentence}}{% endraw %}{% endcall %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{why this option follows from the analysis above}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("approval", "Approval") %}
+    {{ c.approval_block([
+        ("{{name}}", "Sponsor"),
+        ("{{name}}", "Finance"),
+    ]) }}
+  {% endcall %}
+
+{% endblock %}

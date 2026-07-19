@@ -1,0 +1,30 @@
+{# type-name: API Specification #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("conventions", "Conventions"),
+      ("endpoints", "Endpoints"),
+      ("models", "Data models"),
+      ("errors", "Error codes"),
+  ]) }}
+
+  {% call c.section("conventions", "Conventions") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("endpoints", "Endpoints") %}
+    {% call c.subsection("{{endpoint-slug}}", "{{GET}} {{/path}}") %}{% endcall %}
+    {% call c.prose() %}{% raw %}{{what it does}}{% endraw %}{% endcall %}
+    {% call c.code_block(path="Request", lang="http") %}{% raw %}{{GET /path?param=value}}{% endraw %}{% endcall %}
+    {% call c.code_block(path="Response 200", lang="json") %}{% raw %}{{ "field": "value" }}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("models", "Data models") %}
+    {% call c.code_block(path="{{Model}}", lang="json") %}{% raw %}{{ "id": "string", "amount": 0 }}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("errors", "Error codes") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+{% endblock %}

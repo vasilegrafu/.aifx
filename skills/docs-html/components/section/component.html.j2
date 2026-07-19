@@ -1,0 +1,6 @@
+{% macro section(id, heading) %}
+  <section id="{{ id }}">
+    <h2>{{ heading }}</h2>
+    {{ caller() }}
+  </section>
+{% endmacro %}

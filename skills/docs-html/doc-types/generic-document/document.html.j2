@@ -1,0 +1,17 @@
+{# type-name: {{Document Type}} #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("summary", "Summary"),
+      ("details", "Details"),
+  ]) }}
+
+  {% call c.section("summary", "Summary") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("details", "Details") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

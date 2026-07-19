@@ -1,0 +1,38 @@
+{# type-name: Incident Postmortem #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("summary", "Summary"),
+      ("timeline", "Timeline"),
+      ("root-cause", "Root cause"),
+      ("impact", "Impact"),
+      ("action-items", "Action items"),
+      ("lessons", "Lessons learned"),
+  ]) }}
+
+  {% call c.section("summary", "Summary") %}
+    {% call c.lead() %}{% raw %}{{what happened, in 1-2 sentences}}{% endraw %}{% endcall %}
+    {{ c.kpi_tiles([("{{value}}", "{{label}}", "up", "▲ {{delta}}")]) }}
+  {% endcall %}
+
+  {% call c.section("timeline", "Timeline") %}
+    {{ c.timeline([("done", "{{when}}", "{{title}}", "{{...}}")]) }}
+  {% endcall %}
+
+  {% call c.section("root-cause", "Root cause") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("impact", "Impact") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("action-items", "Action items") %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+  {% call c.section("lessons", "Lessons learned") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

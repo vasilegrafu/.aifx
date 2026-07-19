@@ -1,0 +1,17 @@
+/* docs-html — toc: the static, hand-maintained table of contents.
+   Requires base.css. Link in every regular document (not presentations). */
+
+nav.toc {
+  margin: var(--block-gap) 0;
+  padding-top: 1.1rem;
+  padding-bottom: 1.2rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+nav.toc .toc-title { margin: 0 0 .7rem; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc ul ul { padding-left: 1.3rem; }
+nav.toc li { padding: .16rem 0; font-size: .95rem; }
+nav.toc a { color: var(--fg); font-weight: 500; }
+nav.toc ul ul a { color: var(--fg-soft); font-weight: 400; }
+nav.toc a:hover { color: var(--accent); text-decoration: none; }

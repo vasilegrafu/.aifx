@@ -1,0 +1,3 @@
+{% macro lead(text="") %}
+  <p class="lead">{{ caller() if caller else text }}</p>
+{% endmacro %}

@@ -1,0 +1,245 @@
+{# type-name: Component Showcase #}
+{# Source template for showcase.html — regenerate with:
+     python builder.py showcase
+   Exercises every catalog component through its real macro, so the gallery
+   can never drift from the fragments. Open the composed showcase.html in a
+   browser after ANY change to css/ or js/ — those changes hit all documents.
+
+   `mark(name)` is gallery-only chrome (styled by css/modules/gallery.css):
+   a labeled divider naming the component demoed directly below it, so every
+   rendered block traces back to components/<name>/. Documents never use it. #}
+{% extends "doc-types/base.html.j2" %}
+
+{% macro mark(name) %}
+  <div class="component-label"><span>{{ name }}</span></div>
+{% endmacro %}
+
+{% block cover %}
+{{ super() }}
+{{ c.change_history([
+    ("1.0", "2026-07-16", "docs-html", "Initial showcase"),
+    ("5.0", "2026-07-17", "docs-html", "blocks.css: requirement cards, kpi-tiles, timeline, glossary, revision-note, ISO front/back matter"),
+    ("7.0", "2026-07-17", "docs-html", "Metadata reduced to Author / Date / Version"),
+    ("8.0", "2026-07-18", "docs-html", "Generated from showcase.html.j2 — every demo now calls its real component macro"),
+    ("9.0", "2026-07-18", "docs-html", "Component-name labels over every demo; added lead, bullets, numbered"),
+    ("10.0", "2026-07-19", "docs-html", "Code is plain text + data-lang — coloring moved to view time (Prism via docs-html.js)"),
+]) }}
+{% endblock %}
+
+{% block content %}
+  {{ mark("toc") }}
+  {{ c.toc([
+      ("callouts", "Callouts"),
+      ("lead", "Lead paragraph"),
+      ("diagram", "Diagram (mermaid)"),
+      ("code", "Code blocks"),
+      ("tables", "Tables"),
+      ("todo-and-trace", "Todo marker &amp; trace IDs"),
+      ("collapsible", "Collapsible"),
+      ("facts-steps-checklist", "Facts, steps, checklist"),
+      ("prose-lists", "Prose lists"),
+      ("requirements", "Requirement cards"),
+      ("acceptance", "Acceptance criteria"),
+      ("kpis", "KPI tiles"),
+      ("timeline", "Timeline"),
+      ("glossary", "Glossary &amp; revision note"),
+      ("references", "References &amp; appendices"),
+      ("figure", "Figure"),
+      ("approvals", "Approvals"),
+      ("structural", "Structural components"),
+  ]) }}
+
+  {% call c.section("callouts", "Callouts") %}
+    {{ mark("callout") }}
+    {% call c.callout("note") %}{% call c.prose() %}Supplementary context the reader may want.{% endcall %}{% endcall %}
+    {% call c.callout("warning") %}{% call c.prose() %}Consequences if this is ignored: data loss on rollback.{% endcall %}{% endcall %}
+    {% call c.callout("decision") %}{% call c.prose() %}We will use PostgreSQL as the primary store.{% endcall %}{% endcall %}
+    {% call c.callout("risk") %}{% call c.prose() %}The gateway session drops nightly; no automated re-login exists yet.{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("lead", "Lead paragraph") %}
+    {{ mark("lead") }}
+    {% call c.lead() %}The executive-summary opener: one emphasised paragraph stating what this document establishes and why it matters, before any detail.{% endcall %}
+  {% endcall %}
+
+  {% call c.section("diagram", "Diagram (mermaid)") %}
+    {{ mark("diagram-mermaid") }}
+    {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  user([User]) --> app[Web App]
+  app --> api[API]
+  api --> db[(PostgreSQL)]
+  api --> mq[[Message Queue]]{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("code", "Code blocks") %}
+    {% call c.subsection("code-plain", "Plain form") %}
+      {{ mark("code") }}
+      {% call c.code() %}{% raw %}def rate_limited(partition: str) -> bool:
+    """Partition-keyed rate limiter check."""
+    return limiter.acquire(partition){% endraw %}{% endcall %}
+    {% endcall %}
+    {% call c.subsection("code-framed", "Framed form — title bar + runtime syntax coloring") %}
+      {{ mark("code-block") }}
+      {% call c.code_block(path="devfx/patterns/rate_limiter.py", lang="python") %}{% raw %}from devfx.patterns import RateLimiter
+
+def rate_limited(partition: str) -> bool:
+    """Partition-keyed rate limiter check."""
+    # one limiter instance per partition key
+    limiter = RateLimiter(max_calls=30, per_seconds=60)
+    return limiter.acquire(partition) is not None{% endraw %}{% endcall %}
+    {% endcall %}
+    {% call c.prose() %}Inline code: <code>docs/</code> holds only documents. The document holds PLAIN text — <code>data-lang</code> declares the language and coloring happens at view time in the browser.{% endcall %}
+  {% endcall %}
+
+  {% call c.section("tables", "Tables") %}
+    {{ mark("table") }}
+    {{ c.table(["Option", "Pros", "Cons"], [
+        ["PostgreSQL", "mature, SQL", "ops overhead"],
+        ["SQLite", "zero ops", "single writer"],
+    ]) }}
+    {{ c.table(
+        ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5", "Col 6", "Col 7", "Col 8", "Col 9", "Col 10"],
+        [["wide", "table", "scrolls", "inside", "its", "own", "container", "not", "the", "page"]],
+        wide=true) }}
+  {% endcall %}
+
+  {% call c.section("todo-and-trace", "Todo marker &amp; trace IDs") %}
+    {{ mark("todo-marker") }}
+    {% call c.prose() %}{{ c.todo_marker("Verify: does the gateway retry on 429?") }}{% endcall %}
+    {{ mark("trace-id") }}
+    {% call c.prose() %}Definition: {{ c.trace_id("REQ-042") }} — referenced as <a href="#REQ-042" data-trace="REQ-042">REQ-042</a>.{% endcall %}
+  {% endcall %}
+
+  {% call c.section("collapsible", "Collapsible") %}
+    {{ mark("collapsible") }}
+    {% call c.collapsible(summary="Full error payload") %}
+      {% call c.code() %}{% raw %}{ "error": "rate_limited", "retry_after": 30 }{% endraw %}{% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("facts-steps-checklist", "Facts, steps, checklist") %}
+    {{ mark("facts") }}
+    {{ c.facts([
+        ("Environment", "production"),
+        ("Endpoint", "<code>https://api.example.com</code>"),
+    ]) }}
+    {{ mark("steps") }}
+    {{ c.steps([
+        "Stop the service: <code>systemctl stop atlas</code>",
+        "Restore the snapshot.",
+        "Start and verify health.",
+    ]) }}
+    {{ mark("checklist") }}
+    {{ c.checklist([
+        ("done", "TC-001 login happy path"),
+        ("pending", "TC-002 wrong password"),
+        ("blocked", "TC-003 SSO — awaiting test tenant"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("prose-lists", "Prose lists") %}
+    {{ mark("bullets") }}
+    {{ c.bullets([
+        "Unordered points for parallel, unranked facts.",
+        "Each item one idea; no nested essays.",
+    ]) }}
+    {{ mark("numbered") }}
+    {{ c.numbered([
+        "Ordered points when sequence or rank matters.",
+        "Numbering is automatic — never typed into the text.",
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("requirements", "Requirement cards") %}
+    {{ mark("requirement") }}
+    {{ c.requirement(id="REQ-014", title="Portfolio revaluation latency",
+        priority="must", label="Must",
+        description="The displayer revalues an open portfolio within 500 ms of a price tick.",
+        fit="p95 tick-to-render under 500 ms at 200 positions.") }}
+    {{ c.requirement(id="REQ-021", title="Overnight session recovery",
+        priority="should", label="Should",
+        description="The gateway re-authenticates without operator action after a nightly drop.",
+        fit="Session restored within 2 min of disconnect, logged.") }}
+  {% endcall %}
+
+  {% call c.section("acceptance", "Acceptance criteria") %}
+    {{ mark("acceptance-criteria") }}
+    {{ c.acceptance_criteria(id="AC-014", title="Wrong password is rejected",
+        given=["a registered user", "the account is not locked"],
+        when=["they submit an incorrect password"],
+        then=["the login is refused", "the failed-attempt counter increments"]) }}
+  {% endcall %}
+
+  {% call c.section("kpis", "KPI tiles") %}
+    {{ mark("kpi-tiles") }}
+    {{ c.kpi_tiles([
+        ("99.2%", "Test pass rate", "up", "▲ 1.4 pts"),
+        ("3", "Open blockers", "down", "▼ 2"),
+        ("142", "Commits this sprint", "flat", "—"),
+        ("480 ms", "p95 revaluation", "up", "under target"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("timeline", "Timeline") %}
+    {{ mark("timeline") }}
+    {{ c.timeline([
+        ("done", "2026-Q1", "Importer rewrite shipped", "All eight domains on the new session builder."),
+        ("current", "2026-Q3", "Portfolio app v2", "webapi + webapp split; v1 kept read-only."),
+        ("", "2026-Q4", "Research workspace", "Planned."),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("glossary", "Glossary &amp; revision note") %}
+    {{ mark("glossary") }}
+    {% call c.prose() %}An inline definition: the <dfn>fit criterion</dfn> is the measurable pass/fail test for a requirement.{% endcall %}
+    {{ c.glossary([
+        ("term-adr", "ADR", "Architecture Decision Record — a dated, immutable record of one significant decision and its context."),
+        ("term-cgnat", "CGNAT", "Carrier-Grade NAT — ISP-side address sharing that breaks per-connection session affinity."),
+    ]) }}
+    {{ mark("revision-note") }}
+    {% call c.revision_note(rev="v1.2") %}Retry policy clarified after the 2026-06 review: 3 attempts, 30 s backoff.{% endcall %}
+  {% endcall %}
+
+  {% call c.section("references", "References &amp; appendices") %}
+    {{ mark("references") }}
+    {{ c.references([
+        ("ref-29148", "ISO/IEC/IEEE 29148:2018, Requirements engineering."),
+        ("ref-adr", "Nygard, M. <em>Documenting Architecture Decisions</em>, 2011."),
+    ]) }}
+    {{ mark("appendices + appendix") }}
+    {% call c.appendices() %}
+      {% call c.appendix("appendix-schema", "Data model") %}
+        {% call c.prose() %}Renders as "Appendix A. Data model" — lettering is CSS-generated and isolated from the body's section numbering.{% endcall %}
+      {% endcall %}
+      {% call c.appendix("appendix-config", "Configuration reference") %}
+        {% call c.prose() %}Renders as "Appendix B. Configuration reference".{% endcall %}
+      {% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("figure", "Figure") %}
+    {{ mark("figure") }}
+    {{ c.figure(
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='120'%3E%3Crect width='320' height='120' fill='%23ddd'/%3E%3Ctext x='160' y='66' text-anchor='middle' font-family='sans-serif' fill='%23555'%3Escreenshot placeholder%3C/text%3E%3C/svg%3E",
+        alt="placeholder figure",
+        caption="A figure with mandatory caption and alt text.") }}
+  {% endcall %}
+
+  {% call c.section("approvals", "Approvals") %}
+    {{ mark("approval-block") }}
+    {{ c.approval_block([
+        ("Vasile Grafu", "Author"),
+        ("", "Product Owner"),
+    ]) }}
+  {% endcall %}
+
+  {% call c.section("structural", "Structural components") %}
+    {% call c.prose() %}Not shown as separate demos because this page is built from them:
+      <code>metadata-header</code> and <code>change-history</code> form the cover above,
+      <code>toc</code> is the contents block, and <code>section</code>,
+      <code>subsection</code>, <code>prose</code> wrap every demo on this page.
+      <code>page</code> renders only inside <code>&lt;body class="presentation"&gt;</code> —
+      see the presentation doc-type. <code>front-back-matter</code> is guidance-only
+      (no macro).{% endcall %}
+  {% endcall %}
+{% endblock %}

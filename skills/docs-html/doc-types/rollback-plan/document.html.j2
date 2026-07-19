@@ -1,0 +1,32 @@
+{# type-name: Rollback Plan #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("triggers", "Trigger conditions"),
+      ("impact", "Impact"),
+      ("steps", "Rollback steps"),
+      ("verify", "Verification"),
+      ("data", "Data considerations"),
+  ]) }}
+
+  {% call c.section("triggers", "Trigger conditions") %}
+    {{ c.bullets(["{{...}}"]) }}
+  {% endcall %}
+
+  {% call c.section("impact", "Impact") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("steps", "Rollback steps") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("verify", "Verification") %}
+    {{ c.checklist([("pending", "{{item}}")]) }}
+  {% endcall %}
+
+  {% call c.section("data", "Data considerations") %}
+    {% call c.callout(type="risk") %}{% call c.prose() %}{% raw %}{{data risk}} — {{handling}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

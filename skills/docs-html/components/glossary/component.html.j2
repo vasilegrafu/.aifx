@@ -1,0 +1,7 @@
+{% macro glossary(terms) %}
+  <dl class="glossary">
+  {% for id, term, desc in terms %}
+    <dt id="{{ id }}">{{ term }}</dt><dd>{{ desc }}</dd>
+  {% endfor %}
+  </dl>
+{% endmacro %}

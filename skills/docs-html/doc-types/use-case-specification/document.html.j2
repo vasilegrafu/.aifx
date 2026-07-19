@@ -1,0 +1,32 @@
+{# type-name: Use Case Specification #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("actors", "Actors &amp; preconditions"),
+      ("main-flow", "Main flow"),
+      ("alternate", "Alternate flows"),
+      ("exceptions", "Exception flows"),
+      ("postconditions", "Postconditions"),
+  ]) }}
+
+  {% call c.section("actors", "Actors &amp; preconditions") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("main-flow", "Main flow") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("alternate", "Alternate flows") %}
+    {% call c.prose() %}{% raw %}{{Na}}. {{condition}} — {{outcome}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("exceptions", "Exception flows") %}
+    {% call c.callout(type="warning") %}{% call c.prose() %}{% raw %}{{failure}} — {{handling}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("postconditions", "Postconditions") %}
+    {% call c.prose() %}{% raw %}{{...}}{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{# type-name: Defect Report #}
+{% extends "doc-types/base.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      ("environment", "Environment"),
+      ("reproduce", "Steps to reproduce"),
+      ("expected-actual", "Expected vs actual"),
+      ("evidence", "Evidence"),
+      ("root-cause", "Root cause &amp; fix"),
+  ]) }}
+
+  {% call c.section("environment", "Environment") %}
+    {{ c.facts([("{{key}}", "{{value}}")]) }}
+  {% endcall %}
+
+  {% call c.section("reproduce", "Steps to reproduce") %}
+    {{ c.steps(["{{step}}"]) }}
+  {% endcall %}
+
+  {% call c.section("expected-actual", "Expected vs actual") %}
+    {{ c.table(["{{col1}}", "{{col2}}"], [["{{...}}", "{{...}}"]]) }}
+  {% endcall %}
+
+  {% call c.section("evidence", "Evidence") %}
+    {% call c.collapsible(summary="Log / payload") %}{% call c.code() %}{% raw %}{{...}}{% endraw %}{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {% call c.section("root-cause", "Root cause &amp; fix") %}
+    {% call c.todo_marker() %}{% raw %}Root cause pending diagnosis.{% endraw %}{% endcall %}
+  {% endcall %}
+
+{% endblock %}
