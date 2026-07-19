@@ -115,11 +115,16 @@ If the CDN is unreachable, `diagrams.css` leaves the Mermaid source visible as a
 readable code box — the page still works, just without rendered diagrams.
 
 **The href to the skill** is resolved by `builder.py` at compose time and used
-for both lines:
-- Document on the SAME drive as this skill → the relative path from `docs/`,
-  i.e. `../.claude/skills/docs-html` — portable for everyone who clones.
-- A DIFFERENT drive → the absolute `file:///` URL of this skill directory. If
-  the skill moves, sweep the documents' heads.
+for both lines, in preference order:
+1. **Through the project's junction/symlink** — when
+   `<project>/.claude/skills/docs-html` exists, the href is
+   `../.claude/skills/docs-html`: it never leaves the project, and it is
+   identical on every machine regardless of where the shared `.claudefx`
+   clone lives (the junction absorbs that). This is the canonical local form.
+2. Same drive, no junction → the relative path to the skill directory itself.
+3. Different drive → the absolute `file:///` URL. If the skill moves, sweep
+   the documents' heads (the CDN `onerror` fallback covers documents opened
+   where no local copy exists at all).
 
 **Versioning.** The design-system version lives in exactly two files at the
 skill root and NOWHERE else (not in the CSS, not in the JS): `version.json`

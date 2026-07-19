@@ -161,9 +161,15 @@ def cdn_href() -> str:
 def skill_href(out_dir: Path) -> str:
     """How the composed document links back to this skill's css/ and js/.
 
-    Same drive  -> relative path (portable for everyone who clones the repo).
-    Other drive -> absolute file:// URL (relpath is impossible on Windows).
+    Preferred: THROUGH the consuming project's `.claude/skills/docs-html`
+    junction/symlink (out_dir is `<project>/docs`, so `../.claude/...`) — the
+    path stays inside the project and is identical on every machine, wherever
+    the shared .claudefx clone lives. Otherwise: relative path to the skill
+    itself (same drive), or an absolute file:// URL (cross-drive).
     """
+    junction = out_dir.parent / ".claude" / "skills" / "docs-html"
+    if (junction / "SKILL.md").is_file():
+        return "../.claude/skills/docs-html"
     try:
         return os.path.relpath(SKILL_DIR, out_dir).replace(os.sep, "/")
     except ValueError:
