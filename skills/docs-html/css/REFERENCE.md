@@ -11,7 +11,7 @@ of its own — it declares the cascade order once with `@layer`, then `@import`s
 the modules in `css/modules/`:
 
 ```css
-@layer base, metadata, toc, content, callouts, lists, blocks, business, code,
+@layer base, metadata, layout, toc, content, callouts, lists, blocks, business, code,
        math, diagrams, chart, presentation, print;
 ```
 
@@ -30,6 +30,7 @@ Which `css/modules/` file styles which components:
 | `brand.css` | organization identity: `--brand-name`, `--brand-accent`. Imported by base.css — never referenced by documents. THE file a corporation edits to rebrand everything |
 | `base.css` | fonts (Inter + JetBrains Mono via CDN), tokens, typography, layout, the layout-toggle toolbar, opt-in numbering — always |
 | `metadata.css` | metadata-header (cover title block), change-history, approval-block |
+| `layout.css` | spatial primitives: `columns`/`column` (responsive flex row), `grid` (auto-fit tiles), `card` (titled surface). Collapses to one column on narrow width + print |
 | `toc.css` | the static TOC (regular documents; not presentations) |
 | `content.css` | table, plain code, figure, collapsible, quote, comparison-table |
 | `code.css` | framed code blocks (`figure.code` title bar) + the runtime syntax palette (`.token.*`, applied by docs-html.js/Prism) |

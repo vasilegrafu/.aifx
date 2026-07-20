@@ -25,6 +25,36 @@
 {% extends "doc-types/base.html.j2" %}
 
 {% block head %}
+<script>
+  /* Gallery asset strategy (this page only — documents stay CDN-only).
+     base.html.j2 links the LOCAL working-tree assets (../css, ../js), so the
+     gallery previews the CURRENT tree; served from the CDN, those relative
+     paths resolve inside the same pinned tag. If the local assets are absent
+     (e.g. this file was copied out of the repo), fall back to the pinned CDN so
+     the page still renders. Local first, CDN only if local is missing. */
+  (function () {
+    var CDN = "{{ cdn_fallback }}";
+    document.addEventListener("DOMContentLoaded", function () {
+      var cssOk = false;
+      try {
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var s = document.styleSheets[i];
+          if (s.href && /\/css\/docs-html\.css(\?|$)/.test(s.href) && s.cssRules && s.cssRules.length) { cssOk = true; break; }
+        }
+      } catch (e) { cssOk = true; }   /* cross-origin sheet already loaded → fine */
+      if (!cssOk) {
+        var l = document.createElement("link");
+        l.rel = "stylesheet"; l.href = CDN + "/css/docs-html.css";
+        document.head.appendChild(l);
+      }
+      if (!window.docsHtml) {   /* the local loader defines this; absent → local js 404'd */
+        var sc = document.createElement("script");
+        sc.src = CDN + "/js/docs-html.js"; sc.defer = true;
+        document.head.appendChild(sc);
+      }
+    });
+  })();
+</script>
 <style>
   /* -------------------------------------------------------------------------
      showcase chrome (gx- namespace) — page-local styles for THIS page only.
@@ -99,6 +129,7 @@
 {% block content %}
   {{ c.toc([
       ("structure", "Structure"),
+      ("layout", "Layout"),
       ("content", "Content"),
       ("lists", "Lists"),
       ("callouts", "Callouts"),
@@ -110,7 +141,7 @@
   ]) }}
 
   {# ========================= STRUCTURE ========================= #}
-  {{ cat("structure", "Category 01 / 09", "Structure") }}
+  {{ cat("structure", "Category 01 / 10", "Structure") }}
 
   {{ spec("Lead paragraph", "lead") }}
   {% call c.lead() %}The executive-summary opener: one emphasised paragraph stating what this document establishes and why it matters, before any detail.{% endcall %}
@@ -132,8 +163,42 @@
     <code>&lt;body class="presentation"&gt;</code>, see the presentation doc-type.</small>{% endcall %}
 
 
+  {# ========================= LAYOUT ========================= #}
+  {{ cat("layout", "Category 02 / 10", "Layout") }}
+
+  {{ spec("Columns — side by side, with a wider cell", "columns") }}
+  {% call c.columns() %}
+    {% call c.column(span=2) %}
+      {% call c.chart_echarts(height=260) %}{% raw %}
+{
+  "tooltip": { "trigger": "axis" },
+  "xAxis": { "type": "category", "data": ["Q1", "Q2", "Q3", "Q4"] },
+  "yAxis": { "type": "value" },
+  "series": [{ "type": "bar", "name": "Revenue", "data": [120, 145, 132, 168] }]
+}
+{% endraw %}{% endcall %}
+    {% endcall %}
+    {% call c.column() %}
+      {% call c.callout("note") %}The chart takes two thirds of the row (<code>span=2</code>); this reading of it sits alongside in the remaining third. On a phone or in print they stack.{% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {{ spec("Grid — auto-fit equal tiles of cards", "grid") }}
+  {% call c.grid() %}
+    {% call c.card("Throughput") %}{% call c.prose() %}<strong>1,240</strong> req/s sustained across the fleet this quarter.{% endcall %}{% endcall %}
+    {% call c.card("Latency") %}{% call c.prose() %}<strong>68 ms</strong> p95, within the 100 ms budget.{% endcall %}{% endcall %}
+    {% call c.card("Errors") %}{% call c.prose() %}<strong>0.02%</strong> 5xx rate — well under the 0.1% SLO.{% endcall %}{% endcall %}
+  {% endcall %}
+
+  {{ spec("Card — a titled, bordered surface", "card") }}
+  {% call c.card("Key risks") %}
+    {% call c.callout("risk") %}Supplier concentration: 70% of volume from a single vendor.{% endcall %}
+    {% call c.prose() %}A card groups a few related components into one visual unit — standalone here, or as a cell inside a grid or columns.{% endcall %}
+  {% endcall %}
+
+
   {# ========================= CONTENT ========================= #}
-  {{ cat("content", "Category 02 / 09", "Content") }}
+  {{ cat("content", "Category 03 / 10", "Content") }}
 
   {{ spec("Plain code", "code") }}
   {% call c.code() %}{% raw %}def rate_limited(partition: str) -> bool:
@@ -184,7 +249,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= LISTS ========================= #}
-  {{ cat("lists", "Category 03 / 09", "Lists") }}
+  {{ cat("lists", "Category 04 / 10", "Lists") }}
 
   {{ spec("Bulleted list", "bullets") }}
   {{ c.bullets([
@@ -223,7 +288,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= CALLOUTS ========================= #}
-  {{ cat("callouts", "Category 04 / 09", "Callouts") }}
+  {{ cat("callouts", "Category 05 / 10", "Callouts") }}
 
   {{ spec("Note, warning, decision &amp; risk", "callout") }}
   {% call c.callout("note") %}{% call c.prose() %}Supplementary context the reader may want.{% endcall %}{% endcall %}
@@ -236,7 +301,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= BLOCKS ========================= #}
-  {{ cat("blocks", "Category 05 / 09", "Blocks") }}
+  {{ cat("blocks", "Category 06 / 10", "Blocks") }}
 
   {{ spec("Requirement card", "requirement") }}
   {{ c.requirement(id="REQ-014", title="Portfolio revaluation latency",
@@ -304,7 +369,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= BUSINESS ========================= #}
-  {{ cat("business", "Category 06 / 09", "Business &amp; finance") }}
+  {{ cat("business", "Category 07 / 10", "Business &amp; finance") }}
 
   {{ spec("Verdict badges", "badge") }}
   {% call c.prose() %}Verdicts inline: {{ c.badge("Buy", "good") }} {{ c.badge("Hold") }} {{ c.badge("Sell", "bad") }} {{ c.badge("Review", "warn") }} {{ c.badge("New", "info") }}{% endcall %}
@@ -355,7 +420,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= MATTER ========================= #}
-  {{ cat("front-back-matter", "Category 07 / 09", "Front &amp; back matter") }}
+  {{ cat("front-back-matter", "Category 08 / 10", "Front &amp; back matter") }}
 
   {{ spec("References", "references") }}
   {{ c.references([
@@ -382,7 +447,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= DIAGRAMS ========================= #}
-  {{ cat("diagrams", "Category 08 / 09", "Diagrams") }}
+  {{ cat("diagrams", "Category 09 / 10", "Diagrams") }}
 
   {{ spec("Mermaid diagram", "diagram-mermaid") }}
   {% call c.diagram_mermaid() %}{% raw %}flowchart LR
@@ -425,7 +490,7 @@ def rate_limited(partition: str) -> bool:
 
 
   {# ========================= MATH ========================= #}
-  {{ cat("math", "Category 09 / 09", "Formulas") }}
+  {{ cat("math", "Category 10 / 10", "Formulas") }}
 
   {{ spec("Display &amp; inline math", "formula") }}
   {% call c.formula() %}{% raw %}d_1 = \frac{\ln(S/K) + \left(r + \sigma^2/2\right)t}{\sigma\sqrt{t}}{% endraw %}{% endcall %}

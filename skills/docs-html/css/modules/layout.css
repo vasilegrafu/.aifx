@@ -1,0 +1,63 @@
+/* docs-html — layout: spatial arrangement primitives (columns, grid, card).
+   Part of docs-html.css (loaded via @import, layer `layout`). Light theme only.
+
+   The single-column reading model still wins: every layout collapses to ONE
+   column on narrow width and in print. The container owns the geometry (gap +
+   tracks); children keep the no-horizontal-margin contract. */
+
+/* ---------- columns: side by side, responsive ---------- */
+.columns {
+  display: flex;
+  flex-wrap: wrap;                 /* too narrow → cells wrap and stack */
+  gap: var(--block-gap);
+  margin: var(--block-gap) 0;
+}
+.column {
+  flex: 1 1 16rem;                 /* equal by default; span raises flex-grow */
+  min-width: 0;                    /* wide children (tables, charts) shrink, not overflow */
+}
+.column > :first-child { margin-top: 0; }
+.column > :last-child  { margin-bottom: 0; }
+
+/* ---------- grid: auto-fit equal tiles ---------- */
+.grid {
+  display: grid;
+  gap: var(--block-gap);
+  margin: var(--block-gap) 0;
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min, 14rem), 1fr));
+}
+.grid > * { margin: 0; }           /* the grid gap owns spacing */
+
+/* ---------- card: a titled bordered surface / cell ---------- */
+.card {
+  margin: var(--block-gap) 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+.card-title {
+  margin: 0;
+  padding: .55rem .9rem;
+  border-bottom: 1px solid var(--border);
+  font-size: .74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--fg-soft);
+}
+.card-body { padding: .9rem; }
+.card-body > :first-child { margin-top: 0; }
+.card-body > :last-child  { margin-bottom: 0; }
+
+/* ---------- collapse to one column: narrow screens + print ---------- */
+@media (max-width: 34rem) {
+  .columns { display: block; }
+  .columns > .column { margin: var(--block-gap) 0; }
+  .columns > .column:first-child { margin-top: 0; }
+  .columns > .column:last-child  { margin-bottom: 0; }
+}
+@media print {
+  .columns { display: block; }
+  .columns > .column, .grid > *, .card { break-inside: avoid; }
+}

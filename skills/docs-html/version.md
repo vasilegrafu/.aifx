@@ -14,6 +14,25 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 1.4.0 — 2026-07-20
+
+Layout primitives. Additive — existing documents keep working unchanged.
+
+- New `layout` component category (the 10th) with four composable primitives,
+  styled by new `css/layout.css` (layer `layout`):
+  - `columns` + `column` — a responsive side-by-side row; `column(span=N)` for
+    asymmetric splits. Wraps/stacks when narrow.
+  - `grid` — an auto-fit grid of equal tiles (`min` sets the smallest tile).
+  - `card` — a titled, bordered surface; the natural cell for grid/columns, or
+    standalone.
+- The single-column reading model is preserved: every layout **collapses to one
+  column on narrow screens and in print** (`break-inside: avoid` on cells), so
+  layout is an enhancement, never a dependency.
+- Showcase gains a Layout band (now ten category bands); `CATALOG.md`
+  regenerated.
+
+---
+
 ## 1.3.0 — 2026-07-20
 
 Declarative charts. Additive — existing documents keep working unchanged.

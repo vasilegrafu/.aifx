@@ -14,11 +14,12 @@
    base.css itself @imports brand.css (organization identity) and the web fonts;
    those come along automatically. */
 
-@layer base, metadata, toc, content, callouts, lists, blocks, business, code, math,
+@layer base, metadata, layout, toc, content, callouts, lists, blocks, business, code, math,
        diagrams, chart, presentation, print;
 
 @import url("modules/base.css")         layer(base);
 @import url("modules/metadata.css")     layer(metadata);
+@import url("modules/layout.css")        layer(layout);
 @import url("modules/toc.css")          layer(toc);
 @import url("modules/content.css")      layer(content);
 @import url("modules/callouts.css")     layer(callouts);

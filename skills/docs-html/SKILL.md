@@ -100,11 +100,12 @@ the version-pinned CDN URLs into every composed document's head:
 `https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@X.Y.Z/skills/docs-html/…`
 (the version read from `version.json` at compose time — a document is forever
 pinned to the design system it was authored against, and works anywhere on
-the internet with zero local setup). Local paths never appear in any generated
-file — the skill's own showcases (`showcases/*.html`) link the same
-version-pinned CDN as documents, so every output is shareable as-is. `cdn` is
-the only asset path the builder emits; a missing `cdn` in `version.json` is a
-hard error, not a silent local fallback.
+the internet with zero local setup). Local paths never appear in a document.
+The ONE exception is the skill's own showcases (`showcases/*.html`): base links
+them to the LOCAL working tree (`../css`, `../js`) so the gallery always previews
+the current tree, and their own `{% block head %}` hardcodes a **CDN fallback**
+(local first; the pinned CDN only if the local assets are missing). Documents
+never fall back — a missing `cdn` in `version.json` is a hard error.
 
 **Versioning.** The design-system version lives in exactly two files at the
 skill root and NOWHERE else (not in the CSS, not in the JS): `version.json`
@@ -115,12 +116,12 @@ documented at its top). On a CDN the version is carried by the URL path
 loader's self-resolved base pin the whole asset tree to one version
 automatically. See the `release` command below.
 
-**Developing against a document.** Every generated file — documents and the
-showcase alike — pins the CDN version from `version.json`, so previewing local
-CSS/JS edits means bumping `cdn` to the version you're about to release (or
-serving the working tree yourself). A document picks up improvements by a
-deliberate head edit to a newer `@X.Y.Z` — never silently. The `cdn` field in
-`version.json` is the URL template with `{version}`.
+**Previewing CSS/JS edits.** Open the composed `showcases/components.html` — it
+links the local tree, so it reflects your working-tree edits immediately, no
+release needed. Documents, by contrast, pin the CDN version from `version.json`
+and pick up improvements only by a deliberate head edit to a newer `@X.Y.Z` —
+never silently. The `cdn` field in `version.json` is the URL template with
+`{version}`.
 
 ## How documents are composed
 
@@ -141,8 +142,8 @@ js/
     REFERENCE.md     ← JS internals: module roles, feature-author guide, diagrams engine/editor
 components/
     REFERENCE.md      ← the component model (how components are organized + called)
-    <category>/       structure | lists | content | callouts | blocks |
-                      front-back-matter | business | diagrams | math
+    <category>/       structure | layout | content | lists | callouts | blocks |
+                      business | front-back-matter | diagrams | math
         usage.md           category orientation: blurb + when to use
         <name>/
             usage.md           guidance for the author: when + how, and the rules

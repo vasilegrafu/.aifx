@@ -23,9 +23,11 @@ are *styled* (the CSS module map, page-local CSS, rebranding) is in
 every call form + purpose; `python builder.py show <name>` prints one
 component's call form, purpose, and full `usage.md`.
 
-The nine categories: `structure`, `content`, `lists`, `callouts`, `blocks`,
-`business`, `front-back-matter`, `diagrams`, `math`. For which CSS module styles
-each one, see `../css/REFERENCE.md`.
+The ten categories: `structure`, `layout`, `content`, `lists`, `callouts`,
+`blocks`, `business`, `front-back-matter`, `diagrams`, `math`. `layout` holds the
+spatial primitives (`columns`/`column`, `grid`, `card`) that arrange the others;
+everything else is content. For which CSS module styles each one, see
+`../css/REFERENCE.md`.
 
 ## Adding a component
 

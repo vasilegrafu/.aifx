@@ -4,8 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Design System, Exercised — Component Catalog</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.3.0/skills/docs-html/css/docs-html.css">
-  <script src="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.3.0/skills/docs-html/js/docs-html.js" defer></script>
+  <link rel="stylesheet" href="../css/docs-html.css">
+  <script src="../js/docs-html.js" defer></script>
+<script>
+  /* Gallery asset strategy (this page only — documents stay CDN-only).
+     base.html.j2 links the LOCAL working-tree assets (../css, ../js), so the
+     gallery previews the CURRENT tree; served from the CDN, those relative
+     paths resolve inside the same pinned tag. If the local assets are absent
+     (e.g. this file was copied out of the repo), fall back to the pinned CDN so
+     the page still renders. Local first, CDN only if local is missing. */
+  (function () {
+    var CDN = "https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.4.0/skills/docs-html";
+    document.addEventListener("DOMContentLoaded", function () {
+      var cssOk = false;
+      try {
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var s = document.styleSheets[i];
+          if (s.href && /\/css\/docs-html\.css(\?|$)/.test(s.href) && s.cssRules && s.cssRules.length) { cssOk = true; break; }
+        }
+      } catch (e) { cssOk = true; }   /* cross-origin sheet already loaded → fine */
+      if (!cssOk) {
+        var l = document.createElement("link");
+        l.rel = "stylesheet"; l.href = CDN + "/css/docs-html.css";
+        document.head.appendChild(l);
+      }
+      if (!window.docsHtml) {   /* the local loader defines this; absent → local js 404'd */
+        var sc = document.createElement("script");
+        sc.src = CDN + "/js/docs-html.js"; sc.defer = true;
+        document.head.appendChild(sc);
+      }
+    });
+  })();
+</script>
 <style>
   /* -------------------------------------------------------------------------
      showcase chrome (gx- namespace) — page-local styles for THIS page only.
@@ -68,6 +98,7 @@
     <p class="toc-title">Contents</p>
     <ul>
       <li><a href="#structure">Structure</a></li>
+      <li><a href="#layout">Layout</a></li>
       <li><a href="#content">Content</a></li>
       <li><a href="#lists">Lists</a></li>
       <li><a href="#callouts">Callouts</a></li>
@@ -81,7 +112,7 @@
 
 
     <section class="gx-cat" id="structure">
-    <div class="gx-cat-kicker">Category 01 / 09</div>
+    <div class="gx-cat-kicker">Category 01 / 10</div>
     <h2 class="gx-cat-name">Structure <span class="gx-cat-dir">(structure)</span></h2>
     <p class="gx-cat-blurb">The document skeleton — cover, contents, sections and prose that give every document its shape.</p>
     <div class="gx-cat-rule"></div>
@@ -124,8 +155,71 @@
     <code>&lt;body class="presentation"&gt;</code>, see the presentation doc-type.</small></p>
 
 
+    <section class="gx-cat" id="layout">
+    <div class="gx-cat-kicker">Category 02 / 10</div>
+    <h2 class="gx-cat-name">Layout <span class="gx-cat-dir">(layout)</span></h2>
+    <p class="gx-cat-blurb">Arrange components spatially — side-by-side columns, auto-fit tile grids, and titled cards — while keeping the single-column reading model.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Columns — side by side, with a wider cell</h3>
+    <span class="gx-spec-name">columns</span>
+  </div>
+
+  <div class="columns">  <div class="column" style="flex-grow: 2">  <pre class="chart" data-height="260">
+
+{
+  "tooltip": { "trigger": "axis" },
+  "xAxis": { "type": "category", "data": ["Q1", "Q2", "Q3", "Q4"] },
+  "yAxis": { "type": "value" },
+  "series": [{ "type": "bar", "name": "Revenue", "data": [120, 145, 132, 168] }]
+}
+
+  </pre>
+</div>
+  <div class="column">  <aside class="note">The chart takes two thirds of the row (<code>span=2</code>); this reading of it sits alongside in the remaining third. On a phone or in print they stack.</aside>
+</div>
+</div>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Grid — auto-fit equal tiles of cards</h3>
+    <span class="gx-spec-name">grid</span>
+  </div>
+
+  <div class="grid">  <div class="card">
+    <p class="card-title">Throughput</p>
+    <div class="card-body">  <p><strong>1,240</strong> req/s sustained across the fleet this quarter.</p>
+</div>
+  </div>
+  <div class="card">
+    <p class="card-title">Latency</p>
+    <div class="card-body">  <p><strong>68 ms</strong> p95, within the 100 ms budget.</p>
+</div>
+  </div>
+  <div class="card">
+    <p class="card-title">Errors</p>
+    <div class="card-body">  <p><strong>0.02%</strong> 5xx rate — well under the 0.1% SLO.</p>
+</div>
+  </div>
+</div>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Card — a titled, bordered surface</h3>
+    <span class="gx-spec-name">card</span>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Key risks</p>
+    <div class="card-body">  <aside class="risk">Supplier concentration: 70% of volume from a single vendor.</aside>
+  <p>A card groups a few related components into one visual unit — standalone here, or as a cell inside a grid or columns.</p>
+</div>
+  </div>
+
+
     <section class="gx-cat" id="content">
-    <div class="gx-cat-kicker">Category 02 / 09</div>
+    <div class="gx-cat-kicker">Category 03 / 10</div>
     <h2 class="gx-cat-name">Content <span class="gx-cat-dir">(content)</span></h2>
     <p class="gx-cat-blurb">The body set-pieces — code, tables, figures, quotes and collapsibles, the substance a reader came for.</p>
     <div class="gx-cat-rule"></div>
@@ -239,7 +333,7 @@ def rate_limited(partition: str) -> bool:
 
 
     <section class="gx-cat" id="lists">
-    <div class="gx-cat-kicker">Category 03 / 09</div>
+    <div class="gx-cat-kicker">Category 04 / 10</div>
     <h2 class="gx-cat-name">Lists <span class="gx-cat-dir">(lists)</span></h2>
     <p class="gx-cat-blurb">Enumerations — parallel facts, ordered steps, checklists and traceable identifiers.</p>
     <div class="gx-cat-rule"></div>
@@ -312,7 +406,7 @@ def rate_limited(partition: str) -> bool:
 
 
     <section class="gx-cat" id="callouts">
-    <div class="gx-cat-kicker">Category 04 / 09</div>
+    <div class="gx-cat-kicker">Category 05 / 10</div>
     <h2 class="gx-cat-name">Callouts <span class="gx-cat-dir">(callouts)</span></h2>
     <p class="gx-cat-blurb">Attention blocks that interrupt the flow to flag something the reader must not miss.</p>
     <div class="gx-cat-rule"></div>
@@ -342,7 +436,7 @@ def rate_limited(partition: str) -> bool:
 
 
     <section class="gx-cat" id="blocks">
-    <div class="gx-cat-kicker">Category 05 / 09</div>
+    <div class="gx-cat-kicker">Category 06 / 10</div>
     <h2 class="gx-cat-name">Blocks <span class="gx-cat-dir">(blocks)</span></h2>
     <p class="gx-cat-blurb">Specialist record blocks — requirements, acceptance criteria, KPIs, timelines, meters and risk.</p>
     <div class="gx-cat-rule"></div>
@@ -593,7 +687,7 @@ def rate_limited(partition: str) -> bool:
 
 
     <section class="gx-cat" id="business">
-    <div class="gx-cat-kicker">Category 06 / 09</div>
+    <div class="gx-cat-kicker">Category 07 / 10</div>
     <h2 class="gx-cat-name">Business &amp; finance <span class="gx-cat-dir">(business)</span></h2>
     <p class="gx-cat-blurb">Deal and finance artifacts — statements, journal entries, scenario and SWOT analysis, verdict badges and party blocks.</p>
     <div class="gx-cat-rule"></div>
@@ -723,7 +817,7 @@ def rate_limited(partition: str) -> bool:
 
 
     <section class="gx-cat" id="front-back-matter">
-    <div class="gx-cat-kicker">Category 07 / 09</div>
+    <div class="gx-cat-kicker">Category 08 / 10</div>
     <h2 class="gx-cat-name">Front &amp; back matter <span class="gx-cat-dir">(front-back-matter)</span></h2>
     <p class="gx-cat-blurb">The scholarly apparatus — references, appendices and footnotes that frame the body.</p>
     <div class="gx-cat-rule"></div>
@@ -774,7 +868,7 @@ def rate_limited(partition: str) -> bool:
 
 
     <section class="gx-cat" id="diagrams">
-    <div class="gx-cat-kicker">Category 08 / 09</div>
+    <div class="gx-cat-kicker">Category 09 / 10</div>
     <h2 class="gx-cat-name">Diagrams <span class="gx-cat-dir">(diagrams)</span></h2>
     <p class="gx-cat-blurb">Interactive Mermaid diagrams — pan, zoom, fit, fullscreen, a live editor and SVG export, all at view time.</p>
     <div class="gx-cat-rule"></div>
@@ -840,7 +934,7 @@ flowchart LR
 
 
     <section class="gx-cat" id="math">
-    <div class="gx-cat-kicker">Category 09 / 09</div>
+    <div class="gx-cat-kicker">Category 10 / 10</div>
     <h2 class="gx-cat-name">Formulas <span class="gx-cat-dir">(math)</span></h2>
     <p class="gx-cat-blurb">LaTeX mathematics — plain source in the document, rendered by KaTeX at view time with a readable fallback.</p>
     <div class="gx-cat-rule"></div>

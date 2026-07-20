@@ -1,0 +1,4 @@
+{# purpose: lay components side by side in a responsive row (wraps/stacks when narrow) #}
+{% macro columns() %}
+  <div class="columns">{{ caller() }}</div>
+{% endmacro %}

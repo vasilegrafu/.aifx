@@ -64,7 +64,7 @@ PURPOSE_RE = re.compile(r"\{#\s*purpose:\s*(.*?)\s*#\}")        # {# purpose: X 
 MACRO_SIG_RE = re.compile(r"\{%\s*macro\s+\w+\s*\((.*?)\)\s*%\}", re.S)
 
 # Presentation order for CATALOG.md (unknown keys append alphabetically).
-CATEGORY_ORDER = ["structure", "content", "lists", "callouts", "blocks",
+CATEGORY_ORDER = ["structure", "layout", "content", "lists", "callouts", "blocks",
                   "business", "front-back-matter", "diagrams", "math"]
 DOMAIN_ORDER = ["general", "software", "finance", "investing", "accounting",
                 "research", "economics", "engineering", "tools", "fallback"]
@@ -232,10 +232,12 @@ def showcase_templates() -> list[Path]:
 
 def compose_showcase(template: Path) -> str:
     """Render one showcase (showcases/<name>.html.j2). A showcase is the skill's
-    own reference page — it exercises real macros against the same CDN assets a
-    document uses, never a user document. Title/type-name come from
-    `{# title #}` / `{# type-name #}`
-    headers (falling back to the file stem)."""
+    own reference page — it exercises real macros, never a user document. Unlike
+    a document (CDN-only), base.html.j2 links the showcase to the LOCAL working
+    tree (`cdn_href="..", so `../css`/`../js`) so the gallery always previews the
+    current tree; the template's own `{% block head %}` adds a CDN fallback
+    (`cdn_fallback`) for when those local assets are absent. Title/type-name come
+    from `{# title #}` / `{# type-name #}` headers (falling back to the stem)."""
     text = template.read_text(encoding="utf-8")
     stem = template.name[:-len(".html.j2")]
     tn = TYPE_NAME_RE.search(text)
@@ -249,7 +251,8 @@ def compose_showcase(template: Path) -> str:
         author="docs-html",
         date=datetime.date.today().isoformat(),
         version="",
-        cdn_href=cdn_href(),   # same version-pinned CDN as documents — shareable as-is
+        cdn_href="..",              # base links the LOCAL tree (../css, ../js) — previews the current tree
+        cdn_fallback=cdn_href(),    # …and the page's own block head falls back to this pinned CDN if local is absent
         cat_blurb=category_blurbs(),   # single source: the category usage.md blurbs
         body_class="")
 
