@@ -12,7 +12,7 @@ the modules in `css/modules/`:
 
 ```css
 @layer base, metadata, toc, content, callouts, lists, blocks, business, code,
-       math, diagrams, presentation, print;
+       math, diagrams, chart, presentation, print;
 ```
 
 `@layer` makes the cascade order explicit and independent of import order, so
@@ -39,6 +39,7 @@ Which `css/modules/` file styles which components:
 | `business.css` | finance & decision components: financial-table, journal-entry, scenarios, pros-cons, swot-grid, badge, party-block |
 | `math.css` | formula blocks (`.math`) — spacing, overflow, and the readable-LaTeX fallback before/without KaTeX |
 | `diagrams.css` | diagram-mermaid: the pan/zoom viewport + glyph toolbar |
+| `chart.css` | chart-echarts: the chart card (the validated `bg-soft` surface) + the readable-spec fallback before/without ECharts. The categorical palette lives in `js/modules/chart.js`, not here |
 | `presentation.css` | presentation pages (`<body class="presentation">`) |
 | `print.css` | Ctrl+P → cover page, page breaks — layered LAST |
 

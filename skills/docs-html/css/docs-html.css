@@ -15,7 +15,7 @@
    those come along automatically. */
 
 @layer base, metadata, toc, content, callouts, lists, blocks, business, code, math,
-       diagrams, presentation, print;
+       diagrams, chart, presentation, print;
 
 @import url("modules/base.css")         layer(base);
 @import url("modules/metadata.css")     layer(metadata);
@@ -28,5 +28,6 @@
 @import url("modules/math.css")         layer(math);
 @import url("modules/code.css")         layer(code);
 @import url("modules/diagrams.css")     layer(diagrams);
+@import url("modules/chart.css")        layer(chart);
 @import url("modules/presentation.css") layer(presentation);
 @import url("modules/print.css")        layer(print);

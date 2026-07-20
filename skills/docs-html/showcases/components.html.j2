@@ -391,6 +391,38 @@ def rate_limited(partition: str) -> bool:
   api --> db[(PostgreSQL)]
   api --> mq[[Message Queue]]{% endraw %}{% endcall %}
 
+  {{ spec("Chart — bars, line &amp; legend (ECharts)", "chart-echarts") }}
+  {% call c.chart_echarts() %}{% raw %}
+{
+  "tooltip": { "trigger": "axis" },
+  "legend": {},
+  "xAxis": { "type": "category", "data": ["Q1", "Q2", "Q3", "Q4"] },
+  "yAxis": { "type": "value" },
+  "series": [
+    { "type": "bar",  "name": "Revenue",  "data": [120, 145, 132, 168] },
+    { "type": "bar",  "name": "Cost",     "data": [80, 92, 88, 101] },
+    { "type": "line", "name": "Forecast", "data": [118, 140, 138, 172] }
+  ]
+}
+{% endraw %}{% endcall %}
+
+  {{ spec("Chart — composition donut (ECharts)", "chart-echarts") }}
+  {% call c.chart_echarts(height=300) %}{% raw %}
+{
+  "tooltip": {},
+  "legend": {},
+  "series": [{
+    "type": "pie", "radius": ["42%", "70%"],
+    "data": [
+      { "name": "Equities",    "value": 48 },
+      { "name": "Bonds",       "value": 27 },
+      { "name": "Real estate", "value": 15 },
+      { "name": "Cash",        "value": 10 }
+    ]
+  }]
+}
+{% endraw %}{% endcall %}
+
 
   {# ========================= MATH ========================= #}
   {{ cat("math", "Category 09 / 09", "Formulas") }}

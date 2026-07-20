@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Design System, Exercised — Component Catalog</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.2.1/skills/docs-html/css/docs-html.css">
-  <script src="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.2.1/skills/docs-html/js/docs-html.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.3.0/skills/docs-html/css/docs-html.css">
+  <script src="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@1.3.0/skills/docs-html/js/docs-html.js" defer></script>
 <style>
   /* -------------------------------------------------------------------------
      showcase chrome (gx- namespace) — page-local styles for THIS page only.
@@ -792,6 +792,50 @@ flowchart LR
   app --> api[API]
   api --> db[(PostgreSQL)]
   api --> mq[[Message Queue]]
+  </pre>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Chart — bars, line &amp; legend (ECharts)</h3>
+    <span class="gx-spec-name">chart-echarts</span>
+  </div>
+
+  <pre class="chart">
+
+{
+  "tooltip": { "trigger": "axis" },
+  "legend": {},
+  "xAxis": { "type": "category", "data": ["Q1", "Q2", "Q3", "Q4"] },
+  "yAxis": { "type": "value" },
+  "series": [
+    { "type": "bar",  "name": "Revenue",  "data": [120, 145, 132, 168] },
+    { "type": "bar",  "name": "Cost",     "data": [80, 92, 88, 101] },
+    { "type": "line", "name": "Forecast", "data": [118, 140, 138, 172] }
+  ]
+}
+
+  </pre>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Chart — composition donut (ECharts)</h3>
+    <span class="gx-spec-name">chart-echarts</span>
+  </div>
+
+  <pre class="chart" data-height="300">
+
+{
+  "tooltip": {},
+  "legend": {},
+  "series": [{
+    "type": "pie", "radius": ["42%", "70%"],
+    "data": [
+      { "name": "Equities",    "value": 48 },
+      { "name": "Bonds",       "value": 27 },
+      { "name": "Real estate", "value": 15 },
+      { "name": "Cash",        "value": 10 }
+    ]
+  }]
+}
+
   </pre>
 
 

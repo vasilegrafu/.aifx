@@ -67,8 +67,8 @@ it only loads the real code from `js/modules/` (classic `<script>` injection in
 list order — ES modules are blocked on `file://`). The modules form a tree on
 the one `docsHtml` namespace: `core` (registry) · `util` · `icons` ·
 `layout-toggle` · `highlight` (Prism) · `math` (KaTeX) · `diagrams` (Mermaid +
-Panzoom) · `main`. **Module roles, the feature-author guide, and the diagrams
-engine/editor internals are in `js/REFERENCE.md`.**
+Panzoom) · `chart` (ECharts) · `main`. **Module roles, the feature-author guide,
+and the diagrams engine/editor internals are in `js/REFERENCE.md`.**
 
 **Extending**: new behaviour = new `js/modules/<name>.js` that calls
 `docsHtml.register(...)` + its name in the `MODULES` list in `docs-html.js`.
@@ -83,13 +83,17 @@ the author already writes:
 - `.doc-toolbar [data-w]` → the page / full-width **layout toggle** (adds/removes
   `class="wide"` on `<body>`; which button looks active is decided in CSS).
 - `pre.mermaid` → a **diagram**: rendered, then made **pan/zoomable**.
+- `pre.chart` → a **data chart**: a JSON ECharts `option` rendered to SVG with
+  the built-in validated `docs-html` palette (bar/line/pie/scatter/candlestick…).
 
 It loads the heavy engines from CDN **only when a document actually contains a
-diagram** — a diagram-free document fetches nothing extra. Mermaid renders each
+diagram or chart** — a plain document fetches nothing extra. Mermaid renders each
 diagram at natural size in a bounded pan/zoom viewport with an icon toolbar
-(fit · fullscreen · ✎ source editor · download SVG · copy source); if the CDN is
-unreachable the Mermaid source stays visible as a readable code box. **Engine
-pins, the toolbar, and the ✎-editor behaviour are in `js/REFERENCE.md`.**
+(fit · fullscreen · ✎ source editor · download SVG · copy source); ECharts renders
+each chart as SVG. If the CDN is unreachable the Mermaid/chart **source stays
+visible as a readable code box** — nothing breaks. **Engine pins, the toolbar,
+the ✎-editor, and the chart theme/palette are in `js/REFERENCE.md` (charts) and
+`css/REFERENCE.md`.**
 
 **Where the two hrefs point — documents are CDN-ONLY.** `builder.py` bakes
 the version-pinned CDN URLs into every composed document's head:
@@ -399,6 +403,10 @@ valid. See `components/content/code-block/usage.md`.
 - Formulas are LaTeX text in `.math` elements (`c.formula()` block /
   hand-written `<span class="math">` inline), rendered at view time — never
   images of equations.
+- Charts are data, not pictures: a JSON ECharts `option` in `c.chart_echarts()`
+  (`pre.chart`), rendered to SVG at view time — never a screenshot of a chart.
+  Never restyle the theme per chart (the palette is validated); one y-axis only.
+  Prefer it over a Mermaid `xychart-beta` whenever the chart carries analysis.
 - Requirements and traceable items carry trace-ids (`REQ-`, `RISK-`, `TC-`); a
   requirement is a `requirement` card, not a bullet.
 - Formal documents (SRS, architecture, standards, test plans) carry ISO-style

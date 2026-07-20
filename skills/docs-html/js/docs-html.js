@@ -14,7 +14,7 @@
    docsHtml.register — see core.js), then add <name> here. Nothing else. */
 
 (function () {
-  var MODULES = ["core", "util", "icons", "layout-toggle", "highlight", "math", "diagrams", "main"];
+  var MODULES = ["core", "util", "icons", "layout-toggle", "highlight", "math", "diagrams", "chart", "main"];
   var base = document.currentScript.src.replace(/docs-html\.js[^/]*$/, "");
   MODULES.forEach(function (name) {
     var s = document.createElement("script");

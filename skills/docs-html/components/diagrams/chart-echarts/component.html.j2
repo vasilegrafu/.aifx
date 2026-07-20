@@ -1,0 +1,6 @@
+{# purpose: declarative data chart (bar/line/pie/scatter/candlestick…) via Apache ECharts, view-time SVG #}
+{% macro chart_echarts(option="", height=340) %}
+  <pre class="chart"{% if height != 340 %} data-height="{{ height }}"{% endif %}>
+{{ caller() if caller else option }}
+  </pre>
+{% endmacro %}

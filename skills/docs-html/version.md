@@ -14,6 +14,26 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 1.3.0 — 2026-07-20
+
+Declarative charts. Additive — existing documents keep working unchanged.
+
+- New `chart` feature: `<pre class="chart">` holding a JSON ECharts `option`,
+  rendered to **SVG** at view time by Apache ECharts `5.5.1` (lazy, pinned CDN).
+  Component `chart-echarts` (`c.chart_echarts()`), styled by new `css/chart.css`
+  (layer `chart`). Covers bar/line/area/pie/scatter/heatmap/candlestick — real
+  analytical charts, not just Mermaid's `xychart-beta` illustrations.
+- Built-in validated `docs-html` theme: the 8-slot categorical palette (fixed
+  order, colorblind-checked against the light surface via the dataviz method),
+  ink/axis/grid from the base tokens. Never restyle per chart — rebrand once in
+  `js/modules/chart.js`.
+- Accessible by default: `aria`, hover tooltip, and a legend for ≥ 2 series are
+  auto-filled when the author leaves them unset; one y-axis only (documented).
+- Degradation: invalid JSON or an unreachable CDN leaves the spec visible as a
+  readable code box — nothing breaks.
+
+---
+
 ## 1.2.1 — 2026-07-20
 
 Visual patch — no markup change, safe for every document.

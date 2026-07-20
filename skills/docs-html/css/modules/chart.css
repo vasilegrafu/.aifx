@@ -1,0 +1,44 @@
+/* docs-html — chart: declarative charts via Apache ECharts (SVG), rendered at
+   view time by the docs-html.js `chart` feature; engine from the pinned CDN.
+   Part of docs-html.css (loaded via @import, layer `chart`). Light theme only.
+
+   The card background IS the surface the categorical palette was validated
+   against (bg-soft, #f7f9fb) — see css/REFERENCE.md. Don't recolor it without
+   re-running the dataviz validator. */
+
+/* The chart card — the validated surface ECharts renders onto. */
+.chart-figure {
+  margin: var(--block-gap) 0;
+  padding: .75rem .6rem .55rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.chart-canvas { width: 100%; }
+.chart-canvas svg { max-width: 100%; }   /* never overflow the reading column */
+
+/* Source before render — or forever, if the CDN/engine is unavailable or the
+   JSON is invalid: show the ECharts spec as an intentional, readable code box.
+   So write the spec clean enough to read as text. */
+pre.chart {
+  margin: var(--block-gap) 0;
+  padding: .8rem 1rem;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  line-height: 1.5;
+  color: var(--fg-soft);
+  white-space: pre;
+}
+pre.chart[hidden] { display: none; }        /* rendered: source stays in the DOM, hidden */
+pre.chart.chart-error {                     /* invalid JSON: flag it, keep the source */
+  border-color: var(--risk);
+  color: var(--risk);
+}
+
+@media print {
+  .chart-figure { break-inside: avoid; }
+}

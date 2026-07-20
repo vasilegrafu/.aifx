@@ -34,17 +34,14 @@ as text.
 - One Mermaid script per document, however many diagrams.
 - No diagrams → no script, and drop the `diagrams.css` link.
 
-## Charts, for free
+## Charts: use [[chart-echarts]], not Mermaid
 
-Mermaid renders charts, not only diagrams — all through the same
-`<pre class="mermaid">` viewport (pan/zoom, ✎ editor included):
+For real data charts — multi-series, stacked, a legend, tooltips, candlestick —
+reach for [[chart-echarts]] (Apache ECharts, validated palette). Mermaid's own
+`xychart-beta` / `pie` are quick illustrations only: single-series, no legend,
+still "beta". Use them just for a throwaway curve inside a diagram-heavy page;
+anything analytical goes to `chart-echarts`.
 
-- `xychart-beta` — bar and line charts (performance curves, budgets over time)
-- `pie` — allocation / composition pies
-
-The data lives as editable text in the document, like any diagram. Prefer
-these over image charts in finance, research, and reporting doc-types.
-
-Also available through the same viewport: `gantt` (roadmaps, project plans),
-`sankey-beta` (cash/flow decomposition), `quadrantChart` (2×2 positioning —
-a diagram-native alternative to the risk-matrix component).
+Still diagram-native through this viewport (pan/zoom, ✎ editor): `gantt`
+(roadmaps, project plans), `sankey-beta` (cash/flow decomposition),
+`quadrantChart` (2×2 positioning — see also the risk-matrix component).
