@@ -1,5 +1,7 @@
 # investment-policy-statement
 
+_Authoring guidance for the `investment-policy-statement` document type — audience, depth, and rules._
+
 - Audience: the investor's calm self — the document that overrules the
   emotional self in drawdowns and euphoria; or a client relationship.
 - Filename: `docs/investment-policy-statement.html` (one; versioned via

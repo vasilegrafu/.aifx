@@ -1,5 +1,7 @@
 # approval-block
 
+_Authoring guidance for the `approval-block` component — when to use it, how, and the rules._
+
 Styled by: `css/metadata.css`
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the builder composes (parameters, if any, declared at its top). The example(s) below are filled illustrations.
@@ -15,7 +17,7 @@ SLA, release approval, test report acceptance). Placed in a closing
   <table class="approvals">
     <thead><tr><th>Name</th><th>Role</th><th>Date</th><th>Signature</th></tr></thead>
     <tbody>
-      <tr><td>Vasile Grafu</td><td>Author</td><td></td><td></td></tr>
+      <tr><td>Jane Doe</td><td>Author</td><td></td><td></td></tr>
       <tr><td></td><td>Product Owner</td><td></td><td></td></tr>
     </tbody>
   </table>

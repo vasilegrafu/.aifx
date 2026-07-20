@@ -1,5 +1,7 @@
 # decision-record
 
+_Authoring guidance for the `decision-record` document type — audience, depth, and rules._
+
 - Audience: anyone later asking "why is it like this?" — the domain-neutral
   sibling of architecture-decision-record: same mechanics, any field
   (equipment choice, policy change, provider selection, investment process).

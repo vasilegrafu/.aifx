@@ -1,5 +1,7 @@
 # project-management-plan
 
+_Authoring guidance for the `project-management-plan` document type — audience, depth, and rules._
+
 How a project will be run: scope, schedule, team, milestones, risks,
 communication. The PMBOK-style baseline the team commits to.
 

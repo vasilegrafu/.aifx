@@ -1,5 +1,7 @@
 # expense-report
 
+_Authoring guidance for the `expense-report` document type — audience, depth, and rules._
+
 - Audience: the approver and bookkeeping.
 - Filename: `docs/expense-report-<claimant>-<period>.html`.
 - Depth: none.

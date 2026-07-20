@@ -1,5 +1,7 @@
 # user-interface-design-specification
 
+_Authoring guidance for the `user-interface-design-specification` document type — audience, depth, and rules._
+
 How the UI looks and behaves: principles, screens, components, interaction
 flows, accessibility.
 

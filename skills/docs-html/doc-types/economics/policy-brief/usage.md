@@ -1,5 +1,7 @@
 # policy-brief
 
+_Authoring guidance for the `policy-brief` document type — audience, depth, and rules._
+
 - Audience: a decision maker with five minutes — the short, actionable form
   (economic-analysis is its long-form evidence base).
 - Filename: `docs/policy-brief-<issue>.html`.

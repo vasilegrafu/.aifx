@@ -1,5 +1,7 @@
 # statement-of-work (SOW)
 
+_Authoring guidance for the `statement-of-work` document type — audience, depth, and rules._
+
 A contractual scope agreement: parties, deliverables, schedule, acceptance,
 price. Signed. More formal and bounded than a project plan.
 

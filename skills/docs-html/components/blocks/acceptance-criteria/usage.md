@@ -1,5 +1,7 @@
 # acceptance-criteria
 
+_Authoring guidance for the `acceptance-criteria` component — when to use it, how, and the rules._
+
 A Given / When / Then scenario block — the checkable pass/fail conditions for a
 user story, use case, or test case. Leaf macro:
 `acceptance_criteria(id="AC-1", title="", given=[], when=[], then=[])`.

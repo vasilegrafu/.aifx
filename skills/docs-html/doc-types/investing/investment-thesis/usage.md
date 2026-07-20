@@ -1,5 +1,7 @@
 # investment-thesis
 
+_Authoring guidance for the `investment-thesis` document type — audience, depth, and rules._
+
 - Audience: yourself in six months, or an investment partner — someone who
   must judge the bet without you in the room.
 - Filename: `docs/investment-thesis-<asset>.html`

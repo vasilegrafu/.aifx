@@ -1,5 +1,7 @@
 # budget
 
+_Authoring guidance for the `budget` document type — audience, depth, and rules._
+
 - Audience: whoever owns the money — personal, project, or department.
 - Filename: `docs/budget-<scope>-<period>.html`.
 - Depth: none — numbers come from the owner.

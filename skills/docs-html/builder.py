@@ -48,13 +48,26 @@ SKILL_DIR = Path(__file__).resolve().parent
 COMPONENTS_DIR = SKILL_DIR / "components"
 DOCTYPES_DIR = SKILL_DIR / "doc-types"
 
-# The component gallery: a template that calls every macro, composed into a
-# viewable page so it can never drift from the fragments.
-SHOWCASE_TEMPLATE = "components/showcase.html.j2"
-SHOWCASE_OUTPUT = COMPONENTS_DIR / "showcase.html"
+# Showcases: living reference pages in showcases/. Each showcases/<name>.html.j2
+# composes to showcases/<name>.html — the component gallery is component.html.j2,
+# and more showcases can be dropped in the same folder.
+SHOWCASES_DIR = SKILL_DIR / "showcases"
+
+# CATALOG.md — the generated quick-reference: every component's call signature
+# and every doc-type's purpose, pulled straight from source so it can't drift.
+CATALOG_OUTPUT = SKILL_DIR / "CATALOG.md"
 
 TYPE_NAME_RE = re.compile(r"\{#\s*type-name:\s*(.*?)#\}")       # {# type-name: X #}
+TITLE_RE = re.compile(r"\{#\s*title:\s*(.*?)#\}")              # {# title: X #}
 BODY_CLASS_RE = re.compile(r"\{#\s*body-class:\s*(.*?)#\}")     # {# body-class: presentation #}
+PURPOSE_RE = re.compile(r"\{#\s*purpose:\s*(.*?)\s*#\}")        # {# purpose: X #}
+MACRO_SIG_RE = re.compile(r"\{%\s*macro\s+\w+\s*\((.*?)\)\s*%\}", re.S)
+
+# Presentation order for CATALOG.md (unknown keys append alphabetically).
+CATEGORY_ORDER = ["structure", "content", "lists", "callouts", "blocks",
+                  "business", "front-back-matter", "diagrams", "math"]
+DOMAIN_ORDER = ["general", "software", "finance", "investing", "accounting",
+                "research", "economics", "engineering", "tools", "fallback"]
 
 # --------------------------------------------------------------------------
 # component catalog — loaded once, exposes every macro on the `c` namespace
@@ -231,21 +244,32 @@ def compose(type_name: str, title: str, out_dir: Path) -> str:
         body_class=body_class)
 
 
-def compose_showcase() -> str:
-    """Render the component gallery from components/showcase.html.j2.
+def showcase_templates() -> list[Path]:
+    """Every showcase source: showcases/<name>.html.j2."""
+    return sorted(SHOWCASES_DIR.glob("*.html.j2"))
 
-    The gallery calls nearly every macro, so it exercises the whole design
-    system on one page. Metadata is fixed (it is the skill's own reference page,
-    not a user document)."""
-    components = load_components()
-    return make_env(components).get_template(SHOWCASE_TEMPLATE).render(
-        title="The Design System, Exercised",
-        type_name="Component Showcase",
+
+def compose_showcase(template: Path) -> str:
+    """Render one showcase (showcases/<name>.html.j2). A showcase is the skill's
+    own reference page — it exercises real macros against local assets, never a
+    user document. Title/type-name come from `{# title #}` / `{# type-name #}`
+    headers (falling back to the file stem)."""
+    text = template.read_text(encoding="utf-8")
+    stem = template.name[:-len(".html.j2")]
+    tn = TYPE_NAME_RE.search(text)
+    ti = TITLE_RE.search(text)
+    type_name = tn.group(1).strip() if tn else stem
+    title = ti.group(1).strip() if ti else type_name
+    rel = template.relative_to(SKILL_DIR).as_posix()
+    return make_env(load_components()).get_template(rel).render(
+        title=title,
+        type_name=type_name,
         author="docs-html",
         date=datetime.date.today().isoformat(),
-        version="13.0",
-        skill_href=skill_href(COMPONENTS_DIR),   # gallery lives in components/
-        cdn_href="",   # skill-internal document: ALWAYS local relative refs
+        version="",
+        skill_href=skill_href(SHOWCASES_DIR),   # showcases live one level deep
+        cdn_href="",   # skill-internal page: ALWAYS local relative refs
+        cat_blurb=category_blurbs(),   # single source: the category usage.md blurbs
         body_class="")
 
 
@@ -285,10 +309,180 @@ def cmd_list() -> int:
 
 
 def cmd_showcase() -> int:
-    """`showcase` — regenerate components/showcase.html from its template."""
-    SHOWCASE_OUTPUT.write_text(compose_showcase(), encoding="utf-8")
-    print(f"composed showcase -> {SHOWCASE_OUTPUT}")
+    """`showcase` — regenerate every showcases/<name>.html from its template."""
+    templates = showcase_templates()
+    if not templates:
+        print(f"no showcases found in {SHOWCASES_DIR}")
+        return 1
+    for template in templates:
+        output = template.with_suffix("")          # <name>.html.j2 -> <name>.html
+        output.write_text(compose_showcase(template), encoding="utf-8")
+        print(f"composed showcase -> {output}")
     return 0
+
+
+# --------------------------------------------------------------------------
+# CATALOG.md — the generated quick-reference
+# --------------------------------------------------------------------------
+
+
+def _param_names(signature: str) -> str:
+    """A macro's parameter NAMES only — defaults dropped for a clean reference:
+    `id="REQ-1", given=[]` -> `id, given`. (No current default holds a comma.)"""
+    names = [p.split("=", 1)[0].strip()
+             for p in signature.split(",") if p.strip()]
+    return ", ".join(names)
+
+
+def _read(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def _purpose(text: str) -> str:
+    m = PURPOSE_RE.search(text)
+    return m.group(1).strip() if m else ""
+
+
+def _ordered(keys, order: list[str]) -> list[str]:
+    """`order` first (those present), then any remaining keys alphabetically."""
+    present = set(keys)
+    return [k for k in order if k in present] + sorted(present - set(order))
+
+
+def _blurb(text: str) -> str:
+    """The one-line blurb of a category/domain usage.md: the first content
+    paragraph — first non-blank line that is not a Markdown heading."""
+    for line in text.splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            return line
+    return ""
+
+
+def category_blurbs() -> dict[str, str]:
+    """category folder name -> blurb, from components/<category>/usage.md."""
+    return {p.parent.name: _blurb(_read(p))
+            for p in COMPONENTS_DIR.glob("*/usage.md")}
+
+
+def domain_blurbs() -> dict[str, str]:
+    """domain folder name -> blurb, from doc-types/<domain>/usage.md."""
+    return {p.parent.name: _blurb(_read(p))
+            for p in DOCTYPES_DIR.glob("*/usage.md")}
+
+
+def _component_call(comp: Component) -> str:
+    """The exact call form for a component: `{{ c.x(...) }}` for a leaf,
+    `{% call c.x(...) %}…{% endcall %}` for a container (detected via caller())."""
+    text = _read(comp.path)
+    m = MACRO_SIG_RE.search(text)
+    params = _param_names(m.group(1)) if m else ""
+    if "caller()" in text:
+        return f"{{% call c.{comp.macro}({params}) %}}…{{% endcall %}}"
+    return f"{{{{ c.{comp.macro}({params}) }}}}"
+
+
+def compose_catalog() -> str:
+    """Render CATALOG.md from source: component call signatures + doc-type
+    purposes, both grouped and pulled from the templates themselves so the file
+    can never drift from what actually exists."""
+    components = load_components()
+    cat_blurb, dom_blurb = category_blurbs(), domain_blurbs()
+    by_cat: dict[str, list[tuple[str, str]]] = {}
+    for comp in components:
+        category = comp.path.parent.parent.name
+        by_cat.setdefault(category, []).append(
+            (_component_call(comp), _purpose(_read(comp.path))))
+
+    types = doc_type_dirs()
+    by_dom: dict[str, list[tuple[str, str]]] = {}
+    for name, directory in types.items():
+        domain = directory.parent.name if directory.parent != DOCTYPES_DIR else "(root)"
+        purpose = _purpose(_read(directory / "document.html.j2"))
+        by_dom.setdefault(domain, []).append((name, purpose))
+
+    out: list[str] = []
+    out.append("# docs-html — catalog")
+    out.append("")
+    out.append("Auto-generated by `python builder.py catalog` — **do not "
+               "hand-edit**. The one file to read before authoring: every "
+               "component's call form and every doc-type's purpose, pulled "
+               "straight from source so it never drifts.")
+    out.append("")
+    out.append(f"**{len(components)} components · {len(types)} doc-types.**")
+    out.append("")
+
+    out.append("## Components")
+    out.append("")
+    out.append("Call on the `c` namespace inside a doc-type body. Leaves are "
+               "shown as `{{ c.x(...) }}`; containers that wrap content as "
+               "`{% call c.x(...) %}…{% endcall %}`.")
+    for cat in _ordered(by_cat, CATEGORY_ORDER):
+        out.append("")
+        out.append(f"### {cat}")
+        if cat_blurb.get(cat):
+            out.append(f"*{cat_blurb[cat]}*")
+        out.append("")
+        for call, purpose in sorted(by_cat[cat]):
+            out.append(f"- `{call}`" + (f" — {purpose}" if purpose else ""))
+
+    out.append("")
+    out.append("## Doc-types")
+    out.append("")
+    out.append('Compose with `python builder.py new <type> "<title>"`.')
+    for dom in _ordered(by_dom, DOMAIN_ORDER):
+        out.append("")
+        out.append(f"### {dom}")
+        if dom_blurb.get(dom):
+            out.append(f"*{dom_blurb[dom]}*")
+        out.append("")
+        for name, purpose in sorted(by_dom[dom]):
+            out.append(f"- `{name}`" + (f" — {purpose}" if purpose else ""))
+
+    out.append("")
+    return "\n".join(out)
+
+
+def cmd_catalog() -> int:
+    """`catalog` — regenerate CATALOG.md from the templates."""
+    CATALOG_OUTPUT.write_text(compose_catalog(), encoding="utf-8")
+    print(f"composed catalog -> {CATALOG_OUTPUT}")
+    return 0
+
+
+def cmd_show(args: argparse.Namespace) -> int:
+    """`show <name>` — everything about ONE component or doc-type in a single
+    call: its call form / purpose (or type-name + which components it uses) and
+    its full usage.md — so a lookup costs one command, not several file reads."""
+    name = args.name
+
+    comp = next((c for c in load_components() if c.name == name), None)
+    if comp is not None:
+        text = _read(comp.path)
+        print(f"COMPONENT  {name}   (category: {comp.path.parent.parent.name})")
+        print(f"  call:    {_component_call(comp)}")
+        print(f"  purpose: {_purpose(text) or '(none)'}")
+        print(f"\n--- usage.md ({comp.path.parent / 'usage.md'}) ---")
+        print(_read(comp.path.parent / "usage.md").rstrip())
+        return 0
+
+    types = doc_type_dirs()
+    if name in types:
+        directory = types[name]
+        text = _read(directory / "document.html.j2")
+        tn = TYPE_NAME_RE.search(text)
+        used = list(dict.fromkeys(re.findall(r"\bc\.(\w+)\(", text)))  # order-preserving
+        print(f"DOC-TYPE   {name}   (domain: {directory.parent.name})")
+        print(f"  type-name: {tn.group(1).strip() if tn else '(none)'}")
+        print(f"  purpose:   {_purpose(text) or '(none)'}")
+        print(f"  uses:      {', '.join(used) or '(none)'}")
+        print(f"\n--- usage.md ({directory / 'usage.md'}) ---")
+        print(_read(directory / "usage.md").rstrip())
+        return 0
+
+    print(f"no component or doc-type named {name!r}. "
+          f"See CATALOG.md or `python builder.py --list`.")
+    return 1
 
 
 def main(argv: list[str]) -> int:
@@ -301,7 +495,10 @@ def main(argv: list[str]) -> int:
     new.add_argument("title", help="document title (quote it)")
     new.add_argument("--docs", default="docs", help="output directory (default: ./docs)")
     new.add_argument("--force", action="store_true", help="overwrite an existing document")
-    sub.add_parser("showcase", help="regenerate components/showcase.html")
+    sub.add_parser("showcase", help="regenerate every showcases/<name>.html")
+    sub.add_parser("catalog", help="regenerate CATALOG.md (quick-reference)")
+    show = sub.add_parser("show", help="print one component/doc-type: signature + usage.md")
+    show.add_argument("name", help="a component or doc-type name")
 
     args = parser.parse_args(argv)
     if args.list:
@@ -310,6 +507,10 @@ def main(argv: list[str]) -> int:
         return cmd_new(args)
     if args.cmd == "showcase":
         return cmd_showcase()
+    if args.cmd == "catalog":
+        return cmd_catalog()
+    if args.cmd == "show":
+        return cmd_show(args)
     parser.print_help()
     return 1
 

@@ -1,5 +1,7 @@
 # software-architecture
 
+_Authoring guidance for the `software-architecture` document type — audience, depth, and rules._
+
 The system's structure: context, containers, components, data, deployment,
 decisions, risks. C4-inspired.
 

@@ -1,5 +1,7 @@
 # project-charter
 
+_Authoring guidance for the `project-charter` document type — audience, depth, and rules._
+
 The document that formally authorises a project and names its manager: purpose,
 objectives, scope boundary, stakeholders, high-level milestones and budget, and
 the sponsor's sign-off. It is the *mandate to start* — short, signed, and

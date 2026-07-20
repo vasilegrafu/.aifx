@@ -1,5 +1,7 @@
 # sprint-retrospective
 
+_Authoring guidance for the `sprint-retrospective` document type — audience, depth, and rules._
+
 A team's reflection on an iteration: what went well, what didn't, and the
 improvements to try next. Blameless and action-oriented.
 

@@ -1,5 +1,7 @@
 # white-paper
 
+_Authoring guidance for the `white-paper` document type — audience, depth, and rules._
+
 - Audience: outside readers you want to persuade — the formal position piece.
 - Filename: `docs/white-paper-<topic>.html`.
 - Depth: full — a white paper is finished writing, not a skeleton.

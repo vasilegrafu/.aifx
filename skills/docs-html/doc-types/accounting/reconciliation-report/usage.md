@@ -1,5 +1,7 @@
 # reconciliation-report
 
+_Authoring guidance for the `reconciliation-report` document type — audience, depth, and rules._
+
 - Audience: whoever must trust the books — the periodic proof that internal
   records match the bank/broker (IBKR statements included).
 - Filename: `docs/reconciliation-report-<account>-<period>.html`.

@@ -1,5 +1,7 @@
 # architecture-decision-record (ADR)
 
+_Authoring guidance for the `architecture-decision-record` document type — audience, depth, and rules._
+
 One significant technical decision: context, options, decision, consequences.
 
 - Audience: developers, future maintainers. Altitude: technical, terse, honest.

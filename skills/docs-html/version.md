@@ -14,6 +14,31 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 1.2.0 — 2026-07-20
+
+Catalog completion, generated reference, and internal reorganization. Additive —
+existing documents keep working unchanged.
+
+- Catalog grows 59 → 84 doc-types; components reorganized into nine category
+  folders (structure, content, lists, callouts, blocks, business,
+  front-back-matter, diagrams, math). New components: comparison-table, quote,
+  meter, risk-matrix, party-block, footnotes.
+- New generated `CATALOG.md` (every component call form + doc-type purpose,
+  built from source via `builder.py catalog`), backed by a required
+  `{# purpose: … #}` header on every template. `builder.py show <name>` prints
+  one item's signature/purpose + usage.md.
+- Category/domain `usage.md` blurbs are the single source feeding both
+  `CATALOG.md` and the showcase category bands.
+- Showcase rebuilt as a category-driven gallery and moved to
+  `showcases/components.html` (the builder discovers `showcases/*.html.j2`).
+- Page-local CSS via a `{% block head %}` hook; showcase-only chrome left the
+  shared stylesheet (`gallery.css` removed).
+- Docs restructured: a per-subsystem `REFERENCE.md` (css, js, components,
+  doc-types) and a "Documentation map"; SKILL.md slimmed to point at them; every
+  per-item `usage.md` opens with a role line.
+
+---
+
 ## 1.1.0 — 2026-07-19
 
 Multi-domain expansion + CDN-only documents.

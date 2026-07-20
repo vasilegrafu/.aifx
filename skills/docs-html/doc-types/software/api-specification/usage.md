@@ -1,5 +1,7 @@
 # api-specification
 
+_Authoring guidance for the `api-specification` document type — audience, depth, and rules._
+
 The contract for an API: conventions, endpoints, request/response shapes,
 error codes. Reference-grade — a consumer builds against it without reading
 the source.

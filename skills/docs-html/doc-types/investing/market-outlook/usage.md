@@ -1,5 +1,7 @@
 # market-outlook
 
+_Authoring guidance for the `market-outlook` document type — audience, depth, and rules._
+
 - Audience: the investor (and later graders of the call) — outlooks are
   written to be scored, not admired.
 - Filename: `docs/market-outlook-<period>.html` (e.g. `-2026-h2`).

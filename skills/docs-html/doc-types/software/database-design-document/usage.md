@@ -1,5 +1,7 @@
 # database-design-document
 
+_Authoring guidance for the `database-design-document` document type — audience, depth, and rules._
+
 The data layer: entity-relationship model, tables/columns, keys, indexes,
 constraints, migrations, retention.
 

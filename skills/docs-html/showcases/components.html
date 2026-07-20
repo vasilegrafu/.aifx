@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Design System, Exercised — Component Catalog</title>
+  <link rel="stylesheet" href="../css/docs-html.css">
+  <script src="../js/docs-html.js" defer></script>
+<style>
+  /* -------------------------------------------------------------------------
+     showcase chrome (gx- namespace) — page-local styles for THIS page only.
+     Kept in the page, not in a shared css/ module: page-specific CSS belongs
+     with its page. Documents never use these classes. Sits after the design
+     system link, so it reads the same tokens (--accent, --border, …).
+     ------------------------------------------------------------------------- */
+
+  /* Hero — the sales opener replacing the plain metadata cover. */
+  .gx-hero { margin: 0 0 1.5rem; padding-bottom: 1.1rem; border-bottom: 2px solid var(--border); }
+  .gx-hero-kicker {
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .gx-hero-title { font-size: 2rem; line-height: 1.1; margin: .4rem 0 0; border: 0; padding: 0; }
+  .gx-hero-sub { margin: .6rem 0 0; color: var(--fg-soft); max-width: 64ch; font-size: 1.02rem; }
+
+  /* Category separator band. */
+  .gx-cat { margin: 2.6rem 0 1.2rem; }
+  .gx-cat:first-of-type { margin-top: 1.4rem; }
+  .gx-cat-kicker {
+    font-family: var(--font-mono); font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .gx-cat-name { font-size: 1.5rem; font-weight: 700; line-height: 1.1; margin: .15rem 0 0; border: 0; padding: 0; }
+  .gx-cat-dir { font-family: var(--font-mono); font-size: .72rem; font-weight: 600; color: var(--accent); }
+  .gx-cat-blurb { margin: .35rem 0 0; color: var(--fg-soft); max-width: 62ch; }
+  .gx-cat-rule { height: 2px; margin-top: .75rem; border-radius: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
+
+  /* Per-component specimen header: title on the left, folder name chip on the right. */
+  .gx-spec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: .7rem; margin: var(--block-gap) 0 .55rem; padding-bottom: .3rem;
+    border-bottom: 1px dashed var(--border);
+  }
+  .gx-spec-title { font-size: .98rem; font-weight: 600; margin: 0; border: 0; padding: 0; }
+  .gx-spec-name {
+    font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
+    color: var(--accent); background: var(--accent-soft);
+    border: 1px solid var(--border); padding: .12rem .55rem; border-radius: 4px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div class="doc-toolbar" role="group" aria-label="Document width">
+    <button type="button" data-w="page" aria-label="Page width" title="Page width (1024px)">▯</button>
+    <button type="button" data-w="wide" aria-label="Full width" title="Full width">▭</button>
+  </div>
+
+  <main>
+<header class="gx-hero">
+  <div class="gx-hero-kicker">docs-html · component catalog</div>
+  <h1 class="gx-hero-title">The Design System, Exercised</h1>
+  <p class="gx-hero-sub">Every component, grouped by category — the building
+    blocks for professional documents that ship as clean, hand-editable HTML,
+    wired up with a single stylesheet and a single script.</p>
+</header>
+    <nav class="toc">
+    <p class="toc-title">Contents</p>
+    <ul>
+      <li><a href="#structure">Structure</a></li>
+      <li><a href="#content">Content</a></li>
+      <li><a href="#lists">Lists</a></li>
+      <li><a href="#callouts">Callouts</a></li>
+      <li><a href="#blocks">Blocks</a></li>
+      <li><a href="#business">Business</a></li>
+      <li><a href="#front-back-matter">Front &amp; back matter</a></li>
+      <li><a href="#diagrams">Diagrams</a></li>
+      <li><a href="#math">Formulas</a></li>
+    </ul>
+  </nav>
+
+
+    <section class="gx-cat" id="structure">
+    <div class="gx-cat-kicker">Category 01 / 09</div>
+    <h2 class="gx-cat-name">Structure <span class="gx-cat-dir">(structure)</span></h2>
+    <p class="gx-cat-blurb">The document skeleton — cover, contents, sections and prose that give every document its shape.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Lead paragraph</h3>
+    <span class="gx-spec-name">lead</span>
+  </div>
+
+  <p class="lead">The executive-summary opener: one emphasised paragraph stating what this document establishes and why it matters, before any detail.</p>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Section &amp; subsection</h3>
+    <span class="gx-spec-name">section</span>
+  </div>
+
+  <section id="demo-section">
+    <h2>A section heading</h2>
+      <p>Sections carry an anchored, optionally-numbered heading and wrap a block of the document.</p>
+  <section id="demo-subsection">
+    <h3>A subsection</h3>
+      <p>Subsections nest one level deeper for finer structure.</p>
+
+  </section>
+
+  </section>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Prose paragraph</h3>
+    <span class="gx-spec-name">prose</span>
+  </div>
+
+  <p>The body text wrapper — measured line length, inline <code>code</code>, <a href="#">links</a> and <dfn>definitions</dfn>. Every readable paragraph on this page is prose.</p>
+
+  <p><small>Also in this category and used to build the page itself:
+    <code>metadata-header</code> (the cover), <code>toc</code> (the contents block
+    above), and <code>page</code> — which renders only inside
+    <code>&lt;body class="presentation"&gt;</code>, see the presentation doc-type.</small></p>
+
+
+    <section class="gx-cat" id="content">
+    <div class="gx-cat-kicker">Category 02 / 09</div>
+    <h2 class="gx-cat-name">Content <span class="gx-cat-dir">(content)</span></h2>
+    <p class="gx-cat-blurb">The body set-pieces — code, tables, figures, quotes and collapsibles, the substance a reader came for.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Plain code</h3>
+    <span class="gx-spec-name">code</span>
+  </div>
+
+  <pre><code>def rate_limited(partition: str) -> bool:
+    """Partition-keyed rate limiter check."""
+    return limiter.acquire(partition)</code></pre>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Framed code — title bar + runtime syntax coloring</h3>
+    <span class="gx-spec-name">code-block</span>
+  </div>
+
+  <figure class="code">
+    <figcaption>devfx/patterns/rate_limiter.py <span class="lang">python</span></figcaption>
+    <pre><code data-lang="python">from devfx.patterns import RateLimiter
+
+def rate_limited(partition: str) -> bool:
+    """Partition-keyed rate limiter check."""
+    # one limiter instance per partition key
+    limiter = RateLimiter(max_calls=30, per_seconds=60)
+    return limiter.acquire(partition) is not None</code></pre>
+  </figure>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Data table</h3>
+    <span class="gx-spec-name">table</span>
+  </div>
+
+    <table>
+    <thead><tr><th>Option</th><th>Pros</th><th>Cons</th></tr></thead>
+    <tbody>
+      <tr><td>PostgreSQL</td><td>mature, SQL</td><td>ops overhead</td></tr>
+      <tr><td>SQLite</td><td>zero ops</td><td>single writer</td></tr>
+    </tbody>
+  </table>
+
+    <table class="wide">
+    <thead><tr><th>Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th><th>Col 5</th><th>Col 6</th><th>Col 7</th><th>Col 8</th><th>Col 9</th><th>Col 10</th></tr></thead>
+    <tbody>
+      <tr><td>wide</td><td>table</td><td>scrolls</td><td>inside</td><td>its</td><td>own</td><td>container</td><td>not</td><td>the</td><td>page</td></tr>
+    </tbody>
+  </table>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Feature comparison</h3>
+    <span class="gx-spec-name">comparison-table</span>
+  </div>
+
+    <table class="comparison">
+    <thead><tr><th></th><th>PostgreSQL</th><th>SQLite</th></tr></thead>
+    <tbody>
+      <tr>
+<td>Concurrent writers</td>
+<td><span class="mark-yes">✓</span></td>
+<td><span class="mark-no">✗</span></td>
+      </tr>
+      <tr>
+<td>Zero administration</td>
+<td><span class="mark-part">◐</span></td>
+<td><span class="mark-yes">✓</span></td>
+      </tr>
+      <tr>
+<td>Max database size</td>
+<td>unlimited</td>
+<td>281 TB</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Pull quote</h3>
+    <span class="gx-spec-name">quote</span>
+  </div>
+
+  <blockquote class="pull">
+    <p>A decision without a record is a rumor with seniority.</p>
+    <footer>— Nygard, Documenting Architecture Decisions, 2011</footer>
+  </blockquote>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Figure with caption</h3>
+    <span class="gx-spec-name">figure</span>
+  </div>
+
+    <figure>
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='120'%3E%3Crect width='320' height='120' fill='%23ddd'/%3E%3Ctext x='160' y='66' text-anchor='middle' font-family='sans-serif' fill='%23555'%3Escreenshot placeholder%3C/text%3E%3C/svg%3E" alt="placeholder figure">
+    <figcaption>A figure with mandatory caption and alt text.</figcaption>
+  </figure>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Collapsible detail</h3>
+    <span class="gx-spec-name">collapsible</span>
+  </div>
+
+  <details>
+    <summary>Full error payload</summary>
+      <pre><code>{ "error": "rate_limited", "retry_after": 30 }</code></pre>
+
+  </details>
+
+
+    <section class="gx-cat" id="lists">
+    <div class="gx-cat-kicker">Category 03 / 09</div>
+    <h2 class="gx-cat-name">Lists <span class="gx-cat-dir">(lists)</span></h2>
+    <p class="gx-cat-blurb">Enumerations — parallel facts, ordered steps, checklists and traceable identifiers.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Bulleted list</h3>
+    <span class="gx-spec-name">bullets</span>
+  </div>
+
+    <ul>
+    <li>Unordered points for parallel, unranked facts.</li>
+    <li>Each item one idea; no nested essays.</li>
+  </ul>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Numbered list</h3>
+    <span class="gx-spec-name">numbered</span>
+  </div>
+
+    <ol>
+    <li>Ordered points when sequence or rank matters.</li>
+    <li>Numbering is automatic — never typed into the text.</li>
+  </ol>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Facts / definition list</h3>
+    <span class="gx-spec-name">facts</span>
+  </div>
+
+    <dl class="facts">
+    <dt>Environment</dt><dd>production</dd>
+    <dt>Endpoint</dt><dd><code>https://api.example.com</code></dd>
+  </dl>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Procedure steps</h3>
+    <span class="gx-spec-name">steps</span>
+  </div>
+
+    <ol class="steps">
+    <li>Stop the service: <code>systemctl stop atlas</code></li>
+    <li>Restore the snapshot.</li>
+    <li>Start and verify health.</li>
+  </ol>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Status checklist</h3>
+    <span class="gx-spec-name">checklist</span>
+  </div>
+
+    <ul class="checklist">
+    <li data-state="done">TC-001 login happy path</li>
+    <li data-state="pending">TC-002 wrong password</li>
+    <li data-state="blocked">TC-003 SSO — awaiting test tenant</li>
+  </ul>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Traceable identifier</h3>
+    <span class="gx-spec-name">trace-id</span>
+  </div>
+
+  <p>Definition: <span class="req" id="REQ-042">REQ-042</span> — referenced as <a href="#REQ-042" data-trace="REQ-042">REQ-042</a>.</p>
+
+
+    <section class="gx-cat" id="callouts">
+    <div class="gx-cat-kicker">Category 04 / 09</div>
+    <h2 class="gx-cat-name">Callouts <span class="gx-cat-dir">(callouts)</span></h2>
+    <p class="gx-cat-blurb">Attention blocks that interrupt the flow to flag something the reader must not miss.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Note, warning, decision &amp; risk</h3>
+    <span class="gx-spec-name">callout</span>
+  </div>
+
+  <aside class="note">  <p>Supplementary context the reader may want.</p>
+</aside>
+  <aside class="warning">  <p>Consequences if this is ignored: data loss on rollback.</p>
+</aside>
+  <aside class="decision">  <p>We will use PostgreSQL as the primary store.</p>
+</aside>
+  <aside class="risk">  <p>The gateway session drops nightly; no automated re-login exists yet.</p>
+</aside>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Inline todo marker</h3>
+    <span class="gx-spec-name">todo-marker</span>
+  </div>
+
+  <p><mark class="todo">Verify: does the gateway retry on 429?</mark></p>
+
+
+    <section class="gx-cat" id="blocks">
+    <div class="gx-cat-kicker">Category 05 / 09</div>
+    <h2 class="gx-cat-name">Blocks <span class="gx-cat-dir">(blocks)</span></h2>
+    <p class="gx-cat-blurb">Specialist record blocks — requirements, acceptance criteria, KPIs, timelines, meters and risk.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Requirement card</h3>
+    <span class="gx-spec-name">requirement</span>
+  </div>
+
+    <article class="requirement" id="REQ-014">
+    <header>
+      <span class="req-id">REQ-014</span>
+      <h3>Portfolio revaluation latency</h3>
+      <span class="req-priority priority-must">Must</span>
+    </header>
+    <dl>
+      <dt>Description</dt><dd>The displayer revalues an open portfolio within 500 ms of a price tick.</dd>
+      <dt>Fit criterion</dt><dd>p95 tick-to-render under 500 ms at 200 positions.</dd>
+    </dl>
+  </article>
+
+    <article class="requirement" id="REQ-021">
+    <header>
+      <span class="req-id">REQ-021</span>
+      <h3>Overnight session recovery</h3>
+      <span class="req-priority priority-should">Should</span>
+    </header>
+    <dl>
+      <dt>Description</dt><dd>The gateway re-authenticates without operator action after a nightly drop.</dd>
+      <dt>Fit criterion</dt><dd>Session restored within 2 min of disconnect, logged.</dd>
+    </dl>
+  </article>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Acceptance criteria</h3>
+    <span class="gx-spec-name">acceptance-criteria</span>
+  </div>
+
+    <div class="acceptance" id="AC-014">
+    <div class="ac-head">
+      <span class="ac-id">AC-014</span>
+<span class="ac-title">Wrong password is rejected</span>    </div>
+    <dl class="gwt">
+      <dt class="kw-given">Given</dt><dd>a registered user</dd>
+      <dt class="kw-given">and</dt><dd>the account is not locked</dd>
+      <dt class="kw-when">When</dt><dd>they submit an incorrect password</dd>
+      <dt class="kw-then">Then</dt><dd>the login is refused</dd>
+      <dt class="kw-then">and</dt><dd>the failed-attempt counter increments</dd>
+    </dl>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">KPI tiles</h3>
+    <span class="gx-spec-name">kpi-tiles</span>
+  </div>
+
+    <div class="kpi-tiles">
+    <div class="kpi">
+      <span class="kpi-value">99.2%</span>
+      <span class="kpi-label">Test pass rate</span>
+      <span class="kpi-trend up">▲ 1.4 pts</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-value">3</span>
+      <span class="kpi-label">Open blockers</span>
+      <span class="kpi-trend down">▼ 2</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-value">142</span>
+      <span class="kpi-label">Commits this sprint</span>
+      <span class="kpi-trend flat">—</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-value">480 ms</span>
+      <span class="kpi-label">p95 revaluation</span>
+      <span class="kpi-trend up">under target</span>
+    </div>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Milestone timeline</h3>
+    <span class="gx-spec-name">timeline</span>
+  </div>
+
+    <ol class="timeline">
+    <li data-state="done">
+      <span class="when">2026-Q1</span>
+      <h3>Importer rewrite shipped</h3>
+      <p>All eight domains on the new session builder.</p>
+    </li>
+    <li data-state="current">
+      <span class="when">2026-Q3</span>
+      <h3>Portfolio app v2</h3>
+      <p>webapi + webapp split; v1 kept read-only.</p>
+    </li>
+    <li data-state="">
+      <span class="when">2026-Q4</span>
+      <h3>Research workspace</h3>
+      <p>Planned.</p>
+    </li>
+  </ol>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Progress meter</h3>
+    <span class="gx-spec-name">meter</span>
+  </div>
+
+    <div class="meter">
+    <div class="meter-head">
+      <span class="meter-label">Equities vs 60% target</span>
+      <span class="meter-value">54%</span>
+    </div>
+    <div class="meter-track"><div class="meter-fill" data-pct="90.0%"></div></div>
+  </div>
+
+    <div class="meter">
+    <div class="meter-head">
+      <span class="meter-label">Roadmap — importer rewrite</span>
+      <span class="meter-value">80%</span>
+    </div>
+    <div class="meter-track"><div class="meter-fill" data-pct="80.0%"></div></div>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Risk matrix</h3>
+    <span class="gx-spec-name">risk-matrix</span>
+  </div>
+
+    <div class="risk-matrix" role="img" aria-label="probability by impact risk matrix">
+    <span class="rm-corner">P \ I</span>
+    <span class="rm-axis">1</span>
+    <span class="rm-axis">2</span>
+    <span class="rm-axis">3</span>
+    <span class="rm-axis">4</span>
+    <span class="rm-axis">5</span>
+    <span class="rm-axis">5</span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-high">
+      </span>
+      <span class="rm-cell rm-high">
+      </span>
+      <span class="rm-cell rm-high">
+      </span>
+    <span class="rm-axis">4</span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-high">
+      </span>
+      <span class="rm-cell rm-high">
+<span class="rm-chip" title="Broker session drops during trading hours">RISK-01</span>      </span>
+    <span class="rm-axis">3</span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-med">
+<span class="rm-chip" title="Manual reconciliation backlog">RISK-03</span>      </span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-high">
+      </span>
+    <span class="rm-axis">2</span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-med">
+<span class="rm-chip" title="CDN outage degrades rendered documents">RISK-02</span>      </span>
+      <span class="rm-cell rm-med">
+      </span>
+      <span class="rm-cell rm-med">
+      </span>
+    <span class="rm-axis">1</span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-low">
+      </span>
+      <span class="rm-cell rm-med">
+      </span>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Glossary</h3>
+    <span class="gx-spec-name">glossary</span>
+  </div>
+
+    <dl class="glossary">
+    <dt id="term-adr">ADR</dt><dd>Architecture Decision Record — a dated, immutable record of one significant decision and its context.</dd>
+    <dt id="term-cgnat">CGNAT</dt><dd>Carrier-Grade NAT — ISP-side address sharing that breaks per-connection session affinity.</dd>
+  </dl>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Revision note</h3>
+    <span class="gx-spec-name">revision-note</span>
+  </div>
+
+  <p class="revision-note" data-rev="v1.2">Retry policy clarified after the 2026-06 review: 3 attempts, 30 s backoff.</p>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Change history</h3>
+    <span class="gx-spec-name">change-history</span>
+  </div>
+
+    <table class="change-history">
+    <caption>Change history</caption>
+    <thead><tr><th>Version</th><th>Date</th><th>Author</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td>1.0</td><td>2026-07-16</td><td>docs-html</td><td>Initial release</td></tr>
+      <tr><td>1.1</td><td>2026-07-19</td><td>docs-html</td><td>Business, finance and math components</td></tr>
+      <tr><td>1.2</td><td>2026-07-20</td><td>docs-html</td><td>Category-driven catalog gallery</td></tr>
+    </tbody>
+  </table>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Approval block</h3>
+    <span class="gx-spec-name">approval-block</span>
+  </div>
+
+    <table class="approvals">
+    <thead><tr><th>Name</th><th>Role</th><th>Date</th><th>Signature</th></tr></thead>
+    <tbody>
+      <tr><td>Jane Doe</td><td>Author</td><td></td><td></td></tr>
+      <tr><td></td><td>Product Owner</td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+
+
+    <section class="gx-cat" id="business">
+    <div class="gx-cat-kicker">Category 06 / 09</div>
+    <h2 class="gx-cat-name">Business &amp; finance <span class="gx-cat-dir">(business)</span></h2>
+    <p class="gx-cat-blurb">Deal and finance artifacts — statements, journal entries, scenario and SWOT analysis, verdict badges and party blocks.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Verdict badges</h3>
+    <span class="gx-spec-name">badge</span>
+  </div>
+
+  <p>Verdicts inline: <span class="badge badge-good">Buy</span> <span class="badge">Hold</span> <span class="badge badge-bad">Sell</span> <span class="badge badge-warn">Review</span> <span class="badge badge-info">New</span></p>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Financial statement</h3>
+    <span class="gx-spec-name">financial-table</span>
+  </div>
+
+    <table class="financial">
+    <caption>Income statement — FY2026 (EUR '000)</caption>
+    <thead><tr><th></th><th>FY2025</th><th>FY2026</th></tr></thead>
+    <tbody>
+      <tr><td>Revenue</td><td>1,200</td><td>1,450</td></tr>
+      <tr><td>Cost of sales</td><td><span class="neg">(700)</span></td><td><span class="neg">(810)</span></td></tr>
+      <tr class="subtotal"><td>Gross profit</td><td>500</td><td>640</td></tr>
+      <tr><td>Operating expenses</td><td><span class="neg">(320)</span></td><td><span class="neg">(355)</span></td></tr>
+      <tr class="total"><td>Operating profit</td><td>180</td><td>285</td></tr>
+    </tbody>
+  </table>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Journal entry</h3>
+    <span class="gx-spec-name">journal-entry</span>
+  </div>
+
+    <div class="journal">
+    <div class="journal-head">
+<span class="journal-date">2026-07-19</span><span class="journal-id">JE-042</span>    </div>
+    <table>
+      <thead><tr><th>Account</th><th>Debit</th><th>Credit</th></tr></thead>
+      <tbody>
+        <tr><td>Trading commissions expense</td><td>12.50</td><td></td></tr>
+        <tr><td class="credit-account">Cash — broker account</td><td></td><td>12.50</td></tr>
+      </tbody>
+    </table>
+    <p class="journal-memo">Broker commission on IBKR trade #18841</p>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Scenario cards</h3>
+    <span class="gx-spec-name">scenarios</span>
+  </div>
+
+    <div class="scenarios">
+    <article class="scenario scenario-good">
+      <h3>Bull</h3>
+      <ul>
+        <li>Rate cuts land H2</li>
+        <li>Margins recover</li>
+      </ul>
+<p class="scenario-outcome">+40% · target 68</p>    </article>
+    <article class="scenario scenario-neutral">
+      <h3>Base</h3>
+      <ul>
+        <li>Rates flat</li>
+        <li>Share stable</li>
+      </ul>
+<p class="scenario-outcome">+12% · target 54</p>    </article>
+    <article class="scenario scenario-bad">
+      <h3>Bear</h3>
+      <ul>
+        <li>Recession</li>
+        <li>Price war</li>
+      </ul>
+<p class="scenario-outcome">−25% · target 36</p>    </article>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Pros &amp; cons</h3>
+    <span class="gx-spec-name">pros-cons</span>
+  </div>
+
+    <div class="pros-cons">
+    <div class="pros">
+      <p>Pros</p>
+      <ul><li>Recurring revenue, 92% retention</li><li>Net cash balance sheet</li></ul>
+    </div>
+    <div class="cons">
+      <p>Cons</p>
+      <ul><li>Customer concentration (top 3 = 41%)</li><li>Founder dependency</li></ul>
+    </div>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">SWOT grid</h3>
+    <span class="gx-spec-name">swot-grid</span>
+  </div>
+
+    <div class="swot">
+    <div class="strengths"><p>Strengths</p><ul><li>Pricing power in niche</li></ul></div>
+    <div class="weaknesses"><p>Weaknesses</p><ul><li>Single-region supply</li></ul></div>
+    <div class="opportunities"><p>Opportunities</p><ul><li>Adjacent product line</li></ul></div>
+    <div class="threats"><p>Threats</p><ul><li>Regulatory change draft in consultation</li></ul></div>
+  </div>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Party block</h3>
+    <span class="gx-spec-name">party-block</span>
+  </div>
+
+    <div class="parties">
+    <div>
+      <p>Provider</p>
+      <ul><li>Jane Doe</li><li>Bucharest, RO</li><li>jane.doe@example.com</li></ul>
+    </div>
+    <div>
+      <p>Client</p>
+      <ul><li>Acme Industries SRL</li><li>Cluj-Napoca, RO</li><li>RO12345678</li></ul>
+    </div>
+  </div>
+
+
+
+    <section class="gx-cat" id="front-back-matter">
+    <div class="gx-cat-kicker">Category 07 / 09</div>
+    <h2 class="gx-cat-name">Front &amp; back matter <span class="gx-cat-dir">(front-back-matter)</span></h2>
+    <p class="gx-cat-blurb">The scholarly apparatus — references, appendices and footnotes that frame the body.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">References</h3>
+    <span class="gx-spec-name">references</span>
+  </div>
+
+    <ol class="references">
+    <li id="ref-29148">ISO/IEC/IEEE 29148:2018, Requirements engineering.</li>
+    <li id="ref-adr">Nygard, M. <em>Documenting Architecture Decisions</em>, 2011.</li>
+  </ol>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Appendices</h3>
+    <span class="gx-spec-name">appendices</span>
+  </div>
+
+  <div class="appendices">
+        <section class="appendix" id="appendix-schema">
+      <h2>Data model</h2>
+        <p>Renders as "Appendix A. Data model" — lettering is CSS-generated and isolated from the body's section numbering.</p>
+
+    </section>
+    <section class="appendix" id="appendix-config">
+      <h2>Configuration reference</h2>
+        <p>Renders as "Appendix B. Configuration reference".</p>
+
+    </section>
+
+  </div>
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Footnotes</h3>
+    <span class="gx-spec-name">footnotes</span>
+  </div>
+
+  <p>The figure excludes one-off items<sup class="fn"><a id="fnref-1" href="#fn-1">1</a></sup> as reported in the annual filing<sup class="fn"><a id="fnref-2" href="#fn-2">2</a></sup>.</p>
+    <ol class="footnotes">
+    <li id="fn-1">Restructuring charge of 4.2m in Q3. <a class="fn-back" href="#fnref-1" aria-label="back to text">↩</a></li>
+    <li id="fn-2">Company filings, 10-K 2025, note 7. <a class="fn-back" href="#fnref-2" aria-label="back to text">↩</a></li>
+  </ol>
+
+
+
+    <section class="gx-cat" id="diagrams">
+    <div class="gx-cat-kicker">Category 08 / 09</div>
+    <h2 class="gx-cat-name">Diagrams <span class="gx-cat-dir">(diagrams)</span></h2>
+    <p class="gx-cat-blurb">Interactive Mermaid diagrams — pan, zoom, fit, fullscreen, a live editor and SVG export, all at view time.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Mermaid diagram</h3>
+    <span class="gx-spec-name">diagram-mermaid</span>
+  </div>
+
+  <pre class="mermaid">
+flowchart LR
+  user([User]) --> app[Web App]
+  app --> api[API]
+  api --> db[(PostgreSQL)]
+  api --> mq[[Message Queue]]
+  </pre>
+
+
+    <section class="gx-cat" id="math">
+    <div class="gx-cat-kicker">Category 09 / 09</div>
+    <h2 class="gx-cat-name">Formulas <span class="gx-cat-dir">(math)</span></h2>
+    <p class="gx-cat-blurb">LaTeX mathematics — plain source in the document, rendered by KaTeX at view time with a readable fallback.</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+
+
+    <div class="gx-spec-head">
+    <h3 class="gx-spec-title">Display &amp; inline math</h3>
+    <span class="gx-spec-name">formula</span>
+  </div>
+
+  <div class="math">d_1 = \frac{\ln(S/K) + \left(r + \sigma^2/2\right)t}{\sigma\sqrt{t}}</div>
+  <p>Inline math sits in prose: <span class="math">E = mc^2</span> — the document holds plain LaTeX text; KaTeX renders it at view time.</p>
+
+  </main>
+</body>
+</html>

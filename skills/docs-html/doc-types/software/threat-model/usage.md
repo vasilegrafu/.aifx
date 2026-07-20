@@ -1,5 +1,7 @@
 # threat-model
 
+_Authoring guidance for the `threat-model` document type — audience, depth, and rules._
+
 - Audience: whoever must decide which attacks are worth defending against.
 - Filename: `docs/threat-model-<system>.html`.
 - Depth: ask — full means walking the real architecture.

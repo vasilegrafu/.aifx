@@ -1,5 +1,7 @@
 # risk-matrix
 
+_Authoring guidance for the `risk-matrix` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/blocks.css`
 
 The classic 5×5 probability × impact heat grid: rows = probability (5 top),

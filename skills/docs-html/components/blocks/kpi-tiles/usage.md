@@ -1,5 +1,7 @@
 # kpi-tiles
 
+_Authoring guidance for the `kpi-tiles` component — when to use it, how, and the rules._
+
 Styled by: `css/blocks.css`
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the builder composes (parameters, if any, declared at its top). The example(s) below are filled illustrations.

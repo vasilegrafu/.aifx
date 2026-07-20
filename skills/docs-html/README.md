@@ -1,141 +1,158 @@
 # docs-html
 
-A skill for producing professional documents as clean, hand-editable HTML.
-Every document wires up the whole design system with **two lines** — one
-stylesheet and one script — a light theme, no framework at view time. Documents
-live in `<project>/docs/` as the single source of truth and are git-versioned.
+**Professional documents as clean, hand-editable HTML.** One design system, no
+proprietary format, no build step — the file you compose is the file you ship,
+and it opens in any browser, on any machine.
 
-Documents are **composed** by `builder.py` (a Jinja2 driver). Jinja runs only at
-compose time; the output is standalone, hand-editable HTML with no template
-syntax left. There is **no publish step and no build step** — the document you
-compose is the document you ship.
+docs-html turns a document type and a title into a finished, standalone HTML
+page that wires up the whole design system with two lines. Ask Claude for it in
+a sentence, or run one command yourself. Then edit it like any HTML — it's
+yours, and it will read the same next year as it does today.
 
-## The two assets
+- **Standalone HTML, zero lock-in** — no Word, no LaTeX, no export step. Open
+  it, edit it, send it, print it.
+- **One system, consistent everywhere** — 84 document types and 45 components
+  that already look right together; restyle every document by editing one file.
+- **Renders what real documents need** — interactive diagrams, proper math,
+  syntax-highlighted code, tables, KPIs, timelines, callouts.
+- **Two-line include** — a document links one stylesheet and one script from a
+  version-pinned CDN, so it stays portable and pinned to the exact look it was
+  authored against.
+- **Prints to PDF** — Ctrl+P, done. Pagination is handled.
 
-Every document links exactly these, resolved back to this skill:
+## What you can do with it
 
-```html
-<link rel="stylesheet" href="<skill>/css/docs-html.css">
-<script src="<skill>/js/docs-html.js" defer></script>
+Compose any of **84 document types** across **10 domains**, each built from
+**45 reusable components**:
+
+| Domain | A few of the types |
+|---|---|
+| **general** | business case · proposal · decision record · status report · SOP · roadmap |
+| **software** | requirements spec · architecture · ADR · test plan · runbook · release notes |
+| **finance** | budget · cash-flow forecast · valuation report · net-worth statement |
+| **investing** | investment thesis · due diligence · backtest · portfolio review · watchlist |
+| **accounting** | invoice · credit note · expense report · financial statements |
+| **research** | research report · literature review · data-analysis report · white paper |
+| **economics** | economic analysis · industry analysis · policy brief |
+| **engineering** | equipment spec · inspection report · maintenance plan · risk assessment |
+| **tools · fallback** | diagram editor · generic document |
+
+The components are the building blocks — requirement cards, KPI tiles,
+timelines, risk matrices, financial tables, SWOT grids, callouts, interactive
+Mermaid diagrams, KaTeX formulas, and more. See every one rendered live in the
+gallery (below), or read `CATALOG.md` for the full list with a one-line purpose
+for each.
+
+## How to use it
+
+### The easy way — ask Claude
+
+docs-html is a Claude skill. Describe the document you want and Claude does the
+rest — it picks the right type, composes it, and fills in real content:
+
+> “Create a software requirements specification for the payments service.”
+>
+> “Draft an investment thesis for ACME with a bull / base / bear scenario table.”
+
+Behind the scenes Claude reads the generated `CATALOG.md` and runs
+`python builder.py show <name>` to see exactly how each component is called, so
+it composes quickly and hands you a finished document you can open and tweak.
+You never have to learn the internals.
+
+### The direct way — one command
+
+Prefer to drive it yourself? Three steps, no server and no build:
+
+```bash
+python builder.py new invoice "ACME Invoice 0042"   # -> docs/acme-invoice-0042.html
+# fill in the placeholders
+# open the file in a browser — that's it
 ```
 
-- **`css/docs-html.css`** — one stylesheet. Sets cascade order with `@layer`,
-  then `@import`s the modules in `css/modules/`. Documents link only this file.
-- **`js/docs-html.js`** — one script, and like the CSS it is only an entry: it
-  loads `js/modules/` in order (classic script injection — ES modules don't
-  work on `file://`). `core.js` is a tiny feature registry; each feature is a
-  self-contained module activated by its markup (`layout-toggle.js` on
-  `.doc-toolbar`, `diagrams.js` on `pre.mermaid` — Mermaid + Panzoom from CDN,
-  pan/zoom, SVG-icon toolbar: zoom ± with live %, fit, reset, fullscreen,
-  download SVG, copy source). New behaviour = new module + one entry in the
-  `MODULES` list; no per-document JS ever.
+Browse the catalog any time with `python builder.py --list`.
 
-## Layout
+**Requirements.** Authoring needs **Python 3 + Jinja2** (`pip install jinja2`) —
+the only dependency, and it runs once at compose time. *Viewing* a document
+needs nothing but a browser.
 
-```
-docs-html/
-├── SKILL.md            authoring contract + command recipes
-├── builder.py          compose base + doc-type template + component macros → docs/<name>.html
-├── css/
-│   ├── docs-html.css   the single stylesheet (@layer + @import)
-│   └── modules/*.css   the modules it imports
-├── js/
-│   ├── docs-html.js    the single script: entry/loader (MODULES list)
-│   └── modules/*.js    core (registry) · util · icons · layout-toggle · diagrams · main
-├── components/
-│   ├── <category>/            structure · lists · content · callouts · blocks ·
-│   │   └── <name>/            matter · business · diagrams · math
-│   │       ├── usage.md           guidance: when + how to use, and the rules
-│   │       └── component.html.j2  a Jinja macro — the callable markup
-│   └── showcase.html          curated live gallery of every component
-└── doc-types/
-    ├── base.html.j2          the shared shell (head + toolbar + <main> + {% block content %})
-    └── <domain>/             general · software · finance · investing · accounting ·
-        └── <name>/           research · economics · engineering · tools · fallback
-            ├── usage.md          audience, depth, research, rules
-            └── document.html.j2  {% extends base %}; body is ONLY macro calls
+## See it in action
+
+The gallery renders every component through its real code, grouped by category,
+with each demo sitting next to the exact call you would write:
+
+```bash
+python builder.py showcase     # regenerate the gallery
+# then open showcases/components.html
 ```
 
-## Workflow
+It is the fastest way to see what is available and what it looks like — and
+because it is generated from the same components your documents use, it can
+never fall out of date.
 
-Run from the project root. Prefix with `!` in the Claude prompt to run
-in-session, or type them in a terminal — same commands.
+## Sharing documents
 
-1. **Compose** — `python builder.py new <type> "<title>"` writes a standalone
-   `docs/<slug>.html` (base shell + the type's macro calls + component macros;
-   the two asset links, author, and date resolved automatically). It won't
-   overwrite an existing document without `--force`.
-2. **Fill** the `{{...}}` placeholders with real content; keep the TOC in sync
-   with the sections.
+A composed document is **self-contained and portable**. Its two asset links
+point at a **version-pinned CDN** (jsDelivr), which means:
 
-That's it — open the file in a browser to view; there is no export.
+- hand someone the `.html` file and it renders correctly on their machine — no
+  setup, no attachments, no shared folder to keep in sync;
+- it is pinned to the exact design-system version it was authored against, so
+  it looks the same for them as it did for you;
+- need a fixed page for print or email? Open it and **Ctrl+P → Save as PDF**.
 
-Other commands:
+There is no publish or export step. The document you compose *is* the artifact.
 
-```
-python builder.py --list        # doc-types
-python builder.py showcase      # regenerate components/showcase.html
-```
+## Extending it
 
-PDF: open a document and Ctrl+P → Save as PDF (`print.css` handles pagination).
+It is just Jinja and CSS — growing it is easy:
 
-## How templates work
+- **New component** — add `components/<category>/<name>/component.html.j2`
+  (a Jinja macro) plus a short `usage.md`, style it in a `css/modules/` file,
+  and add a demo to the gallery.
+- **New document type** — add `doc-types/<domain>/<name>/document.html.j2`
+  (a body of component calls) plus a `usage.md`.
+- **Rebrand everything** — edit `css/modules/brand.css` (name + accent colour);
+  it cascades to every document.
 
-A doc-type `document.html.j2` contains **only component-macro calls** — no raw
-HTML:
-
-```jinja
-{# type-name: Software Requirements Specification #}
-{% extends "doc-types/base.html.j2" %}
-{% block content %}
-  {{ c.toc([("purpose", "Purpose & scope"), ("functional", "Functional requirements")]) }}
-
-  {% call c.section("purpose", "Purpose & scope") %}
-    {% call c.prose() %}{% raw %}{{what this covers}}{% endraw %}{% endcall %}
-  {% endcall %}
-
-  {% call c.section("functional", "Functional requirements") %}
-    {{ c.requirement(id="REQ-001", priority="must", label="Must") }}
-  {% endcall %}
-{% endblock %}
-```
-
-Every component is a macro on the `c` namespace (no imports). Leaves use
-`{{ c.name(...) }}`; containers use `{% call c.name(...) %}…{% endcall %}`. The
-base shell writes the two asset links; the body is pure component calls.
-
-## Extending
-
-- **New doc-type** — add `doc-types/<name>/usage.md` + `document.html.j2`
-  (`{% extends "doc-types/base.html.j2" %}` with a body of only macro calls).
-- **New component** — add `components/<name>/usage.md` (guidance) +
-  `component.html.j2` (a `{% macro %}`), style it in a `css/modules/` file (add
-  its `@import` to `css/docs-html.css`), and add it to the showcase.
-- **Rebrand** — edit `css/modules/brand.css` (`--brand-name`, accent colour); it
-  cascades to every document.
-
-`builder.py` needs `jinja2`; viewing does not. See `SKILL.md` for the full
-authoring contract and the complete doc-type catalog.
+Then refresh the reference with `python builder.py catalog` and the gallery
+with `python builder.py showcase`. See `SKILL.md` for the full authoring
+contract.
 
 ## Versioning
 
-The design-system version lives ONLY in `version.json` (source of truth) +
-`version.md` (changelog + semver contract) at the skill root — never in the
-CSS or JS. On a CDN the URL path carries it (`…/docs-html@X.Y.Z/…`); relative
-imports pin the whole asset tree to one version. Releases via the `release`
-command in SKILL.md; published versions are immutable.
+The design-system version lives in exactly two files — `version.json`
+(machine-readable) and `version.md` (the changelog and semver contract). On the
+CDN the version is carried in the URL, and **published versions are
+immutable**: a document pinned to `@X.Y.Z` never changes underneath you.
+Upgrading a document to a newer look is a deliberate one-line edit, never a
+surprise.
 
-## Local-first, CDN fallback
+## How it's organized
 
-Documents always try the local skill assets first; when `version.json` carries
-a `cdn` base URL, the builder adds an `onerror` fallback to both head tags —
-a document opened where the skill doesn't exist heals itself from the
-version-pinned CDN copy (pinned at compose time). While `cdn` is empty, heads
-carry plain local links.
+```
+docs-html/
+├── SKILL.md            the authoring contract + full catalog
+├── CATALOG.md          generated quick-reference: every component + doc-type
+├── builder.py          composes documents  (new · --list · catalog · show · showcase)
+├── version.json        the design-system version   (+ version.md changelog)
+├── css/
+│   ├── docs-html.css   the single stylesheet every document links
+│   └── modules/*.css   the modules it imports
+├── js/
+│   ├── docs-html.js    the single script every document links
+│   └── modules/*.js    features: syntax highlighting, math, diagrams, layout
+├── components/
+│   └── <category>/     45 building blocks, grouped by category
+├── doc-types/
+│   └── <domain>/       84 document types, grouped by domain
+└── showcases/
+    └── components.html  the live component gallery
+```
 
-## CDN (live)
+Every document references exactly one stylesheet and one script back to this
+system, so a change made here updates every document that points at that
+version — no copies to chase.
 
-This skill's repo — `github.com/vasilegrafu/.claudefx`, mounted as a git
-submodule by consuming solutions — is also the CDN origin: jsDelivr serves its
-tags at `https://cdn.jsdelivr.net/gh/vasilegrafu/.claudefx@X.Y.Z/skills/docs-html/…`.
-Releasing = tagging (see SKILL.md `release`); published tags are immutable.
+## License
+
+MIT — use it, copy it, ship it.

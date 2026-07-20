@@ -1,5 +1,7 @@
 # release-notes
 
+_Authoring guidance for the `release-notes` document type — audience, depth, and rules._
+
 What changed in a release, for the people who consume it: added, changed,
 fixed, deprecated, removed, plus upgrade notes and known issues. Keep a
 Changelog style.

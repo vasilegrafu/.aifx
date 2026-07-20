@@ -1,5 +1,7 @@
 # requirements-traceability-matrix (RTM)
 
+_Authoring guidance for the `requirements-traceability-matrix` document type — audience, depth, and rules._
+
 The grid that proves coverage: each requirement traced to its design element,
 implementation, and the test(s) that verify it.
 

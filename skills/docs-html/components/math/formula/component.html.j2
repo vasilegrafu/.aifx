@@ -1,3 +1,4 @@
+{# purpose: LaTeX math block, rendered by KaTeX at view time #}
 {% macro formula(tex="") %}
   <div class="math">{{ caller() if caller else tex }}</div>
 {% endmacro %}

@@ -1,5 +1,7 @@
 # economic-analysis
 
+_Authoring guidance for the `economic-analysis` document type — audience, depth, and rules._
+
 - Audience: whoever's decision depends on the macro picture (often the
   investor's own market-outlook and theses).
 - Filename: `docs/economic-analysis-<economy-or-sector>-<period>.html`.

@@ -1,5 +1,7 @@
 # user-story-backlog
 
+_Authoring guidance for the `user-story-backlog` document type — audience, depth, and rules._
+
 An agile backlog: epics and user stories with acceptance criteria and
 priority. A living, ordered list.
 

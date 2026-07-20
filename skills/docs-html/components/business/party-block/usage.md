@@ -1,5 +1,7 @@
 # party-block
 
+_Authoring guidance for the `party-block` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 Two-party identity block side by side (From/To, Issuer/Client,

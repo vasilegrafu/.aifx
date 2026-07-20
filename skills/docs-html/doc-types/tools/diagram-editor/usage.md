@@ -1,5 +1,7 @@
 # diagram-editor
 
+_Authoring guidance for the `diagram-editor` document type — audience, depth, and rules._
+
 A diagram workspace: one Mermaid diagram and nothing else. The document IS the
 diagram — open it in a browser and use the viewport's own tools (✎ edit with
 live preview, pan/zoom, fit, fullscreen, resize grip, download SVG, copy

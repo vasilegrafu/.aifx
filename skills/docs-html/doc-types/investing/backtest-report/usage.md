@@ -1,5 +1,7 @@
 # backtest-report
 
+_Authoring guidance for the `backtest-report` document type — audience, depth, and rules._
+
 - Audience: the strategy's judge — pairs with strategy-specification like a
   test report pairs with an SRS.
 - Filename: `docs/backtest-report-<strategy>-<date>.html`.

@@ -1,5 +1,7 @@
 # generic-document
 
+_Authoring guidance for the `generic-document` document type — audience, depth, and rules._
+
 Fallback for any document without a dedicated doc-type yet. If the same
 kind is requested twice, propose promoting it: `new type <name>` adds a
 dedicated doc-type + template to the skill.

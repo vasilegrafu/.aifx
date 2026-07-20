@@ -1,5 +1,7 @@
 # software-design-document (SDD)
 
+_Authoring guidance for the `software-design-document` document type — audience, depth, and rules._
+
 How the software is built to meet the SRS: components, their responsibilities,
 data design, interfaces, and the decisions behind them.
 

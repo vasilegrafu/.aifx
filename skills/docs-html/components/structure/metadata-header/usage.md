@@ -1,5 +1,7 @@
 # metadata-header
 
+_Authoring guidance for the `metadata-header` component — when to use it, how, and the rules._
+
 Styled by: `css/metadata.css`
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the builder composes (parameters, if any, declared at its top). The example(s) below are filled illustrations.
@@ -16,7 +18,7 @@ page.
   <p class="doc-type">Architecture Decision Record</p>
   <h1>Message Queue Selection</h1>
   <dl>
-    <dt>Author</dt>         <dd>Vasile Grafu</dd>
+    <dt>Author</dt>         <dd>Jane Doe</dd>
     <dt>Date</dt>           <dd>2026-07-16</dd>
     <dt>Version</dt>        <dd>0.1</dd>
   </dl>

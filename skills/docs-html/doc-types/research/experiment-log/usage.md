@@ -1,5 +1,7 @@
 # experiment-log
 
+_Authoring guidance for the `experiment-log` document type — audience, depth, and rules._
+
 - Audience: the experimenter — the lab notebook (trade-journal's sibling for
   research; backtest series fit here too before a formal backtest-report).
 - Filename: `docs/experiment-log-<topic>.html`, one per line of inquiry.

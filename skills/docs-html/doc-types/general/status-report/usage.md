@@ -1,5 +1,7 @@
 # status-report
 
+_Authoring guidance for the `status-report` document type — audience, depth, and rules._
+
 A periodic project update: headline metrics, progress since last report,
 what's next, risks and blockers.
 

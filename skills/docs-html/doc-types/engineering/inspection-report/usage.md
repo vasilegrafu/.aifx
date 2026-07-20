@@ -1,5 +1,7 @@
 # inspection-report
 
+_Authoring guidance for the `inspection-report` document type — audience, depth, and rules._
+
 - Audience: whoever must accept or reject the inspected item — and auditors
   later.
 - Filename: `docs/inspection-report-<subject>-<date>.html`.

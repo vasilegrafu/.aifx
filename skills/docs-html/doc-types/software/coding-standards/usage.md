@@ -1,5 +1,7 @@
 # coding-standards
 
+_Authoring guidance for the `coding-standards` document type — audience, depth, and rules._
+
 The team's rules for writing code: naming, formatting, patterns to use and
 avoid, testing expectations, tooling. The reference a reviewer cites.
 

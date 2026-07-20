@@ -1,5 +1,7 @@
 # disaster-recovery-plan
 
+_Authoring guidance for the `disaster-recovery-plan` document type — audience, depth, and rules._
+
 - Audience: whoever is recovering the system, under stress, possibly without
   the person who wrote it.
 - Filename: `docs/disaster-recovery-plan-<system>.html`.

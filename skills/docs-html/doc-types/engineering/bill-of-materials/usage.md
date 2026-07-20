@@ -1,5 +1,7 @@
 # bill-of-materials
 
+_Authoring guidance for the `bill-of-materials` document type — audience, depth, and rules._
+
 - Audience: purchasing and assembly — the list that must be exactly right.
 - Filename: `docs/bill-of-materials-<assembly>.html`.
 - Depth: none.

@@ -1,5 +1,7 @@
 # journal-entry
 
+_Authoring guidance for the `journal-entry` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 An accounting journal entry: debit/credit lines under an Account | Debit |

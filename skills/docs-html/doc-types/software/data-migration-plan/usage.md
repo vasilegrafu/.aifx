@@ -1,5 +1,7 @@
 # data-migration-plan
 
+_Authoring guidance for the `data-migration-plan` document type — audience, depth, and rules._
+
 - Audience: the operator on migration day and the reviewer before it.
 - Filename: `docs/data-migration-plan-<subject>.html`.
 - Depth: full.

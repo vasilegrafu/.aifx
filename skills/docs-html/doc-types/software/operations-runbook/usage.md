@@ -1,5 +1,7 @@
 # operations-runbook
 
+_Authoring guidance for the `operations-runbook` document type — audience, depth, and rules._
+
 How to run and keep a service healthy day to day: overview, routine tasks,
 alerts and their responses, escalation, recovery procedures.
 

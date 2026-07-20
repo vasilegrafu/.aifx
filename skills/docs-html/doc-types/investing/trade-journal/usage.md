@@ -1,5 +1,7 @@
 # trade-journal
 
+_Authoring guidance for the `trade-journal` document type — audience, depth, and rules._
+
 - Audience: the trader — the journal exists to make behavior visible, not to
   look good.
 - Filename: `docs/trade-journal-<period>.html` (e.g. `-2026-h2`), one file per

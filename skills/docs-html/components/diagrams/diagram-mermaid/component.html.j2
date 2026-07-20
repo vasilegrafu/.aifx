@@ -1,3 +1,4 @@
+{# purpose: interactive Mermaid diagram: pan, zoom, live editor #}
 {% macro diagram_mermaid(code="") %}
   <pre class="mermaid">
 {{ caller() if caller else code }}

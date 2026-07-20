@@ -1,5 +1,7 @@
 # net-worth-statement
 
+_Authoring guidance for the `net-worth-statement` document type — audience, depth, and rules._
+
 - Audience: the owner — the personal balance sheet, taken on a fixed cadence.
 - Filename: `docs/net-worth-statement-<date>.html` (or one living document
   with change-history).

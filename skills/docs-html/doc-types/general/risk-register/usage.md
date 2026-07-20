@@ -1,5 +1,7 @@
 # risk-register
 
+_Authoring guidance for the `risk-register` document type — audience, depth, and rules._
+
 A living catalogue of project/product risks: likelihood, impact, owner,
 mitigation, status. Reviewed on a cadence.
 

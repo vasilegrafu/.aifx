@@ -1,5 +1,7 @@
 # software-requirements-specification (SRS)
 
+_Authoring guidance for the `software-requirements-specification` document type — audience, depth, and rules._
+
 The definitive statement of what the software must do — ISO/IEC/IEEE 29148
 style. Functional and non-functional requirements, interfaces, constraints,
 with full front/back matter.

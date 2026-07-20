@@ -1,5 +1,7 @@
 # rollback-plan
 
+_Authoring guidance for the `rollback-plan` document type — audience, depth, and rules._
+
 How to safely revert a release or change: trigger conditions, impact, exact
 rollback steps, verification, and data considerations.
 

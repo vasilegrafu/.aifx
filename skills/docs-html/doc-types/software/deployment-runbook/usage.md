@@ -1,5 +1,7 @@
 # deployment-runbook
 
+_Authoring guidance for the `deployment-runbook` document type — audience, depth, and rules._
+
 The exact procedure to deploy a release: prerequisites, pre-checks, deploy
 steps, verification, rollback, contacts. Followed under pressure, so it is
 unambiguous.

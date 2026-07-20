@@ -1,5 +1,7 @@
 # footnotes
 
+_Authoring guidance for the `footnotes` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/blocks.css`
 
 Numbered notes at the end of a document (or section), each with a ↩ link back

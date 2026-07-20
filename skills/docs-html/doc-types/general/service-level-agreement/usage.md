@@ -1,5 +1,7 @@
 # service-level-agreement (SLA)
 
+_Authoring guidance for the `service-level-agreement` document type — audience, depth, and rules._
+
 The commitment between a service provider and its consumers: services,
 measurable service levels, responsibilities, reporting, and remedies.
 

@@ -1,3 +1,4 @@
+{# purpose: body-text paragraph wrapper #}
 {% macro prose(text="") %}
   <p>{{ caller() if caller else text }}</p>
 {% endmacro %}

@@ -1,5 +1,7 @@
 # literature-review
 
+_Authoring guidance for the `literature-review` document type — audience, depth, and rules._
+
 - Audience: a researcher entering the topic — the map of who said what.
 - Filename: `docs/literature-review-<topic>.html`.
 - Depth: ask — full means actually reading the sources.

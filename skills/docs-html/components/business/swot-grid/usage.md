@@ -1,5 +1,7 @@
 # swot-grid
 
+_Authoring guidance for the `swot-grid` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 The classic 2×2: Strengths | Weaknesses over Opportunities | Threats

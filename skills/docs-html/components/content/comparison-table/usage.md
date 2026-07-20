@@ -1,5 +1,7 @@
 # comparison-table
 
+_Authoring guidance for the `comparison-table` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/content.css`
 
 A feature/option matrix: first column = criteria, remaining columns = the

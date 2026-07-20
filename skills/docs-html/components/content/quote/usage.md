@@ -1,5 +1,7 @@
 # quote
 
+_Authoring guidance for the `quote` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/content.css`
 
 A pull-quote: cited words set apart from the prose, with attribution.

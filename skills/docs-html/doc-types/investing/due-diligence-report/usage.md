@@ -1,5 +1,7 @@
 # due-diligence-report
 
+_Authoring guidance for the `due-diligence-report` document type — audience, depth, and rules._
+
 - Audience: the decision maker (often future you) verifying a company, fund,
   or counterparty before committing money.
 - Filename: `docs/due-diligence-report-<subject>.html`

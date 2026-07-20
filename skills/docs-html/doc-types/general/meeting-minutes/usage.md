@@ -1,5 +1,7 @@
 # meeting-minutes
 
+_Authoring guidance for the `meeting-minutes` document type — audience, depth, and rules._
+
 The record of a meeting: attendees, agenda, discussion, decisions, and action
 items with owners.
 

@@ -1,5 +1,7 @@
 # scenarios
 
+_Authoring guidance for the `scenarios` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 Side-by-side scenario cards (base / bull / bear, best / expected / worst):

@@ -1,5 +1,7 @@
 # earnings-note
 
+_Authoring guidance for the `earnings-note` document type — audience, depth, and rules._
+
 - Audience: the holder of the position, quarterly — the thesis check-in.
 - Filename: `docs/earnings-note-<ticker>-<quarter>.html`.
 - Depth: none — written from the report/call, same week.

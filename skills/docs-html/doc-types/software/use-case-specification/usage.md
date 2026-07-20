@@ -1,5 +1,7 @@
 # use-case-specification
 
+_Authoring guidance for the `use-case-specification` document type — audience, depth, and rules._
+
 One use case in full: actors, preconditions, the main flow, alternate and
 exception flows, postconditions. Cockburn style.
 

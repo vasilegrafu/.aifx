@@ -1,5 +1,7 @@
 # developer-setup-guide
 
+_Authoring guidance for the `developer-setup-guide` document type — audience, depth, and rules._
+
 How a new developer gets the project running locally: prerequisites, setup,
 running, common tasks, troubleshooting. Onboarding in one page.
 

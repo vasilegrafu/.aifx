@@ -1,5 +1,7 @@
 # portfolio-review
 
+_Authoring guidance for the `portfolio-review` document type — audience, depth, and rules._
+
 - Audience: the portfolio owner, reviewing on a fixed cadence (monthly or
   quarterly) — discipline against drift and narrative-chasing.
 - Filename: `docs/portfolio-review-<period>.html` (e.g. `-2026-q2`).

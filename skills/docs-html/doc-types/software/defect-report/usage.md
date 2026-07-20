@@ -1,5 +1,7 @@
 # defect-report
 
+_Authoring guidance for the `defect-report` document type — audience, depth, and rules._
+
 One defect, documented so anyone can reproduce and fix it: environment,
 steps, expected vs actual, evidence, root cause, fix.
 

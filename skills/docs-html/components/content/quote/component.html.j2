@@ -1,3 +1,4 @@
+{# purpose: pull quote with attribution #}
 {% macro quote(text="", source="") %}
   <blockquote class="pull">
     <p>{{ caller() if caller else text }}</p>

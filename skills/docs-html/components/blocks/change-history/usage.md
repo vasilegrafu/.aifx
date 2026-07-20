@@ -1,5 +1,7 @@
 # change-history
 
+_Authoring guidance for the `change-history` component — when to use it, how, and the rules._
+
 Styled by: `css/metadata.css`
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the builder composes (parameters, if any, declared at its top). The example(s) below are filled illustrations.
@@ -13,7 +15,7 @@ The document's version log — who changed what, when. Lives inside the
   <caption>Change history</caption>
   <thead><tr><th>Version</th><th>Date</th><th>Author</th><th>Change</th></tr></thead>
   <tbody>
-    <tr><td>0.1</td><td>2026-07-16</td><td>Vasile Grafu</td><td>Initial draft</td></tr>
+    <tr><td>0.1</td><td>2026-07-16</td><td>Jane Doe</td><td>Initial draft</td></tr>
   </tbody>
 </table>
 ```

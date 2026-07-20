@@ -1,5 +1,7 @@
 # code-block
 
+_Authoring guidance for the `code-block` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/content.css` (plain) + `css/modules/code.css` (frame + palette)
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the

@@ -1,5 +1,7 @@
 # badge
 
+_Authoring guidance for the `badge` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 A generic inline status/rating pill: Buy/Hold/Sell, Pass/Fail, risk ratings,

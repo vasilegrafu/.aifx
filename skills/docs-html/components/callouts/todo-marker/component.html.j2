@@ -1,1 +1,2 @@
+{# purpose: inline unresolved-todo flag #}
 {% macro todo_marker(text="") %}<mark class="todo">{{ caller() if caller else text }}</mark>{% endmacro %}

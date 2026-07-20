@@ -1,5 +1,7 @@
 # watchlist
 
+_Authoring guidance for the `watchlist` document type — audience, depth, and rules._
+
 - Audience: the investor's future self at the moment a trigger fires.
 - Filename: `docs/watchlist.html` (one living document, change-history).
 - Depth: none.

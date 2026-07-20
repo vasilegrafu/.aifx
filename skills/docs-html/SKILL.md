@@ -34,54 +34,46 @@ inlining, no generated export. The document you compose is the document you ship
 
 Paths below are relative to this skill directory.
 
+## Documentation map
+
+Five kinds of doc file, each with one job — read the next level only when you
+need it:
+
+| file | for | answers |
+|---|---|---|
+| `README.md` | users / evaluators | what this is, why use it, how to start |
+| `SKILL.md` (this file) | the agent | what to do, and the rules |
+| `CATALOG.md` (generated) | authoring | every component call form + doc-type purpose |
+| `<item>/usage.md` | authoring | how &amp; when to use one component / doc-type |
+| `<subsystem>/REFERENCE.md` | maintaining | how css / js / components / doc-types work, and how to extend them |
+
+Reading path: `README` → `SKILL` → `CATALOG` → `usage.md` (to author a document)
+or `REFERENCE.md` (to extend the system).
+
 ## The two assets
 
 **`css/docs-html.css`** — the single stylesheet. It sets the cascade order once
 with `@layer`, then `@import`s the modules in `css/modules/`. A document links
 only this file.
 
-| module (css/modules/) | styles |
-|---|---|
-| `brand.css` | organization identity: `--brand-name`, `--brand-accent`. Imported by base.css — never referenced by documents. THE file a corporation edits to rebrand everything |
-| `base.css` | fonts (Inter + JetBrains Mono via CDN), tokens, typography, layout, the layout-toggle toolbar, opt-in numbering — always |
-| `metadata.css` | metadata-header (cover title block), change-history, approval-block |
-| `toc.css` | the static TOC (regular documents; not presentations) |
-| `content.css` | table, plain code, figure, collapsible, quote, comparison-table |
-| `code.css` | framed code blocks (`figure.code` title bar) + the runtime syntax palette (`.token.*`, applied by docs-html.js/Prism) |
-| `callouts.css` | callout, todo-marker |
-| `lists.css` | facts, steps, checklist, trace-id |
-| `blocks.css` | requirement card, acceptance-criteria (Given/When/Then), kpi-tiles, timeline, glossary, revision-note, meter, risk-matrix, footnotes, ISO front/back matter |
-| `business.css` | finance & decision components: financial-table, journal-entry, scenarios, pros-cons, swot-grid, badge, party-block |
-| `math.css` | formula blocks (`.math`) — spacing, overflow, and the readable-LaTeX fallback before/without KaTeX |
-| `diagrams.css` | diagram-mermaid: the pan/zoom viewport + glyph toolbar |
-| `presentation.css` | presentation pages (`<body class="presentation">`) |
-| `print.css` | Ctrl+P → cover page, page breaks — layered LAST |
-
-Every document links the whole stylesheet; there is no tree-shaking. The CSS is
-small and a single cached file beats a per-document set. `@layer` makes the
-cascade order explicit and independent of import order, so modules can be added
-or reordered without specificity surprises.
+`@layer` makes the cascade order explicit and independent of import order, so
+modules can be added or reordered without specificity surprises; a document
+links the whole stylesheet (no tree-shaking — one cached file beats a
+per-document set). **The CSS architecture — the `@layer` order, the full module
+map, page-local CSS, and rebranding — is in `css/REFERENCE.md`.**
 
 **`js/docs-html.js`** — the single script a document links; like the CSS entry,
 it only loads the real code from `js/modules/` (classic `<script>` injection in
 list order — ES modules are blocked on `file://`). The modules form a tree on
-the one `docsHtml` namespace:
-
-| module (js/modules/) | role |
-|---|---|
-| `core.js` | the trunk: `docsHtml.register(feature)` + `init()`. A feature = `{name, selector, init}`; markup absent → dormant; a failing feature degrades itself only |
-| `util.js` | leaf helpers: `loadScript`, `copyText`, `downloadBlob` |
-| `icons.js` | the inline SVG icon set (Lucide-style strokes, currentColor) |
-| `layout-toggle.js` | feature on `.doc-toolbar`: the ▯/▭ width switch |
-| `highlight.js` | feature on `code[data-lang]`: runtime syntax coloring (Prism core + autoloader, lazy; grammars on demand). Exposes `docsHtml.highlight.ensure()/element()` for other features |
-| `math.js` | feature on `.math`: LaTeX rendered by KaTeX `0.16.11` (lazy CDN, script + stylesheet). `<div class="math">` = display, `<span class="math">` = inline; CDN down → the LaTeX source stays readable (math.css) |
-| `diagrams.js` | feature on `pre.mermaid`: everything diagrams — CDN pins, `DiagramViewer` class (pan/zoom + toolbar from a declarative `BUTTONS` spec); the source editor reuses `highlight` for a colored overlay |
-| `main.js` | `docsHtml.init()` on DOM-ready — final, never edited |
+the one `docsHtml` namespace: `core` (registry) · `util` · `icons` ·
+`layout-toggle` · `highlight` (Prism) · `math` (KaTeX) · `diagrams` (Mermaid +
+Panzoom) · `main`. **Module roles, the feature-author guide, and the diagrams
+engine/editor internals are in `js/REFERENCE.md`.**
 
 **Extending**: new behaviour = new `js/modules/<name>.js` that calls
 `docsHtml.register(...)` + its name in the `MODULES` list in `docs-html.js`.
-`core.js`/`main.js`/other features stay untouched — `js/README.md` is the
-feature-author guide (contract, skeleton, rules). Features read per-document
+`core.js`/`main.js`/other features stay untouched — `js/REFERENCE.md` is the
+feature-author guide (contract, skeleton, rules) and the full JS internals. Features read per-document
 options from `data-` attributes on their own markup via
 `docsHtml.data(el, "option-name", fallback)` (e.g.
 `<pre class="mermaid" data-max-scale="10">` raises that diagram's zoom cap) —
@@ -93,31 +85,11 @@ the author already writes:
 - `pre.mermaid` → a **diagram**: rendered, then made **pan/zoomable**.
 
 It loads the heavy engines from CDN **only when a document actually contains a
-diagram** — a diagram-free document fetches nothing extra:
-
-- Mermaid `11.4.1` — renders every `<pre class="mermaid">` with
-  `useMaxWidth:false` (natural pixel size; a node's box is the same across every
-  diagram regardless of node count).
-- Panzoom `@panzoom/panzoom@4.6.0` — wraps each rendered diagram in a bounded
-  viewport with **drag-to-pan**, **Ctrl+wheel zoom**, and an icon toolbar
-  (inline SVG icons, Lucide-style strokes, no icon files): zoom out · live
-  zoom-% · zoom in │ fit-to-view · reset-100% │ fullscreen │ ✎ edit-source │
-  download-SVG · copy-Mermaid-source. The **✎ editor** opens a **side panel**
-  left of the diagram — its own column, the diagram is never covered (the SVG
-  lives in a `.mermaid-canvas` pane that shrinks beside it; drag the panel's
-  right-edge grip to resize, 256px minimum, double-click resets) — re-rendering
-  after a typing pause while **preserving the current pan/zoom** (so you can
-  stay zoomed into the region you are editing); parse errors show under the
-  textarea and the last good render stays. Edits are **session-only** (a
-  `file://` page cannot save itself): the copy button carries the edited
-  source back into the document. The viewport opens at the diagram's natural height
-  capped at `70vh` (diagrams that fit show in full; larger ones are
-  panned/zoomed, never shrunk), and a **grip pill on the bottom edge resizes it
-  vertically** — drag to grow or shrink, double-click to reset. Plain
-  mouse-wheel still scrolls the page.
-
-If the CDN is unreachable, `diagrams.css` leaves the Mermaid source visible as a
-readable code box — the page still works, just without rendered diagrams.
+diagram** — a diagram-free document fetches nothing extra. Mermaid renders each
+diagram at natural size in a bounded pan/zoom viewport with an icon toolbar
+(fit · fullscreen · ✎ source editor · download SVG · copy source); if the CDN is
+unreachable the Mermaid source stays visible as a readable code box. **Engine
+pins, the toolbar, and the ✎-editor behaviour are in `js/REFERENCE.md`.**
 
 **Where the two hrefs point — documents are CDN-ONLY.** `builder.py` bakes
 the version-pinned CDN URLs into every composed document's head:
@@ -125,8 +97,8 @@ the version-pinned CDN URLs into every composed document's head:
 (the version read from `version.json` at compose time — a document is forever
 pinned to the design system it was authored against, and works anywhere on
 the internet with zero local setup). Local paths never appear in documents.
-The ONE exception is the skill's own gallery (`components/showcase.html`),
-which uses local relative refs so it always shows the working tree — the
+The ONE exception is the skill's own showcases (`showcases/*.html`),
+which use local relative refs so they always show the working tree — the
 builder forces this (`cdn_href=""` in `compose_showcase`). If `version.json`
 has no `cdn` configured, composed heads fall back to local skill paths (a
 dev-only situation).
@@ -154,23 +126,31 @@ directly — into a finished document:
 
 ```
 SKILL.md
+CATALOG.md     ← generated quick-reference (component call forms + doc-type purposes); `builder.py catalog`
 builder.py     ← Jinja compose: base + doc-type template + component macros → docs/<name>.html
 css/
     docs-html.css    ← the single stylesheet (@layer + @import)
     modules/*.css    ← the modules it imports
+    REFERENCE.md     ← CSS architecture: @layer order, module map, page-local CSS, rebranding
 js/
     docs-html.js     ← the single script: entry/loader (MODULES list)
     modules/*.js     ← the modules it loads (core, util, icons, features, main)
+    REFERENCE.md     ← JS internals: module roles, feature-author guide, diagrams engine/editor
 components/
-    <category>/       structure | lists | content | callouts | blocks | matter |
-                      business | diagrams | math
+    REFERENCE.md      ← the component model (how components are organized + called)
+    <category>/       structure | lists | content | callouts | blocks |
+                      front-back-matter | business | diagrams | math
+        usage.md           category orientation: blurb + when to use
         <name>/
             usage.md           guidance for the author: when + how, and the rules
             component.html.j2  a Jinja macro {% macro <name>(...) %} — the callable markup
-    showcase.html.j2       source template for the gallery (edit this)
-    showcase.html          generated gallery — run `python builder.py showcase`
+showcases/
+    <name>.html.j2    source template for a showcase (edit this)
+    <name>.html       generated showcase — run `python builder.py showcase`
+                      (components.html.j2 = the category-driven component gallery)
 doc-types/
-    base.html.j2      the shared shell: head (the two links) + toolbar + <main> + {% block content %}
+    REFERENCE.md      ← curated type taxonomy (groupings, † markers, abbreviations)
+    base.html.j2      the shared shell: head (the two links + {% block head %}) + toolbar + <main> + {% block content %}
     <domain>/         general | software | finance | investing | accounting |
                       research | economics | engineering | tools | fallback
         <name>/
@@ -208,72 +188,49 @@ The buttons carry only `data-w="page"|"wide"` — no inline handler.
 purely in CSS from the body class. The toolbar is excluded from the reading
 column, hidden in print, and omitted from presentations.
 
+## CATALOG.md — read this first
+
+`CATALOG.md` (skill root) is the generated quick-reference: every component's
+exact call form (`{{ c.x(...) }}` for leaves, `{% call c.x(...) %}…{% endcall %}`
+for containers) and every doc-type's one-line purpose, grouped by category /
+domain, each group introduced by its blurb. **Read it once before authoring
+instead of opening component and doc-type files** — it is built from the
+templates themselves (macro signatures + the `{# purpose: … #}` headers +
+category/domain blurbs), so it can never drift. Regenerate with
+`python builder.py catalog` after adding or changing any component or doc-type.
+
+**For one item, don't read files — ask the builder:**
+`python builder.py show <name>` prints, for a component, its call form +
+purpose + full `usage.md`; for a doc-type, its domain, type-name, purpose, the
+components it uses, and its `usage.md`. One command instead of several reads.
+
+**Category / domain orientation.** Each `components/<category>/usage.md` and
+`doc-types/<domain>/usage.md` opens with a one-line **blurb** (the first
+content paragraph) then a `**Use when**` line — the fast way to pick the right
+category. That blurb is the SINGLE SOURCE: the builder reads it into both
+`CATALOG.md` (the group intro) and the showcase category bands, so the copy is
+written once. Keep the blurb as the first non-heading line.
+
 ## Document type catalog
 
 Each type is a folder `doc-types/<domain>/<name>/` holding a `usage.md` and a
-`document.html.j2`. `doc-types/` is the authoritative list; this table is the
-map. Run `python builder.py --list` for the live catalog, grouped by domain.
+`document.html.j2`. The type's identity is its own folder name (unique across
+all domains) — commands take the type name alone, never the domain.
 
-The catalog is organized by DOMAIN, and **the directory tree mirrors this
-table exactly**: `doc-types/<domain>/<type>/`. The type's identity is its own
-folder name (unique across all domains) — commands take the type name alone,
-never the domain. Types marked † are universal patterns whose recipes are
-still software-flavored — reusable in other fields with judgment (each
-carries a "Beyond software" note in its usage.md).
-
-**general/** — any field
-| Group | Types |
-|---|---|
-| Initiation & Planning | business-case, project-charter, feasibility-study, statement-of-work, proposal, project-management-plan, roadmap, risk-register |
-| Governance & Operations | decision-record, policy, standard-operating-procedure, change-request, incident-postmortem, service-level-agreement, user-guide |
-| Communication | status-report, meeting-minutes, presentation |
-
-**software/** — SDLC
-| Stage | Types |
-|---|---|
-| Requirements | product-requirements-document †, software-requirements-specification, use-case-specification †, user-story-backlog, requirements-traceability-matrix † |
-| Design | architecture-decision-record †, software-architecture, software-design-document, api-specification, database-design-document, user-interface-design-specification, threat-model |
-| Implementation | coding-standards, developer-setup-guide, technical-specification † |
-| Testing | test-plan, test-case-specification, test-summary-report, performance-test-report, defect-report † |
-| Deployment & Operations | release-notes †, deployment-runbook †, rollback-plan, operations-runbook †, data-migration-plan, disaster-recovery-plan |
-| Process | sprint-retrospective †, project-closure |
-
-**finance/** — budget, cash-flow-forecast, management-report,
-net-worth-statement, valuation-report
-
-**investing/** — investment-thesis, due-diligence-report, portfolio-review,
-trade-journal, investment-policy-statement, market-outlook,
-strategy-specification, backtest-report, watchlist, earnings-note
-
-**accounting/** — financial-statements, invoice, credit-note, expense-report,
-reconciliation-report
-
-**research/** — research-report, data-analysis-report, literature-review,
-white-paper, experiment-log
-
-**economics/** — economic-analysis, policy-brief, industry-analysis
-
-**engineering/** — design-calculation-note, equipment-specification,
-inspection-report, failure-analysis, bill-of-materials, risk-assessment,
-maintenance-plan, commissioning-report
-
-**tools/** — diagram-editor (one Mermaid diagram, nothing else — a workspace
-for the built-in ✎ editor)
-
-**fallback/** — generic-document
+The ten domains: **general** (any field), **software** (SDLC), **finance**,
+**investing**, **accounting**, **research**, **economics**, **engineering**,
+**tools**, **fallback**. For the live list read `CATALOG.md` (names + purposes)
+or run `python builder.py --list`. For the curated taxonomy — types grouped by
+SDLC stage / theme, the † universal-pattern markers, and the abbreviation map —
+see `doc-types/REFERENCE.md`.
 
 ## Commands
 
 ### `new <type> "<title>"` — create a document
-Pick the type from the catalog (`doc-types/` is the live list). The builder
-accepts only full type names — when the user says an abbreviation, translate it
-yourself: ADR → architecture-decision-record, SRS →
-software-requirements-specification, PRD → product-requirements-document, SOW →
-statement-of-work, SDD → software-design-document, RTM →
-requirements-traceability-matrix, API spec → api-specification, SLA →
-service-level-agreement, postmortem → incident-postmortem, CR → change-request,
-runbook → deployment-runbook or operations-runbook (ask which if ambiguous),
-retro → sprint-retrospective, changelog → release-notes. If no dedicated type
+Pick the type from the catalog (`CATALOG.md`, or `python builder.py --list`).
+The builder accepts only full type names — when the user gives an abbreviation
+(ADR, SRS, PRD, SOW, RTM, SLA, retro, changelog…), translate it to the full name
+first; the abbreviation map is in `doc-types/REFERENCE.md`. If no dedicated type
 fits, use `generic-document` and offer to promote it via `new type`.
 
 1. Read `doc-types/<full-type-name>/usage.md` → audience, filename rule, depth
@@ -325,6 +282,7 @@ domain gets a new folder — the builder discovers recursively).
 The template is a Jinja file:
 ```jinja
 {# type-name: Full Type Name #}
+{# purpose: one line — what this document is for (feeds CATALOG.md) #}
 {% extends "doc-types/base.html.j2" %}
 {% block content %}
   {{ c.toc([("id", "Heading"), ...]) }}
@@ -333,20 +291,24 @@ The template is a Jinja file:
   {% endcall %}
 {% endblock %}
 ```
-Its body is **only** component-macro calls — `{{ c.<name>(...) }}` for leaves,
-`{% call c.<name>(...) %}…{% endcall %}` for containers. Every component is a
-macro on the `c` namespace (no imports). Base shell, cover, and the two asset
-links come from `base.html.j2` + the builder. If a needed component is missing,
-add it as `components/<category>/<new>/{usage.md, component.html.j2}` (pick the category folder; the builder discovers recursively).
+The `{# purpose: … #}` line is required — `python builder.py catalog` reads it
+into CATALOG.md. Its body is **only** component-macro calls —
+`{{ c.<name>(...) }}` for leaves, `{% call c.<name>(...) %}…{% endcall %}` for
+containers. Every component is a macro on the `c` namespace (no imports). Base
+shell, cover, and the two asset links come from `base.html.j2` + the builder.
+If a needed component is missing, add it as
+`components/<category>/<new>/{usage.md, component.html.j2}` (pick the category
+folder; the builder discovers recursively) — the macro file's FIRST line is
+`{# purpose: … #}`. After adding either, run `python builder.py catalog` to
+regenerate CATALOG.md.
 
 ### `release [major|minor|patch]` — publish a design-system version
 This skill lives in `github.com/vasilegrafu/.claudefx` — a standalone public
-repo, checked out ONCE as a shared clone (on this machine:
-`D:\Dev.Work\.claudefx`) that solutions consume via junctions/symlinks into
-their `.claude/skills/`; the same repo is ALSO the CDN origin (jsDelivr
-serves its tags). There is no sync step: releasing IS
-tagging this repo. The version lives ONLY in `version.json` + `version.md`
-(skill root). When the user asks for a release:
+repo, checked out ONCE as a shared clone that solutions consume via
+junctions/symlinks into their `.claude/skills/`; the same repo is ALSO the CDN
+origin (jsDelivr serves its tags). There is no sync step: releasing IS tagging
+this repo. The version lives ONLY in `version.json` + `version.md` (skill root).
+When the user asks for a release:
 1. Read `version.json`; bump per semver (`version.md` documents the contract:
    patch = visual fix, minor = additive, major = markup contract change —
    infer the level from what changed since the last entry if not stated).
@@ -429,7 +391,7 @@ Documents hold code as **plain text** — never token `<span>`s, never
 plain but readable code). The `language-*` ban applies to *authored markup*;
 the runtime adds those classes internally. Use the framed form (`figure.code`
 with title bar) for developer-facing documents; plain `<pre><code>` is always
-valid. See `components/code-block/usage.md`.
+valid. See `components/content/code-block/usage.md`.
 
 **Content**
 - Uncertain content is always `<mark class="todo">` — never silently invented,
@@ -460,15 +422,32 @@ valid. See `components/code-block/usage.md`.
 - No filler ("it should be noted that", "in order to"), no marketing adjectives.
   A sentence that adds no information is deleted.
 
-## Maintenance rule
-The gallery is generated: never hand-edit `components/showcase.html`. Every
-catalog component has a demo, and every demo sits under a labeled divider
-naming its component (the gallery-only `mark(...)` macro in showcase.html.j2,
-styled by `css/modules/gallery.css` — documents never use it). After changing
-anything in `css/` or any component, edit `components/showcase.html.j2`
-(add a demo + its `mark` label when you add a component), then regenerate with
-`python builder.py showcase` and open the result in a browser — **CSS and JS
-changes hit ALL documents in ALL projects retroactively** (documents reference
-the shared assets, not copies). When changing a component's markup, edit its
-`component.html.j2` macro (the source the builder composes); the `usage.md` is
-guidance only. `builder.py` needs `jinja2`; viewing does not.
+## Page-specific CSS
+
+Shared `css/modules/` are for styles used across MANY documents; CSS that styles
+ONE page lives in that page, in a `{% block head %}` `<style>` (the base shell
+exposes `{% block head %}` just before `</head>`, after the design-system link,
+so the page reads the same tokens). Worked example + mechanics:
+`css/REFERENCE.md`.
+
+## Showcases &amp; the maintenance rule
+Showcases are the skill's own generated reference pages: `showcases/<name>.html.j2`
+→ `showcases/<name>.html`. `components.html` is the **category-driven component
+gallery** — structured by the nine `components/<category>/` folders. Add more
+showcases by dropping another `<name>.html.j2` in `showcases/`. Never hand-edit
+a generated `showcases/*.html`.
+
+Two gallery-only macros in `components.html.j2` (documents never use them):
+`cat(dir, kicker, name)` opens each category with a separator band — the folder
+name in parentheses after the title, and the blurb pulled from
+`components/<dir>/usage.md`; `spec(title, name)` heads each component's demo,
+pairing a human title with its macro/folder name. Every catalog component has a
+demo under a `spec` header. After changing anything in `css/` or any component,
+edit `showcases/components.html.j2` (add a `spec` + demo in the right category
+when you add a component), then regenerate with `python builder.py showcase`
+and open the result in a browser
+— **CSS and JS changes hit ALL documents in ALL projects retroactively**
+(documents reference the shared assets, not copies). When changing a
+component's markup, edit its `component.html.j2` macro (the source the builder
+composes); the `usage.md` is guidance only. `builder.py` needs `jinja2`;
+viewing does not.

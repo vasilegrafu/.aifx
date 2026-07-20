@@ -1,5 +1,7 @@
 # financial-table
 
+_Authoring guidance for the `financial-table` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 THE numeric report table: first column left-aligned (labels), all others

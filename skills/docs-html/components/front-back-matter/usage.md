@@ -1,14 +1,15 @@
-# front-back-matter
+# Front & back matter — front-back-matter
 
-Styled by: `css/blocks.css` (executive-summary lead, references, appendices).
+The scholarly apparatus — references, appendices and footnotes that frame the body.
 
-Guidance-only component: there is NO `component.html.j2` here. Front/back
-matter is a pattern composed from existing components — [[facts]],
-[[approval-block]], [[references]], [[glossary]], [[appendix]] — plus normal
-sections. The example(s) below are filled illustrations.
+**Use when** a formal document needs an executive summary up front and
+references / appendices / footnotes at the back.
 
-The formal scaffolding ISO/IEEE-style documents carry around the body:
-front matter before the first content section, back matter after the last.
+Category components (styled by `css/blocks.css`): `references`, `appendices`,
+`appendix`, `footnotes`. Front/back matter itself is a *pattern* composed from
+these plus [[facts]], [[approval-block]], [[glossary]] and normal sections —
+the formal scaffolding ISO/IEEE-style documents carry around the body: front
+matter before the first content section, back matter after the last.
 
 ## Front matter (in order, after the metadata-header)
 1. **Purpose & Scope** — a normal `<section>`: what the document covers and,

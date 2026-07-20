@@ -1,5 +1,7 @@
 # valuation-report
 
+_Authoring guidance for the `valuation-report` document type — audience, depth, and rules._
+
 - Audience: whoever acts on the number — buy, sell, negotiate, or account.
 - Filename: `docs/valuation-report-<asset>-<date>.html`.
 - Depth: ask.

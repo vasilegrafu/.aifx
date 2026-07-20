@@ -1,5 +1,7 @@
 # collapsible
 
+_Authoring guidance for the `collapsible` component — when to use it, how, and the rules._
+
 Styled by: `css/content.css`
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the builder composes (parameters, if any, declared at its top). The example(s) below are filled illustrations.

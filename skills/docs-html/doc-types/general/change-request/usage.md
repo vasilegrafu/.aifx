@@ -1,5 +1,7 @@
 # change-request
 
+_Authoring guidance for the `change-request` document type — audience, depth, and rules._
+
 A proposed change to a controlled system, for review and approval: what,
 why, impact, rollout, rollback, sign-off. ITIL change-management style.
 

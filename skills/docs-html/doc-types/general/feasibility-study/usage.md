@@ -1,5 +1,7 @@
 # feasibility-study
 
+_Authoring guidance for the `feasibility-study` document type — audience, depth, and rules._
+
 Can this be done, and should it? Technical, economic, and operational
 feasibility of options, ending in a recommendation.
 

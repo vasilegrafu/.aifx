@@ -1,3 +1,4 @@
+{# purpose: inline dated note about a change #}
 {% macro revision_note(rev="v1.0") %}
   <p class="revision-note" data-rev="{{ rev }}">{{ caller() }}</p>
 {% endmacro %}

@@ -1,5 +1,7 @@
 # risk-assessment
 
+_Authoring guidance for the `risk-assessment` document type — audience, depth, and rules._
+
 - Audience: whoever accepts the residual risk — the FMEA/HAZOP-style
   engineering assessment (risk-register is its general-management sibling).
 - Filename: `docs/risk-assessment-<subject>.html`.

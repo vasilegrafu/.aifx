@@ -1,5 +1,7 @@
 # product-requirements-document (PRD)
 
+_Authoring guidance for the `product-requirements-document` document type — audience, depth, and rules._
+
 What to build and why, from the product side: problem, users, goals,
 requirements, success metrics. The bridge between a business need and an SRS.
 

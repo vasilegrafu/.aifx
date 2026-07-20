@@ -1,0 +1,402 @@
+{# type-name: Component Catalog #}
+{# title: The Design System, Exercised #}
+{# One of the showcases in showcases/. Regenerate every showcase with:
+     python builder.py showcase
+   which composes each showcases/<name>.html.j2 into showcases/<name>.html.
+   This one — components.html — is the category-driven gallery: structured by
+   the nine component categories (components/<category>/). Each category opens
+   with a separator band, and every component sits under a specimen header
+   pairing a human title with its macro/folder name. Exercises the real macros,
+   so the gallery can never drift from the fragments. Open the composed
+   showcases/components.html in a browser after ANY change to css/ or js/ —
+   those changes hit all documents.
+
+   Gallery-only chrome lives in this page's own {% raw %}{% block head %}{% endraw %} <style>
+   below (gx- namespace) — NOT in a shared css/ module, because it styles this
+   one page only. The macros:
+     cat(dir, kicker, name)  — the category separator band; `dir` is the category
+                              folder name (shown in parentheses after the title,
+                              and the section id). The blurb is NOT passed — it
+                              is looked up from `cat_blurb[dir]`, sourced from
+                              components/<dir>/usage.md by the builder (single
+                              source, shared with CATALOG.md).
+     spec(title, name)              — the per-component specimen header.
+   Documents never use either. #}
+{% extends "doc-types/base.html.j2" %}
+
+{% block head %}
+<style>
+  /* -------------------------------------------------------------------------
+     showcase chrome (gx- namespace) — page-local styles for THIS page only.
+     Kept in the page, not in a shared css/ module: page-specific CSS belongs
+     with its page. Documents never use these classes. Sits after the design
+     system link, so it reads the same tokens (--accent, --border, …).
+     ------------------------------------------------------------------------- */
+
+  /* Hero — the sales opener replacing the plain metadata cover. */
+  .gx-hero { margin: 0 0 1.5rem; padding-bottom: 1.1rem; border-bottom: 2px solid var(--border); }
+  .gx-hero-kicker {
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .gx-hero-title { font-size: 2rem; line-height: 1.1; margin: .4rem 0 0; border: 0; padding: 0; }
+  .gx-hero-sub { margin: .6rem 0 0; color: var(--fg-soft); max-width: 64ch; font-size: 1.02rem; }
+
+  /* Category separator band. */
+  .gx-cat { margin: 2.6rem 0 1.2rem; }
+  .gx-cat:first-of-type { margin-top: 1.4rem; }
+  .gx-cat-kicker {
+    font-family: var(--font-mono); font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .gx-cat-name { font-size: 1.5rem; font-weight: 700; line-height: 1.1; margin: .15rem 0 0; border: 0; padding: 0; }
+  .gx-cat-dir { font-family: var(--font-mono); font-size: .72rem; font-weight: 600; color: var(--accent); }
+  .gx-cat-blurb { margin: .35rem 0 0; color: var(--fg-soft); max-width: 62ch; }
+  .gx-cat-rule { height: 2px; margin-top: .75rem; border-radius: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
+
+  /* Per-component specimen header: title on the left, folder name chip on the right. */
+  .gx-spec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: .7rem; margin: var(--block-gap) 0 .55rem; padding-bottom: .3rem;
+    border-bottom: 1px dashed var(--border);
+  }
+  .gx-spec-title { font-size: .98rem; font-weight: 600; margin: 0; border: 0; padding: 0; }
+  .gx-spec-name {
+    font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
+    color: var(--accent); background: var(--accent-soft);
+    border: 1px solid var(--border); padding: .12rem .55rem; border-radius: 4px;
+    white-space: nowrap;
+  }
+</style>
+{% endblock %}
+
+{% macro cat(dir, kicker, name) %}
+  <section class="gx-cat" id="{{ dir }}">
+    <div class="gx-cat-kicker">{{ kicker }}</div>
+    <h2 class="gx-cat-name">{{ name }} <span class="gx-cat-dir">({{ dir }})</span></h2>
+    <p class="gx-cat-blurb">{{ cat_blurb[dir] }}</p>
+    <div class="gx-cat-rule"></div>
+  </section>
+{% endmacro %}
+
+{% macro spec(title, name) %}
+  <div class="gx-spec-head">
+    <h3 class="gx-spec-title">{{ title }}</h3>
+    <span class="gx-spec-name">{{ name }}</span>
+  </div>
+{% endmacro %}
+
+{% block cover %}
+<header class="gx-hero">
+  <div class="gx-hero-kicker">docs-html · component catalog</div>
+  <h1 class="gx-hero-title">{{ title }}</h1>
+  <p class="gx-hero-sub">Every component, grouped by category — the building
+    blocks for professional documents that ship as clean, hand-editable HTML,
+    wired up with a single stylesheet and a single script.</p>
+</header>
+{% endblock %}
+
+{% block content %}
+  {{ c.toc([
+      ("structure", "Structure"),
+      ("content", "Content"),
+      ("lists", "Lists"),
+      ("callouts", "Callouts"),
+      ("blocks", "Blocks"),
+      ("business", "Business"),
+      ("front-back-matter", "Front &amp; back matter"),
+      ("diagrams", "Diagrams"),
+      ("math", "Formulas"),
+  ]) }}
+
+  {# ========================= STRUCTURE ========================= #}
+  {{ cat("structure", "Category 01 / 09", "Structure") }}
+
+  {{ spec("Lead paragraph", "lead") }}
+  {% call c.lead() %}The executive-summary opener: one emphasised paragraph stating what this document establishes and why it matters, before any detail.{% endcall %}
+
+  {{ spec("Section &amp; subsection", "section") }}
+  {% call c.section("demo-section", "A section heading") %}
+    {% call c.prose() %}Sections carry an anchored, optionally-numbered heading and wrap a block of the document.{% endcall %}
+    {% call c.subsection("demo-subsection", "A subsection") %}
+      {% call c.prose() %}Subsections nest one level deeper for finer structure.{% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {{ spec("Prose paragraph", "prose") }}
+  {% call c.prose() %}The body text wrapper — measured line length, inline <code>code</code>, <a href="#">links</a> and <dfn>definitions</dfn>. Every readable paragraph on this page is prose.{% endcall %}
+
+  {% call c.prose() %}<small>Also in this category and used to build the page itself:
+    <code>metadata-header</code> (the cover), <code>toc</code> (the contents block
+    above), and <code>page</code> — which renders only inside
+    <code>&lt;body class="presentation"&gt;</code>, see the presentation doc-type.</small>{% endcall %}
+
+
+  {# ========================= CONTENT ========================= #}
+  {{ cat("content", "Category 02 / 09", "Content") }}
+
+  {{ spec("Plain code", "code") }}
+  {% call c.code() %}{% raw %}def rate_limited(partition: str) -> bool:
+    """Partition-keyed rate limiter check."""
+    return limiter.acquire(partition){% endraw %}{% endcall %}
+
+  {{ spec("Framed code — title bar + runtime syntax coloring", "code-block") }}
+  {% call c.code_block(path="devfx/patterns/rate_limiter.py", lang="python") %}{% raw %}from devfx.patterns import RateLimiter
+
+def rate_limited(partition: str) -> bool:
+    """Partition-keyed rate limiter check."""
+    # one limiter instance per partition key
+    limiter = RateLimiter(max_calls=30, per_seconds=60)
+    return limiter.acquire(partition) is not None{% endraw %}{% endcall %}
+
+  {{ spec("Data table", "table") }}
+  {{ c.table(["Option", "Pros", "Cons"], [
+      ["PostgreSQL", "mature, SQL", "ops overhead"],
+      ["SQLite", "zero ops", "single writer"],
+  ]) }}
+  {{ c.table(
+      ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5", "Col 6", "Col 7", "Col 8", "Col 9", "Col 10"],
+      [["wide", "table", "scrolls", "inside", "its", "own", "container", "not", "the", "page"]],
+      wide=true) }}
+
+  {{ spec("Feature comparison", "comparison-table") }}
+  {{ c.comparison_table(
+      headers=["", "PostgreSQL", "SQLite"],
+      rows=[
+        ["Concurrent writers", "yes", "no"],
+        ["Zero administration", "part", "yes"],
+        ["Max database size", "unlimited", "281 TB"],
+      ]) }}
+
+  {{ spec("Pull quote", "quote") }}
+  {% call c.quote(source="Nygard, Documenting Architecture Decisions, 2011") %}A decision without a record is a rumor with seniority.{% endcall %}
+
+  {{ spec("Figure with caption", "figure") }}
+  {{ c.figure(
+      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='120'%3E%3Crect width='320' height='120' fill='%23ddd'/%3E%3Ctext x='160' y='66' text-anchor='middle' font-family='sans-serif' fill='%23555'%3Escreenshot placeholder%3C/text%3E%3C/svg%3E",
+      alt="placeholder figure",
+      caption="A figure with mandatory caption and alt text.") }}
+
+  {{ spec("Collapsible detail", "collapsible") }}
+  {% call c.collapsible(summary="Full error payload") %}
+    {% call c.code() %}{% raw %}{ "error": "rate_limited", "retry_after": 30 }{% endraw %}{% endcall %}
+  {% endcall %}
+
+
+  {# ========================= LISTS ========================= #}
+  {{ cat("lists", "Category 03 / 09", "Lists") }}
+
+  {{ spec("Bulleted list", "bullets") }}
+  {{ c.bullets([
+      "Unordered points for parallel, unranked facts.",
+      "Each item one idea; no nested essays.",
+  ]) }}
+
+  {{ spec("Numbered list", "numbered") }}
+  {{ c.numbered([
+      "Ordered points when sequence or rank matters.",
+      "Numbering is automatic — never typed into the text.",
+  ]) }}
+
+  {{ spec("Facts / definition list", "facts") }}
+  {{ c.facts([
+      ("Environment", "production"),
+      ("Endpoint", "<code>https://api.example.com</code>"),
+  ]) }}
+
+  {{ spec("Procedure steps", "steps") }}
+  {{ c.steps([
+      "Stop the service: <code>systemctl stop atlas</code>",
+      "Restore the snapshot.",
+      "Start and verify health.",
+  ]) }}
+
+  {{ spec("Status checklist", "checklist") }}
+  {{ c.checklist([
+      ("done", "TC-001 login happy path"),
+      ("pending", "TC-002 wrong password"),
+      ("blocked", "TC-003 SSO — awaiting test tenant"),
+  ]) }}
+
+  {{ spec("Traceable identifier", "trace-id") }}
+  {% call c.prose() %}Definition: {{ c.trace_id("REQ-042") }} — referenced as <a href="#REQ-042" data-trace="REQ-042">REQ-042</a>.{% endcall %}
+
+
+  {# ========================= CALLOUTS ========================= #}
+  {{ cat("callouts", "Category 04 / 09", "Callouts") }}
+
+  {{ spec("Note, warning, decision &amp; risk", "callout") }}
+  {% call c.callout("note") %}{% call c.prose() %}Supplementary context the reader may want.{% endcall %}{% endcall %}
+  {% call c.callout("warning") %}{% call c.prose() %}Consequences if this is ignored: data loss on rollback.{% endcall %}{% endcall %}
+  {% call c.callout("decision") %}{% call c.prose() %}We will use PostgreSQL as the primary store.{% endcall %}{% endcall %}
+  {% call c.callout("risk") %}{% call c.prose() %}The gateway session drops nightly; no automated re-login exists yet.{% endcall %}{% endcall %}
+
+  {{ spec("Inline todo marker", "todo-marker") }}
+  {% call c.prose() %}{{ c.todo_marker("Verify: does the gateway retry on 429?") }}{% endcall %}
+
+
+  {# ========================= BLOCKS ========================= #}
+  {{ cat("blocks", "Category 05 / 09", "Blocks") }}
+
+  {{ spec("Requirement card", "requirement") }}
+  {{ c.requirement(id="REQ-014", title="Portfolio revaluation latency",
+      priority="must", label="Must",
+      description="The displayer revalues an open portfolio within 500 ms of a price tick.",
+      fit="p95 tick-to-render under 500 ms at 200 positions.") }}
+  {{ c.requirement(id="REQ-021", title="Overnight session recovery",
+      priority="should", label="Should",
+      description="The gateway re-authenticates without operator action after a nightly drop.",
+      fit="Session restored within 2 min of disconnect, logged.") }}
+
+  {{ spec("Acceptance criteria", "acceptance-criteria") }}
+  {{ c.acceptance_criteria(id="AC-014", title="Wrong password is rejected",
+      given=["a registered user", "the account is not locked"],
+      when=["they submit an incorrect password"],
+      then=["the login is refused", "the failed-attempt counter increments"]) }}
+
+  {{ spec("KPI tiles", "kpi-tiles") }}
+  {{ c.kpi_tiles([
+      ("99.2%", "Test pass rate", "up", "▲ 1.4 pts"),
+      ("3", "Open blockers", "down", "▼ 2"),
+      ("142", "Commits this sprint", "flat", "—"),
+      ("480 ms", "p95 revaluation", "up", "under target"),
+  ]) }}
+
+  {{ spec("Milestone timeline", "timeline") }}
+  {{ c.timeline([
+      ("done", "2026-Q1", "Importer rewrite shipped", "All eight domains on the new session builder."),
+      ("current", "2026-Q3", "Portfolio app v2", "webapi + webapp split; v1 kept read-only."),
+      ("", "2026-Q4", "Research workspace", "Planned."),
+  ]) }}
+
+  {{ spec("Progress meter", "meter") }}
+  {{ c.meter(label="Equities vs 60% target", value=54, max=60, display="54%") }}
+  {{ c.meter(label="Roadmap — importer rewrite", value=80, max=100, display="80%") }}
+
+  {{ spec("Risk matrix", "risk-matrix") }}
+  {{ c.risk_matrix([
+      ("RISK-01", 4, 5, "Broker session drops during trading hours"),
+      ("RISK-02", 2, 3, "CDN outage degrades rendered documents"),
+      ("RISK-03", 3, 2, "Manual reconciliation backlog"),
+  ]) }}
+
+  {{ spec("Glossary", "glossary") }}
+  {{ c.glossary([
+      ("term-adr", "ADR", "Architecture Decision Record — a dated, immutable record of one significant decision and its context."),
+      ("term-cgnat", "CGNAT", "Carrier-Grade NAT — ISP-side address sharing that breaks per-connection session affinity."),
+  ]) }}
+
+  {{ spec("Revision note", "revision-note") }}
+  {% call c.revision_note(rev="v1.2") %}Retry policy clarified after the 2026-06 review: 3 attempts, 30 s backoff.{% endcall %}
+
+  {{ spec("Change history", "change-history") }}
+  {{ c.change_history([
+      ("1.0", "2026-07-16", "docs-html", "Initial release"),
+      ("1.1", "2026-07-19", "docs-html", "Business, finance and math components"),
+      ("1.2", "2026-07-20", "docs-html", "Category-driven catalog gallery"),
+  ]) }}
+
+  {{ spec("Approval block", "approval-block") }}
+  {{ c.approval_block([
+      ("Jane Doe", "Author"),
+      ("", "Product Owner"),
+  ]) }}
+
+
+  {# ========================= BUSINESS ========================= #}
+  {{ cat("business", "Category 06 / 09", "Business &amp; finance") }}
+
+  {{ spec("Verdict badges", "badge") }}
+  {% call c.prose() %}Verdicts inline: {{ c.badge("Buy", "good") }} {{ c.badge("Hold") }} {{ c.badge("Sell", "bad") }} {{ c.badge("Review", "warn") }} {{ c.badge("New", "info") }}{% endcall %}
+
+  {{ spec("Financial statement", "financial-table") }}
+  {{ c.financial_table(
+      caption="Income statement — FY2026 (EUR '000)",
+      headers=["", "FY2025", "FY2026"],
+      rows=[
+        ("", ["Revenue", "1,200", "1,450"]),
+        ("", ["Cost of sales", '<span class="neg">(700)</span>', '<span class="neg">(810)</span>']),
+        ("subtotal", ["Gross profit", "500", "640"]),
+        ("", ["Operating expenses", '<span class="neg">(320)</span>', '<span class="neg">(355)</span>']),
+        ("total", ["Operating profit", "180", "285"]),
+      ]) }}
+
+  {{ spec("Journal entry", "journal-entry") }}
+  {{ c.journal_entry(id="JE-042", date="2026-07-19",
+      memo="Broker commission on IBKR trade #18841",
+      lines=[
+        ("Trading commissions expense", "12.50", ""),
+        ("Cash — broker account", "", "12.50"),
+      ]) }}
+
+  {{ spec("Scenario cards", "scenarios") }}
+  {{ c.scenarios([
+      ("Bull", "good", ["Rate cuts land H2", "Margins recover"], "+40% · target 68"),
+      ("Base", "neutral", ["Rates flat", "Share stable"], "+12% · target 54"),
+      ("Bear", "bad", ["Recession", "Price war"], "−25% · target 36"),
+  ]) }}
+
+  {{ spec("Pros &amp; cons", "pros-cons") }}
+  {{ c.pros_cons(
+      pros=["Recurring revenue, 92% retention", "Net cash balance sheet"],
+      cons=["Customer concentration (top 3 = 41%)", "Founder dependency"]) }}
+
+  {{ spec("SWOT grid", "swot-grid") }}
+  {{ c.swot_grid(
+      strengths=["Pricing power in niche"],
+      weaknesses=["Single-region supply"],
+      opportunities=["Adjacent product line"],
+      threats=["Regulatory change draft in consultation"]) }}
+
+  {{ spec("Party block", "party-block") }}
+  {{ c.party_block(
+      from_title="Provider", from_lines=["Jane Doe", "Bucharest, RO", "jane.doe@example.com"],
+      to_title="Client", to_lines=["Acme Industries SRL", "Cluj-Napoca, RO", "RO12345678"]) }}
+
+
+  {# ========================= MATTER ========================= #}
+  {{ cat("front-back-matter", "Category 07 / 09", "Front &amp; back matter") }}
+
+  {{ spec("References", "references") }}
+  {{ c.references([
+      ("ref-29148", "ISO/IEC/IEEE 29148:2018, Requirements engineering."),
+      ("ref-adr", "Nygard, M. <em>Documenting Architecture Decisions</em>, 2011."),
+  ]) }}
+
+  {{ spec("Appendices", "appendices") }}
+  {% call c.appendices() %}
+    {% call c.appendix("appendix-schema", "Data model") %}
+      {% call c.prose() %}Renders as "Appendix A. Data model" — lettering is CSS-generated and isolated from the body's section numbering.{% endcall %}
+    {% endcall %}
+    {% call c.appendix("appendix-config", "Configuration reference") %}
+      {% call c.prose() %}Renders as "Appendix B. Configuration reference".{% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {{ spec("Footnotes", "footnotes") }}
+  {% call c.prose() %}The figure excludes one-off items<sup class="fn"><a id="fnref-1" href="#fn-1">1</a></sup> as reported in the annual filing<sup class="fn"><a id="fnref-2" href="#fn-2">2</a></sup>.{% endcall %}
+  {{ c.footnotes([
+      "Restructuring charge of 4.2m in Q3.",
+      "Company filings, 10-K 2025, note 7.",
+  ]) }}
+
+
+  {# ========================= DIAGRAMS ========================= #}
+  {{ cat("diagrams", "Category 08 / 09", "Diagrams") }}
+
+  {{ spec("Mermaid diagram", "diagram-mermaid") }}
+  {% call c.diagram_mermaid() %}{% raw %}flowchart LR
+  user([User]) --> app[Web App]
+  app --> api[API]
+  api --> db[(PostgreSQL)]
+  api --> mq[[Message Queue]]{% endraw %}{% endcall %}
+
+
+  {# ========================= MATH ========================= #}
+  {{ cat("math", "Category 09 / 09", "Formulas") }}
+
+  {{ spec("Display &amp; inline math", "formula") }}
+  {% call c.formula() %}{% raw %}d_1 = \frac{\ln(S/K) + \left(r + \sigma^2/2\right)t}{\sigma\sqrt{t}}{% endraw %}{% endcall %}
+  {% call c.prose() %}{% raw %}Inline math sits in prose: <span class="math">E = mc^2</span> — the document holds plain LaTeX text; KaTeX renders it at view time.{% endraw %}{% endcall %}
+
+{% endblock %}

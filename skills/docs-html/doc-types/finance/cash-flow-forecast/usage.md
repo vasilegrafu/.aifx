@@ -1,5 +1,7 @@
 # cash-flow-forecast
 
+_Authoring guidance for the `cash-flow-forecast` document type — audience, depth, and rules._
+
 - Audience: whoever must not run out of cash — the planning twin of budget
   (budget allocates, forecast times).
 - Filename: `docs/cash-flow-forecast-<scope>-<horizon>.html`.

@@ -1,5 +1,7 @@
 # maintenance-plan
 
+_Authoring guidance for the `maintenance-plan` document type — audience, depth, and rules._
+
 - Audience: the maintainer and the auditor of maintenance.
 - Filename: `docs/maintenance-plan-<equipment>.html`.
 - Depth: full.

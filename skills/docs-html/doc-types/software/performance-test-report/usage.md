@@ -1,5 +1,7 @@
 # performance-test-report
 
+_Authoring guidance for the `performance-test-report` document type — audience, depth, and rules._
+
 - Audience: whoever decides the system is ready for its load.
 - Filename: `docs/performance-test-report-<system>-<date>.html`.
 - Depth: none — written from real test runs.

@@ -1,5 +1,7 @@
 # test-plan
 
+_Authoring guidance for the `test-plan` document type — audience, depth, and rules._
+
 How testing will be done: scope, approach, what to test, environment,
 schedule, entry/exit criteria, risks. IEEE 829 style.
 

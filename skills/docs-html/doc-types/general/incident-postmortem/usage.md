@@ -1,5 +1,7 @@
 # incident-postmortem
 
+_Authoring guidance for the `incident-postmortem` document type — audience, depth, and rules._
+
 A blameless account of an incident: what happened, the timeline, root cause,
 impact, and the action items that prevent recurrence.
 

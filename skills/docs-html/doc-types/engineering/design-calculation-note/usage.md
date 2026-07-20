@@ -1,5 +1,7 @@
 # design-calculation-note
 
+_Authoring guidance for the `design-calculation-note` document type — audience, depth, and rules._
+
 - Audience: a checker — the classic calc sheet, written so an independent
   engineer can verify every step.
 - Filename: `docs/design-calculation-note-<subject>.html`.

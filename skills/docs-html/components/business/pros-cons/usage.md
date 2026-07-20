@@ -1,5 +1,7 @@
 # pros-cons
 
+_Authoring guidance for the `pros-cons` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/business.css`
 
 A two-column weighing block: Pros (green edge) beside Cons (red edge). For

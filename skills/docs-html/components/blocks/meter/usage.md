@@ -1,5 +1,7 @@
 # meter
 
+_Authoring guidance for the `meter` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/blocks.css`
 
 A value-vs-target progress bar: label left, value right, a filled track

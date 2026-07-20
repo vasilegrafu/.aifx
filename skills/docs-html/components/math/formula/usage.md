@@ -1,5 +1,7 @@
 # formula
 
+_Authoring guidance for the `formula` component — when to use it, how, and the rules._
+
 Styled by: `css/modules/math.css` (+ KaTeX's own stylesheet at view time)
 
 A display formula: LaTeX source as plain text, rendered in the browser by

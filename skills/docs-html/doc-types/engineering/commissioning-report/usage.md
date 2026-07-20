@@ -1,5 +1,7 @@
 # commissioning-report
 
+_Authoring guidance for the `commissioning-report` document type — audience, depth, and rules._
+
 - Audience: the party accepting the installation — the record that it works
   as specified, witnessed.
 - Filename: `docs/commissioning-report-<installation>.html`.

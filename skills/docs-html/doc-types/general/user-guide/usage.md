@@ -1,5 +1,7 @@
 # user-guide
 
+_Authoring guidance for the `user-guide` document type — audience, depth, and rules._
+
 End-user documentation: how a person uses the product to get their work done.
 Task-oriented and written for the reader's goals, not the system's internals.
 Distinct from `developer-setup-guide` (engineers building the software) and

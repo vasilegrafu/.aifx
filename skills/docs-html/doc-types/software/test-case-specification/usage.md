@@ -1,5 +1,7 @@
 # test-case-specification
 
+_Authoring guidance for the `test-case-specification` document type — audience, depth, and rules._
+
 The concrete test cases: id, preconditions, steps, expected result, and the
 requirement each verifies.
 

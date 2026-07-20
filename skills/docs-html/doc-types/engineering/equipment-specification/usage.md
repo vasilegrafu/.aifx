@@ -1,5 +1,7 @@
 # equipment-specification
 
+_Authoring guidance for the `equipment-specification` document type — audience, depth, and rules._
+
 - Audience: suppliers quoting against it and inspectors accepting against it.
 - Filename: `docs/equipment-specification-<equipment>.html`.
 - Depth: full.

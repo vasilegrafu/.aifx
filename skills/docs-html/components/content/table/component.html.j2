@@ -1,3 +1,4 @@
+{# purpose: basic data table; wide=true to scroll horizontally #}
 {% macro table(headers, rows, wide=false) %}
   <table{% if wide %} class="wide"{% endif %}>
     <thead><tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>

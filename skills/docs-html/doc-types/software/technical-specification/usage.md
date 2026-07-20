@@ -1,5 +1,7 @@
 # technical-specification
 
+_Authoring guidance for the `technical-specification` document type — audience, depth, and rules._
+
 A focused engineering design for one feature or change: the problem, the
 proposed approach, the detailed design, alternatives, rollout, and testing.
 The "tech spec" / design-doc engineers write before building.

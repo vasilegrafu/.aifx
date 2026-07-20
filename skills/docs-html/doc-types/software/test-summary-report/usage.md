@@ -1,5 +1,7 @@
 # test-summary-report
 
+_Authoring guidance for the `test-summary-report` document type — audience, depth, and rules._
+
 What the testing found: results, coverage, defects, and a pass/fail
 assessment for a release decision. Signed off.
 

@@ -1,5 +1,7 @@
 # presentation
 
+_Authoring guidance for the `presentation` document type — audience, depth, and rules._
+
 A deck of sequential 16:9 pages — like a PowerPoint presentation read one
 page after another. Pure HTML + CSS (+ Mermaid for diagrams): no
 navigation code — readers scroll or press PageDown/PageUp and pages snap

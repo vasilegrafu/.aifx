@@ -1,5 +1,7 @@
 # business-case
 
+_Authoring guidance for the `business-case` document type — audience, depth, and rules._
+
 Why the organisation should invest in this work: the problem, the options, the
 money, and the recommendation. Answers "should we fund this?" — distinct from
 `feasibility-study` (can it be done?) and `statement-of-work` (what will be

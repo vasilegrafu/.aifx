@@ -1,5 +1,7 @@
 # data-analysis-report
 
+_Authoring guidance for the `data-analysis-report` document type — audience, depth, and rules._
+
 - Audience: someone who will act on the numbers — or rerun them.
 - Filename: `docs/data-analysis-report-<topic>.html`.
 - Depth: ask.

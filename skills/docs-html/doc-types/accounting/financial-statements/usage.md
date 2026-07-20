@@ -1,5 +1,7 @@
 # financial-statements
 
+_Authoring guidance for the `financial-statements` document type — audience, depth, and rules._
+
 - Audience: the entity's owner, partner, or accountant — the period's formal
   picture.
 - Filename: `docs/financial-statements-<entity>-<period>.html`.

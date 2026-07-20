@@ -1,5 +1,7 @@
 # roadmap
 
+_Authoring guidance for the `roadmap` document type — audience, depth, and rules._
+
 - Audience: everyone steering by it — a living document, updated on cadence.
 - Filename: `docs/roadmap-<subject>.html` (or `-<year>`).
 - Depth: none — the owner's plan.
