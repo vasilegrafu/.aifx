@@ -93,12 +93,19 @@
   .gx-cat-blurb { margin: .35rem 0 0; color: var(--fg-soft); max-width: 62ch; }
   .gx-cat-rule { height: 2px; margin-top: .75rem; border-radius: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
 
-  /* Per-component specimen header: title on the left, folder name chip on the right. */
+  /* Per-component specimen header: title on the left, folder name chip on the right.
+     The generous TOP margin is the gallery's only separator between one demo and
+     the next: components carry just --block-gap (1rem) of their own, which is
+     right inside a document but too tight here, where consecutive specimens
+     would otherwise run together with no visible boundary. Margins collapse, so
+     this value IS the gap between components. */
   .gx-spec-head {
     display: flex; align-items: baseline; justify-content: space-between;
-    gap: .7rem; margin: var(--block-gap) 0 .55rem; padding-bottom: .3rem;
+    gap: .7rem; margin: 2.5rem 0 .55rem; padding-bottom: .3rem;
     border-bottom: 1px dashed var(--border);
   }
+  /* …except right after a category band, which already supplies its own space. */
+  .gx-cat + .gx-spec-head { margin-top: 1.2rem; }
   .gx-spec-title { font-size: .98rem; font-weight: 600; margin: 0; border: 0; padding: 0; }
   .gx-spec-name {
     font-family: var(--font-mono); font-size: .72rem; font-weight: 600;

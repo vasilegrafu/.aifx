@@ -14,6 +14,25 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 3.0.1 — 2026-07-22
+
+Visual fix. No markup contract change — safe for every document; upgrade by
+changing the version in the two hrefs.
+
+- **`kpi-tiles` values are smaller**: `1.5rem` -> `1.25rem` (24px -> 20px), with
+  line-height at `1.2`. They were reading as poster numbers rather than headline
+  metrics; the weight (800) and tight tracking carry the emphasis instead of the
+  size. A long value like `$1,001,000` now also fits one line in a 9rem tile.
+- **Component gallery: more air between specimens.** `.gx-spec-head` gained a
+  `2.5rem` top margin, so consecutive demos are separated by 40px instead of
+  16px and it is obvious where one component ends and the next begins. A spec
+  header directly after a category band keeps the tighter `1.2rem`, since the
+  band already supplies its own space. This is page-local chrome in
+  `showcases/components.html.j2`, not a shared module — documents download none
+  of it.
+
+---
+
 ## 3.0.0 — 2026-07-22
 
 **Charts changed their markup hook, and gained a whole component category for

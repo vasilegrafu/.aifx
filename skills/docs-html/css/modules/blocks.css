@@ -106,7 +106,10 @@ article.requirement dd { margin: 0; }
 }
 .kpi-value {
   display: block;
-  font-size: 1.5rem; font-weight: 800; line-height: 1.15;
+  /* A headline metric, not a poster: big enough to scan a row of tiles at a
+     glance, small enough that a long value ("$1,001,000") still fits one line
+     in a 9rem tile. Weight and tight tracking carry the emphasis, not size. */
+  font-size: 1.25rem; font-weight: 800; line-height: 1.2;
   letter-spacing: -.02em;
 }
 .kpi-label {
