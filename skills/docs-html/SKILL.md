@@ -66,10 +66,12 @@ map, page-local CSS, and rebranding — is in `css/REFERENCE.md`.**
 it only loads the real code from `js/modules/` (classic `<script>` injection in
 list order — ES modules are blocked on `file://`). The modules form a tree on
 the one `docsHtml` namespace: `core` (registry) · `util` · `icons` ·
-`layout-toggle` · `highlight` (Prism) · `math` (KaTeX) · `diagrams` (Mermaid +
-Panzoom) · `chart` (ECharts) · `drawio` (diagrams.net viewer) · `main`. **Module
-roles, the feature-author guide, and the diagrams engine/editor internals are in
-`js/REFERENCE.md`.**
+`layout-toggle` · `highlight` (Prism) · `math` (KaTeX) · `diagrams` (the SHARED
+diagram viewport — pan/zoom + toolbar, no engine) · `diagram-mermaid` (Mermaid +
+the ✎ editor) · `diagram-drawio` (diagrams.net mxGraph) · `chart` (ECharts) ·
+`main`. Adding a diagram engine = one `diagram-<name>.js` that produces an
+`<svg>`; the viewport comes free. **Module roles, the feature-author guide, and
+the diagrams engine/editor internals are in `js/REFERENCE.md`.**
 
 **Extending**: new behaviour = new `js/modules/<name>.js` that calls
 `docsHtml.register(...)` + its name in the `MODULES` list in `docs-html.js`.

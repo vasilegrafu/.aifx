@@ -1,0 +1,139 @@
+/* docs-html — diagram-mermaid: what is MERMAID-specific.
+   Part of docs-html.css (loaded via @import, layer `diagrams`). The viewport,
+   toolbar and pan/zoom chrome are shared — see diagrams.css.
+
+   Two things live here: the source block's fallback styling, and the ✎ live
+   source editor. */
+
+/* Before Mermaid renders — or forever, if the CDN is unreachable — the block
+   shows its diagram source as a readable code box. Once rendered, the Viewer
+   moves the SVG into .diagram-figure and hides this. So write diagram source
+   clean enough to read as text. */
+pre.mermaid {
+  margin: var(--block-gap) 0;
+  background: var(--code-bg);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: .9rem 1.1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: .85rem; line-height: 1.6;
+  white-space: pre;
+}
+pre.mermaid[hidden] { display: none; }   /* rendered: source stays in the DOM, hidden */
+
+/* source editor: the ✎ button opens a side PANEL left of the canvas — its own
+   flex column, never over the diagram (injected by docs-html.js; session-only,
+   the copy button is the path back into the document). Kept in fullscreen:
+   fullscreen + editor is the full editing workspace. */
+.mermaid-editor {
+  position: relative;              /* anchors its right-edge resize grip */
+  flex: 0 0 auto;
+  width: 325px;                    /* default; drag the grip to change */
+  min-width: 16rem;                /* 256px floor, matched by the drag clamp */
+  display: flex; flex-direction: column;
+  gap: .25rem;
+  padding: .35rem;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+}
+
+/* right-edge grip: drag horizontally to resize the panel */
+.mermaid-editor-resize {
+  position: absolute;
+  top: 0; bottom: 0; right: -6px;
+  width: 12px;
+  z-index: 3;                      /* straddles the divider, above the canvas */
+  display: flex; align-items: center; justify-content: center;
+  cursor: ew-resize;
+}
+.mermaid-editor-resize::after {
+  content: "";
+  width: 4px; height: 38px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.mermaid-editor-resize:hover::after,
+.mermaid-editor-resize.dragging::after { background: var(--accent); }
+
+/* the editing surface: a Prism-colored mirror behind a transparent-text
+   textarea with IDENTICAL metrics (same font, size, line-height, padding —
+   any drift misaligns caret and glyphs). The textarea text goes transparent
+   only in the .highlighted state (Prism actually loaded). */
+.mermaid-editor .editor-surface {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.mermaid-editor .editor-surface pre.editor-code {
+  display: none;                   /* until Prism is ready */
+  position: absolute; inset: 0;
+  margin: 0;
+  border: none; border-radius: 0;
+  background: none;
+  overflow: hidden;                /* follows the textarea's scroll via JS */
+}
+.mermaid-editor .editor-surface.highlighted pre.editor-code { display: block; }
+.mermaid-editor .editor-surface.highlighted textarea {
+  color: transparent;
+  caret-color: var(--fg);
+}
+.mermaid-editor .editor-surface pre.editor-code code {
+  display: block;
+  background: none; border: none; padding: 0;
+  font-size: inherit;
+}
+.mermaid-editor .editor-surface pre.editor-code,
+.mermaid-editor textarea {
+  padding: .3rem .45rem;
+  font-family: var(--font-mono);
+  font-size: .8rem; line-height: 1.45;
+  white-space: pre;
+}
+.mermaid-editor textarea {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  resize: none;
+  border: none;                    /* seamless: same surface as the panel */
+  background: transparent;         /* panel background shows through */
+  color: var(--fg);
+  outline: none;
+}
+/* Scrollbars. Chromium/Edge: the ::-webkit-scrollbar rules below give an exact
+   5px bar with a 50%-transparent thumb — but ONLY apply when no standard
+   scrollbar property is set on the element, so the standard properties live in
+   a Firefox-only guard. */
+@supports (-moz-appearance: none) {
+  .mermaid-editor textarea {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--border) 50%, transparent) transparent;
+  }
+}
+.mermaid-editor textarea::-webkit-scrollbar { width: 5px; height: 5px; }
+.mermaid-editor textarea::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--border) 50%, transparent);
+  border-radius: 3px;
+}
+.mermaid-editor textarea::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--fg-soft) 50%, transparent);
+}
+.mermaid-editor textarea::-webkit-scrollbar-track,
+.mermaid-editor textarea::-webkit-scrollbar-corner { background: transparent; }
+
+.mermaid-editor .editor-error {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--risk);
+  white-space: pre-wrap;
+}
+.mermaid-editor .editor-error:empty { display: none; }
+.mermaid-editor .editor-hint {
+  margin: 0;
+  font-size: .68rem;
+  color: var(--fg-soft);
+}
+
+@media print {
+  .mermaid-editor { display: none; }
+}

@@ -24,9 +24,9 @@ flowchart LR
 
 ## Degradation (pure CSS, automatic)
 Until Mermaid renders — or forever, if the CDN is unreachable — the block
-displays its source as a readable code box (`diagrams.css` targets the
-absence of `data-processed`). So write diagram source clean enough to read
-as text.
+displays its source as a readable code box (`diagram-mermaid.css`). Once
+rendered, the SVG moves into the shared viewport and this block is hidden. So
+write diagram source clean enough to read as text.
 
 ## Rules
 - Diagrams are never images; screenshots use [[figure]].

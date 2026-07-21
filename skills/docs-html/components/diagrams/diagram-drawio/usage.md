@@ -3,10 +3,12 @@
 _Authoring guidance for the `diagram-drawio` component — when to use it, how, and the rules._
 
 Styled by: `css/diagrams.css`
-Rendered by: the pinned diagrams.net viewer (`viewer-static.min.js`), loaded by
-the `drawio` feature only when the document holds a `.drawio` element (see
-SKILL.md). No `<script>` in the document — the feature self-loads the viewer.
-Renders **SVG** (crisp in print) with the viewer's own zoom / lightbox.
+Rendered by: the pinned diagrams.net engine, loaded by the `drawio` feature only
+when the document holds a `.drawio` element (see SKILL.md). No `<script>` in the
+document — the feature self-loads it. Renders **SVG** (crisp in print) into the
+same bounded viewport Mermaid uses: at 100% the diagram **fits the column width**
+with proportional height, and the toolbar gives zoom · fit · fullscreen ·
+download SVG · copy XML (drag to pan, Ctrl+wheel to zoom).
 
 For **freeform** diagrams — architecture, network, infrastructure, deployment —
 where you want deliberate placement and rich shapes (cylinders, clouds, actors,

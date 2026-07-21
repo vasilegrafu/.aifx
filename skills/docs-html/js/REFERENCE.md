@@ -18,9 +18,10 @@ docs-html.js          entry/loader: the MODULES list + injector — order IS dep
     ├── layout-toggle.js   feature — ▯/▭ width switch   (selector: .doc-toolbar)
     ├── highlight.js       feature — runtime code coloring (selector: code[data-lang]; Prism, lazy)
     ├── math.js            feature — LaTeX formulas (selector: .math; KaTeX, lazy)
-    ├── diagrams.js        feature — everything diagrams (selector: pre.mermaid)
+    ├── diagrams.js        SHARED diagram viewport — docsHtml.diagram.Viewer (no feature, no engine)
+    ├── diagram-mermaid.js feature — Mermaid (selector: pre.mermaid; lazy) + the ✎ source editor
+    ├── diagram-drawio.js  feature — draw.io (selector: pre.drawio; diagrams.net mxGraph, lazy)
     ├── chart.js           feature — declarative charts (selector: pre.chart; ECharts, lazy, SVG)
-    ├── drawio.js          feature — freeform draw.io diagrams (selector: pre.drawio; diagrams.net viewer, lazy, SVG)
     └── main.js       docsHtml.init() on DOM-ready — final, never edited
 ```
 
@@ -34,10 +35,16 @@ docs-html.js          entry/loader: the MODULES list + injector — order IS dep
 | `layout-toggle.js` | feature on `.doc-toolbar`: the ▯/▭ width switch |
 | `highlight.js` | feature on `code[data-lang]`: runtime syntax coloring (Prism core + autoloader, lazy; grammars on demand). Exposes `docsHtml.highlight.ensure()/element()` for other features |
 | `math.js` | feature on `.math`: LaTeX rendered by KaTeX `0.16.11` (lazy CDN, script + stylesheet). `<div class="math">` = display, `<span class="math">` = inline; CDN down → the LaTeX source stays readable (math.css) |
-| `diagrams.js` | feature on `pre.mermaid`: everything diagrams — CDN pins, `DiagramViewer` class (pan/zoom + toolbar from a declarative `BUTTONS` spec); the source editor reuses `highlight` for a colored overlay |
+| `diagrams.js` | **Not a feature** — the shared, engine-agnostic diagram viewport, exposed as `docsHtml.diagram.Viewer`. Owns `.diagram-figure` (bounded box), `.diagram-canvas` (pan surface), the toolbar from a declarative `BUTTONS` spec, the zoom-% readout, fit/reset/fullscreen/download-SVG/copy-source, the resize grip, and pan/zoom (a small self-contained transform — **not** `@panzoom`, because the diagrams.net bundle ships a global `Panzoom` that clobbers it). Knows nothing about any engine |
+| `diagram-mermaid.js` | feature on `pre.mermaid`: pins Mermaid `11.4.1` (lazy), renders with `useMaxWidth:false` (natural pixel size, so 100% = natural), hands the SVG to `diagram.Viewer`, and adds the ✎ **live source editor** (its only engine-specific tool — re-renders into the same SVG node so the view survives; reuses `highlight` for the colored overlay) |
+| `diagram-drawio.js` | feature on `pre.drawio`: lazy-loads the pinned diagrams.net bundle (`jgraph/drawio@24.7.17`, ~3.6 MB) and uses **only** its `mxGraph` to render the XML to SVG offscreen, stamps a `viewBox` (so 100% = fit-to-column-width, height proportional), then hands it to `diagram.Viewer`. Bad XML or CDN down → the XML source is restored. No auto-layout — the XML carries explicit coordinates |
 | `chart.js` | feature on `pre.chart`: declarative data charts. Parses a JSON ECharts `option`, lazy-loads ECharts `5.5.1` (pinned CDN), renders **SVG** with the built-in validated `docs-html` theme; auto-fills `aria`/`tooltip`/`legend` only when unset; reflows on resize. Invalid JSON or CDN down → the spec stays a readable code box (chart.css). Rebrand the palette here, never per chart |
-| `drawio.js` | feature on `pre.drawio`: freeform draw.io diagrams. Reads the mxGraph XML source, builds a `.mxgraph` host and lazy-loads the pinned diagrams.net viewer (`jgraph/drawio@24.7.17`, ~3.6 MB), which renders **SVG** with its own zoom/lightbox. Viewer down → the XML source is restored (diagrams.css). No auto-layout — the XML carries explicit coordinates |
 | `main.js` | `docsHtml.init()` on DOM-ready — final, never edited |
+
+**Adding a diagram engine** = a new `diagram-<name>.js` that turns its source
+into an `<svg>` and calls `new docsHtml.diagram.Viewer({ pre, svg, index,
+source, copyTitle, extraButtons })`, plus a `diagram-<name>.css` for its
+source-block fallback. The viewport, toolbar and pan/zoom come free.
 
 Features read per-document options from `data-` attributes on their own markup
 via `docsHtml.data(el, "option-name", fallback)` (e.g.
@@ -86,22 +93,27 @@ docsHtml.register({
    but design the CSS-only fallback too (like `pre.mermaid` staying a readable
    code box when the CDN is unreachable).
 5. **Declarative internals.** Repetitive UI (toolbars, button rows) is a data
-   spec walked by a generic builder — see `DiagramViewer.BUTTONS` in
-   `diagrams.js`, the reference example.
+   spec walked by a generic builder — see `Viewer.BUTTONS` in `diagrams.js`,
+   the reference example.
 
 ## Diagrams — engine & editor internals
 
-`diagrams.js` loads its heavy engines from pinned CDNs **only when a document
-actually contains a diagram** — a diagram-free document fetches nothing extra:
+Each engine loads from a pinned CDN **only when a document actually contains
+that kind of diagram** — a diagram-free document fetches nothing extra:
 
-- **Mermaid `11.4.1`** — renders every `<pre class="mermaid">` with
-  `useMaxWidth:false` (natural pixel size; a node's box is the same across every
-  diagram regardless of node count).
-- **Panzoom `@panzoom/panzoom@4.6.0`** — wraps each rendered diagram in a
-  bounded viewport with **drag-to-pan**, **Ctrl+wheel zoom**, and an icon
-  toolbar (inline SVG icons, Lucide-style strokes, no icon files): zoom out ·
-  live zoom-% · zoom in │ fit-to-view · reset-100% │ fullscreen │ ✎ edit-source │
-  download-SVG · copy-Mermaid-source.
+- **Mermaid `11.4.1`** (`diagram-mermaid.js`) — renders every
+  `<pre class="mermaid">` with `useMaxWidth:false` (natural pixel size; a node's
+  box is the same across every diagram regardless of node count), so 100% is
+  natural size.
+- **diagrams.net `jgraph/drawio@24.7.17`** (`diagram-drawio.js`) — only its
+  `mxGraph` is used, to render `<pre class="drawio">` XML to SVG offscreen; the
+  SVG gets a `viewBox`, so 100% is fit-to-column-width.
+
+Both hand their SVG to the shared `docsHtml.diagram.Viewer`, which supplies the
+bounded viewport with **drag-to-pan**, **Ctrl+wheel zoom**, and one icon toolbar
+(inline SVG icons, Lucide-style strokes, no icon files): zoom out · live zoom-% ·
+zoom in │ fit-to-view · reset-100% │ fullscreen │ *engine tools* │ download-SVG ·
+copy-source. Mermaid contributes the one engine tool, ✎ edit-source.
 
 The viewport opens at the diagram's natural height capped at `70vh` (diagrams
 that fit show in full; larger ones are panned/zoomed, never shrunk), and a
@@ -109,7 +121,7 @@ that fit show in full; larger ones are panned/zoomed, never shrunk), and a
 double-click to reset. Plain mouse-wheel still scrolls the page.
 
 The **✎ editor** opens a **side panel** left of the diagram — its own column;
-the diagram is never covered (the SVG lives in a `.mermaid-canvas` pane that
+the diagram is never covered (the SVG lives in a `.diagram-canvas` pane that
 shrinks beside it; drag the panel's right-edge grip to resize, 256px minimum,
 double-click resets). It re-renders after a typing pause while **preserving the
 current pan/zoom** (so you can stay zoomed into the region you are editing);

@@ -14,6 +14,36 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 1.8.0 — 2026-07-21
+
+Diagram subsystem split into shared core + per-engine files. No authored-markup
+change (`pre.mermaid` / `pre.drawio` are unchanged), so documents are unaffected.
+
+- JS: `diagrams.js` is now the **engine-agnostic viewport** (`docsHtml.diagram.Viewer`
+  — bounded box, pan/zoom, toolbar, fit/reset/fullscreen/download/copy, resize
+  grip); `diagram-mermaid.js` and `diagram-drawio.js` only turn source into an
+  `<svg>` and hand it over. Mermaid keeps the ✎ editor as its one engine tool.
+- CSS: `diagrams.css` (shared chrome) + `diagram-mermaid.css` + `diagram-drawio.css`.
+  Runtime classes renamed to neutral `.diagram-figure` / `.diagram-canvas` /
+  `.diagram-tools` / `.diagram-resize`.
+- draw.io gains the **reset-to-100%** button it was missing, and both engines now
+  share one identical toolbar.
+- `@panzoom` is gone: pan/zoom is self-contained for both engines (the
+  diagrams.net bundle ships a global `Panzoom` that clobbered it).
+
+---
+
+## 1.7.0 — 2026-07-21
+
+- `diagram-drawio` now renders into the same bounded viewport as Mermaid, with
+  the on-brand toolbar (zoom % · fit · fullscreen · download SVG · copy XML,
+  drag to pan, Ctrl+wheel to zoom) instead of the diagrams.net chrome. The SVG
+  carries a `viewBox`, so 100% **fits the column width** with proportional
+  height. Pan/zoom is self-contained — the diagrams.net bundle ships a global
+  `Panzoom` that clobbered `@panzoom`, so draw.io no longer loads it.
+
+---
+
 ## 1.6.0 — 2026-07-20
 
 - New `drawio` feature + `diagram-drawio` component: freeform draw.io /
