@@ -10,7 +10,7 @@ below. For allocation vs bands, goals, utilization, completion.
 `{{ c.meter(label="Equities vs 60% target", value=54, max=60, display="54%") }}`
 
 The fill width comes from a `data-pct` attribute (the authoring contract
-forbids `style=`), consumed by CSS `attr()` — supported in current
-Chromium/Edge; older browsers show the labeled values with an empty track,
-still readable. Rules: `display` carries the human-formatted value; a meter
-over 100% clamps visually — say so in `display`.
+forbids `style=`), consumed by CSS `attr()` in Chromium/Edge and applied by
+`attr-fallback.js` everywhere else, so the fill is proportional in every
+browser. Rules: `display` carries the human-formatted value; a meter over 100%
+clamps visually — say so in `display`.

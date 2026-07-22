@@ -27,9 +27,9 @@ steps float from the running total, which the component tracks at compose time.
 ```
 
 Bar offset and width are computed at compose time and carried as `data-lo` /
-`data-span` (the contract forbids `style=`), read by CSS `attr()`. Every row
-prints its own value, so an engine without `attr()` still shows the full
-decomposition.
+`data-span` (the contract forbids `style=`), read by CSS `attr()` in
+Chromium/Edge and applied by `attr-fallback.js` everywhere else, so the bars are
+proportional in every browser. Every row also prints its own value.
 
 Rules: the steps must actually reconcile — start plus every delta equals end, and
 you check that by hand before publishing. `scale_min` is the axis floor, NOT

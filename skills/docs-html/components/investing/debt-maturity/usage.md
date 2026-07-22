@@ -22,8 +22,9 @@ in a different position from the same company facing a refinancing next spring.
     ]) }}
 ```
 
-Bar widths come from a `data-pct` attribute read by CSS `attr()`; every row also
-prints its amount, so the figure survives without it.
+Bar widths come from a `data-pct` attribute read by CSS `attr()` in
+Chromium/Edge and applied by `attr-fallback.js` everywhere else; every row also
+prints its amount.
 
 Rules: shares are percentages of TOTAL debt and sum to 100%; group everything
 beyond five years into a single bucket rather than drawing a twenty-year tail.

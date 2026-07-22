@@ -30,9 +30,9 @@ bottom-left, bottom-right.
 ```
 
 Item positions come from `data-x` / `data-y` attributes computed at compose time
-(the contract forbids `style=`), read by CSS `attr()`. Where `attr()` is
-unavailable the items stack in the corner — so always state the conclusion in
-`note` rather than relying on the picture alone.
+(the contract forbids `style=`), read by CSS `attr()` in Chromium/Edge and
+applied by `attr-fallback.js` everywhere else. State the conclusion in `note`
+regardless — a scatter of labels is an argument only once someone names it.
 
 Rules: both axes must be DEFINED and measurable, with the definition in `note` —
 "quality" and "attractiveness" as bare labels make the chart unfalsifiable.

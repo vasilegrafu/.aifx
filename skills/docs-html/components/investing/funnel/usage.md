@@ -22,8 +22,9 @@ form is that each step forces you to state a rate and defend it.
     ]) }}
 ```
 
-Bar widths come from a `data-pct` attribute read by CSS `attr()`; every stage
-also prints its value, so the figure degrades to a readable list.
+Bar widths come from a `data-pct` attribute read by CSS `attr()` in
+Chromium/Edge and applied by `attr-fallback.js` everywhere else; every stage
+also prints its value.
 
 Rules: each stage states WHY it is smaller than the one above — an unexplained
 narrowing is where market sizing turns into wishful arithmetic. Widths are

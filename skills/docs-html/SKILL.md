@@ -66,6 +66,7 @@ map, page-local CSS, and rebranding — is in `css/REFERENCE.md`.**
 it only loads the real code from `js/modules/` (classic `<script>` injection in
 list order — ES modules are blocked on `file://`). The modules form a tree on
 the one `docsHtml` namespace: `core` (registry) · `util` · `icons` ·
+`attr-fallback` (a polyfill: bar geometry outside Chromium) ·
 `layout-toggle` · `highlight` (Prism) · `math` (KaTeX) · `diagrams` (the SHARED
 diagram viewport — pan/zoom + toolbar, no engine) · `diagram-mermaid` (Mermaid +
 the ✎ editor) · `charts` (the SHARED chart frame — card, toolbar, palette, no

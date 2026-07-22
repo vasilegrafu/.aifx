@@ -15,6 +15,7 @@ docs-html.js          entry/loader: the MODULES list + injector — order IS dep
     ├── core.js       the trunk: docsHtml namespace — register(), init(), data()
     ├── util.js       leaf helpers: loadScript (deduped), copyText, downloadBlob
     ├── icons.js      the shared SVG icon set (Lucide-style strokes, currentColor)
+    ├── attr-fallback.js   polyfill — typed attr() bar geometry off Chromium; delete when it lands
     ├── layout-toggle.js   feature — ▯/▭ width switch   (selector: .doc-toolbar)
     ├── highlight.js       feature — runtime code coloring (selector: code[data-lang]; Prism, lazy)
     ├── math.js            feature — LaTeX formulas (selector: .math; KaTeX, lazy)
@@ -34,6 +35,7 @@ docs-html.js          entry/loader: the MODULES list + injector — order IS dep
 | `core.js` | the trunk: `docsHtml.register(feature)` + `init()`. A feature = `{name, selector, init}`; markup absent → dormant; a failing feature degrades itself only. Also `docsHtml.data(el, name, fallback)` |
 | `util.js` | leaf helpers: `loadScript` (deduped), `loadStyle` (deduped), `copyText`, `downloadBlob`, `drag(handle, {start, move})` |
 | `icons.js` | the inline SVG icon set (Lucide-style strokes, `currentColor`) |
+| `attr-fallback.js` | **polyfill, not a feature.** The 14 bar/plot components carry their geometry in `data-pct` / `data-lo` / `data-span` / `data-at` / `data-x` / `data-y` and CSS reads it with typed `attr()` — Chromium 133+ only. Elsewhere the whole declaration is dropped (`width: auto` → **every bar full width**, wrong data rather than missing data), so this sets the equivalent inline style. Selects on the *attribute*, relying on the invariant that the attribute name determines the property system-wide. Delete this file when Firefox and Safari ship typed `attr()` |
 | `layout-toggle.js` | feature on `.doc-toolbar`: the ▯/▭ width switch |
 | `highlight.js` | feature on `code[data-lang]`: runtime syntax coloring (Prism core + autoloader, lazy; grammars on demand). Exposes `docsHtml.highlight.ensure()/element()` for other features |
 | `math.js` | feature on `.math`: LaTeX rendered by KaTeX `0.16.11` (lazy CDN, script + stylesheet). `<div class="math">` = display, `<span class="math">` = inline; CDN down → the LaTeX source stays readable (math.css) |

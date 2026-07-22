@@ -23,8 +23,8 @@ never does.
 ```
 
 The weight bar width comes from a `data-pct` attribute (the contract forbids
-`style=`), consumed by CSS `attr()`; the numeric percentage sits beside the bar
-so the table reads identically without it.
+`style=`), consumed by CSS `attr()` in Chromium/Edge and applied by
+`attr-fallback.js` everywhere else; the numeric percentage sits beside the bar.
 
 Rules: weights sum to 100% including cash — cash is a position and hiding it
 overstates every other weight. Same valuation date for every row, named in the

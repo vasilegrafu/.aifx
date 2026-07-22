@@ -15,7 +15,9 @@
    Every block's external spacing is exactly `margin: var(--block-gap) 0` and
    nothing here sets a root-level horizontal margin — components stay flush on
    the reading column's left edge. Bar widths come from data- attributes via
-   attr(), never style= (the authoring contract forbids inline styles). */
+   typed attr(), never style= (the authoring contract forbids inline styles);
+   js/modules/attr-fallback.js applies the same geometry on engines that do not
+   support typed attr() yet — see .score-fill for why that is not optional. */
 
 /* ---------- shared: numeric tables ---------- */
 /* ONE skin for every numeric table in the category. A table opts in with the
@@ -185,8 +187,10 @@ table.scorecard td:last-child, table.scorecard th:last-child { text-align: left;
   display: block; height: 100%; max-width: 100%;
   background: var(--accent);
   border-radius: 999px;
-  /* width from data-pct — the contract forbids style=. Engines without
-     advanced attr() show an empty track; the numeric score stays readable. */
+  /* width from data-pct — the contract forbids style=. Typed attr() is
+     Chromium-only today; js/modules/attr-fallback.js supplies the same width
+     elsewhere, because an unparsed declaration yields a FULL track, not an
+     empty one. Same applies to every *-fill and bar in this file. */
   width: attr(data-pct type(<percentage>), 0%);
 }
 

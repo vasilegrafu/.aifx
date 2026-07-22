@@ -14,6 +14,48 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 3.0.2 — 2026-07-22
+
+Bug fix. No markup contract change — safe for every document; upgrade by
+changing the version in the two hrefs. **Recommended for anyone whose readers
+are not all on Chromium or Edge.**
+
+- **Bar geometry now renders correctly in Firefox and Safari.** Fourteen
+  components carry their geometry in `data-` attributes that CSS reads with
+  typed `attr()` — `width: attr(data-pct type(<percentage>), 0%)`. That syntax
+  is CSS Values 5 and today ships only in Chromium 133+. Elsewhere the engine
+  cannot parse the declaration and **drops it whole**: the `0%` fallback is
+  inside the syntax it could not parse, so `width` reverts to `auto` and the
+  bar fills its track. Every bar rendered full width — a `bridge` showed
+  `+13,031` and `+4,200` as the same size. Wrong data, not missing data.
+
+  New `js/modules/attr-fallback.js` detects the gap once
+  (`CSS.supports("width", "attr(...)")`) and, only where it exists, applies the
+  same geometry as an inline style. Chromium never enters that path and its
+  rendering is byte-for-byte unchanged.
+
+  Affected: `blocks/meter`, and in `investing` — `aging-schedule`, `bridge`,
+  `capital-allocation`, `debt-maturity`, `exposure-bars`, `funnel`,
+  `holdings-table`, `ownership-table`, `quadrant-map`, `scorecard`,
+  `segment-reporting`, `stress-test`, `valuation-range`.
+
+  Verified in Firefox 153: typed `attr()` absent, all 79 geometry elements
+  corrected, 89 of 90 rendered measurements within 2% of their declared
+  percentage — the one outlier being `funnel-bar`'s deliberate `min-width:
+  11rem` legibility floor, which behaves identically in Chromium.
+
+- **Documentation corrected.** Nine `usage.md` files, `css/modules/blocks.css`
+  and `css/modules/investing.css` claimed these components "degrade to an empty
+  track" with the numbers staying readable. That was false in the dangerous
+  direction — the tracks came out full, contradicting the numbers printed
+  beside them. `SKILL.md`, `js/REFERENCE.md` and `css/REFERENCE.md` updated too.
+
+The polyfill is deliberately deletable: when Firefox and Safari ship typed
+`attr()`, remove the file and the line in `js/docs-html.js`. Nothing else
+references it.
+
+---
+
 ## 3.0.1 — 2026-07-22
 
 Visual fix. No markup contract change — safe for every document; upgrade by

@@ -24,8 +24,9 @@ outside what the methods support, and by how much.
 
 Bar offset and width are computed at compose time and carried as `data-lo` /
 `data-span` attributes (the contract forbids `style=`), consumed by CSS
-`attr()`. Older engines show empty tracks — the numeric label on every row
-keeps the figure readable, which is why the label is never optional.
+`attr()` in Chromium/Edge and applied by `attr-fallback.js` everywhere else.
+The numeric label on every row is never optional — a reader should be able to
+check the picture against the number.
 
 Rules: `scale_min` / `scale_max` bound every bar — a range that falls outside
 them is clipped silently, so set the axis last, after the ranges are known.

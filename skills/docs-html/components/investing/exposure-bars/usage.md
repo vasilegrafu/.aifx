@@ -22,8 +22,8 @@ or a limit.
 ```
 
 Bar widths come from a `data-pct` attribute (the contract forbids `style=`),
-consumed by CSS `attr()`; the percentage is also printed as text, so the figure
-survives an engine without `attr()` support.
+consumed by CSS `attr()` in Chromium/Edge and applied by `attr-fallback.js`
+everywhere else; the percentage is also printed as text.
 
 Rules: one dimension per figure — a chart mixing sectors and geographies
 answers neither question. Percentages sum to 100% including cash and "Other".

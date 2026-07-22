@@ -243,8 +243,9 @@ ol.references > li::before {
   background: var(--accent);
   border-radius: 999px;
   /* width from the data-pct attribute — the contract forbids style=.
-     Older engines without advanced attr() show an empty track; the labeled
-     values above stay fully readable. */
+     Typed attr() is Chromium-only today, and an engine that cannot parse this
+     drops the declaration whole (width: auto → a full track, not an empty one),
+     so js/modules/attr-fallback.js sets the same width there. */
   width: attr(data-pct type(<percentage>), 0%);
 }
 

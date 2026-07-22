@@ -14,9 +14,12 @@
    docsHtml.register — see core.js), then add <name> here. Nothing else. */
 
 (function () {
+  // "attr-fallback" is a polyfill, not a feature — it corrects CSS geometry
+  // wherever typed attr() is unsupported, so it runs before anything measures.
   // "diagrams" is the shared diagram viewport and "charts" the shared chart
   // frame; each engine module follows the shared one it builds on.
-  var MODULES = ["core", "util", "icons", "layout-toggle", "highlight", "math",
+  var MODULES = ["core", "util", "icons", "attr-fallback",
+                 "layout-toggle", "highlight", "math",
                  "diagrams", "diagram-mermaid",
                  "charts", "chart-apache-echarts", "main"];
   var base = document.currentScript.src.replace(/docs-html\.js[^/]*$/, "");

@@ -20,8 +20,9 @@ Weights force you to say what matters before you look at the answer.
 ```
 
 The rating bar width comes from a `data-pct` attribute computed at compose
-time (the authoring contract forbids `style=`), consumed by CSS `attr()`.
-Older engines show the numeric score with an empty track — still readable.
+time (the authoring contract forbids `style=`), consumed by CSS `attr()` in
+Chromium/Edge and applied by `attr-fallback.js` everywhere else, so the bar
+matches the numeric score in every browser.
 
 Rules: weights sum to 100% and are set BEFORE scoring, not tuned until the
 total agrees with a conclusion you already had. Every score carries evidence
