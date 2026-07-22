@@ -94,7 +94,8 @@ steps, touching nothing that exists:
 
 **Adding a chart KIND (a preset) — the far more common job.** A kind is not an
 engine: it is a macro that writes a spec for an engine that already exists.
-`components/charts/{sankey,price-history,drawdown-curve}` are the models.
+`components/charts/{sankey,price-history,drawdown-curve,return-distribution,correlation-matrix}`
+are the models.
 
 1. `components/charts/<kind>/component.html.j2`. Import the engine macro and
    delegate to it, so the engine name is written in ONE place per preset:

@@ -107,11 +107,47 @@ def load_components() -> list[Component]:
 # --------------------------------------------------------------------------
 
 
+def boxstats(values: list[float]) -> dict:
+    """Five-number summary + Tukey outliers, for the box-plot preset.
+
+    A Jinja filter rather than template arithmetic: quartiles need sorting and
+    interpolation, which Jinja can express only badly. It still runs at compose
+    time, so the rendered spec carries the derived numbers and a reader can
+    check them.
+
+    Quartiles use linear interpolation between order statistics (the default of
+    R's type 7 and numpy's `percentile`). Whiskers are Tukey's: the furthest
+    point within 1.5 x IQR of the box, NOT the extremes — points beyond are
+    returned separately so they can be drawn as outliers rather than silently
+    stretching the whisker."""
+    data = sorted(float(v) for v in values)
+    if not data:
+        return {"box": [0, 0, 0, 0, 0], "outliers": []}
+
+    def q(p: float) -> float:
+        if len(data) == 1:
+            return data[0]
+        pos = p * (len(data) - 1)
+        lo = int(pos)
+        hi = min(lo + 1, len(data) - 1)
+        return data[lo] + (pos - lo) * (data[hi] - data[lo])
+
+    q1, med, q3 = q(.25), q(.5), q(.75)
+    iqr = q3 - q1
+    lo_fence, hi_fence = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+    inside = [v for v in data if lo_fence <= v <= hi_fence] or data
+    return {
+        "box": [round(v, 4) for v in (inside[0], q1, med, q3, inside[-1])],
+        "outliers": [round(v, 4) for v in data if v < lo_fence or v > hi_fence],
+    }
+
+
 def make_env(components: list[Component]) -> Environment:
     """Build the Jinja environment used for composing documents."""
     env = Environment(loader=FileSystemLoader(str(SKILL_DIR)),
                       trim_blocks=True, lstrip_blocks=True,   # tidy whitespace
                       keep_trailing_newline=True, autoescape=False)
+    env.filters["boxstats"] = boxstats
     c = SimpleNamespace()
     for component in components:
         module = env.get_template(
@@ -443,13 +479,62 @@ SAMPLE_RE = re.compile(r"\{#\s*sample:\s*(.*?)\s*#\}", re.S)   # {# sample: a=1,
 CHART_PRE_RE = re.compile(r'<pre class="chart[^"]*"[^>]*>(.*?)</pre>', re.S)
 
 
-def cmd_charts() -> int:
-    """`charts` — render every chart preset and prove its spec is valid JSON.
+# Slots 1-3 and 7 clear 3:1 on the chart surface; 4, 5, 6 and 8 do not (run
+# `python builder.py dataviz`). Colours are handed out in order, so the moment a
+# chart needs a FOURTH automatic colour it has reached a slot that requires
+# relief. Keep this in step with PALETTE in js/modules/charts.js.
+RELIEF_FREE_SLOTS = 3
 
-    A chart preset writes an engine spec. If that spec is malformed the page
-    does not error: the engine leaves the source visible as a code box, which
-    looks exactly like an unreachable CDN. The failure is silent by design, so
-    it needs a test rather than an eyeball.
+
+def relief_violations(spec: dict) -> str | None:
+    """The dataviz *relief rule*, checked: a series drawn in a low-contrast slot
+    must not be identified by colour alone — it needs visible data labels.
+
+    Only AUTOMATIC colours count. A series or item that sets its own colour is
+    not drawing from the rotating palette at all, which is why a role-coloured
+    sankey with fifteen nodes is fine and a four-series bar chart is not.
+
+    Returns a description of the violation, or None."""
+    series = spec.get("series")
+    if not isinstance(series, list):
+        return None
+
+    def labelled(obj: dict) -> bool:
+        label = obj.get("label")
+        return isinstance(label, dict) and label.get("show") is True
+
+    # Multi-series: one automatic colour per series.
+    auto = [s for s in series
+            if isinstance(s, dict) and not (s.get("itemStyle") or {}).get("color")
+            and not (s.get("lineStyle") or {}).get("color")]
+    if len(auto) > RELIEF_FREE_SLOTS and not any(labelled(s) for s in auto):
+        return (f"{len(auto)} series take automatic palette colours "
+                f"(slots past {RELIEF_FREE_SLOTS} need relief) and none show labels")
+
+    # Single categorical series (pie, funnel, treemap): one colour per ITEM.
+    # These draw labels by default, so the violation is switching them OFF.
+    for s in series:
+        if not isinstance(s, dict) or s.get("type") not in {"pie", "funnel", "treemap"}:
+            continue
+        items = [d for d in (s.get("data") or [])
+                 if isinstance(d, dict) and not (d.get("itemStyle") or {}).get("color")]
+        label = s.get("label")
+        hidden = isinstance(label, dict) and label.get("show") is False
+        if len(items) > RELIEF_FREE_SLOTS and hidden:
+            return (f"{s['type']} has {len(items)} auto-coloured slices "
+                    f"with labels switched off")
+    return None
+
+
+def cmd_charts() -> int:
+    """`charts` — render every chart preset, then check two things about every
+    spec (the presets' and the showcase's alike).
+
+    1. It is valid JSON. If a spec is malformed the page does not error: the
+       engine leaves the source visible as a code box, which looks exactly like
+       an unreachable CDN. The failure is silent by design, so it needs a test
+       rather than an eyeball.
+    2. It satisfies the dataviz relief rule — see `relief_violations`.
 
     A preset opts in with a `{# sample: ... #}` header holding the keyword
     arguments to call it with — real enough to exercise every loop."""
@@ -492,20 +577,40 @@ def cmd_charts() -> int:
         for block in blocks:
             checked += 1
             try:
-                json.loads(html_mod.unescape(block))
+                spec = json.loads(html_mod.unescape(block))
             except json.JSONDecodeError as e:
-                print(f"  {comp.name:<16} INVALID JSON: {e}")
+                print(f"  {comp.name:<20} INVALID JSON: {e}")
+                failures += 1
+                break
+            bad = relief_violations(spec)
+            if bad:
+                print(f"  {comp.name:<20} RELIEF RULE: {bad}")
                 failures += 1
                 break
         else:
-            print(f"  {comp.name:<16} ok ({len(blocks)} spec"
+            print(f"  {comp.name:<20} ok ({len(blocks)} spec"
                   f"{'s' if len(blocks) > 1 else ''})")
+
+    # The showcase's hand-written specs are held to the same rule — the gallery
+    # is the system's own dogfood, and a demo that breaks a rule teaches it.
+    for page in sorted(SHOWCASES_DIR.glob("*.html")):
+        for block in CHART_PRE_RE.findall(_read(page)):
+            try:
+                spec = json.loads(html_mod.unescape(block))
+            except json.JSONDecodeError:
+                continue                  # rendered-source noise, not a spec
+            checked += 1
+            bad = relief_violations(spec)
+            if bad:
+                print(f"  {page.name:<20} RELIEF RULE: {bad}")
+                failures += 1
 
     print()
     if failures:
-        print(f"{failures} chart preset(s) failed")
+        print(f"{failures} chart spec(s) failed")
         return 1
-    print(f"all chart presets emit valid JSON ({checked} spec(s) checked)")
+    print(f"all chart specs are valid JSON and satisfy the relief rule "
+          f"({checked} spec(s) checked)")
     return 0
 
 

@@ -1,0 +1,40 @@
+{# purpose: pairwise relationships across a set — a heatmap on the sequential ramp, not the categorical palette #}
+{# labels: list of names; matrix: list of rows, matrix[i][j] is the value for labels[i] vs labels[j] #}
+{# sample: labels=["A","B"], matrix=[[1,0.4],[0.4,1]], caption="s" #}
+{% import "components/charts/apache-echarts/component.html.j2" as engine %}
+
+{% macro correlation_matrix(labels=[], matrix=[], caption="", height=380, note="",
+                            vmin=-1, vmax=1) %}
+{# ECharts heatmap wants [x, y, value] triples. Row i is flipped onto the y
+   axis so the matrix reads the way it is written — first label top-left. #}
+{% set cells = [] %}
+{% for row in matrix %}
+{%   set y = (matrix | length) - 1 - loop.index0 %}
+{%   for value in row %}
+{%     set _ = cells.append([loop.index0, y, value]) %}
+{%   endfor %}
+{% endfor %}
+{% set y_labels = labels | reverse | list %}
+{# A correlation is ORDERED data, so it takes the sequential ramp. The
+   categorical palette would imply unrelated categories, and ECharts' stock
+   blue-to-red visualMap reads as good-to-bad on a number that carries no such
+   judgement — a -0.8 correlation is not "bad", it is informative. #}
+{% set option = {
+     "tooltip": {"position": "top"},
+     "grid": {"left": 8, "right": 16, "top": (52 if caption else 16),
+              "bottom": 72, "containLabel": true},
+     "xAxis": {"type": "category", "data": labels, "splitArea": {"show": true}},
+     "yAxis": {"type": "category", "data": y_labels, "splitArea": {"show": true}},
+     "visualMap": {"min": vmin, "max": vmax, "calculable": true,
+                   "orient": "horizontal", "left": "center", "bottom": 8,
+                   "inRange": {"color": ["ramp:1", "ramp:2", "ramp:3",
+                                         "ramp:4", "ramp:5", "ramp:6"]}},
+     "series": [{"type": "heatmap", "name": "correlation", "data": cells,
+                 "label": {"show": true, "fontSize": 10}}],
+   } %}
+{% if caption %}{% set _ = option.update({"title": {"text": caption}}) %}{% endif %}
+{% call engine.apache_echarts(height=height) %}{{ option | tojson(indent=2) }}{% endcall %}
+{% if note %}
+  <p class="chart-note">{{ note }}</p>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,40 @@
+{# purpose: the SPREAD of an outcome rather than its average — box plot with outliers #}
+{# series: list of (label, [raw values]) — quartiles and whiskers are derived here #}
+{# sample: series=[("A",[1,2,3,4,5,20]),("B",[2,2,3,3,4])], caption="s" #}
+{% import "components/charts/apache-echarts/component.html.j2" as engine %}
+
+{% macro return_distribution(series=[], caption="", height=340, note="", unit="%") %}
+{# Raw observations go in; the five-number summary comes out HERE, at compose
+   time, so the rendered spec carries the derived numbers and a reader can check
+   them against the source data. Whiskers are Tukey's (1.5 x IQR), and points
+   beyond are drawn as outliers rather than being absorbed into the whisker —
+   an outlier quietly extending a whisker is how a fat tail disappears. #}
+{% set labels = [] %}{% set boxes = [] %}{% set outliers = [] %}
+{% for label, values in series %}
+{%   set column = loop.index0 %}
+{%   set stats = values | boxstats %}
+{%   set _ = labels.append(label) %}
+{%   set _ = boxes.append(stats.box) %}
+{%   for o in stats.outliers %}
+{%     set _ = outliers.append([column, o]) %}
+{%   endfor %}
+{% endfor %}
+{% set option = {
+     "tooltip": {"trigger": "item"},
+     "grid": {"left": 46, "right": 16, "top": (52 if caption else 16),
+              "bottom": 8, "containLabel": true},
+     "xAxis": {"type": "category", "data": labels, "boundaryGap": true},
+     "yAxis": {"type": "value", "name": unit, "nameLocation": "middle",
+               "nameGap": 46, "nameRotate": 90},
+     "series": [
+       {"type": "boxplot", "name": "distribution", "data": boxes},
+       {"type": "scatter", "name": "outlier", "symbolSize": 6,
+        "itemStyle": {"color": "token:negative", "opacity": 0.8},
+        "data": outliers}],
+   } %}
+{% if caption %}{% set _ = option.update({"title": {"text": caption}}) %}{% endif %}
+{% call engine.apache_echarts(height=height) %}{{ option | tojson(indent=2) }}{% endcall %}
+{% if note %}
+  <p class="chart-note">{{ note }}</p>
+{% endif %}
+{% endmacro %}

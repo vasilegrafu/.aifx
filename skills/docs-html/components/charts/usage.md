@@ -26,6 +26,8 @@ else a preset would just be indirection over JSON you can already read.
 | flow | `{{ c.sankey(...) }}` | how a total splits, merges or converts across stages — revenue to net income, cash sources to uses |
 | price action | `{{ c.price_history(...) }}` | candlestick with volume beneath, one shared time axis |
 | drawdown | `{{ c.drawdown_curve(...) }}` | peak-to-trough decline over time — the shape of the losing periods |
+| distribution | `{{ c.return_distribution(...) }}` | the spread of an outcome rather than its average — box plot with outliers drawn, not absorbed |
+| correlation | `{{ c.correlation_matrix(...) }}` | pairwise relationships across a set, on the sequential ramp |
 
 ### Recipes
 
@@ -35,13 +37,15 @@ else a preset would just be indirection over JSON you can already read.
 | comparison | `bar` | a measure across categories, ranked |
 | composition | `bar` stacked | parts of a whole across time or category — prefer over `pie` past three slices |
 | risk/return | `scatter` | two measures per entity — volatility against return, valuation against growth |
-| distribution | `boxplot` | the spread of an outcome, not just its average — return dispersion, estimate ranges |
-| correlation | `heatmap` | a matrix of pairwise relationships |
 
-`risk-return` and `return-distribution` are recipes rather than macros because
-the ECharts `option` for each is already about as short and as readable as the
-data it carries; wrapping it would hide the chart without simplifying it. Both
-are written out in full in [[apache-echarts]].
+`risk-return` stays a recipe: its ECharts `option` is already about as short and
+as readable as the data it carries, so a macro would hide the chart without
+simplifying it. It is written out in full in [[apache-echarts]].
+
+Distribution and correlation went the other way once it was clear what each had
+to compute — Tukey fences and quartiles for one, a correctly wired sequential
+`visualMap` for the other. That is the test: a preset earns its place by
+computing something, enforcing a rule, or preventing a known mistake.
 
 ## Colour is not yours to choose
 

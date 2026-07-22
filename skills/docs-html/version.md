@@ -14,6 +14,54 @@ A published version is immutable: any change, however small, is a new version.
 
 ---
 
+## 3.2.0 — 2026-07-22
+
+Additive: two more chart kinds, and the relief rule becomes enforceable instead
+of merely documented. No markup contract change.
+
+### New — two chart presets
+
+- **`c.return_distribution(series, …)`** — a box plot built from **raw
+  observations**. Quartiles (type-7 interpolation) and **Tukey whiskers**
+  (1.5 × IQR) are derived at compose time by a new `boxstats` filter, so the
+  rendered spec carries the numbers and a reader can check them. Points beyond
+  the fences are drawn as **outliers rather than absorbed into the whisker** —
+  an outlier quietly extending a whisker is how a fat tail disappears from a
+  chart, and that is the reason this is a component rather than a recipe.
+- **`c.correlation_matrix(labels, matrix, …)`** — pairwise relationships on the
+  sequential `RAMP`. The categorical palette would imply unrelated categories,
+  and ECharts' stock blue-to-red `visualMap` reads as good-to-bad on a number
+  carrying no such judgement: a −0.8 correlation is not "bad", it is the point
+  of a diversifier. Values are printed as well as coloured.
+
+`risk-return` deliberately stays a **recipe** — its spec is already as short and
+readable as the data it carries, so a macro would hide the chart without
+simplifying it. The test a preset must pass is unchanged: compute something,
+enforce a rule, or prevent a known mistake.
+
+### New — the relief rule is checked
+
+`python builder.py charts` now validates two things about every chart spec, the
+presets' and the showcase's alike: that it is valid JSON, and that it satisfies
+the dataviz **relief rule** — more than three automatically-coloured series
+reaches a palette slot below 3:1 on the chart surface, so it needs visible data
+labels rather than colour alone.
+
+Only **automatic** colours count. A series or item that sets its own colour is
+not drawing from the rotating palette, which is why a fifteen-node role-coloured
+sankey passes and a four-series bar chart does not. Pie, funnel and treemap
+label by default, so for those the violation is switching labels *off*.
+
+### `c.sankey` gained layout control
+
+`label_room` (default 150) reserves right margin for terminal nodes, whose
+labels sit outside the node and otherwise clip. Node width, gap, alignment and a
+white label text-border are now sensible defaults rather than something every
+call site re-specifies. This came out of migrating a real sixteen-node document,
+which is the only way that gap was going to surface.
+
+---
+
 ## 3.1.0 — 2026-07-22
 
 Additive: the chart layer grows a checked colour system, three chart presets,

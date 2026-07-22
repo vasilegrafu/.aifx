@@ -4,7 +4,7 @@
 {# sample: nodes=[("Revenue","source"),("Cost","cost"),("Net","retained")], links=[("Revenue","Cost",40),("Revenue","Net",60)], caption="s" #}
 {% import "components/charts/apache-echarts/component.html.j2" as engine %}
 
-{% macro sankey(nodes=[], links=[], caption="", height=420, note="") %}
+{% macro sankey(nodes=[], links=[], caption="", height=420, note="", label_room=150) %}
 {% set roles = {"source": "palette:1", "stage": "token:muted",
                 "cost": "token:caution", "retained": "token:positive"} %}
 {# The spec is built as a DATA STRUCTURE and serialised once. Hand-written JSON
@@ -20,9 +20,18 @@
 {% for source, target, value in links %}
 {%   set _ = link_data.append({"source": source, "target": target, "value": value}) %}
 {% endfor %}
+{# Layout, not styling — it depends on how long the labels are, so it cannot
+   live in the theme. `label_room` reserves right margin for the terminal
+   nodes' labels, which sit OUTSIDE the node; without it they clip. The white
+   text border keeps a label legible where it crosses a ribbon. #}
 {% set option = {
      "tooltip": {"trigger": "item", "triggerOn": "mousemove"},
      "series": [{"type": "sankey", "emphasis": {"focus": "adjacency"},
+                 "left": 8, "right": label_room, "top": 14, "bottom": 14,
+                 "nodeWidth": 14, "nodeGap": 18, "nodeAlign": "left",
+                 "draggable": false,
+                 "label": {"fontSize": 12, "textBorderColor": "#ffffff",
+                           "textBorderWidth": 3},
                  "data": node_data, "links": link_data}],
    } %}
 {% if caption %}{% set _ = option.update({"title": {"text": caption}}) %}{% endif %}

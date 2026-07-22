@@ -317,9 +317,14 @@ regenerate CATALOG.md.
 **Two checks guard the chart category — run both after touching it:**
 
 - `python builder.py charts` — renders every chart preset from its
-  `{# sample: … #}` header and fails if the spec is not valid JSON. This matters
-  because a malformed spec does **not** raise: the engine leaves the source
-  visible as a code box, indistinguishable from an unreachable CDN.
+  `{# sample: … #}` header, then checks every spec (presets' and the showcase's)
+  on two counts: that it is **valid JSON**, and that it satisfies the **relief
+  rule** (more than three automatically-coloured series reaches a palette slot
+  below 3:1, so it needs visible data labels). The JSON check matters because a
+  malformed spec does **not** raise: the engine leaves the source visible as a
+  code box, indistinguishable from an unreachable CDN. Explicitly coloured
+  series and items are exempt from the relief check — they are not drawing from
+  the rotating palette at all.
 - `python builder.py dataviz` — verifies the chart colours: contrast on the
   chart surface, pairwise separation under protanopia / deuteranopia /
   tritanopia, and monotonic luminance of the sequential ramp.
@@ -432,7 +437,8 @@ valid. See `components/content/code-block/usage.md`.
   view time — never a screenshot of a chart.
   Never restyle the theme per chart (the palette is checked colour-blind-safe by
   `python builder.py dataviz`); one y-axis only. The approved chart kinds — and
-  which are presets (`c.sankey`, `c.price_history`, `c.drawdown_curve`) versus
+  which are presets (`c.sankey`, `c.price_history`, `c.drawdown_curve`,
+  `c.return_distribution`, `c.correlation_matrix`) versus
   hand-written recipes — are listed in `components/charts/usage.md`.
   Prefer it over a Mermaid `xychart-beta` whenever the chart carries analysis.
 - Requirements and traceable items carry trace-ids (`REQ-`, `RISK-`, `TC-`); a
