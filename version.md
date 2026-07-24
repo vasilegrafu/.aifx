@@ -18,6 +18,19 @@ Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
 
 ---
 
+## 4.3.1 — 2026-07-24
+
+**Patch.** Fixes the `investing` **`bar`** chart: an earlier sweep had
+over-replaced string literals, leaving `"s.name"` as ECharts option keys where
+`"name"` was meant — so series and axis names were silently dropped (ECharts
+ignores unknown keys, so it drew cleanly and lied). No markup contract change.
+
+Also adds per-component **showcases** (`showcase.py` beside each component;
+`builder.py showcase` renders each into a browsable page) — build-side tooling
+that does not affect the shipped CSS/JS bundle.
+
+---
+
 ## 4.3.0 — 2026-07-24
 
 **Minor.** Adds the **`investing`** skill — a data-driven report generator

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bar — showcase</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@4.3.1/skills/investing/css/bundle.css">
+  <script src="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@4.3.1/skills/investing/js/bundle.js" defer></script>
+  <style>
+/* Showcase chrome — the frame around a component demo, NOT part of any
+   component. builder.py inlines this into every generated showcase.html so the
+   page stays self-contained (the pages live scattered under each component
+   folder and are browsed over a local server, so a linked stylesheet would need
+   a different relative path per component). It adds nothing to the shipped
+   bundle; the component itself is styled entirely by the CDN bundle.css. */
+
+.showcase-head {
+  margin: 2rem 0 1rem;
+}
+.showcase-head code {
+  font-size: .85em;
+  opacity: .7;
+}
+
+.showcase-case {
+  margin: 0 0 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(128, 128, 128, .25);
+}
+.showcase-case > .showcase-label {
+  font: 600 .8rem/1.4 system-ui, sans-serif;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .6;
+  margin: 0 0 .75rem;
+}
+
+  </style>
+</head>
+<body>
+  <main>
+    <header class="showcase-head">
+      <h1>bar</h1>
+      <code>bar(series=[], categories=[], caption="", height=340, note="", y_name="", unit="")</code>
+    </header>
+    <section class="showcase-case">
+      <p class="showcase-label">single series — unit as a subtext line under the caption</p>
+        <pre class="chart apache-echarts">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        12.4,
+        13.1,
+        13.9,
+        15.2
+      ],
+      "name": "Revenue",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Revenue by quarter"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Cloud momentum builds through the year.</p>
+
+
+    </section>
+    <section class="showcase-case">
+      <p class="showcase-label">two series — a legend appears, colour is never the only cue</p>
+        <pre class="chart apache-echarts">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        12.4,
+        13.1,
+        13.9,
+        15.2
+      ],
+      "name": "FY24",
+      "type": "bar"
+    },
+    {
+      "data": [
+        10.8,
+        11.5,
+        12.2,
+        13.0
+      ],
+      "name": "FY23",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "This year vs last"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Every quarter ahead of the prior year.</p>
+
+
+    </section>
+    <section class="showcase-case">
+      <p class="showcase-label">named axis — y_name labels the axis, unit names the measure</p>
+        <pre class="chart apache-echarts">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        22.1,
+        14.7,
+        3.2,
+        5.4
+      ],
+      "name": "FY24",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Segment revenue"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Cloud",
+      "License",
+      "Hardware",
+      "Services"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "USD (billions)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Cloud is now the largest single line.</p>
+
+
+    </section>
+    <section class="showcase-case">
+      <p class="showcase-label">percentages — a different unit family, same component</p>
+        <pre class="chart apache-echarts">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        31.2,
+        88.4,
+        9.1,
+        24.7
+      ],
+      "name": "FY24",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "percent",
+    "text": "Operating margin by segment"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Cloud",
+      "License",
+      "Hardware",
+      "Services"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "Operating margin (%)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">License carries the business; hardware dilutes it.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>
