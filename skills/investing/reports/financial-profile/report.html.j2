@@ -7,10 +7,11 @@
 
    Reading it top to bottom should tell you what the report argues:
      what it is -> where money comes from -> where it goes -> what it owns ->
-     what a share owns -> how that changed -> how it compares -> what to conclude.
+     what a share owns -> how that changed -> how it compares.
 
-   `{{...}}` left in the output is BY DESIGN: the 17 prose slots are judgement,
-   and the builder does not invent judgement. They render as visible prompts.
+   FULLY GENERATED. There are no prose slots: every exhibit is built from data,
+   so the output carries no `{{...}}` prompts and needs no hand editing. The
+   report is what the numbers say; interpretation is the reader's.
 #}
 {% extends "reports/base.html.j2" %}
 {% block content %}
@@ -22,7 +23,6 @@
       {"id": "per-share", "label": "Per share"},
       {"id": "evolution", "label": "How it evolved"},
       {"id": "peers",     "label": "How it compares"},
-      {"id": "reading",   "label": "Reading"},
   ]) }}
 
   {% call c.section("snapshot", "Snapshot") %}
@@ -36,7 +36,6 @@
     {% call c.callout("note") %}
       {{ c.facts(d.basis_facts) }}
     {% endcall %}
-    {% call c.lead() %}{{ d.lead }}{% endcall %}
   {% endcall %}
 
   {% call c.section("income", "Where the money comes from") %}
@@ -45,13 +44,11 @@
        into one diagram would make it silently wrong. Segments get their own
        exhibits below, on their own dates. #}
     {{ c.sankey(nodes=d.inc_nodes, links=d.inc_links, height=460, unit=d.unit,
-                caption=d.inc_caption, note=d.income_note) }}
+                caption=d.inc_caption) }}
     {# No profit columns: the product-segmentation feed publishes revenue only,
        and the macro renders a narrower table rather than a fabricated one. #}
     {{ c.segment_reporting(rows=d.seg_rows, total_row=d.seg_total_row,
-                           caption=d.seg_caption, unit=d.unit,
-                           source=d.segment_source) }}
-    {% call c.prose() %}{{ d.income_prose }}{% endcall %}
+                           caption=d.seg_caption, unit=d.unit) }}
   {% endcall %}
 
   {% call c.section("cash", "Where the money goes") %}
@@ -60,17 +57,16 @@
        nowhere on the income statement. Investing is grossed up rather than
        netted, so capital expenditure stays a visible node. #}
     {{ c.sankey(nodes=d.cash_nodes, links=d.cash_links, height=400, unit=d.unit,
-                caption=d.cash_caption, note=d.cash_note) }}
-    {% call c.prose() %}{{ d.cash_prose }}{% endcall %}
+                caption=d.cash_caption) }}
   {% endcall %}
 
   {% call c.section("position", "What it owns and owes") %}
     {# A BALANCE SHEET IS A STOCK, NOT A FLOW. Nothing moves along these ribbons;
        the roles encode direction and there is no direction here. The picture
-       shows composition and claim, and the note says so — otherwise a reader
-       trained by the two sankeys above will read movement into it. #}
+       shows composition and claim — a reader trained by the two sankeys above
+       must not read movement into it. #}
     {{ c.sankey(nodes=d.bs_nodes, links=d.bs_links, height=380, label_room=190,
-                unit=d.bs_unit, caption=d.bs_sankey_caption, note=d.position_note) }}
+                unit=d.bs_unit, caption=d.bs_sankey_caption) }}
     {{ c.balance_sheet(periods=d.bs_periods, rows=d.bs_rows, unit=d.unit,
                        caption=d.bs_caption, check=d.bs_check) }}
     {# A solvency score is standard, free and instantly readable — and dominated
@@ -78,8 +74,7 @@
        are shown rather than just the number. #}
     {{ c.composite_score(name=d.z_name, formula=d.z_formula, inputs=d.z_inputs,
                          score=d.z_score, band=d.z_band, tone=d.z_tone,
-                         bands=d.z_bands, caption="Solvency", note=d.score_note) }}
-    {% call c.prose() %}{{ d.position_prose }}{% endcall %}
+                         bands=d.z_bands, caption="Solvency") }}
   {% endcall %}
 
   {% call c.section("per-share", "Per share") %}
@@ -88,10 +83,9 @@
        by retiring stock; the totals above never show it. #}
     {{ c.roll_forward(periods=d.share_periods, rows=d.roll_rows,
                       caption="Shares outstanding, weighted average",
-                      unit="millions", note=d.shares_note) }}
+                      unit="millions") }}
     {{ c.metric_trend(periods=d.periods, rows=d.pershare_rows,
                       caption="Per-share record", unit="$ per share") }}
-    {% call c.prose() %}{{ d.pershare_prose }}{% endcall %}
   {% endcall %}
 
   {% call c.section("evolution", "How it evolved") %}
@@ -103,19 +97,16 @@
        cannot tell growth from substitution.
        In a stacked area only the BOTTOM band and the TOTAL are readable by eye,
        which is exactly why the normalised chart follows rather than replaces. #}
-    {{ c.stacked_area(series=d.seg_series, categories=d.seg_years, y_name=d.unit,
-                      caption="Revenue by segment — total and composition",
-                      note=d.stacked_note) }}
+    {{ c.stacked_area(series=d.seg_series, categories=d.seg_years, unit=d.unit,
+                      caption="Revenue by segment — total and composition") }}
     {{ c.stacked_normalized(series=d.seg_series, categories=d.seg_years,
-                            caption="Revenue mix — each year as 100%",
-                            note=d.mix_note) }}
+                            caption="Revenue mix — each year as 100%") }}
     {# The bridge prices the mix shift: growth is rarely spread evenly, and one
        segment usually paid for all of it. #}
     {{ c.bridge(steps=d.bridge_steps, scale_min=d.bridge_min, scale_max=d.bridge_max,
-                caption=d.bridge_caption, note=d.bridge_note) }}
+                caption=d.bridge_caption) }}
     {{ c.metric_trend(periods=d.periods, rows=d.margin_rows, fmt="pct",
                       caption="Margins and returns, five fiscal years") }}
-    {% call c.prose() %}{{ d.evolution_prose }}{% endcall %}
   {% endcall %}
 
   {% call c.section("peers", "How it compares") %}
@@ -123,10 +114,5 @@
        rarely align, which the caption states rather than hides. #}
     {{ c.peer_comparison(headers=d.peer_headers, formats=d.peer_formats,
                          rows=d.peer_rows, caption=d.peer_caption) }}
-    {% call c.prose() %}{{ d.peers_prose }}{% endcall %}
-  {% endcall %}
-
-  {% call c.section("reading", "Reading") %}
-    {% call c.callout("note") %}{% call c.prose() %}{{ d.reading }}{% endcall %}{% endcall %}
   {% endcall %}
 {% endblock %}

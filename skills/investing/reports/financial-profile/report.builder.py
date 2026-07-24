@@ -35,13 +35,14 @@ from data_providers.fmp import FmpClient          # noqa: E402
 # the data appetite, declared in one place
 # --------------------------------------------------------------------------
 
+# ANNUAL endpoints. The trend, segment, per-share, margin and peer exhibits are
+# all multi-year; and on the Starter plan key-metrics and
+# revenue-product-segmentation serve ANNUAL ONLY — quarterly returns HTTP 402
+# (see endpoints.md), which is why everything downstream of them stays annual.
+# limit=5 on cash flow so five years of free cash flow are read, not
+# back-calculated from enterpriseValue / evToFreeCashFlow.
 ENDPOINTS = [
     ("income-statement",             {"period": "annual", "limit": 5}),
-    ("balance-sheet-statement",      {"period": "annual", "limit": 2}),
-    # limit=5, not 2. With 2 years, five years of free cash flow can only be
-    # reconstructed from `enterpriseValue / evToFreeCashFlow` — which reproduces
-    # the reported number exactly and therefore looks like a read rather than a
-    # back-calculation. Pull the years you intend to show.
     ("cash-flow-statement",          {"period": "annual", "limit": 5}),
     ("revenue-product-segmentation", {"period": "annual"}),
     ("key-metrics",                  {"period": "annual", "limit": 5}),
@@ -50,37 +51,18 @@ ENDPOINTS = [
     ("quote",                        {}),
 ]
 
-# The 17 slots this report cannot fill. They render as visible prompts; the
-# builder never invents an argument. Keeping them in one dict makes the count
-# checkable rather than a thing someone believes.
-PROSE = {
-    "lead": "{{one paragraph: what the business sells, to whom, and the one "
-            "structural fact about its economics a reader should carry into the rest}}",
-    "income_note": "{{one sentence: where the margin is made and what consumes it}}",
-    "income_prose": "{{which segment actually pays for the company — revenue share "
-                    "and profit share are rarely the same number, and the gap is the point}}",
-    "cash_note": "{{one sentence: what management actually did with the money}}",
-    "cash_prose": "{{reinvestment versus return of capital}}",
-    "position_note": "{{one sentence: equity as a share of assets, and what funds "
-                     "the rest — a stock, not a flow}}",
-    "score_note": "{{what the score does and does not tell you about this company}}",
-    "position_prose": "{{liquidity, leverage, and what the balance sheet is FOR here}}",
-    "shares_note": "{{how much of the per-share growth was bought rather than earned}}",
-    "pershare_prose": "{{compare these growth rates with the totals above — the gap "
-                      "IS the buyback}}",
-    "stacked_note": "{{one sentence: did the whole grow, and which band grew with it}}",
-    "mix_note": "{{one sentence: is this the same business it was five years ago?}}",
-    "bridge_note": "{{one sentence: which segment produced the growth, and what share}}",
-    "evolution_prose": "{{whether growth came with operating leverage or bought it "
-                       "with spending}}",
-    "peers_prose": "{{where the subject is genuinely different, and whether that "
-                   "difference is an advantage or a lag}}",
-    "reading": "{{the four or five sentences a reader should leave with — the shape of "
-               "the earnings, the spending, the balance sheet, and what changed. "
-               "State what would change this reading.}}",
-    "segment_source": "{{filing and page}}",
-}
-
+# QUARTERLY statements. The three flow/position exhibits — the income sankey,
+# the cash sankey and the balance sheet — describe the LAST REPORTED QUARTER.
+# These three statement endpoints serve quarterly on the Starter plan (unlike
+# key-metrics and segmentation above). Fetched under their own keys so the
+# quarterly pull does not collide with the annual one in the payload dict.
+# Balance sheet takes 5 quarters so the exhibit can compare the latest quarter
+# with the SAME quarter a year ago; income and cash need only the latest.
+QUARTER = [
+    ("income-statement-quarter", "income-statement",        {"limit": 2}),
+    ("balance-sheet-quarter",    "balance-sheet-statement",  {"limit": 5}),
+    ("cash-flow-quarter",        "cash-flow-statement",      {"limit": 2}),
+]
 
 def add_args(parser):
     parser.add_argument("symbol", help="ticker, e.g. ORCL")
@@ -94,11 +76,17 @@ def add_args(parser):
 # --------------------------------------------------------------------------
 
 def fetch(symbol, peers=""):
-    """Live, in one pass, uncached. ~10 calls, ~10 seconds."""
+    """Live, in one pass, uncached. ~13 calls, ~13 seconds.
+
+    Statements are pulled twice: ANNUAL for the multi-year exhibits, and the
+    last few QUARTERS for the flow/position exhibits that describe the most
+    recent reported quarter."""
     symbol = symbol.upper()
     client = FmpClient()
     payloads = client.get_many(
         [(endpoint, dict(symbol=symbol, **params)) for endpoint, params in ENDPOINTS])
+    for key, endpoint, params in QUARTER:
+        payloads[key] = client.get(endpoint, symbol=symbol, period="quarter", **params)
     payloads["_symbol"] = symbol
     payloads["_fetched"] = datetime.now().isoformat(timespec="seconds")
     payloads["_peers"] = {}
@@ -145,6 +133,12 @@ def _fy(row):
     return f"FY{row['fiscalYear']}"
 
 
+def _q(row):
+    """A quarterly period label, e.g. 'Q1 FY2026'. FMP gives period ('Q1') and
+    fiscalYear ('2026') separately; the statements are the ones with a quarter."""
+    return f"{row['period']} FY{row['fiscalYear']}"
+
+
 def _seg_label(name):
     """Tidy FMP's product-line labels without inventing a per-company map.
 
@@ -152,7 +146,7 @@ def _seg_label(name):
     'Business' on every line and a capitalised 'And'. Both are noise. Stripping
     them is a generic transform that reads correctly for any issuer; anything
     beyond it (a house spelling, an abbreviation) is an editorial choice that
-    belongs to whoever fills the prose, not to the data layer."""
+    does not belong in the data layer."""
     name = name.strip()
     if name.endswith(" Business"):
         name = name[:-len(" Business")]
@@ -164,19 +158,27 @@ def _seg_label(name):
 # --------------------------------------------------------------------------
 
 def shape(p):                                        # noqa: C901 — one long, flat derivation
-    inc = _chron(p["income-statement"])
-    bs = _chron(p["balance-sheet-statement"])
-    cf = _chron(p["cash-flow-statement"])
-    km = _chron(p["key-metrics"])
+    inc = _chron(p["income-statement"])            # annual — trends, per share, margins
+    cf = _chron(p["cash-flow-statement"])          # annual — free cash flow per share
+    km = _chron(p["key-metrics"])                  # annual — ROIC, peers
+    incq = _chron(p["income-statement-quarter"])   # quarterly — income sankey, snapshot
+    bsq = _chron(p["balance-sheet-quarter"])       # quarterly — balance sheet exhibits
+    cfq = _chron(p["cash-flow-quarter"])           # quarterly — cash sankey
     scores = p["financial-scores"][0]
     profile = p["profile"][0]
     quote = p["quote"][0]
     symbol = p.get("_symbol", profile["symbol"])
 
-    years = [_fy(r) for r in inc]
-    latest = inc[-1]
-    bs_now, bs_prev = bs[-1], bs[-2]
-    cash = cf[-1]
+    years = [_fy(r) for r in inc]                  # annual period labels
+    latest = incq[-1]                              # THE last reported quarter
+    latest_a = inc[-1]                             # latest full year — Altman Z flows
+    q_label = _q(latest)
+    # The balance sheet compares the latest quarter with the SAME quarter a year
+    # ago (seasonality-neutral); fall back to the oldest quarter fetched if a
+    # full year is not available.
+    bs_now = bsq[-1]
+    bs_prev = bsq[-5] if len(bsq) >= 5 else bsq[0]
+    cash = cfq[-1]                                 # last reported quarter's cash flow
     km_now = km[-1]
 
     report_date = date.today()
@@ -346,15 +348,20 @@ def shape(p):                                        # noqa: C901 — one long, 
     equity_share = 100 * equity[1] / assets[1]
 
     # ----------------------------------------------------------- composite Z
+    # Altman Z mixes point-in-time STOCKS with a year of FLOWS. The stocks come
+    # from the latest quarter's balance sheet; the flows (EBIT, revenue) must be
+    # the full YEAR, not the quarter — a single quarter's revenue would divide
+    # the S/A term by roughly four and understate the score.
     working_capital = _m(bs_now["totalCurrentAssets"]) - _m(bs_now["totalCurrentLiabilities"])
     retained_earnings = _m(bs_now["retainedEarnings"])
-    ebit = _m(latest["ebit"])
+    ebit = _m(latest_a["ebit"])
+    rev_a = _m(latest_a["revenue"])
     market_cap = _m(quote["marketCap"])
     z_inputs = [("Working capital / assets", 1.2, working_capital / assets[1]),
                 ("Retained earnings / assets", 1.4, retained_earnings / assets[1]),
                 ("EBIT / assets", 3.3, ebit / assets[1]),
                 ("Market cap / liabilities", 0.6, market_cap / liab[1]),
-                ("Revenue / assets", 1.0, rev / assets[1])]
+                ("Revenue / assets", 1.0, rev_a / assets[1])]
     z_score = sum(c * v for _, c, v in z_inputs)
     z_band, z_tone = (("Distress", "bad") if z_score < 1.8
                       else ("Grey", "neutral") if z_score < 3.0 else ("Safe", "good"))
@@ -401,7 +408,6 @@ def shape(p):                                        # noqa: C901 — one long, 
     seg_series = [{"name": _seg_label(k), "points": [_m(r["data"].get(k, 0)) for r in seg_raw]}
                   for k in seg_names]
     seg_totals = [sum(s["points"][i] for s in seg_series) for i in range(len(seg_raw))]
-    segment_lag = seg_years[-1] != years[-1]
 
     # NO PROFIT KEYS. `revenue-product-segmentation` publishes revenue only, and
     # the component now omits the profit columns rather than being handed
@@ -437,6 +443,19 @@ def shape(p):                                        # noqa: C901 — one long, 
                         "kind": "end"}])
     assert seg_totals[0] + sum(d for _, d in deltas) == seg_totals[-1], (
         f"{symbol}: bridge steps do not carry {seg_totals[0]} to {seg_totals[-1]}")
+
+    # The bridge scale must bound the RUNNING TOTAL through the walk, not just the
+    # endpoints. When a company renames segments (AMD: old lines fall to zero as
+    # new ones rise), the deltas are large +/- pairs and the cumulative peaks well
+    # above the final revenue mid-walk. Scaling to seg_totals[-1] then pushes those
+    # bars off the right of the track. Walk it and take the true peak and trough.
+    bridge_cum, bridge_peak, bridge_trough = seg_totals[0], seg_totals[0], seg_totals[0]
+    for _, dv in deltas:
+        bridge_cum += dv
+        bridge_peak = max(bridge_peak, bridge_cum)
+        bridge_trough = min(bridge_trough, bridge_cum)
+    bridge_peak = max(bridge_peak, seg_totals[-1])
+    bridge_trough = min(bridge_trough, 0)
 
     # --------------------------------------------------------------- margins
     def ratio(values):
@@ -496,7 +515,7 @@ def shape(p):                                        # noqa: C901 — one long, 
         "exchange": profile.get("exchange", ""),
         "sector": profile.get("sector", ""),
         "unit": unit,
-        "period": years[-1],
+        "period": q_label,
         "period_end": period_end.strftime("%d %B %Y"),
         "filed": filed.strftime("%d %B %Y"),
         "report_date": report_date.strftime("%d %B %Y"),
@@ -507,29 +526,36 @@ def shape(p):                                        # noqa: C901 — one long, 
         "header_facts": [
             {"label": "Price", "value": f"${quote['price']:,.2f}"},
             {"label": "Market cap", "value": f"${market_cap / 1000:,.0f}B"},
-            {"label": f"Revenue {years[-1]}", "value": f"${rev / 1000:,.1f}B"},
-            {"label": f"Net income {years[-1]}", "value": f"${net / 1000:,.1f}B"},
+            {"label": f"Revenue {q_label}", "value": f"${rev / 1000:,.1f}B"},
+            {"label": f"Net income {q_label}", "value": f"${net / 1000:,.1f}B"},
             {"label": "Sector", "value": profile.get("sector", "—")},
         ],
         "basis_facts": [
             {"term": "Report date",
              "value": f"{report_date:%d %B %Y} — every date below is measured against it"},
             {"term": "Latest period",
-             "value": f"{years[-1]}, ended {period_end:%d %B %Y} — "
+             "value": f"{q_label}, ended {period_end:%d %B %Y} — "
                       f"{(report_date - period_end).days} days before this report"},
             {"term": "Filed", "value": f"{filed:%d %B %Y}"},
+            {"term": "Reporting basis",
+             "value": (f"the income, cash-flow and balance-sheet exhibits are the last "
+                       f"reported quarter ({q_label}); the segment, per-share, margin and "
+                       f"peer exhibits are ANNUAL ({years[0]}–{years[-1]}), because "
+                       f"product-line revenue and per-company metrics are not available "
+                       f"quarterly on this data plan. Each exhibit's caption states its "
+                       f"own period")},
             {"term": "Price as of",
              "value": f"{report_date:%d %B %Y}. A market price is not a filing date; "
                       f"market-cap-sensitive figures below carry this one"},
             {"term": "Currency and unit",
              "value": f"{latest.get('reportedCurrency', 'USD')}, {unit} unless stated"},
             {"term": "Segment exhibits",
-             "value": (f"{seg_years[0]}–{seg_years[-1]}: product-line revenue is published "
-                       f"only through {seg_years[-1]} in this feed, so those exhibits run "
-                       f"behind the rest" if segment_lag
-                       else f"{seg_years[0]}–{seg_years[-1]}, aligned with the statements")},
+             "value": f"annual, {seg_years[0]}–{seg_years[-1]} — the latest full years, "
+                      f"which run behind the quarterly statements above"},
             {"term": "Derived figures",
-             "value": (f"free cash flow per share and the Altman Z are computed here"
+             "value": (f"free cash flow per share and the Altman Z are computed here; the "
+                       f"Z uses the latest full year's EBIT and revenue over the quarter-end "
+                       f"balance sheet"
                        + (f"; the ${other_opex:,}m 'other operating' line absorbs an "
                           f"inconsistency in the source between operating income and the "
                           f"expense lines" if other_opex else "")
@@ -541,20 +567,20 @@ def shape(p):                                        # noqa: C901 — one long, 
         ],
         # income
         "inc_nodes": inc_nodes, "inc_links": inc_links,
-        "inc_caption": f"{profile.get('companyName', symbol)} {years[-1]} — revenue to net income",
+        "inc_caption": f"{profile.get('companyName', symbol)} {q_label} — revenue to net income",
         "seg_rows": seg_rows,
         "seg_total_row": seg_total_row,
         "seg_caption": f"Revenue by segment, {seg_years[-1]}",
         "seg_years": seg_years,
         # cash
         "cash_nodes": cash_nodes, "cash_links": cash_links,
-        "cash_caption": f"{profile.get('companyName', symbol)} {years[-1]} — cash generated and deployed",
+        "cash_caption": f"{profile.get('companyName', symbol)} {q_label} — cash generated and deployed",
         # position
         "bs_nodes": bs_nodes, "bs_links": bs_links,
-        "bs_periods": [_fy(bs_prev), _fy(bs_now)],
+        "bs_periods": [_q(bs_prev), _q(bs_now)],
         "bs_rows": bs_rows,
-        "bs_caption": f"Balance sheet — {_fy(bs_now)} against {_fy(bs_prev)}",
-        "bs_sankey_caption": f"{profile.get('companyName', symbol)} — what it owns and who has a claim on it",
+        "bs_caption": f"Balance sheet — {_q(bs_now)} against {_q(bs_prev)}",
+        "bs_sankey_caption": f"{profile.get('companyName', symbol)} {q_label} — what it owns and who has a claim on it",
         "bs_check": f"{assets[1]:,} = {liab[1]:,} + {equity[1]:,}",
         "bs_unit": f"{unit}, at {period_end:%d %B %Y}",
         "equity_share": equity_share,
@@ -577,13 +603,12 @@ def shape(p):                                        # noqa: C901 — one long, 
         "seg_series": seg_series,
         "seg_totals": seg_totals,
         "bridge_steps": bridge_steps,
-        "bridge_min": 0,
-        "bridge_max": int(seg_totals[-1] * 1.05),
+        "bridge_min": bridge_trough,
+        "bridge_max": int(bridge_peak * 1.05),
         "bridge_caption": f"Revenue bridge, {seg_years[0]} to {seg_years[-1]} ({unit})",
         "margin_rows": margin_rows,
         # peers
         "peer_headers": peer_headers, "peer_formats": peer_formats, "peer_rows": peer_rows,
         "peer_caption": "Peers — fiscal years ending on different dates",
     }
-    d.update(PROSE)
     return d
