@@ -122,8 +122,9 @@ contract.
 
 ## Versioning
 
-The design-system version lives in exactly two files — `version.json`
-(machine-readable) and `version.md` (the changelog and semver contract). On the
+The version is repo-wide and lives in two files at the **repo root** —
+`version.json` (machine-readable) and `version.md` (the changelog and semver
+contract) — and governs every skill under `skills/`. On the
 CDN the version is carried in the URL, and **published versions are
 immutable**: a document pinned to `@X.Y.Z` never changes underneath you.
 Upgrading a document to a newer look is a deliberate one-line edit, never a
@@ -136,7 +137,6 @@ docs-html/
 ├── SKILL.md            the authoring contract + full catalog
 ├── CATALOG.md          generated quick-reference: every component + doc-type
 ├── builder.py          composes documents  (new · --list · catalog · show · showcase)
-├── version.json        the design-system version   (+ version.md changelog)
 ├── css/
 │   ├── docs-html.css   the single stylesheet every document links
 │   ├── foundational/   colour tokens, typography, layout, content, blocks…

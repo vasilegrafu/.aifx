@@ -232,11 +232,11 @@ def cdn_href() -> str:
     …/gh/<user>/<repo>@{version}/skills/docs-html); a plain base URL gets
     "@version" appended. It is the only asset path the builder emits, so a
     missing cdn is a hard error rather than a silent broken link."""
-    info = json.loads((SKILL_DIR / "version.json").read_text(encoding="utf-8"))
+    info = json.loads((SKILL_DIR.parent.parent / "version.json").read_text(encoding="utf-8"))
     cdn, version = info.get("cdn"), info["version"]
     if not cdn:
         sys.exit("version.json has no \"cdn\" — every document links the CDN; set it first.")
-    return cdn.replace("{version}", version) if "{version}" in cdn else f"{cdn}@{version}"
+    return cdn.replace("{version}", version).replace("{skill}", SKILL_DIR.name)
 
 
 # --------------------------------------------------------------------------

@@ -263,11 +263,11 @@ def cdn_href() -> str:
     Read from version.json at build time, so every generated file is pinned to
     the design-system version it was built against. Published tags are
     immutable, so an old report keeps rendering exactly as it did."""
-    info = json.loads((SKILL_DIR / "version.json").read_text(encoding="utf-8"))
+    info = json.loads((SKILL_DIR.parent.parent / "version.json").read_text(encoding="utf-8"))
     cdn, version = info.get("cdn"), info["version"]
     if not cdn:
         sys.exit('version.json has no "cdn" — every report links it; set it first.')
-    return cdn.replace("{version}", version) if "{version}" in cdn else f"{cdn}@{version}"
+    return cdn.replace("{version}", version).replace("{skill}", SKILL_DIR.name)
 
 
 # --------------------------------------------------------------------------

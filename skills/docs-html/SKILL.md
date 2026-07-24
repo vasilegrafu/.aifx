@@ -110,7 +110,7 @@ the ✎-editor, and the chart theme/palette are in `js/REFERENCE.md` (charts) an
 **Where the two hrefs point — documents are CDN-ONLY.** `builder.py` bakes
 the version-pinned CDN URLs into every composed document's head:
 `https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@X.Y.Z/skills/docs-html/…`
-(the version read from `version.json` at compose time — a document is forever
+(the version read from the repo-root `version.json` at compose time — a document is forever
 pinned to the design system it was authored against, and works anywhere on
 the internet with zero local setup). Local paths never appear in a document.
 The ONE exception is the skill's own showcases (`showcases/*.html`): base links
@@ -119,21 +119,22 @@ the current tree, and their own `{% block head %}` hardcodes a **CDN fallback**
 (local first; the pinned CDN only if the local assets are missing). Documents
 never fall back — a missing `cdn` in `version.json` is a hard error.
 
-**Versioning.** The design-system version lives in exactly two files at the
-skill root and NOWHERE else (not in the CSS, not in the JS): `version.json`
-(machine-readable source of truth: `version`, `date`, `cdn` base URL) and
-`version.md` (the human changelog, one entry per release, semver contract
-documented at its top). On a CDN the version is carried by the URL path
-(`…/docs-html@X.Y.Z/css/docs-html.css`) — relative `@import`s and the JS
-loader's self-resolved base pin the whole asset tree to one version
+**Versioning.** One version governs the whole `.aifx` repo and every skill
+under it; it lives in exactly two files at the **repo root** and NOWHERE else
+(not per skill, not in the CSS, not in the JS): `version.json` (machine-readable
+source of truth: `version`, `date`, `cdn` template with `{version}` and
+`{skill}`) and `version.md` (the human changelog, one entry per release, semver
+contract documented at its top). On a CDN the version is carried by the URL path
+(`…/.aifx@X.Y.Z/skills/docs-html/css/docs-html.css`) — relative `@import`s and the
+JS loader's self-resolved base pin the whole asset tree to one version
 automatically. See the `release` command below.
 
 **Previewing CSS/JS edits.** Open the composed `showcases/components.html` — it
 links the local tree, so it reflects your working-tree edits immediately, no
 release needed. Documents, by contrast, pin the CDN version from `version.json`
 and pick up improvements only by a deliberate head edit to a newer `@X.Y.Z` —
-never silently. The `cdn` field in `version.json` is the URL template with
-`{version}`.
+never silently. The `cdn` field in the root `version.json` is the URL template
+with `{version}` and `{skill}`.
 
 ## How documents are composed
 
@@ -368,13 +369,14 @@ This skill lives in `github.com/vasilegrafu/.aifx` — a standalone public
 repo, checked out ONCE as a shared clone that solutions consume via
 junctions/symlinks into their `.claude/skills/`; the same repo is ALSO the CDN
 origin (jsDelivr serves its tags). There is no sync step: releasing IS tagging
-this repo. The version lives ONLY in `version.json` + `version.md` (skill root).
-When the user asks for a release:
-1. Read `version.json`; bump per semver (`version.md` documents the contract:
-   patch = visual fix, minor = additive, major = markup contract change —
-   infer the level from what changed since the last entry if not stated).
-2. Write the new `version.json` (version + ISO date, keep the `cdn` template)
-   and prepend a `version.md` entry summarizing the changes.
+this repo. The version lives ONLY in `version.json` + `version.md` at the repo
+root, and is shared by every skill. When the user asks for a release:
+1. Read the root `version.json`; bump per semver (`version.md` documents the
+   contract: patch = visual fix, minor = additive / new skill, major = markup
+   contract change — infer the level from what changed since the last entry if
+   not stated). A change to ANY skill bumps this one shared number.
+2. Write the new root `version.json` (version + ISO date, keep the `cdn`
+   template) and prepend a `version.md` entry summarizing the changes.
 3. In the `.aifx` repo: commit all changes; `git tag vX.Y.Z`;
    `git push origin main --tags`. A published tag is IMMUTABLE — never move or
    re-tag; any fix is a new version. Verify with a HEAD request to

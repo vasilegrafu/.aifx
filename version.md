@@ -1,16 +1,39 @@
-# docs-html — version history
+# .aifx — version history
 
-The SINGLE source of truth for the design-system version is `version.json`
+The SINGLE source of truth for the version is `version.json` at the **repo root**
 (machine-readable); this file is its human ledger — newest release first, one
-entry per version, written when the version is bumped. No version number lives
-anywhere else (not in the CSS, not in the JS, not in documents).
+entry per version, written when the version is bumped. **One version governs the
+whole repository** and every skill under `skills/` (docs-html, investing, …); no
+version number lives anywhere else (not in the CSS, not in the JS, not in
+documents, not per skill).
 
 Semver contract:
 - **PATCH** — visual fix, no markup contract change. Safe for every document.
-- **MINOR** — additive: new component, new style, new JS feature.
-- **MAJOR** — the markup contract changed; documents must opt in to upgrade.
+- **MINOR** — additive: new component, new style, new JS feature, new skill.
+- **MAJOR** — a markup contract changed; documents must opt in to upgrade.
 
 A published version is immutable: any change, however small, is a new version.
+Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
+`…/.aifx@<version>/skills/<skill>/…`.
+
+---
+
+## 4.3.0 — 2026-07-24
+
+**Minor.** Adds the **`investing`** skill — a data-driven report generator
+(`data_providers/fmp` → `report.builder.py` → `report.html.j2` → thin
+components → HTML), with 110 components seeded from docs-html 4.2.0 and one
+report (`financial-profile`). No change to docs-html markup: a 4.2.0 document
+upgrades, if desired, by repointing its two head links to `@4.3.0`, and still
+resolves unchanged on the retained `v4.2.0` tag if left alone.
+
+### Versioning is now repo-wide
+
+The repo previously carried one `version.json` per skill. With a second
+independently-usable skill, that split invited drift, so the version moved to a
+single **root `version.json`**, and both builders read it and substitute the
+skill name into the CDN path. A change to *either* skill now bumps this one
+number and gets one entry here.
 
 ---
 
