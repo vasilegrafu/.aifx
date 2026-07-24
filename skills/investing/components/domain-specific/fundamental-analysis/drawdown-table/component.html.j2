@@ -1,0 +1,23 @@
+{# purpose: the worst drawdowns with peak, trough, recovery and how long each took #}
+{# data: rows[] {depth:str, peak:str, trough:str, recovery:str, decline_months:str, recovery_months:str, cause:str} #}
+{% macro drawdown_table(rows=[], caption="", note="") %}
+  <table class="investing-fin investing-drawdowns">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>#</th><th>Depth</th><th>Peak</th><th>Trough</th><th>Recovered</th><th>Fall</th><th>Recovery</th><th>Cause</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <th scope="row">{{ loop.index }}</th>
+        <td class="investing-dd-depth neg">{{ r.depth }}</td>
+        <td class="investing-dd-date">{{ r.peak }}</td>
+        <td class="investing-dd-date">{{ r.trough }}</td>
+        <td class="investing-dd-date">{{ r.recovery }}</td>
+        <td>{{ r.decline_months }}</td>
+        <td>{{ r.recovery_months }}</td>
+        <td class="investing-dd-cause">{{ r.cause }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+{% endmacro %}

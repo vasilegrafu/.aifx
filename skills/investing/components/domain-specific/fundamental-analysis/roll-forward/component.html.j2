@@ -1,0 +1,21 @@
+{# purpose: movement schedule: opening balance, the movements, closing balance #}
+{# data: rows[] {label:str, cells:num[], kind:opening|movement|closing}
+         periods: str[] #}
+{# Opening + movements must equal closing in every column. Nothing here checks
+   it — the report's shape() does, because only it has the arithmetic. #}
+{% macro roll_forward(periods=[], rows=[], caption="", unit="", note="", fmt="money") %}
+  <table class="investing-fin investing-rollfwd">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="investing-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+    <thead><tr><th>{{ "" }}</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr class="investing-rf-{{ r.get('kind') or 'movement' }}">
+        <th scope="row">{{ r.label }}</th>
+        {% for v in r.cells %}<td{% if v is number and v < 0 %} class="neg"{% endif %}>{{ v | fmt(fmt) }}</td>{% endfor %}
+        {% for _ in range(periods | length - r.cells | length) %}<td></td>{% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+{% endmacro %}

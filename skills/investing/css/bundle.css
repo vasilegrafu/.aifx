@@ -1,0 +1,72 @@
+/* bundle.css — the single stylesheet every report links.
+
+   One line in the report (`<link rel="stylesheet" href=".../css/bundle.css">`)
+   pulls in the whole design system. This entry file is the only thing a
+   document references; everything else is @imported from here.
+
+   The modules are grouped by SCOPE, one directory each — the layout says what
+   a file is for before you open it:
+
+     foundational/     any report may use it; nothing here knows a discipline
+     domain-specific/  one ANALYSIS DISCIPLINE owns it. fundamental-analysis is
+                       the only one so far; technical-analysis or portfolio
+                       would sit beside it. Classes are namespaced `investing-`
+                       — the skill's name, not the discipline's, so a component
+                       can move between disciplines without a class rename
+     math/             the formula subsystem: KaTeX
+     diagrams/         the diagram subsystem: shared viewport + one engine
+     charts/           the chart subsystem: shared frame + one engine
+
+   The last three are RENDERING SUBSYSTEMS: each pairs this CSS with a lazy
+   CDN engine in js/modules/, and a document that uses none of them fetches
+   none of them.
+
+   @layer sets the cascade order once, up front, so it no longer depends on
+   @import order or per-rule specificity: later layers win. All of the design
+   system is layered, and documents carry no unlayered author CSS (no <style>,
+   no style=), so this reproduces the old fixed link order while making the
+   cascade robust to adding or reordering modules.
+
+   base.css itself @imports the web fonts; those come along automatically. */
+
+@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, investing,
+       code, math, diagrams, charts;
+
+/* ---------- foundational ---------- */
+/* Theme first: it defines the colour tokens every later layer consumes.
+   ONE file — edit foundational/theme.css to retheme everything. */
+@import url("foundational/theme.css")    layer(theme);
+
+@import url("foundational/base.css")     layer(base);
+@import url("foundational/metadata.css") layer(metadata);
+@import url("foundational/layout.css")   layer(layout);
+@import url("foundational/toc.css")      layer(toc);
+@import url("foundational/content.css")  layer(content);
+@import url("foundational/callouts.css") layer(callouts);
+@import url("foundational/lists.css")    layer(lists);
+@import url("foundational/blocks.css")   layer(blocks);
+@import url("foundational/code.css")     layer(code);
+
+/* ---------- domain-specific ----------
+   One discipline so far: fundamental-analysis (statements, valuation, peers,
+   solvency). The LAYER is still called `investing` because that is the class
+   prefix every rule inside uses; the FILE is named for the discipline, so a
+   sibling like technical-analysis.css can join without renaming anything. */
+@import url("domain-specific/fundamental-analysis.css") layer(investing);
+
+/* ---------- math ---------- */
+@import url("math/math.css")                layer(math);       /* KaTeX */
+
+/* ---------- diagrams ---------- */
+@import url("diagrams/diagrams.css")        layer(diagrams);   /* shared viewport */
+@import url("diagrams/diagram-mermaid.css") layer(diagrams);   /* one engine */
+
+/* ---------- charts ---------- */
+@import url("charts/charts.css")               layer(charts);  /* shared frame */
+@import url("charts/chart-apache-echarts.css") layer(charts);  /* one engine */
+
+/* There is no print module. Ctrl+P uses the browser's own defaults; the only
+   print CSS left is the `@media print` block each module keeps for itself —
+   hiding the floating toolbar, freezing diagrams to static images, collapsing
+   columns to one. Those stop screen-only UI reaching the paper; they do not
+   impose pagination, a cover page or margins. */

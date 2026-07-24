@@ -1,0 +1,98 @@
+/* docs-html — charts: the SHARED, ENGINE-AGNOSTIC chart frame.
+   Part of docs-html.css (loaded via @import, layer `charts`).
+
+   Owns the card every chart renders onto, the canvas an engine draws into, the
+   icon toolbar, and the source-block fallback that keeps a document readable
+   when an engine's CDN is unreachable or a spec is invalid. One engine CSS file
+   sits beside this one per engine (chart-apache-echarts.css) and adds only what
+   is specific to it — this file must never name an engine.
+
+   The card background IS the surface the categorical palette was chosen
+   against (--bg-soft) — see css/REFERENCE.md and the PALETTE in
+   js/modules/charts.js. Recolouring it changes the contrast of every series
+   drawn on it, which is why a theme picks its own palette ORDER rather than
+   reusing one: legibility depends on the ground. */
+
+/* The chart card — the validated surface an engine renders onto.
+   Positioned so the toolbar can sit inside its top-right corner. */
+.chart-figure {
+  position: relative;
+  margin: var(--block-gap) 0;
+  padding: .75rem .6rem .55rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.chart-canvas { width: 100%; }
+.chart-canvas svg { max-width: 100%; }   /* never overflow the reading column */
+
+/* The one-line reading under a chart — what the shape MEANS. It sits outside
+   the card, like a figure's caption, and pulls up tight against it so the two
+   read as one block rather than a chart followed by a stray sentence. */
+.chart-note {
+  margin: calc(var(--block-gap) * -.6) 0 var(--block-gap);
+  font-size: .82rem;
+  color: var(--fg-soft);
+}
+
+/* per-chart icon toolbar, top-right inside the card — one chip holding flat
+   SVG-icon buttons (injected by docs-html.js), same look as .doc-toolbar and
+   .diagram-tools. It hangs off the figure, not the canvas: the canvas belongs
+   to the engine, which may replace its contents on every redraw. */
+.chart-tools {
+  position: absolute;
+  top: .5rem; right: .5rem;
+  z-index: 2;
+  display: flex; align-items: center; gap: .15rem;
+  padding: .2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  box-shadow: var(--shadow);
+}
+.chart-tools button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-soft);
+  width: 1.6rem; height: 1.6rem;
+  padding: 0;
+  border-radius: .35rem;
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.chart-tools button:hover { background: var(--bg-soft); color: var(--fg); }
+.chart-tools button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.chart-tools .sep {
+  width: 1px; height: 1.1rem;
+  background: var(--border);
+  margin: 0 .15rem;
+}
+
+/* Source before render — or forever, if the engine is unavailable or the spec
+   is invalid: show it as an intentional, readable code box. One definition for
+   every engine, selected by the shared `chart` marker class. So write the spec
+   clean enough to read as text. */
+pre.chart {
+  margin: var(--block-gap) 0;
+  padding: .8rem 1rem;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  line-height: 1.5;
+  color: var(--fg-soft);
+  white-space: pre;
+}
+pre.chart[hidden] { display: none; }        /* rendered: source stays in the DOM, hidden */
+pre.chart.chart-error {                     /* invalid spec: flag it, keep the source */
+  border-color: var(--risk);
+  color: var(--risk);
+}
+
+@media print {
+  .chart-figure { break-inside: avoid; }
+  .chart-tools { display: none; }
+}

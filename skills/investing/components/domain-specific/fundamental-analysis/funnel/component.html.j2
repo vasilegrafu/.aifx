@@ -1,0 +1,19 @@
+{# purpose: nested magnitudes narrowing to a target — market sizing, or a conversion funnel #}
+{# data: stages[] {label:str, value:str, pct:num, note?:str} — pct is width vs the first stage #}
+{% macro funnel(stages=[], caption="", note="") %}
+  <figure class="investing-funnel">
+  {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
+    <div class="investing-funnel-stages">
+    {% for st in stages %}
+      <div class="investing-funnel-stage">
+        <span class="investing-funnel-bar" data-pct="{{ st.pct }}%">
+          <span class="investing-funnel-label">{{ st.label }}</span>
+          <span class="investing-funnel-value">{{ st.value }}</span>
+        </span>
+        {% if st.get('note') %}<span class="investing-funnel-note">{{ st.note }}</span>{% endif %}
+      </div>
+    {% endfor %}
+    </div>
+    {% if note %}<p class="investing-funnel-summary">{{ note }}</p>{% endif %}
+  </figure>
+{% endmacro %}

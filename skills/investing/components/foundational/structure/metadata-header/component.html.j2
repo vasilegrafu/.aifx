@@ -1,0 +1,16 @@
+{# purpose: report cover: the report-type kicker and the title #}
+{# The `<dl>` of Author/Date/Version was removed in docs-html 4.0.0 and does not
+   come back here. Those three facts were composed into every document whether
+   or not they meant anything, and a fact nobody maintains is worse than an
+   absent one because a reader trusts it. A GENERATED report has a sharper
+   version of the same problem: it can restate its own build date effortlessly
+   and endlessly, which tells the reader when the file was written rather than
+   when the data was true. Those are different dates and only the second one
+   matters — so the report states its data's as-of dates in the body, where a
+   reader will actually weigh them. #}
+{% macro metadata_header(report_name, title) %}
+  <header class="doc-meta">
+    <p class="doc-type">{{ report_name }}</p>
+    <h1>{{ title }}</h1>
+  </header>
+{% endmacro %}

@@ -1,0 +1,58 @@
+{# purpose: revenue by segment with each segment's share and growth — and its profit where the source discloses it #}
+{# data: rows[] {segment:str, revenue:num, rev_share:num, growth:num,
+                 profit?:num, profit_share?:num, margin?:num}
+         shares, margin and growth are PERCENT NUMBERS (52.4, not 0.524)
+         total_row? {label:str, cells:str[]} #}
+{# PROFIT IS OPTIONAL, AND ITS ABSENCE IS THE COMMON CASE. Product-line
+   segmentation feeds — FMP's among them — publish revenue and nothing else.
+   When this macro demanded profit anyway, the path of least resistance was to
+   pass revenue twice, which renders a confident table asserting that every
+   segment converts revenue to profit at 100% and reporting a "margin" that is
+   really a revenue share. Nothing about the output looks wrong.
+
+   So the profit columns appear only when there is something to put in them. A
+   source with no profit disclosure gets a NARROWER table, never a fabricated
+   one. #}
+{% macro segment_reporting(rows=[], caption="", unit="", revenue_label="Revenue", profit_label="Profit", total_row=none, source="", fmt="money") %}
+{% set has_profit = rows and rows[0].get('profit') is not none %}
+  <table class="investing-fin segments">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="investing-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+    <thead><tr>
+      <th>Segment</th>
+      <th>{{ revenue_label }}</th><th class="investing-seg-share-head">% of {{ revenue_label | lower }}</th>
+      {% if has_profit %}
+      <th>{{ profit_label }}</th><th class="investing-seg-share-head">% of {{ profit_label | lower }}</th>
+      <th>Margin</th>
+      {% endif %}
+      <th>y/y</th>
+    </tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <th scope="row">{{ r.segment }}</th>
+        <td>{{ r.revenue | fmt(fmt) }}</td>
+        <td class="investing-seg-share">
+          <span class="investing-seg-track"><span class="investing-seg-fill" data-pct="{{ r.rev_share | round(1) }}%"></span></span>
+          <span class="investing-seg-pct">{{ r.rev_share | pct }}</span>
+        </td>
+        {% if has_profit %}
+        <td>{{ r.profit | fmt(fmt) }}</td>
+        <td class="investing-seg-share">
+          <span class="investing-seg-track"><span class="investing-seg-fill investing-seg-fill-profit" data-pct="{{ r.profit_share | round(1) }}%"></span></span>
+          <span class="investing-seg-pct">{{ r.profit_share | pct }}</span>
+        </td>
+        <td>{{ r.margin | pct }}</td>
+        {% endif %}
+        <td{% if r.growth is number and r.growth < 0 %} class="neg"{% endif %}>{{ r.growth | pct }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    {% if total_row %}
+    <tfoot><tr class="investing-total">
+      <th scope="row">{{ total_row.label }}</th>
+      {% for v in total_row.cells %}<td>{{ v }}</td>{% endfor %}
+    </tr></tfoot>
+    {% endif %}
+  </table>
+  {% if source %}<p class="investing-st-source">{{ source }}</p>{% endif %}
+{% endmacro %}

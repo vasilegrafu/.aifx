@@ -1,0 +1,9 @@
+{# purpose: numbered, anchorable reference list #}
+{# data: items[] {id:str, text:str} #}
+{% macro references(items=[]) %}
+  <ol class="references">
+  {% for it in items %}
+    <li id="{{ it.id }}">{{ it.text }}</li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

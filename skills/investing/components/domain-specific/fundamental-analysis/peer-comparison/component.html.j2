@@ -1,0 +1,23 @@
+{# purpose: the subject against named peers across chosen metrics, subject row highlighted #}
+{# data: headers[] str — the METRIC columns ONLY. The macro emits the Company
+         column itself; passing it again shifts every value one column left and
+         leaves the last one blank, which renders as a perfectly tidy wrong
+         table. shape() asserts the count.
+         formats[] str — one format name per metric column, because peers are
+         compared on mixed units (a percent, a ratio, a multiple) and one
+         format for all of them would be a lie. Defaults to `num` throughout.
+         rows[] {name:str, cells:num[], subject:bool} #}
+{% macro peer_comparison(headers=[], rows=[], formats=[], caption="") %}
+  <table class="investing-fin investing-peers">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>Company</th>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr{% if r.subject %} class="investing-subject"{% endif %}>
+        <th scope="row">{{ r.name }}</th>
+        {% for v in r.cells %}<td>{{ v | fmt(formats[loop.index0] if loop.index0 < formats | length else 'num') }}</td>{% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

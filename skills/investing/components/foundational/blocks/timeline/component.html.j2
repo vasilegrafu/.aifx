@@ -1,0 +1,13 @@
+{# purpose: dated milestone timeline with status #}
+{# data: items[] {state:done|active|todo, when:str, title:str, detail:str} #}
+{% macro timeline(items=[]) %}
+  <ol class="timeline">
+  {% for it in items %}
+    <li data-state="{{ it.state }}">
+      <span class="when">{{ it.when }}</span>
+      <h3>{{ it.title }}</h3>
+      <p>{{ it.detail }}</p>
+    </li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

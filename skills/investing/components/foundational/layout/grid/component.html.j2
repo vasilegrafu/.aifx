@@ -1,0 +1,4 @@
+{# purpose: auto-fit grid of equal tiles; min sets the smallest tile width #}
+{% macro grid(min="14rem") %}
+  <div class="grid"{% if min != "14rem" %} style="--grid-min: {{ min }}"{% endif %}>{{ caller() }}</div>
+{% endmacro %}

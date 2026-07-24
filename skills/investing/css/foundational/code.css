@@ -1,0 +1,72 @@
+/* docs-html — code: professional code blocks with title bar and
+   generation-time syntax highlighting. Requires base.css + content.css.
+   Link in developer-facing documents (ADR, architecture, API specs,
+   coding standards, runbooks…).
+
+   Highlighting has NO runtime JavaScript: token <span>s are written into
+   the document when Claude generates or modifies it (build-time
+   highlighting, like static-site generators). Hand-written plain
+   <pre><code> without tokens is always valid — tokens are an enhancement.
+
+   Token vocabulary (see components/code-block.md):
+     tok-kw   keyword           tok-str  string literal
+     tok-num  number literal    tok-com  comment
+     tok-fn   function name     tok-cls  class / type name
+     tok-const constant/builtin tok-op   operator / punctuation (optional)
+*/
+
+/* ---------- framed code block with title bar ---------- */
+figure.code {
+  margin: var(--block-gap) 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--code-bg);
+  text-align: left;
+}
+figure.code > figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0;
+  padding: .55rem 1.2rem;
+  background: var(--code-surface);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: .78rem; font-weight: 500;
+  color: var(--fg-soft);
+}
+figure.code > figcaption .lang {
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--accent);
+}
+figure.code pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+/* ---------- syntax palette ----------
+   Applied at VIEW TIME by docs-html.js (Prism, lazy from CDN) to any
+   `<pre><code data-lang="…">` — documents hold plain text, never token
+   markup. The same palette colors the diagram source editor.
+
+   The values come from the active theme (--code-* in theme-*.css), so a dark
+   document gets a dark-legible palette without touching this file. */
+.token.keyword                        { color: var(--code-keyword); }
+.token.string, .token.char,
+.token.attr-value, .token.inserted    { color: var(--code-string); }
+.token.number, .token.boolean         { color: var(--code-number); }
+.token.comment, .token.prolog,
+.token.cdata                          { color: var(--code-comment); font-style: italic; }
+.token.function                       { color: var(--code-function); }
+.token.class-name, .token.builtin,
+.token.tag                            { color: var(--code-tag); font-weight: 600; }
+.token.constant, .token.symbol,
+.token.property, .token.attr-name     { color: var(--code-property); }
+.token.operator, .token.punctuation,
+.token.arrow                          { color: var(--code-punct); }
+.token.important, .token.deleted      { color: var(--risk); }

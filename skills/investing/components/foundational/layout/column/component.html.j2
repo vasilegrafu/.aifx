@@ -1,0 +1,4 @@
+{# purpose: one cell inside columns; span>1 makes it proportionally wider #}
+{% macro column(span=1) %}
+  <div class="column"{% if span != 1 %} style="flex-grow: {{ span }}"{% endif %}>{{ caller() }}</div>
+{% endmacro %}

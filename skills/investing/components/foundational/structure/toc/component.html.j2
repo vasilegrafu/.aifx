@@ -1,0 +1,15 @@
+{# purpose: table of contents from section ids and labels #}
+{# data: entries[] {id:str, label:str} #}
+{# In docs-html the TOC is maintained BY HAND and drifts from the document the
+   moment a section is renamed. Here the recipe knows its own sections, so the
+   report passes the same list it renders from and the two cannot disagree. #}
+{% macro toc(entries=[]) %}
+  <nav class="toc">
+    <p class="toc-title">Contents</p>
+    <ul>
+    {% for e in entries %}
+      <li><a href="#{{ e.id }}">{{ e.label }}</a></li>
+    {% endfor %}
+    </ul>
+  </nav>
+{% endmacro %}

@@ -1,0 +1,7 @@
+{# purpose: click-to-expand details block #}
+{% macro collapsible(summary="") %}
+  <details>
+    <summary>{{ summary }}</summary>
+    {{ caller() }}
+  </details>
+{% endmacro %}

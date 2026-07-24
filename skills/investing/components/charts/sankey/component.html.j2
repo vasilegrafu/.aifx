@@ -1,0 +1,43 @@
+{# purpose: flow decomposition — how a total splits, merges or converts across stages #}
+{# unit: required — a ribbon is a bare number with no axis to label #}
+{# data: nodes[] {name:str, role:source|stage|cost|retained}
+         links[] {source:str, target:str, value:num} — names must match nodes #}
+{% import "components/charts/_render.html.j2" as r %}
+
+{% macro sankey(nodes=[], links=[], caption="", height=420, note="", label_room=150, unit="") %}
+{% set roles = {"source": "palette:1", "stage": "token:muted",
+                "cost": "token:caution", "retained": "token:positive"} %}
+{# CONSERVATION IS NOT CHECKED HERE, AND CANNOT BE. Inflows must equal outflows
+   at every intermediate node; a sankey that does not balance draws perfectly
+   and lies, because the ribbons are scaled independently per node. The report's
+   shape() asserts it before this macro is ever called — that is the only place
+   with the arithmetic to do so. If you are reading this because you are writing
+   a new report: assert it there, not here.
+
+   LABELS ARE CANVAS TEXT. They never pass an HTML parser, so `&amp;` renders
+   literally as five characters. Pass a raw `&` and a real `’`. #}
+{% set node_data = [] %}
+{% for n in nodes %}
+{%   set _ = node_data.append({"name": n.name,
+                               "itemStyle": {"color": roles.get(n.role, "token:muted")}}) %}
+{% endfor %}
+{% set link_data = [] %}
+{% for l in links %}
+{%   set _ = link_data.append({"source": l.source, "target": l.target, "value": l.value}) %}
+{% endfor %}
+{# Layout, not styling — it depends on how long the labels are, so it cannot
+   live in the theme. `label_room` reserves right margin for the terminal
+   nodes' labels, which sit OUTSIDE the node; without it they clip. The white
+   text border keeps a label legible where it crosses a ribbon. #}
+{% set option = {
+     "tooltip": {"trigger": "item", "triggerOn": "mousemove"},
+     "series": [{"type": "sankey", "emphasis": {"focus": "adjacency"},
+                 "left": 8, "right": label_room, "top": 14, "bottom": 14,
+                 "nodeWidth": 14, "nodeGap": 18, "nodeAlign": "left",
+                 "draggable": false,
+                 "label": {"fontSize": 12, "textBorderColor": "#ffffff",
+                           "textBorderWidth": 3},
+                 "data": node_data, "links": link_data}],
+   } %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

@@ -1,0 +1,21 @@
+{# purpose: financial covenants: the test, the limit, the actual level, and the headroom #}
+{# data: rows[] {covenant:str, test:str, limit:str, actual:str, headroom:str, status:pass|tight|breach} #}
+{% macro covenant_table(rows=[], caption="", asof="", note="") %}
+  <table class="investing-fin investing-covenants">
+  {% if caption or asof %}<caption>{{ caption }}{% if asof %} <span class="investing-macro-asof">tested at {{ asof }}</span>{% endif %}</caption>{% endif %}
+    <thead><tr><th>Covenant</th><th>Test</th><th>Limit</th><th>Actual</th><th>Headroom</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr class="investing-cov-{{ r.status }}">
+        <th scope="row">{{ r.covenant }}</th>
+        <td class="investing-cov-test">{{ r.test }}</td>
+        <td>{{ r.limit }}</td>
+        <td class="investing-cov-actual">{{ r.actual }}</td>
+        <td>{{ r.headroom }}</td>
+        <td><span class="badge badge-{{ {"pass": "good", "tight": "warn", "breach": "bad"}.get(r.status, "info") }}">{{ r.status }}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+{% endmacro %}

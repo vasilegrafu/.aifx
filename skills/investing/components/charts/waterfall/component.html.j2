@@ -1,0 +1,61 @@
+{# purpose: how a total became another total — a bridge of additive steps #}
+{# unit: axis — one measured axis; name it with y_name #}
+{# data: steps[] {label:str, value:num, kind:start|delta|total} — running cumulative computed here #}
+{% import "components/charts/_render.html.j2" as r %}
+
+{% macro waterfall(steps=[], caption="", height=360, note="", y_name="", unit="") %}
+{# ECharts has no waterfall series type. It is faked with two stacked bars: an
+   invisible `placeholder` that lifts each floating bar to where it starts, and
+   the visible delta drawn on top.
+
+   The placeholder heights are a RUNNING CUMULATIVE TOTAL, computed here. An
+   author redoing this arithmetic by hand for every chart gets it wrong
+   silently — a waterfall with a bad placeholder still draws, it just draws a
+   different story.
+
+   `steps` is [(label, value, kind)] with kind start | delta | total. #}
+{% set labels = [] %}{% set base = [] %}{% set bars = [] %}
+{% set ns = namespace(cum=0) %}
+{% for st in steps %}
+{%   set _ = labels.append(st.label) %}
+{%   if st.kind in ("start", "total") %}
+{# A start or a total is an absolute level, not a step: it sits on the axis and
+   resets the running total rather than adding to it. #}
+{%     set _ = base.append(0) %}
+{%     set _ = bars.append({"value": st.value | abs,
+                            "itemStyle": {"color": "palette:1"}}) %}
+{%     set ns.cum = st.value %}
+{%   else %}
+{# A falling step is drawn from where it ENDS, so the floor is the lower of the
+   two levels either side of it. #}
+{%     set _ = base.append([ns.cum, ns.cum + st.value] | min) %}
+{%     set _ = bars.append({"value": st.value | abs,
+                            "itemStyle": {"color": "token:positive" if st.value >= 0
+                                                   else "token:negative"}}) %}
+{%     set ns.cum = ns.cum + st.value %}
+{%   endif %}
+{% endfor %}
+{% set y_axis = {"type": "value"} %}
+{% if y_name %}
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
+                            "nameGap": 46, "nameRotate": 90}) %}
+{% endif %}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+     "grid": {"left": (46 if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
+     "xAxis": {"type": "category", "data": labels},
+     "yAxis": y_axis,
+     "series": [
+       {"type": "bar", "name": "placeholder", "stack": "wf",
+        "itemStyle": {"color": "transparent"},
+        "emphasis": {"itemStyle": {"color": "transparent"}},
+        "tooltip": {"show": false}, "silent": true, "data": base},
+       {"type": "bar", "name": "change", "stack": "wf",
+        "label": {"show": true, "position": "top"}, "data": bars}],
+   } %}
+{# The placeholder is scaffolding, not a series. Name the legend explicitly so
+   the engine's "two or more series -> add a legend" default cannot advertise
+   it. #}
+{% set _ = option.update({"legend": {"data": ["change"], "show": false}}) %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

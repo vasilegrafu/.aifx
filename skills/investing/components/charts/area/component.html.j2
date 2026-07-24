@@ -1,0 +1,33 @@
+{# purpose: a measure over time with the region beneath filled — magnitude, not just direction #}
+{# unit: axis — one measured axis; s.name it with y_name #}
+{# data: series[] {name:str, points:num[]}   categories: str[] #}
+{% import "components/charts/_render.html.j2" as r %}
+
+{% macro area(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
+{# Built as data and serialised once — see the note in line/component.html.j2. #}
+{% set built = [] %}
+{% for s in series %}
+{# The fill claims the quantity BENEATH the line is real, so this kind belongs
+   to measures with a meaningful zero. Overlapping fills hide one another; past
+   two series, stack them instead. #}
+{%   set _ = built.append({"type": "line", "s.name": s.name, "areaStyle": {},
+                           "showSymbol": categories | length <= 24,
+                           "data": s.points}) %}
+{% endfor %}
+{% set y_axis = {"type": "value"} %}
+{% if y_name %}
+{%   set _ = y_axis.update({"s.name": y_name, "nameLocation": "middle",
+                            "nameGap": 46, "nameRotate": 90}) %}
+{% endif %}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "line"}},
+     "grid": {"left": (46 if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
+     "xAxis": {"type": "category", "data": categories},
+     "yAxis": y_axis,
+     "series": built,
+   } %}
+{% if built | length > 1 %}
+{%   set _ = option.update({"legend": {}}) %}
+{% endif %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

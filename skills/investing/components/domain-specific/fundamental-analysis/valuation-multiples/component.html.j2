@@ -1,0 +1,20 @@
+{# purpose: each valuation multiple against peer median and its own history, with the premium #}
+{# data: rows[] {multiple:str, current:str, peers:str, history:str, premium:str, verdict:cheap|fair|rich} #}
+{% macro valuation_multiples(rows=[], history_label="5-yr own median", caption="") %}
+  <table class="investing-fin investing-multiples">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>Multiple</th><th>Current</th><th>Peer median</th><th>{{ history_label }}</th><th>Premium</th><th>Read</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <th scope="row">{{ r.multiple }}</th>
+        <td class="investing-mult-current">{{ r.current }}</td>
+        <td>{{ r.peers }}</td>
+        <td>{{ r.history }}</td>
+        <td>{{ r.premium }}</td>
+        <td>{% if r.get('verdict') %}<span class="badge badge-{{ {"cheap": "good", "fair": "info", "rich": "bad"}.get(r.verdict, "info") }}">{{ r.verdict }}</span>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

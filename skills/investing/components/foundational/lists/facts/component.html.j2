@@ -1,0 +1,13 @@
+{# purpose: key/value definition list #}
+{# data: rows[] {term:str, value:str} #}
+{# WAS a list of (term, desc) tuples. A two-tuple is the most tempting shape to
+   get backwards and the least likely to complain: swap them and you get a
+   perfectly formatted list with every label and value transposed. Named keys
+   cannot be swapped silently. #}
+{% macro facts(rows=[]) %}
+  <dl class="facts">
+  {% for r in rows %}
+    <dt>{{ r.term }}</dt><dd>{{ r.value }}</dd>
+  {% endfor %}
+  </dl>
+{% endmacro %}

@@ -1,0 +1,21 @@
+{# purpose: valuation ranges by method with the current price marked — the football field #}
+{# data: rows[] {method:str, low:num, high:num, label:str} — offsets computed here; price marks the current level #}
+{% macro valuation_range(rows=[], scale_min=0, scale_max=100, price=none, price_label="", caption="", unit="") %}
+  {% set span = (scale_max - scale_min) if (scale_max - scale_min) else 1 %}
+  <figure class="investing-valrange">
+  {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
+    <div class="investing-valrange-rows">
+    {% for r in rows %}
+      <div class="investing-valrange-row">
+        <span class="investing-valrange-method">{{ r.method }}</span>
+        <span class="investing-valrange-track">
+          <span class="investing-valrange-bar" data-lo="{{ (100 * (r.low - scale_min) / span) | round(2) }}%" data-span="{{ (100 * (r.high - r.low) / span) | round(2) }}%"></span>
+          {% if price is not none %}<span class="investing-valrange-mark" data-at="{{ (100 * (price - scale_min) / span) | round(2) }}%"></span>{% endif %}
+        </span>
+        <span class="investing-valrange-value">{{ r.label }}</span>
+      </div>
+    {% endfor %}
+    </div>
+    <p class="investing-valrange-axis"><span>{{ unit }}{{ scale_min }}</span>{% if price is not none %}<span class="investing-valrange-price">{{ price_label }}</span>{% endif %}<span>{{ unit }}{{ scale_max }}</span></p>
+  </figure>
+{% endmacro %}

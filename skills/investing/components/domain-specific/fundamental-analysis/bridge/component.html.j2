@@ -1,0 +1,32 @@
+{# purpose: waterfall bridge decomposing how a total moved from one value to another #}
+{# data: steps[] {label:str, delta:num, kind:start|up|down|subtotal|end, display?:str}
+         `delta` is the VALUE for start/end/subtotal and the CHANGE for up/down.
+         `display` overrides the formatted delta where a step needs custom text. #}
+{# The steps must carry start to end. shape() asserts it; a bridge whose
+   movements do not reach its own endpoint still draws, and looks convincing. #}
+{% macro bridge(steps=[], scale_min=0, scale_max=100, caption="", note="", fmt="money") %}
+  {% set span = (scale_max - scale_min) if (scale_max - scale_min) else 1 %}
+  {% set ns = namespace(cum=scale_min) %}
+  <figure class="investing-bridge">
+  {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
+    <div class="investing-bridge-rows">
+    {% for s in steps %}
+      {% if s.kind in ("start", "end", "subtotal") %}
+        {% set lo = scale_min %}{% set hi = s.delta %}{% set ns.cum = s.delta %}
+      {% elif s.delta >= 0 %}
+        {% set lo = ns.cum %}{% set hi = ns.cum + s.delta %}{% set ns.cum = ns.cum + s.delta %}
+      {% else %}
+        {% set lo = ns.cum + s.delta %}{% set hi = ns.cum %}{% set ns.cum = ns.cum + s.delta %}
+      {% endif %}
+      <div class="investing-bridge-row investing-bridge-{{ s.kind }}">
+        <span class="investing-bridge-label">{{ s.label }}</span>
+        <span class="investing-bridge-track">
+          <span class="investing-bridge-bar" data-lo="{{ (100 * (lo - scale_min) / span) | round(2) }}%" data-span="{{ (100 * (hi - lo) / span) | round(2) }}%"></span>
+        </span>
+        <span class="investing-bridge-value">{{ s.get('display') or (s.delta | fmt('signed' if s.kind in ('up', 'down') else fmt)) }}</span>
+      </div>
+    {% endfor %}
+    </div>
+    {% if note %}<p class="investing-bridge-note">{{ note }}</p>{% endif %}
+  </figure>
+{% endmacro %}

@@ -1,0 +1,20 @@
+{# purpose: 2x2 positioning map with items placed by two scores #}
+{# data: items[] {label:str, x:0-100, y:0-100, tone?:str}   quadrants: str[4] #}
+{% macro quadrant_map(items=[], x_label="", y_label="", quadrants=[], caption="", note="") %}
+  <figure class="investing-quadrant">
+  {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
+    <div class="investing-quadrant-frame">
+      <span class="investing-quadrant-y-label">{{ y_label }}</span>
+      <div class="investing-quadrant-plot">
+        {% for q in quadrants %}<span class="investing-quadrant-zone investing-quadrant-z{{ loop.index }}">{{ q }}</span>{% endfor %}
+        {% for it in items %}
+        <span class="investing-quadrant-item{% if it.get('tone') %} investing-quadrant-{{ it.tone }}{% endif %}" data-x="{{ it.x }}%" data-y="{{ it.y }}%">
+          <span class="investing-quadrant-dot"></span><span class="investing-quadrant-label">{{ it.label }}</span>
+        </span>
+        {% endfor %}
+      </div>
+      <span class="investing-quadrant-x-label">{{ x_label }}</span>
+    </div>
+    {% if note %}<p class="investing-quadrant-note">{{ note }}</p>{% endif %}
+  </figure>
+{% endmacro %}

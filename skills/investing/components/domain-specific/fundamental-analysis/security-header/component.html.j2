@@ -1,0 +1,23 @@
+{# purpose: identity strip for the security under analysis: ticker, name, key market data #}
+{# data: facts[] {label:str, value:str} — pre-formatted, because these are
+         heterogeneous (a price, a market cap, a sector name) and no single
+         numeric format fits them #}
+{% macro security_header(ticker="", name="", exchange="", asof="", facts=[]) %}
+  <header class="investing-sec-header">
+    <p class="investing-sec-id">
+      <span class="investing-sec-ticker">{{ ticker }}</span>
+      <span class="investing-sec-name">{{ name }}</span>
+      {% if exchange %}<span class="investing-sec-exchange">{{ exchange }}</span>{% endif %}
+    </p>
+    {% if facts %}
+    <dl class="investing-sec-facts">
+      {% for f in facts %}
+      <div><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></div>
+      {% endfor %}
+    </dl>
+    {% endif %}
+    {# `asof` is a MARKET data date and is not the filing date, the period end,
+       or the build date. Reports conflate those four routinely. #}
+    {% if asof %}<p class="investing-sec-asof">Market data as of {{ asof }}</p>{% endif %}
+  </header>
+{% endmacro %}

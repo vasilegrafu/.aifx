@@ -1,0 +1,9 @@
+{# purpose: defined-terms list #}
+{# data: terms[] {id:str, term:str, desc:str} #}
+{% macro glossary(terms=[]) %}
+  <dl class="glossary">
+  {% for t in terms %}
+    <dt id="{{ t.id }}">{{ t.term }}</dt><dd>{{ t.desc }}</dd>
+  {% endfor %}
+  </dl>
+{% endmacro %}

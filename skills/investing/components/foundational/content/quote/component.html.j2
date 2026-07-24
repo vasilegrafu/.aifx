@@ -1,0 +1,9 @@
+{# purpose: pull quote with attribution #}
+{% macro quote(text="", source="") %}
+  <blockquote class="pull">
+    <p>{{ caller() if caller is defined else text }}</p>
+  {% if source %}
+    <footer>— {{ source }}</footer>
+  {% endif %}
+  </blockquote>
+{% endmacro %}

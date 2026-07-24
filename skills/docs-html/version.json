@@ -1,5 +1,5 @@
 {
   "version": "4.2.0",
   "date": "2026-07-24",
-  "cdn": "https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@{version}/skills/docs-html"
+  "cdn": "https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@docs-html-v{version}/skills/docs-html"
 }

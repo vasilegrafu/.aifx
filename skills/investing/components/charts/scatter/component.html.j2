@@ -1,0 +1,52 @@
+{# purpose: two measures per entity — where the relationship between them is the finding #}
+{# unit: multi — x and y are different measures; name each axis #}
+{# data: series[] {name:str, points: list of [x,y] or [x,y,label]} — points stay positional; ECharts reads [x,y] natively #}
+{% import "components/charts/_render.html.j2" as r %}
+
+{% macro scatter(series=[], caption="", height=360, note="", x_name="", y_name="", unit="") %}
+{# Built as data and serialised once — see the note in line/component.html.j2.
+   A point is (x, y) or (x, y, label); the third element is optional and names
+   the point on the chart, which is what turns a cloud into something a reader
+   can argue with. #}
+{% set built = [] %}
+{% for s in series %}
+{%   set data = [] %}
+{%   for point in s.points %}
+{%     set mark = {"value": [point[0], point[1]]} %}
+{%     if point | length > 2 %}
+{%       set _ = mark.update({"name": point[2],
+                              "label": {"show": true, "position": "right",
+                                        "formatter": "{b}", "fontSize": 10}}) %}
+{%     endif %}
+{%     set _ = data.append(mark) %}
+{%   endfor %}
+{%   set _ = built.append({"type": "scatter", "name": s.name, "data": data}) %}
+{% endfor %}
+{# `scale: true` on BOTH axes — a scatter is about the relationship, and forcing
+   either axis to start at zero can flatten the very pattern being shown.
+   A named axis sits mid-axis; only the vertical one rotates, or it reads
+   sideways. containLabel reserves room for tick labels but not for a name, so
+   the corresponding margin widens with it. #}
+{% set x_axis = {"type": "value", "scale": true} %}
+{% if x_name %}
+{%   set _ = x_axis.update({"name": x_name, "nameLocation": "middle",
+                            "nameGap": 28}) %}
+{% endif %}
+{% set y_axis = {"type": "value", "scale": true} %}
+{% if y_name %}
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
+                            "nameGap": 46, "nameRotate": 90}) %}
+{% endif %}
+{% set option = {
+     "tooltip": {"trigger": "item"},
+     "grid": {"left": (46 if y_name else 8), "right": 16,
+              "bottom": (34 if x_name else 8), "containLabel": true},
+     "xAxis": x_axis,
+     "yAxis": y_axis,
+     "series": built,
+   } %}
+{% if built | length > 1 %}
+{%   set _ = option.update({"legend": {}}) %}
+{% endif %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

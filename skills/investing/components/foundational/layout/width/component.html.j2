@@ -1,0 +1,4 @@
+{# purpose: constrain any component(s) to a fixed width; optional align left/center/right #}
+{% macro width(w="24rem", align="left") %}
+  <div class="width{% if align != 'left' %} width-{{ align }}{% endif %}" style="--w: {{ w }}">{{ caller() }}</div>
+{% endmacro %}

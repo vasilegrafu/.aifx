@@ -1,0 +1,18 @@
+{# purpose: working capital efficiency: days sales, inventory and payables, and the cash conversion cycle #}
+{# data: rows[] {metric:str, cells:str[], kind?:total, dir:up|down|flat} — pre-formatted strings #}
+{% macro working_capital(periods=[], rows=[], caption="", note="") %}
+  <table class="investing-fin investing-workcap">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>Metric</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}<th class="investing-trend-head">Trend</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr{% if r.get('kind') %} class="investing-wc-{{ r.kind }}"{% endif %}>
+        <th scope="row">{{ r.metric }}</th>
+        {% for v in r.cells %}<td{% if v is string and (v.startswith("(") or v.startswith("-") or v.startswith("−")) %} class="neg"{% endif %}>{{ v }}</td>{% endfor %}
+        <td class="investing-trend investing-trend-{{ r.dir }}">{{ {"up": "▲", "down": "▼"}.get(r.dir, "▬") }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+{% endmacro %}

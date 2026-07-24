@@ -1,0 +1,29 @@
+/* docs-html — chart-apache-echarts: Apache ECharts specifics ONLY.
+   Part of docs-html.css (loaded via @import, layer `charts`).
+
+   The card, the canvas, the toolbar and the source fallback are shared and live
+   in charts.css — this file exists as the per-engine seam, exactly as
+   diagram-mermaid.css sits beside diagrams.css.
+
+   It is deliberately SMALL, and that is the point: everything ECharts needs
+   that another engine would also need has already been lifted into the shared
+   layer. Rules land here only when they are true of ECharts and false of the
+   next engine. The theme (palette, ink, axes) is NOT styling and is not here —
+   ECharts cannot read CSS custom properties, so it is built in
+   js/modules/chart-apache-echarts.js from the shared tokens in
+   js/modules/charts.js. */
+
+/* ECharts draws into a generated wrapper div rather than into .chart-canvas
+   itself, and appends its tooltip into that same wrapper. Contain both so a
+   wide chart or a tooltip near the edge cannot push the reading column. */
+.chart-canvas > div {
+  max-width: 100%;
+}
+
+/* The engine sets an explicit pixel width on its wrapper when it initialises;
+   allow it to shrink with the column on reflow rather than holding the old
+   measurement until the debounced resize lands. */
+.chart-canvas > div > canvas,
+.chart-canvas > div > svg {
+  max-width: 100%;
+}

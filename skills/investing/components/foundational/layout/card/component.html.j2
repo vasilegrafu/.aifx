@@ -1,0 +1,9 @@
+{# purpose: titled bordered surface that groups components; the cell unit for columns/grid #}
+{% macro card(title="") %}
+  <div class="card">
+  {% if title %}
+    <p class="card-title">{{ title }}</p>
+  {% endif %}
+    <div class="card-body">{{ caller() }}</div>
+  </div>
+{% endmacro %}

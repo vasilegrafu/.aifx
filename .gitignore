@@ -2,3 +2,8 @@
 # next to the sources. They are build artifacts, never content.
 __pycache__/
 *.py[cod]
+
+# Credentials. This repo is PUBLIC and jsDelivr serves it, so anything
+# committed here is fetchable at a URL. Keys live in the FMP_API_KEY
+# environment variable, or in this file, which never leaves the machine.
+credentials.local.json

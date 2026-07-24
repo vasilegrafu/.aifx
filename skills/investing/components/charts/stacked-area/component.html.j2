@@ -1,0 +1,33 @@
+{# purpose: parts summing to a whole over time — composition and total in one figure #}
+{# unit: axis — one measured axis; name it with y_name #}
+{# data: series[] {name:str, points:num[]}   categories: str[] #}
+{% import "components/charts/_render.html.j2" as r %}
+
+{% macro stacked_area(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
+{% set built = [] %}
+{% for s in series %}
+{# Stack plus fill: the outline is the total and each band is a part. Order the
+   series deliberately — the bottom band is the only one with a straight
+   baseline, so it is the only one whose shape can be read precisely. #}
+{%   set _ = built.append({"type": "line", "name": s.name, "stack": "total",
+                           "areaStyle": {},
+                           "showSymbol": categories | length <= 24,
+                           "data": s.points}) %}
+{% endfor %}
+{% set y_axis = {"type": "value"} %}
+{% if y_name %}
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
+                            "nameGap": 46, "nameRotate": 90}) %}
+{% endif %}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "line"}},
+     "grid": {"left": (46 if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
+     "xAxis": {"type": "category", "data": categories},
+     "yAxis": y_axis,
+     "series": built,
+   } %}
+{% if built | length > 1 %}
+{%   set _ = option.update({"legend": {}}) %}
+{% endif %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

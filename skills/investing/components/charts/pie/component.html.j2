@@ -1,0 +1,25 @@
+{# purpose: composition of a single whole — a donut, for a handful of parts #}
+{# unit: required — a slice is a bare number with no axis to label #}
+{# data: slices[] {name:str, value:num} #}
+{% import "components/charts/_render.html.j2" as r %}
+
+{% macro pie(slices=[], caption="", height=320, note="", donut=True, unit="") %}
+{# Built as data and serialised once — see the note in line/component.html.j2. #}
+{% set data = [] %}
+{% for sl in slices %}
+{%   set _ = data.append({"name": sl.name, "value": sl.value}) %}
+{% endfor %}
+{# A donut by default: the hole costs nothing and stops the eye reading the
+   whole disc as a quantity. The border separates adjacent slices without a
+   second colour doing the work. #}
+{% set option = {
+     "tooltip": {"trigger": "item"},
+     "series": [{"type": "pie",
+                 "radius": (["42%", "70%"] if donut else "68%"),
+                 "itemStyle": {"borderWidth": 2},
+                 "data": data}],
+   } %}
+{# Every slice is a separate colour, so the legend is not optional here. #}
+{% set _ = option.update({"legend": {}}) %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

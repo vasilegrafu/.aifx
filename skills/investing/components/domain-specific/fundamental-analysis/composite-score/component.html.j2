@@ -1,0 +1,42 @@
+{# purpose: a formula-based composite score with its inputs, the result, and the band it falls in #}
+{# data: inputs[] {component:str, coefficient:num, value:num, contribution:num}
+         bands[]  {label:str, range:str, tone:good|neutral|bad} #}
+{# SHOW THE INPUTS, NOT JUST THE NUMBER. A score whose workings are hidden is an
+   opinion wearing a decimal point — and these scores are dominated by one term
+   far more often than a reader expects. #}
+{% macro composite_score(name="", formula="", inputs=[], score="", band="", tone="neutral", bands=[], caption="", note="", fmt="num") %}
+  <div class="investing-composite">
+    <p class="investing-composite-head">
+      <span class="investing-composite-name">{{ name }}</span>
+      {% if formula %}<span class="math">{{ formula }}</span>{% endif %}
+    </p>
+    {% if inputs %}
+    <table class="investing-fin investing-composite-inputs">
+    {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+      <thead><tr><th>Component</th><th>Coefficient</th><th>Value</th><th>Contribution</th></tr></thead>
+      <tbody>
+      {% for i in inputs %}
+        <tr>
+          <th scope="row">{{ i.component }}</th>
+          <td>{{ i.coefficient | fmt(fmt) }}</td>
+          <td>{{ i.value | fmt(fmt, 4) }}</td>
+          <td{% if i.contribution is number and i.contribution < 0 %} class="neg"{% endif %}>{{ i.contribution | fmt(fmt, 4) }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+      <tfoot><tr class="investing-total"><th scope="row">Score</th><td></td><td></td><td>{{ score | fmt(fmt) }}</td></tr></tfoot>
+    </table>
+    {% endif %}
+    <p class="investing-composite-band investing-composite-{{ tone }}">
+      <span class="investing-composite-band-tag">{{ band }}</span>
+      {% if bands %}
+      <span class="investing-composite-scale">
+        {% for b in bands %}
+        <span class="investing-composite-step investing-composite-step-{{ b.tone }}{% if b.label == band %} investing-current{% endif %}">{{ b.label }} <em>{{ b.range }}</em></span>
+        {% endfor %}
+      </span>
+      {% endif %}
+    </p>
+    {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+  </div>
+{% endmacro %}

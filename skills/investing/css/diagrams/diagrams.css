@@ -1,0 +1,123 @@
+/* docs-html — diagrams: the SHARED diagram viewport. ENGINE-AGNOSTIC.
+   Part of docs-html.css (loaded via @import, layer `diagrams`).
+
+   Every diagram — whatever renders it — is an <svg> inside .diagram-figure:
+   a bounded box with a pan/zoom canvas, an icon toolbar, and a resize grip,
+   all injected by js/modules/diagrams.js. Engine-specific styling (each
+   source-block fallback, Mermaid's ✎ editor) lives in diagram-<engine>.css.
+
+   The figure's height is set inline by the Viewer (the diagram's natural height,
+   capped at 70vh) so the resize grip can grow the box — a CSS max-height would
+   cap the growth. */
+
+/* the viewport: [editor panel |] canvas, side by side */
+.diagram-figure {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  margin: var(--block-gap) 0;
+  padding: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* the diagram pane: clip box for panning, and the pointer surface for the drag */
+.diagram-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;                /* the transform moves the SVG; no scrollbars */
+  touch-action: none;              /* the drag owns touch gestures */
+}
+
+/* `> svg` (child, not descendant) — the toolbar's icon <svg>s also live inside
+   the canvas and must NOT get the diagram's grab cursor or sizing. */
+.diagram-canvas > svg {
+  display: block;
+  max-width: none !important;
+  height: auto;
+  transform-origin: 0 0;           /* the Viewer's translate() is in parent px */
+  cursor: grab;
+}
+.diagram-canvas.grabbing > svg { cursor: grabbing; }
+
+/* per-diagram icon toolbar, top-right inside the viewport — one chip holding
+   flat SVG-icon buttons (injected by docs-html.js), same look as .doc-toolbar */
+.diagram-tools {
+  position: absolute;
+  top: .5rem; right: .5rem;
+  z-index: 2;
+  display: flex; align-items: center; gap: .15rem;
+  padding: .2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  box-shadow: var(--shadow);
+  cursor: default;      /* the canvas is the pan surface (grab hand) — not the toolbar */
+}
+.diagram-tools button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-soft);
+  width: 1.6rem; height: 1.6rem;
+  padding: 0;
+  border-radius: .35rem;
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.diagram-tools button:hover { background: var(--bg-soft); color: var(--fg); }
+.diagram-tools button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.diagram-tools .zoom-label {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  color: var(--fg-soft);
+  min-width: 2.4rem;
+  text-align: center;
+}
+.diagram-tools .sep {
+  width: 1px; height: 1.1rem;
+  background: var(--border);
+  margin: 0 .15rem;
+}
+
+/* resize handle: a full-width strip along the bottom edge with a centered grip
+   pill — drag vertically to resize the viewport (it carries .diagram-exclude,
+   so dragging it never pans). */
+.diagram-resize {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 12px;
+  z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  cursor: ns-resize;
+}
+.diagram-resize::after {
+  content: "";
+  width: 38px; height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.diagram-resize:hover::after,
+.diagram-resize.dragging::after { background: var(--accent); }
+
+/* fullscreen: the viewport becomes the screen; pan/zoom keeps working */
+.diagram-figure:fullscreen {
+  border: none; border-radius: 0;
+  background: var(--bg);
+}
+.diagram-figure:fullscreen .diagram-resize { display: none; }
+
+/* Print: freeze to a static, fully-visible diagram (no viewport clip, no tools). */
+@media print {
+  .diagram-figure {
+    overflow: visible;
+    height: auto !important;
+    border: none;
+    break-inside: avoid;
+  }
+  .diagram-canvas { overflow: visible; }
+  .diagram-canvas > svg { transform: none !important; }
+  .diagram-tools, .diagram-resize { display: none; }
+}

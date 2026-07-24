@@ -1,0 +1,121 @@
+/* docs-html — theme: EVERY colour the design system uses, in one file.
+
+   THIS IS THE FILE YOU EDIT TO RETHEME. Change the values below and every
+   document follows — the components, the syntax highlighting, the data ramps
+   and the charts all read from here. Nothing else needs touching, and there is
+   no second theme file to keep in step.
+
+   Structure (fonts, spacing, layout) lives in base.css and is theme-agnostic.
+   Nothing here should be anything but a colour.
+
+   Going DARK is a real edit, not an inversion — three things need re-deciding:
+   `--bg-soft` becomes lighter than `--bg` (a recess on white is a raise on
+   black); `--accent` needs a lighter brand tone, and `--on-accent` must flip
+   dark or a badge becomes illegible; and the chart palette must be REORDERED,
+   because colours are handed out in sequence and legibility depends on the
+   ground — `#0072b2` leads well on white and is nearly the worst choice on
+   near-black.
+
+   Charts read these values through JavaScript (getComputedStyle) rather than
+   CSS, because an engine's theme object cannot hold `var()`. That happens once
+   at load, so a change here reaches charts on the next page load like anything
+   else — see js/modules/charts.js. */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- surfaces and text ---------- */
+  --bg: #ffffff;
+  --bg-soft: #f7f9fb;
+  --fg: #182338;
+  --fg-soft: #5b6b81;
+  --border: #dde3ea;
+  /* The brand colour. Headings rule, links, kickers, step numbers, the chart
+     ramp's dark end — pick a corporate tone (deep navy, burgundy, forest…)
+     and everything follows. This IS the rebranding knob; there is no separate
+     brand file. */
+  --accent: #1f4e8c;
+  --accent-soft: #edf3fa;
+  /* text drawn ON --accent (a filled step number, a badge) */
+  --on-accent: #ffffff;
+
+  /* ---------- semantic / status ---------- */
+  --note: var(--accent);
+  --note-bg: var(--accent-soft);
+  --warning: #8a5a00;
+  --warning-bg: #faf3e0;
+  --decision: #15693b;
+  --decision-bg: #e9f6ee;
+  --risk: #b42331;
+  --risk-bg: #fbeceb;
+  --todo-bg: #fdf3cf;
+  --code-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(24, 35, 56, .10);
+
+  /* ---------- syntax palette ----------
+     Applied at view time by Prism; documents hold plain text, never token
+     markup. Also colours the diagram source editor. */
+  --code-surface: #eef2f6;
+  --code-keyword: #8250df;
+  --code-string: #116329;
+  --code-number: #0550ae;
+  --code-comment: #6e7c91;
+  --code-function: #953800;
+  --code-tag: #0550ae;
+  --code-property: #0550ae;
+  --code-punct: #57606a;
+
+  /* ---------- data ramps ----------
+     Ordered encodings, not identity. Both must stay MONOTONIC in luminance:
+     that is what lets them survive greyscale printing and colour vision
+     deficiency, and it is the property a new theme is most likely to break. */
+  --heat-pos-1-bg: #e9f6ee;  --heat-pos-1-fg: #15693b;
+  --heat-pos-2-bg: #c9ead6;  --heat-pos-2-fg: #10502d;
+  --heat-pos-3-bg: #9fd9b8;  --heat-pos-3-fg: #0b3a20;
+  --heat-neg-1-bg: #fbeceb;  --heat-neg-1-fg: #b42331;
+  --heat-neg-2-bg: #f6d3d1;  --heat-neg-2-fg: #911c27;
+  --heat-neg-3-bg: #eeb0ad;  --heat-neg-3-fg: #6d151d;
+
+  --cohort-1-bg: #eeb0ad;  --cohort-1-fg: #6d151d;
+  --cohort-2-bg: #fbeceb;  --cohort-2-fg: #b42331;
+  --cohort-4-bg: #e9f6ee;  --cohort-4-fg: #15693b;
+  --cohort-5-bg: #c9ead6;  --cohort-5-fg: #10502d;
+
+  /* ---------- charts ----------
+     Read by js/modules/charts.js at init (getComputedStyle), because an
+     ECharts theme object cannot hold var(). Documents never contain a hex —
+     they carry "palette:1" / "token:positive" / "ramp:2" and the engine
+     substitutes from here, so the SAME document renders in any theme.
+
+     The categorical palette is Okabe-Ito, the published reference set for
+     categorical colour under colour vision deficiency, ordered by contrast
+     against the chart surface with the document's ink replacing pure black.
+     Do not hand-pick a replacement: the set's worst pair is CIEDE2000 11.1
+     and an ad-hoc substitution will not hold that. Retheming should keep these
+     eight hues and change only their ORDER. */
+  --chart-palette-1: #0072b2;
+  --chart-palette-2: #d55e00;
+  --chart-palette-3: #009e73;
+  --chart-palette-4: #cc79a7;
+  --chart-palette-5: #56b4e9;
+  --chart-palette-6: #e69f00;
+  --chart-palette-7: #182338;
+  --chart-palette-8: #f0e442;
+
+  --chart-ramp-1: #eaf1f9;
+  --chart-ramp-2: #c5d9ee;
+  --chart-ramp-3: #9ac0e0;
+  --chart-ramp-4: #6aa3d0;
+  --chart-ramp-5: #3f7fb8;
+  --chart-ramp-6: #1f4e8c;
+
+  --chart-ink: #182338;
+  --chart-muted: #5b6b81;
+  --chart-axis: #c3c2b7;
+  --chart-grid: #eef1f5;
+  --chart-surface: #ffffff;
+  --chart-border: #dde3ea;
+  --chart-positive: #15693b;
+  --chart-negative: #b42331;
+  --chart-caution: #8a5a00;
+}

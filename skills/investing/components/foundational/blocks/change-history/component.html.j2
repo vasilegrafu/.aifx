@@ -1,0 +1,13 @@
+{# purpose: versioned revision log for the cover #}
+{# data: rows[] {version:str, date:str, author:str, change:str} #}
+{% macro change_history(rows=[]) %}
+  <table class="change-history">
+    <caption>Change history</caption>
+    <thead><tr><th>Version</th><th>Date</th><th>Author</th><th>Change</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr><td>{{ r.version }}</td><td>{{ r.date }}</td><td>{{ r.author }}</td><td>{{ r.change }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

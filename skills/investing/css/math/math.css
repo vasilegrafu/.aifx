@@ -1,0 +1,18 @@
+/* docs-html — math: LaTeX formulas, rendered at view time by KaTeX
+   (docs-html.js `math` feature; engine + fonts from the pinned CDN).
+   Part of docs-html.css (loaded via @import, layer `math`). */
+
+div.math {
+  margin: var(--block-gap) 0;
+  padding: .2rem 0;
+  overflow-x: auto;        /* long equations scroll, never break the column */
+}
+
+/* Until KaTeX renders — or permanently if the CDN is unreachable — the raw
+   LaTeX source shows; style it as intentional, readable notation. */
+div.math:not(:has(.katex)),
+span.math:not(:has(.katex)) {
+  font-family: var(--font-mono);
+  font-size: .9em;
+  color: var(--fg-soft);
+}

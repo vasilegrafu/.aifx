@@ -1,0 +1,17 @@
+{# purpose: dated catalysts ahead, with expected direction and likelihood #}
+{# data: items[] {date:str, event:str, direction:up|down|mixed, likelihood?:str, note?:str} #}
+{% macro catalyst_timeline(items=[]) %}
+  <ol class="investing-catalysts">
+  {% for it in items %}
+    <li class="investing-catalyst investing-catalyst-{{ it.direction }}">
+      <span class="investing-catalyst-date">{{ it.date }}</span>
+      <span class="investing-catalyst-dir" aria-hidden="true">{{ {"up": "▲", "down": "▼"}.get(it.direction, "◆") }}</span>
+      <span class="investing-catalyst-body">
+        <span class="investing-catalyst-event">{{ it.event }}</span>
+        {% if it.likelihood %}<span class="investing-catalyst-likelihood">{{ it.likelihood }}</span>{% endif %}
+        {% if it.get('note') %}<span class="investing-catalyst-note">{{ it.note }}</span>{% endif %}
+      </span>
+    </li>
+  {% endfor %}
+  </ol>
+{% endmacro %}

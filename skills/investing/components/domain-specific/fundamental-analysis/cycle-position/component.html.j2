@@ -1,0 +1,17 @@
+{# purpose: where the economy or a market sits in a multi-phase cycle #}
+{# data: phases[] {label:str, note?:str}   at: 0-based index of the current phase #}
+{% macro cycle_position(phases=[], at=0, asof="", note="") %}
+  <figure class="investing-cycle">
+    <ol class="investing-cycle-band">
+    {% for ph in phases %}
+      <li class="investing-cycle-phase{% if loop.index0 == at %} investing-current{% endif %}"{% if loop.index0 == at %} aria-current="true"{% endif %}>
+        <span class="investing-cycle-label">{{ ph.label }}</span>
+        {% if ph.get('note') %}<span class="investing-cycle-note">{{ ph.note }}</span>{% endif %}
+      </li>
+    {% endfor %}
+    </ol>
+    {% if note or asof %}
+    <figcaption>{{ note }}{% if asof %} <span class="investing-cycle-asof">{{ asof }}</span>{% endif %}</figcaption>
+    {% endif %}
+  </figure>
+{% endmacro %}

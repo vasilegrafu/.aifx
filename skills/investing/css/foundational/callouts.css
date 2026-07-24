@@ -1,0 +1,37 @@
+/* docs-html — callouts: note/warning/decision/risk boxes + todo marker.
+   Requires base.css. Link when the document uses callout or todo-marker. */
+
+/* ---------- callout ---------- */
+aside.note, aside.warning, aside.decision, aside.risk {
+  margin: var(--block-gap) 0;
+  padding: .7rem 1rem;
+  border-radius: 6px;
+  border-left: 3px solid;
+  font-size: .95rem;
+}
+aside > :first-child { margin-top: 0; }
+aside > :last-child { margin-bottom: 0; }
+aside.note     { border-color: var(--note);     background: var(--note-bg); }
+aside.warning  { border-color: var(--warning);  background: var(--warning-bg); }
+aside.decision { border-color: var(--decision); background: var(--decision-bg); }
+aside.risk     { border-color: var(--risk);     background: var(--risk-bg); }
+aside.note::before, aside.warning::before, aside.decision::before, aside.risk::before {
+  display: block;
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  margin-bottom: .3rem;
+}
+aside.note::before     { content: "Note";     color: var(--note); }
+aside.warning::before  { content: "Warning";  color: var(--warning); }
+aside.decision::before { content: "Decision"; color: var(--decision); }
+aside.risk::before     { content: "Risk";     color: var(--risk); }
+
+/* ---------- todo-marker ---------- */
+mark.todo {
+  background: var(--todo-bg);
+  color: inherit;
+  padding: .1em .4em;
+  border-radius: 4px;
+  border: 1px dashed var(--warning);
+}
+mark.todo::before { content: "TODO: "; font-weight: 700; color: var(--warning); }

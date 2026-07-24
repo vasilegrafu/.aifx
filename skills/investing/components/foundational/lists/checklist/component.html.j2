@@ -1,0 +1,9 @@
+{# purpose: status checklist: done/pending/blocked #}
+{# data: items[] {state:done|pending|blocked, text:str} #}
+{% macro checklist(items=[]) %}
+  <ul class="checklist">
+  {% for it in items %}
+    <li data-state="{{ it.state }}">{{ it.text }}</li>
+  {% endfor %}
+  </ul>
+{% endmacro %}

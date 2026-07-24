@@ -1,0 +1,104 @@
+/* docs-html — content: tables, plain code, figures, collapsibles.
+   Requires base.css. Link when the document uses any of: table, code-block,
+   figure, collapsible. (Professional code chrome + syntax tokens live in
+   code.css.) */
+
+/* ---------- table ---------- */
+table { border-collapse: collapse; margin: var(--block-gap) 0; width: 100%; font-size: .95rem; }
+th, td {
+  border: none; border-bottom: 1px solid var(--border);
+  padding: .55rem .8rem .55rem 0;
+  text-align: left; vertical-align: top;
+}
+thead th {
+  font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--fg-soft);
+  border-bottom: 2px solid var(--border);
+}
+table.wide { display: block; overflow-x: auto; }   /* many columns → the table scrolls, not the page */
+
+/* ---------- plain code ---------- */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .8rem 1rem;
+  overflow-x: auto;
+  font-size: .85rem; line-height: 1.5;
+}
+code { font-size: .88em; }
+:not(pre) > code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: .1em .38em;
+  font-size: .84em;
+}
+pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+/* ---------- figure ---------- */
+/* Left-aligned like every other component — the shared edge is the design. */
+figure { margin: var(--block-gap) 0; }
+figure img { border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); }
+figcaption { font-size: .85rem; color: var(--fg-soft); margin-top: .6rem; }
+
+/* ---------- exhibit title ---------- */
+/* A table's `caption` and a figure's LEADING `figcaption` do the same job as
+   the title a chart engine draws: they name the exhibit. They used to be set
+   at .72rem uppercase soft-grey — within .02rem and .02em of the column-header
+   row directly beneath them — so the title carried no rank of its own and read
+   as a second header row. This is one treatment, matched to the chart title
+   (15px, bold, ink), so a table and a chart look like peers.
+
+   `:first-child` is the whole distinction: a figcaption that LEADS its figure
+   is a title, one that FOLLOWS is a caption, and the rule above still styles
+   the latter. Every titled exhibit in the system inherits this — nothing
+   restates it, which is why changing it here changes all of them. */
+caption, figcaption:first-child {
+  text-align: left;
+  margin-top: 0;
+  padding-bottom: .45rem;
+  font-size: .95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.004em;
+  color: var(--fg);
+}
+
+/* ---------- collapsible ---------- */
+details {
+  margin: var(--block-gap) 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .55rem .9rem;
+  background: var(--bg-soft);
+}
+summary { cursor: pointer; font-weight: 600; font-size: .95rem; }
+details[open] summary { margin-bottom: .6rem; }
+
+/* ---------- quote: pull-quote with attribution ---------- */
+blockquote.pull {
+  margin: var(--block-gap) 0;
+  padding: .4rem 1.1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-soft);
+  border-radius: 0 8px 8px 0;
+}
+blockquote.pull p { margin: .3rem 0; font-size: 1.02rem; font-style: italic; }
+blockquote.pull footer { font-size: .85rem; color: var(--fg-soft); font-style: normal; padding-bottom: .2rem; }
+
+/* ---------- comparison-table: ✓ / ✗ / ◐ option matrix ---------- */
+table.comparison td:not(:first-child), table.comparison th:not(:first-child) { text-align: center; }
+table.comparison .mark-yes  { color: var(--decision); font-weight: 700; }
+table.comparison .mark-no   { color: var(--risk); font-weight: 700; }
+table.comparison .mark-part { color: var(--warning); font-weight: 700; }
+
+/* ---------- neg: a negative number ----------
+   Foundational, not domain-specific. It says "this figure is negative", which
+   is arithmetic rather than a domain concept, and it is written by hand in
+   doc-type markup (`<span class="neg">(700)</span>`) across accounting,
+   finance and general documents. Both business.css and investing.css defined
+   it before 4.0.0 — the only genuine class collision in the system — and
+   namespacing them resolved it by moving the one definition here. */
+.neg { color: var(--risk); }

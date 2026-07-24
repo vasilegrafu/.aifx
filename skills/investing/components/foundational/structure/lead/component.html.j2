@@ -1,0 +1,4 @@
+{# purpose: emphasised executive-summary opening paragraph #}
+{% macro lead(text="") %}
+  <p class="lead">{{ caller() if caller is defined else text }}</p>
+{% endmacro %}
