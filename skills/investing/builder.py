@@ -27,6 +27,25 @@ the note there, it is the single most important line in this file.
 
 Jinja runs ONLY here, at build time. The written file is standalone HTML with
 no Jinja left, linking the two version-pinned CDN assets and nothing else.
+
+MAP — the whole engine is five small things; everything else is a guard or a
+comment explaining WHY. Read these five and you have read the builder:
+
+    1. FIND FILES       load_components() · report_dirs()   rglob for *.html.j2;
+                        found, never registered.
+    2. MAKE THE ENV     make_env()   number filters, macros hung on `c`, and
+                        StrictUndefined (the one line that matters most).
+    3. RENDER A REPORT  compose_report()   data on `d`, macros on `c`, CDN links
+                        baked in.
+    4. build            cmd_build()   fetch() -> shape() -> render -> write.
+    5. check            cmd_check()   the same render from sample(), offline —
+                        no network, no key — plus every showcase.py.
+
+The rest earns its keep but is not the spine:
+    - filters + boxstats()          the one place a number becomes a string
+    - chart_audit() · data_audit()  static rules rendering cannot catch
+    - showcase machinery            per-component proof: showcase.py -> .html
+    - _blame() · _family_tally()    nicer failure and summary output
 """
 
 import argparse
@@ -48,7 +67,6 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 SKILL_DIR = Path(__file__).resolve().parent
 COMPONENTS_DIR = SKILL_DIR / "components"
 REPORTS_DIR = SKILL_DIR / "reports"
-SHOWCASES_DIR = SKILL_DIR / "showcases"
 
 REPORT_NAME_RE = re.compile(r"\{#\s*report-name:\s*(.+?)\s*#\}")
 
@@ -289,14 +307,56 @@ def compose_report(name: str, d: dict, title: str = "") -> str:
         cdn_href=cdn_href())
 
 
-def showcase_templates() -> list[Path]:
-    return sorted(SHOWCASES_DIR.glob("*.html.j2")) if SHOWCASES_DIR.exists() else []
+def load_showcase_cases(component: Component) -> list[tuple[str, dict]]:
+    """Import components/<cat>/<name>/showcase.py and return its cases().
+
+    By path, like report modules, so a component folder needs no __init__.py and
+    the discovery rule stays 'a directory containing component.html.j2'. The
+    contract is one function, cases() -> list[(label, kwargs)]; each kwargs dict
+    is fed straight to the macro."""
+    path = component.path.parent / "showcase.py"
+    spec = importlib.util.spec_from_file_location(
+        f"showcase_{component.macro}", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if not hasattr(module, "cases"):
+        raise SystemExit(f"{component.name}: showcase.py defines no cases()")
+    cases = module.cases()
+    if not cases:
+        raise SystemExit(f"{component.name}: cases() returned nothing")
+    return cases
 
 
-def compose_showcase(template: Path) -> str:
-    rel = template.relative_to(SKILL_DIR).as_posix()
-    return make_env(load_components()).get_template(rel).render(
-        title="Component gallery", report_name="Showcase", cdn_href=cdn_href())
+def components_with_showcase() -> list[Component]:
+    """Every component that ships a showcase.py beside its markup."""
+    return [c for c in load_components()
+            if (c.path.parent / "showcase.py").exists()]
+
+
+def compose_component_showcase(env: Environment, component: Component) -> str:
+    """Render every case of one component into its standalone showcase page.
+
+    Each case is rendered by CALLING the macro from Python — the same macro the
+    reports call through `c.<macro>` — so the showcase exercises the exact code
+    path a report does, not a re-implementation of it. A macro that renders here
+    renders there."""
+    macro = getattr(env.globals["c"], component.macro, None)
+    if macro is None:
+        raise SystemExit(f"{component.name}: no macro {component.macro!r} to show")
+
+    src = component.path.read_text(encoding="utf-8")
+    sig = re.search(r"\{% macro (\w+\(.*?\)) %\}", src, re.S)
+    rendered = [{"label": label, "body": macro(**kwargs)}
+                for label, kwargs in load_showcase_cases(component)]
+
+    css = (SKILL_DIR / "css" / "_showcase.css").read_text(encoding="utf-8")
+    return env.get_template("components/_showcase.html.j2").render(
+        title=f"{component.name} — showcase",
+        component_name=component.name,
+        macro_sig=sig.group(1) if sig else component.macro,
+        cases=rendered,
+        showcase_css=css,
+        cdn_href=cdn_href())
 
 
 def _blame(exc: BaseException) -> str:
@@ -510,24 +570,34 @@ def cmd_check() -> int:
             print(f"  {name:<30} UNRENDERED: {left.group(0)!r}")
             failures += 1
 
-    shows = showcase_templates()
-    for template in shows:
+    # Per-component showcases — the render-coverage net. Only financial-profile
+    # calls components, and it calls a fraction of them; every other component
+    # would ship with nothing proving it renders. showcase.py fixes that: each
+    # is rendered here, in memory, offline. A component with NO showcase.py is
+    # reported as uncovered so the gap is visible rather than silent.
+    env = make_env(load_components())
+    shown = components_with_showcase()
+    shown_names = {c.name for c in shown}
+    for component in shown:
         try:
-            out = compose_showcase(template)
+            out = compose_component_showcase(env, component)
         except Exception as e:                   # noqa: BLE001 — report, don't crash
-            print(f"  {template.name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
+            print(f"  {component.name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
             failures += 1
             continue
         left = re.search(r"\{%.{0,60}", out, re.S)
         if left:
-            print(f"  {template.name:<30} UNRENDERED: {left.group(0)!r}")
+            print(f"  {component.name:<30} UNRENDERED: {left.group(0)!r}")
             failures += 1
+
+    uncovered = [c.name for c in load_components() if c.name not in shown_names]
 
     problems = chart_audit() + data_audit()
     for problem in problems:
         print(f"  {problem}")
 
     elapsed = time.perf_counter() - start
+    total = len(load_components())
     print()
     if failures or problems:
         if failures:
@@ -535,8 +605,11 @@ def cmd_check() -> int:
         if problems:
             print(f"{len(problems)} rule(s) broken")
         return 1
-    print(f"{len(load_components())} components executed via {len(reports)} report(s) "
-          f"+ {len(shows)} showcase(s), all clean ({elapsed:.1f}s)")
+    print(f"{total} components: {len(shown)} shown via showcase.py, "
+          f"{len(reports)} report(s), all clean ({elapsed:.1f}s)")
+    if uncovered:
+        print(f"  {len(uncovered)} without a showcase.py yet: "
+              f"{', '.join(uncovered[:8])}{' …' if len(uncovered) > 8 else ''}")
     if _family_tally():
         print(f"charts: {_family_tally()}, none titles itself")
     return 0
@@ -558,15 +631,32 @@ def cmd_show(name: str) -> int:
     return 1
 
 
-def cmd_showcase() -> int:
-    templates = showcase_templates()
-    if not templates:
-        print("no showcases yet")
+def cmd_showcase(name: str | None = None) -> int:
+    """Write showcase.html beside every component that ships a showcase.py.
+
+    The output is a build artifact, gitignored (see .gitignore): this is a
+    PUBLIC repo and 110 generated pages have no business being served by the
+    CDN. Regenerate them locally to browse; the showcase.py is the source."""
+    components = components_with_showcase()
+    if name:
+        components = [c for c in components if c.name == name or c.macro == name]
+        if not components:
+            print(f"no component with a showcase.py named {name!r}")
+            return 1
+    if not components:
+        print("no showcase.py files yet — add one beside a component.html.j2")
         return 0
-    for template in templates:
-        out = template.with_suffix("").with_suffix(".html")
-        out.write_text(compose_showcase(template), encoding="utf-8")
-        print(f"composed: {out}")
+
+    env = make_env(load_components())
+    for component in components:
+        out = component.path.parent / "showcase.html"
+        try:
+            out.write_text(compose_component_showcase(env, component),
+                           encoding="utf-8")
+        except Exception as e:                   # noqa: BLE001 — report, don't crash
+            print(f"  {component.name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
+            return 1
+        print(f"composed: {out.relative_to(SKILL_DIR)}")
     return 0
 
 
@@ -582,7 +672,9 @@ def main(argv: list[str]) -> int:
 
     sub.add_parser("check", help="build every report from sample(); fail on anything unrendered")
     sub.add_parser("list", help="list reports and components")
-    sub.add_parser("showcase", help="regenerate showcases/<name>.html")
+    showcase = sub.add_parser("showcase",
+        help="write showcase.html beside each component that has a showcase.py")
+    showcase.add_argument("name", nargs="?", help="only this component (optional)")
     show = sub.add_parser("show", help="print one component: signature + usage.md")
     show.add_argument("name")
 
@@ -594,7 +686,7 @@ def main(argv: list[str]) -> int:
     if args.cmd == "list":
         return cmd_list()
     if args.cmd == "showcase":
-        return cmd_showcase()
+        return cmd_showcase(args.name)
     if args.cmd == "show":
         return cmd_show(args.name)
     parser.print_help()

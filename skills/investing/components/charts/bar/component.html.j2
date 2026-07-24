@@ -1,5 +1,5 @@
 {# purpose: a measure across categories — the workhorse comparison #}
-{# unit: axis — one measured axis; s.name it with y_name #}
+{# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
 {% import "components/charts/_render.html.j2" as r %}
 
@@ -7,15 +7,15 @@
 {# Built as data and serialised once — see the note in line/component.html.j2. #}
 {% set built = [] %}
 {% for s in series %}
-{%   set _ = built.append({"type": "bar", "s.name": s.name, "data": s.points}) %}
+{%   set _ = built.append({"type": "bar", "name": s.name, "data": s.points}) %}
 {% endfor %}
-{# A named value axis sits MID-axis and rotated: ECharts puts the s.name at the
+{# A named value axis sits MID-axis and rotated: ECharts puts the name at the
    END by default, which is exactly where the title is. containLabel reserves
-   room for tick labels but NOT for an axis s.name, so the left margin has to
-   widen too — otherwise the s.name renders off the card and disappears. #}
+   room for tick labels but NOT for an axis name, so the left margin has to
+   widen too — otherwise the name renders off the card and disappears. #}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
-{%   set _ = y_axis.update({"s.name": y_name, "nameLocation": "middle",
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
                             "nameGap": 46, "nameRotate": 90}) %}
 {% endif %}
 {# A bar chart's axis pointer is a shadow band over the whole category, not a
@@ -27,7 +27,7 @@
      "yAxis": y_axis,
      "series": built,
    } %}
-{# Identity is never colour alone: from two series up, s.name them in a legend. #}
+{# Identity is never colour alone: from two series up, name them in a legend. #}
 {% if built | length > 1 %}
 {%   set _ = option.update({"legend": {}}) %}
 {% endif %}

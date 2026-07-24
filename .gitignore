@@ -7,3 +7,9 @@ __pycache__/
 # committed here is fetchable at a URL. Keys live in the FMP_API_KEY
 # environment variable, or in this file, which never leaves the machine.
 credentials.local.json
+
+# Generated component showcases. `builder.py showcase` writes showcase.html
+# beside each component's showcase.py — a browsable build artifact. The .py is
+# the source and is committed; the rendered page is not (this is a PUBLIC repo
+# served by the CDN, and 110 demo pages have no business being fetchable).
+**/showcase.html

@@ -1,0 +1,36 @@
+{# Standalone showcase page for ONE component. NOT a component — the file is
+   named _showcase.html.j2, not component.html.j2, so load_components() never
+   registers it. builder.py renders each case from the component's showcase.py,
+   then feeds the (label, note, body) triples here.
+
+   It carries the SAME two CDN links as a real report (reports/base.html.j2), so
+   a chart draws through the live engine and a class resolves against the live
+   stylesheet — the showcase proves the component as it will actually ship, not
+   against some local copy that can drift. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="{{ cdn_href }}/css/bundle.css">
+  <script src="{{ cdn_href }}/js/bundle.js" defer></script>
+  <style>
+{{ showcase_css }}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="showcase-head">
+      <h1>{{ component_name }}</h1>
+      <code>{{ macro_sig }}</code>
+    </header>
+{% for case in cases %}
+    <section class="showcase-case">
+      <p class="showcase-label">{{ case.label }}</p>
+      {{ case.body }}
+    </section>
+{% endfor %}
+  </main>
+</body>
+</html>
