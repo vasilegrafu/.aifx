@@ -18,6 +18,47 @@ Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
 
 ---
 
+## 4.4.0 — 2026-07-28
+
+**Minor.** Two shipped changes in the `investing` bundle, plus a build-side
+restructure that does not reach a document.
+
+**Charts no longer flash their spec.** The JSON used to sit on screen until the
+engine drew over it, so every chart showed a wall of raw data first. The spec
+now ships `hidden` from the one macro all chart components funnel through, and
+the three paths that used to fail in silence — invalid JSON, a spec the engine
+refuses, an engine that never loads — each state what happened in a card where
+the chart should have been, with *show source* one click away. New CSS:
+`.chart-figure.chart-failed`, `.chart-status`, `.chart-source-toggle`. In the
+runtime, `markError(pre)` becomes `fail(pre, message)`.
+
+Additive for existing documents: a 4.3.1 document whose specs carry no `hidden`
+renders on 4.4.0 assets exactly as it did. Nothing has to opt in.
+
+**Local-first asset loading.** A generated page now links the bundle twice
+over — the local copy, relative to wherever the file was written, and the
+version-pinned CDN as an `onerror` fallback. Local first, so a page previews
+the current tree the moment it is generated; CDN second, so the same file still
+renders once it leaves the tree. The two halves live beside the bundles they
+load, `css/css.loader.html.j2` and `js/js.loader.html.j2`, because they fail
+differently: a `<link>` retargets its own `href`, while a `<script>` that has
+failed will not re-fetch on a new `src` and must be replaced with a fresh
+element.
+
+**Build-side, no effect on the shipped bundle.** Reports and showcases became
+one pattern — a shell, a controller returning data, and a view that is the only
+thing calling a macro — so Python no longer emits markup on either side. Each
+directory owns its engine and runs alone (`reports/report_builder.py`,
+`components/showcase_builder.py`); `builder.py` is dispatch only, and `check`,
+`list` and `show` are gone. The skill gained a `SKILL.md`.
+
+**Removed from `investing` only:** the `return-distribution` component and the
+`boxstats` filter that existed solely for it. `docs-html` keeps both, and no
+generated document is affected — an existing box plot is already static markup.
+Component count 110 → 109.
+
+---
+
 ## 4.3.1 — 2026-07-24
 
 **Patch.** Fixes the `investing` **`bar`** chart: an earlier sweep had

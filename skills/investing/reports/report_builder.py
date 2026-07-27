@@ -1,38 +1,17 @@
 """reports — the report engine: fetch live data, shape it, render a report.
 
-RUNNABLE ON ITS OWN. This directory builds its own reports with no reference to
-../builder.py:
+RUNNABLE ON ITS OWN, with no reference to ../builder.py:
 
     python reports/report_builder.py financial-profile INTC --peers AMD --out DIR
 
-THE SHAPE, and it is the showcase's shape exactly:
+Discovery, resolve, controller, compose, write — the same five stages
+components/showcase_builder.py has, and two of them are literally its
+functions. The extra arguments here are the two things a report has and a
+showcase does not: per-report CLI arguments to fetch with, and a destination of
+its own.
 
-    report.master.html.j2        the shell          showcase.master.html.j2
-    <name>/report_controller.py  fetch() + shape()  showcase_controller.py
-    <name>/report.html.j2        the view           showcase.html.j2
-
-A CONTROLLER BUILDS DATA. A VIEW EMITS MARKUP. The controller fetches and does
-arithmetic; the view decides which components appear and in what order, and is
-the only thing that calls a macro. Break that and the two stop being
-replaceable.
-
-WHERE THE ENV COMES FROM. Not from here. components/ owns the macros, the
-number filters they use, and the Jinja environment that exposes them as `c` —
-this file borrows it, so a macro drawn on a showcase page draws the same in a
-report. The arrow points ONE WAY: reports depend on components, never the
-reverse.
-
-HOW THIS DIFFERS FROM docs-html. There, a doc-type is a SKELETON a human fills:
-component calls carrying literal placeholder text, and the output is edited by
-hand. Here a report is a PROGRAM: the same component calls carry `d.*`, and the
-output is regenerated. The consequence is `StrictUndefined` on the shared env.
-
-Jinja runs ONLY at build time. The written file is standalone HTML with no
-Jinja left, linking the local bundle first and the version-pinned CDN second.
-
-WHAT GUARDS THE OUTPUT. Building a report requires the network and a key, so
-there is no offline check: shape()'s assertions and StrictUndefined fire during
-a real build, and nowhere else.
+The env comes from components/, borrowed rather than built — see SKILL.md for
+that and for the shell/controller/view shape both sides share.
 """
 
 import argparse
@@ -112,8 +91,16 @@ class Reports:
                                f"report_{name.replace('-', '_')}", "shape")
 
     # -------------------------------------------------------------- render
-    def compose(self, name: str, d: dict, out_dir: Path | str,
-                title: str = "") -> str:
+    def display_name(self, name: str) -> str:
+        """The title a reader sees, from the view's {# report-name: … #} header.
+
+        Read as TEXT, not through Jinja — the header is a comment, so rendering
+        the template would discard it. Falls back to the folder name."""
+        src = (self.all()[name] / VIEW).read_text(encoding="utf-8")
+        match = REPORT_NAME_RE.search(src)
+        return match.group(1).strip() if match else name.replace("-", " ").title()
+
+    def compose(self, name: str, d: dict, out_dir: Path | str) -> str:
         """Render one report's view with the data its controller produced.
 
         `out_dir` is where the file is about to be written, and it has NO
@@ -121,15 +108,12 @@ class Reports:
         report composed without naming its destination would link assets
         relative to a directory nobody chose. Whoever knows where the file is
         going passes it."""
-        directory = self.all()[name]
-        rel = (directory.relative_to(SKILL_DIR) / VIEW).as_posix()
-        src = (SKILL_DIR / rel).read_text(encoding="utf-8")
-        match = REPORT_NAME_RE.search(src)
-        display = match.group(1).strip() if match else name.replace("-", " ").title()
+        rel = (self.all()[name].relative_to(SKILL_DIR) / VIEW).as_posix()
+        display = self.display_name(name)
 
         return self.components.env().get_template(rel).render(
             d=SimpleNamespace(**d) if isinstance(d, dict) else d,
-            title=title or d.get("title", display),
+            title=d.get("title", display),
             report_name=display,
             local_href=showcase_builder.local_href(out_dir),
             cdn_href=showcase_builder.cdn_href())

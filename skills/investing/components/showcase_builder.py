@@ -11,81 +11,18 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 COMPONENTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = COMPONENTS_DIR.parent
 
+# `import filters` has to work whether this file is RUN (sys.path[0] is
+# components/ already) or IMPORTED as components.showcase_builder (sys.path[0]
+# is the skill root). One guarded insert covers both, and it is the same idiom
+# reports/report_builder.py uses to reach components in the first place.
+if str(COMPONENTS_DIR) not in sys.path:
+    sys.path.insert(0, str(COMPONENTS_DIR))
+
+from filters import FILTERS                              # noqa: E402
+
 MARKUP = "component.html.j2"        # what makes a directory a component
 CONTROLLER = "showcase_controller.py"
 VIEW = "showcase.html.j2"
-
-
-# --------------------------------------------------------------------------
-# formatting — the one place a number becomes a string
-# --------------------------------------------------------------------------
-#
-# These live in components/ because only components use them: 20 call sites
-# across components/*.j2 and none in reports/*.j2. A report's builder does
-# arithmetic and hands over NUMBERS; the macro it calls turns them into
-# strings. That is why this directory does not reach outside itself.
-#
-# In docs-html the author passed pre-formatted strings, which meant every
-# generator re-implemented money()/pct()/signed() and two documents could
-# disagree about what a thousands separator looks like. One definition,
-# applied by the component.
-#
-# Every filter passes STRINGS THROUGH UNCHANGED. A builder legitimately needs
-# to emit "n/m" where a ratio has no meaning (a CAGR from a negative base,
-# say), and forcing that through a numeric format would either crash or invent
-# a number. Passing it through is the honest behaviour.
-
-def _passthrough(fn):
-    def wrapped(value, *a, **kw):
-        if isinstance(value, str) or value is None:
-            return "" if value is None else value
-        return fn(value, *a, **kw)
-    return wrapped
-
-
-@_passthrough
-def f_money(v, digits=0):
-    return f"{v:,.{digits}f}"
-
-
-@_passthrough
-def f_pct(v, digits=1):
-    return f"{v:.{digits}f}%"
-
-
-@_passthrough
-def f_signed(v, digits=0):
-    return f"{v:+,.{digits}f}"
-
-
-@_passthrough
-def f_bps(v):
-    return f"{v:+,.0f} bps"
-
-
-@_passthrough
-def f_num(v, digits=2):
-    return f"{v:,.{digits}f}"
-
-
-FORMATS = {"money": f_money, "pct": f_pct, "signed": f_signed,
-           "bps": f_bps, "num": f_num, "raw": lambda v: v}
-
-
-def f_fmt(value, spec="num", *a, **kw):
-    """Dispatch by name, so a component can take `fmt="money"` as an argument.
-
-    Named `fmt` rather than `format` because Jinja already ships a `format`
-    filter (printf-style) and shadowing it would break any template using it."""
-    if spec not in FORMATS:
-        raise ValueError(f"unknown format {spec!r} — one of {', '.join(FORMATS)}")
-    return FORMATS[spec](value, *a, **kw)
-
-
-#: What the env exposes. Derived from FORMATS rather than restated, so the two
-#: cannot drift — `fmt` dispatches over exactly the names available directly.
-#: `raw` comes along as the identity filter, which is what it already meant.
-FILTERS = {**FORMATS, "fmt": f_fmt}
 
 
 # --------------------------------------------------------------------------
@@ -290,12 +227,14 @@ class Showcases:
         return load_controller(self.all()[name] / CONTROLLER,
                                f"showcase_{self.macro(name)}", "context")
 
-    def compose(self, name: str,
-                local: str | None = None, cdn: str | None = None) -> str:
+    def compose(self, name: str) -> str:
         """Render one component's view with the data its controller produced.
 
         Nothing here calls a macro. The view does, through the same `c`
-        namespace and the same env a report uses."""
+        namespace and the same env a report uses.
+
+        A showcase always lands beside its component, so unlike a report it has
+        no destination to be told — the asset hrefs follow from where it goes."""
         directory = self.all()[name]
         d = self.controller(name).context()
         if not isinstance(d, dict):
@@ -307,8 +246,8 @@ class Showcases:
             d=SimpleNamespace(**d),
             title=f"{name} — showcase",
             component_name=name,
-            local_href=local if local is not None else local_href(directory),
-            cdn_href=cdn if cdn is not None else cdn_href())
+            local_href=local_href(directory),
+            cdn_href=cdn_href())
 
     def write(self, name: str | None = None) -> int:
         """Write showcase.html beside every component that ships both halves.
