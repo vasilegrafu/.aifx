@@ -1,7 +1,7 @@
 {# purpose: one value against a range — a dial, for a single bounded measure #}
 {# unit: required — the value is read alone, against nothing #}
 {# data: value:num, minimum:num, maximum:num — scalars, no collection #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro gauge(value=0, minimum=0, maximum=100, caption="", height=280, note="", unit="") %}
 {# Deliberately plain: no coloured danger bands. A gauge already spends a great

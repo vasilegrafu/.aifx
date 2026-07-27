@@ -1,7 +1,7 @@
 {# purpose: a measure over time — the default form for anything with a date axis #}
 {# unit: axis — one measured axis; s.name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro line(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
 {# The spec is built as a DATA STRUCTURE and serialised once. Hand-written JSON

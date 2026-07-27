@@ -1,7 +1,7 @@
 {# purpose: how a total became another total — a bridge of additive steps #}
 {# unit: axis — one measured axis; name it with y_name #}
 {# data: steps[] {label:str, value:num, kind:start|delta|total} — running cumulative computed here #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro waterfall(steps=[], caption="", height=360, note="", y_name="", unit="") %}
 {# ECharts has no waterfall series type. It is faked with two stacked bars: an

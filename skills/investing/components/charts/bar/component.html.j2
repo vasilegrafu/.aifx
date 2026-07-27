@@ -1,7 +1,7 @@
 {# purpose: a measure across categories — the workhorse comparison #}
 {# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro bar(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
 {# Built as data and serialised once — see the note in line/component.html.j2. #}

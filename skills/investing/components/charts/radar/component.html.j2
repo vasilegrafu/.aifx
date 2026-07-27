@@ -1,7 +1,7 @@
 {# purpose: several attributes of a few entities at once — profile shape, not precise values #}
 {# unit: none — normalised scores, a different scale per indicator #}
 {# data: indicators[] {name:str, max:num|null — null derives from the data}   series[] {name:str, points:num[]} #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro radar(indicators=[], series=[], caption="", height=380, note="", unit="") %}
 {# `indicators` is [(name, max)]; pass max=None and it is DERIVED — the largest

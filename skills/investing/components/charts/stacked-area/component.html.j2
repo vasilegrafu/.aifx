@@ -1,7 +1,7 @@
 {# purpose: parts summing to a whole over time — composition and total in one figure #}
 {# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro stacked_area(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
 {% set built = [] %}

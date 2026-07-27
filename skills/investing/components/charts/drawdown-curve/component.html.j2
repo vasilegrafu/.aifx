@@ -2,7 +2,7 @@
 {# unit: none — the axis is already named `drawdown %` #}
 {# data: series[] {date:str, value:num} — running peak and drawdown derived here #}
 
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro drawdown_curve(series=[], caption="", height=300, note="", unit="") %}
 {# Drawdown is computed HERE, at compose time: the document carries the level

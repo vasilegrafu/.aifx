@@ -2,7 +2,7 @@
 {# unit: required — a ribbon is a bare number with no axis to label #}
 {# data: nodes[] {name:str, role:source|stage|cost|retained}
          links[] {source:str, target:str, value:num} — names must match nodes #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro sankey(nodes=[], links=[], caption="", height=420, note="", label_room=150, unit="") %}
 {% set roles = {"source": "palette:1", "stage": "token:muted",

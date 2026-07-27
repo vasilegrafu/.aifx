@@ -2,7 +2,7 @@
 {# unit: required — the box plot names no axis; the unit is the subtext #}
 {# data: series[] {label:str, points:num[] — raw observations} — quartiles and Tukey whiskers derived here #}
 
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro return_distribution(series=[], caption="", height=340, note="", unit="%") %}
 {# Raw observations go in; the five-number summary comes out HERE, at compose

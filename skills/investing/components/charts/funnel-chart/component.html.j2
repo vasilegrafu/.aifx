@@ -1,7 +1,7 @@
 {# purpose: stage-to-stage narrowing — a rendered funnel with proportional bands #}
 {# unit: required — a stage is a bare number with no axis to label #}
 {# data: stages[] {name:str, value:num} #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro funnel_chart(stages=[], caption="", height=340, note="", unit="") %}
 {# Built as data and serialised once — see the note in line/component.html.j2. #}

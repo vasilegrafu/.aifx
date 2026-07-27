@@ -11,7 +11,7 @@
    repeated `(52 if caption else 16)` while sankey pinned its series at 14 and
    drew the title straight through the ribbons. One owner, one rule, and a new
    chart cannot get it wrong by copying the wrong neighbour. #}
-{% import "components/charts/apache-echarts/component.html.j2" as engine %}
+{% import "charts/apache-echarts/component.html.j2" as engine %}
 
 {% macro out(option, height=340, note="", caption="", unit="") %}
 {# The unit is a SUBTEXT line under the caption, not part of it. The registered

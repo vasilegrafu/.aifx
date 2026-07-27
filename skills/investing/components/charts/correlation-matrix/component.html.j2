@@ -2,7 +2,7 @@
 {# unit: none — a correlation coefficient, −1 to 1, is unitless #}
 {# data: labels: str[]   matrix: num[][] — matrix[i][j] is labels[i] vs labels[j] #}
 
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro correlation_matrix(labels=[], matrix=[], caption="", height=380, note="",
                             vmin=-1, vmax=1, unit="") %}

@@ -1,7 +1,7 @@
 {# purpose: a measure that crosses zero — variance, surprise, contribution #}
 {# unit: axis — one measured axis; s.name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro bar_negative(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
 {# Each bar is coloured by the SIGN of its value. This is the one sanctioned use

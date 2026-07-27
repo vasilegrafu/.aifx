@@ -2,7 +2,7 @@
 {# unit: required — the chart is ABOUT price, and neither panel names its axis #}
 {# data: bars[] {date:str, open:num, close:num, low:num, high:num, volume:num} — a six-tuple is the worst shift risk in the set; named keys remove it #}
 
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro price_history(bars=[], caption="", height=420, note="", unit="") %}
 {# Built as data, serialised once — see the note in sankey/component.html.j2. #}

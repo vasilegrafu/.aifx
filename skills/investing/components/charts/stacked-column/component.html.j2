@@ -1,7 +1,7 @@
 {# purpose: parts summing to a whole across categories — vertical stacked bars #}
 {# unit: axis — one measured axis; s.name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro stacked_column(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
 {# Built as data and serialised once — see the note in line/component.html.j2. #}

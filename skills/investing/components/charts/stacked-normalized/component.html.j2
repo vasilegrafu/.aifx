@@ -1,7 +1,7 @@
 {# purpose: each category as 100% — composition when the shares matter and the totals do not #}
 {# unit: none — every column is 100% by construction #}
 {# data: series[] {name:str, points:num[]}   categories: str[] — RAW values, not shares #}
-{% import "components/charts/_render.html.j2" as r %}
+{% import "charts/_render.html.j2" as r %}
 
 {% macro stacked_normalized(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
 {# The shares are computed HERE so the rendered spec carries the percentages and
