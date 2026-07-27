@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }}</title>
-  <link rel="stylesheet" href="{{ cdn_href }}/css/bundle.css">
-  <script src="{{ cdn_href }}/js/bundle.js" defer></script>
+{% include "components/_assets.html.j2" %}
 {% block head %}{% endblock %}
 </head>
 <body>

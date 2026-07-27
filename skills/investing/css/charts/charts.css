@@ -69,10 +69,12 @@
   margin: 0 .15rem;
 }
 
-/* Source before render — or forever, if the engine is unavailable or the spec
-   is invalid: show it as an intentional, readable code box. One definition for
-   every engine, selected by the shared `chart` marker class. So write the spec
-   clean enough to read as text. */
+/* The spec block. It ships `hidden` and is no longer what a reader waits in
+   front of — see the engine component. It becomes visible only when someone
+   asks for it (the `show source` button on a failed chart), and then it is an
+   intentional, readable code box. One definition for every engine, selected by
+   the shared `chart` marker class. So write the spec clean enough to read as
+   text. */
 pre.chart {
   margin: var(--block-gap) 0;
   padding: .8rem 1rem;
@@ -86,11 +88,44 @@ pre.chart {
   color: var(--fg-soft);
   white-space: pre;
 }
-pre.chart[hidden] { display: none; }        /* rendered: source stays in the DOM, hidden */
-pre.chart.chart-error {                     /* invalid spec: flag it, keep the source */
+pre.chart[hidden] { display: none; }        /* the resting state, and again once drawn */
+pre.chart.chart-error {                     /* revealed after a failure: flag the source */
   border-color: var(--risk);
   color: var(--risk);
 }
+
+/* ---------- the chart that could not be drawn ---------- */
+/* A failure takes the chart's PLACE: same card, one line saying what happened,
+   and the spec one click away. It is deliberately not the chart's height —
+   there is nothing to look at, and a tall empty box reads as a broken layout
+   rather than as a stated failure. */
+.chart-figure.chart-failed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .4rem;
+  padding: 1rem;
+}
+.chart-status {
+  margin: 0;
+  font-size: .85rem;
+  color: var(--risk);
+}
+/* A text button, not a chip: it sits in the flow of the message rather than in
+   the .chart-tools bar, which belongs to a chart that drew. */
+.chart-source-toggle {
+  appearance: none;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--fg-soft);
+  font: inherit;
+  font-size: .8rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.chart-source-toggle:hover { color: var(--fg); }
 
 @media print {
   .chart-figure { break-inside: avoid; }

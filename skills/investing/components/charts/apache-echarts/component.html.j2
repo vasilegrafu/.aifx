@@ -1,7 +1,15 @@
 {# purpose: declarative data chart (bar/line/pie/scatter/candlestick…) via Apache ECharts, view-time SVG #}
 {# `chart` is the shared marker every engine wears; `apache-echarts` selects the engine #}
+{# SHIPPED HIDDEN. The spec used to be visible until the engine replaced it,
+   which meant every reader watched a block of JSON for as long as the ~900 KB
+   engine took to arrive — the spec is data for the engine, not something a
+   reader was ever meant to read first. Hidden is the resting state; charts.js
+   puts the chart on screen when it has one, or a message where it failed, and
+   the source stays in the DOM behind a `show source` button either way.
+   The attribute (not a class) so the UA stylesheet hides it even if the
+   stylesheet never loads. #}
 {% macro apache_echarts(option="", height=340) %}
-  <pre class="chart apache-echarts"{% if height != 340 %} data-height="{{ height }}"{% endif %}>
+  <pre class="chart apache-echarts" hidden{% if height != 340 %} data-height="{{ height }}"{% endif %}>
 {{ caller() if caller is defined else option }}
   </pre>
 {% endmacro %}

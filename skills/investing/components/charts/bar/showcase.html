@@ -4,48 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>bar — showcase</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@4.3.1/skills/investing/css/bundle.css">
-  <script src="https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@4.3.1/skills/investing/js/bundle.js" defer></script>
-  <style>
-/* Showcase chrome — the frame around a component demo, NOT part of any
-   component. builder.py inlines this into every generated showcase.html so the
-   page stays self-contained (the pages live scattered under each component
-   folder and are browsed over a local server, so a linked stylesheet would need
-   a different relative path per component). It adds nothing to the shipped
-   bundle; the component itself is styled entirely by the CDN bundle.css. */
-
-.showcase-head {
-  margin: 2rem 0 1rem;
-}
-.showcase-head code {
-  font-size: .85em;
-  opacity: .7;
-}
-
-.showcase-case {
-  margin: 0 0 2.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(128, 128, 128, .25);
-}
-.showcase-case > .showcase-label {
-  font: 600 .8rem/1.4 system-ui, sans-serif;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  opacity: .6;
-  margin: 0 0 .75rem;
-}
-
-  </style>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@4.3.1/skills/investing/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@4.3.1/skills/investing/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
-    <header class="showcase-head">
-      <h1>bar</h1>
-      <code>bar(series=[], categories=[], caption="", height=340, note="", y_name="", unit="")</code>
-    </header>
-    <section class="showcase-case">
-      <p class="showcase-label">single series — unit as a subtext line under the caption</p>
-        <pre class="chart apache-echarts">
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>bar</h1>
+  </header>
+
+    <section>
+      <h3>single series — unit as a subtext line under the caption</h3>
+        <pre class="chart apache-echarts" hidden>
 {
   "grid": {
     "bottom": 8,
@@ -94,9 +67,10 @@
 
 
     </section>
-    <section class="showcase-case">
-      <p class="showcase-label">two series — a legend appears, colour is never the only cue</p>
-        <pre class="chart apache-echarts">
+    <hr>
+    <section>
+      <h3>two series — a legend appears, colour is never the only cue</h3>
+        <pre class="chart apache-echarts" hidden>
 {
   "grid": {
     "bottom": 8,
@@ -158,9 +132,10 @@
 
 
     </section>
-    <section class="showcase-case">
-      <p class="showcase-label">named axis — y_name labels the axis, unit names the measure</p>
-        <pre class="chart apache-echarts">
+    <hr>
+    <section>
+      <h3>named axis — y_name labels the axis, unit names the measure</h3>
+        <pre class="chart apache-echarts" hidden>
 {
   "grid": {
     "bottom": 8,
@@ -213,9 +188,10 @@
 
 
     </section>
-    <section class="showcase-case">
-      <p class="showcase-label">percentages — a different unit family, same component</p>
-        <pre class="chart apache-echarts">
+    <hr>
+    <section>
+      <h3>percentages — a different unit family, same component</h3>
+        <pre class="chart apache-echarts" hidden>
 {
   "grid": {
     "bottom": 8,

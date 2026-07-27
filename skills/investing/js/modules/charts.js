@@ -13,9 +13,10 @@
        <engine>.renderInto(frame.canvas, spec);
        frame.onResize(() => <engine>.resize());
 
-   `pre` is the source block; it is hidden once the chart renders and stays in
-   the DOM as the fallback (charts.css styles it as a readable code box, so an
-   unreachable CDN or an invalid spec degrades to source instead of breaking).
+   `pre` is the source block. It SHIPS hidden and stays in the DOM either way:
+   the page shows a chart when there is one and `fail()`'s message where there
+   is not, and the source sits behind that message's `show source` button. It
+   is never what a reader waits in front of.
 
    It also owns the DESIGN SYSTEM's chart colour tokens as plain data — PALETTE
    (categorical), RAMP (sequential) and TOKENS (ink, axes, and the semantic
@@ -226,8 +227,40 @@ docsHtml.chart = (() => {
     }
   }
 
-  /** Flag an unparseable spec: the source stays visible, styled as an error. */
-  const markError = (pre) => pre.classList.add("chart-error");
+  /** Put a stated failure where the chart would have gone.
+
+      The spec ships hidden, so a chart that cannot be drawn would otherwise
+      leave NOTHING on the page — a silent hole a reader cannot tell from a
+      document that never had a chart there. So say it: one line in the chart's
+      own card, naming what failed, with the source behind a button for whoever
+      can act on it. The reader learns something is missing; the author learns
+      what. Returns the card, so a caller can decide where it goes. */
+  const fail = (pre, message) => {
+    pre.classList.add("chart-error");
+
+    const figure = document.createElement("figure");
+    figure.className = "chart-figure chart-failed";
+
+    const status = document.createElement("p");
+    status.className = "chart-status";
+    status.textContent = message;
+    figure.appendChild(status);
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "chart-source-toggle";
+    toggle.textContent = "show source";
+    toggle.addEventListener("click", () => {
+      pre.hidden = !pre.hidden;
+      toggle.textContent = pre.hidden ? "show source" : "hide source";
+    });
+    figure.appendChild(toggle);
+
+    // BEFORE the spec, not after: revealing the source should unfold it
+    // underneath the message that explains why anyone is looking at it.
+    pre.before(figure);
+    return figure;
+  };
 
   /* A chart spec sometimes has to NAME a design colour — a preset colouring
      sankey nodes by role, or a markLine drawn in the caution tone. Writing the
@@ -272,5 +305,5 @@ docsHtml.chart = (() => {
     return node;
   };
 
-  return { PALETTE, TOKENS, RAMP, Frame, markError, resolveColors, DEFAULT_HEIGHT };
+  return { PALETTE, TOKENS, RAMP, Frame, fail, resolveColors, DEFAULT_HEIGHT };
 })();

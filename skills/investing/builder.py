@@ -1,7 +1,7 @@
 """investing — builder: generate a report from live data through Jinja.
 
 Usage:
-    python builder.py build <report> <args...> [--out DIR]
+    python builder.py build <report> <args...> --out DIR
     python builder.py check
     python builder.py list
     python builder.py show <name>
@@ -51,6 +51,7 @@ The rest earns its keep but is not the spine:
 import argparse
 import importlib.util
 import json
+import os
 import re
 import sys
 import time
@@ -69,7 +70,6 @@ COMPONENTS_DIR = SKILL_DIR / "components"
 REPORTS_DIR = SKILL_DIR / "reports"
 
 REPORT_NAME_RE = re.compile(r"\{#\s*report-name:\s*(.+?)\s*#\}")
-
 
 class Component(NamedTuple):
     """One entry of components/<cat>/<name>/component.html.j2."""
@@ -280,7 +280,8 @@ def cdn_href() -> str:
 
     Read from version.json at build time, so every generated file is pinned to
     the design-system version it was built against. Published tags are
-    immutable, so an old report keeps rendering exactly as it did."""
+    immutable, so a report that has left the tree keeps rendering exactly as it
+    did. It is the FALLBACK half of the pair — see local_href()."""
     info = json.loads((SKILL_DIR.parent.parent / "version.json").read_text(encoding="utf-8"))
     cdn, version = info.get("cdn"), info["version"]
     if not cdn:
@@ -288,12 +289,36 @@ def cdn_href() -> str:
     return cdn.replace("{version}", version).replace("{skill}", SKILL_DIR.name)
 
 
+def local_href(out_dir: Path) -> str:
+    """Path back to this skill FROM WHERE THE PAGE IS WRITTEN — the local half
+    of the asset pair (components/_assets.html.j2 links both).
+
+    Generated pages land in three different places — a showcase beside its
+    component, a report in --out, a future report wherever it is built — and
+    each is a different number of folders away from css/ and js/. The page
+    cannot know that; the builder does, because it knows where it is about to
+    write. So the depth is computed here, once, and handed to the template.
+
+    Empty when no relative path exists — a different Windows drive — and the
+    template then links the CDN alone rather than an href that cannot resolve."""
+    try:
+        return Path(os.path.relpath(SKILL_DIR, Path(out_dir).resolve())).as_posix()
+    except ValueError:
+        return ""
+
+
 # --------------------------------------------------------------------------
 # build — the heart
 # --------------------------------------------------------------------------
 
-def compose_report(name: str, d: dict, title: str = "") -> str:
-    """Render one report's recipe with the data its builder produced."""
+def compose_report(name: str, d: dict, out_dir: Path | str,
+                   title: str = "") -> str:
+    """Render one report's recipe with the data its builder produced.
+
+    `out_dir` is where the file is about to be written, and it has NO DEFAULT on
+    purpose: the head's local asset href is relative to it, so a report composed
+    without naming its destination would link assets relative to a directory
+    nobody chose. Whoever knows where the file is going passes it."""
     directory = report_dirs()[name]
     rel = (directory.relative_to(SKILL_DIR) / "report.html.j2").as_posix()
     src = (SKILL_DIR / rel).read_text(encoding="utf-8")
@@ -304,6 +329,7 @@ def compose_report(name: str, d: dict, title: str = "") -> str:
         d=SimpleNamespace(**d) if isinstance(d, dict) else d,
         title=title or d.get("title", display),
         report_name=display,
+        local_href=local_href(out_dir),
         cdn_href=cdn_href())
 
 
@@ -344,18 +370,14 @@ def compose_component_showcase(env: Environment, component: Component) -> str:
     if macro is None:
         raise SystemExit(f"{component.name}: no macro {component.macro!r} to show")
 
-    src = component.path.read_text(encoding="utf-8")
-    sig = re.search(r"\{% macro (\w+\(.*?\)) %\}", src, re.S)
     rendered = [{"label": label, "body": macro(**kwargs)}
                 for label, kwargs in load_showcase_cases(component)]
 
-    css = (SKILL_DIR / "css" / "_showcase.css").read_text(encoding="utf-8")
     return env.get_template("components/_showcase.html.j2").render(
         title=f"{component.name} — showcase",
         component_name=component.name,
-        macro_sig=sig.group(1) if sig else component.macro,
         cases=rendered,
-        showcase_css=css,
+        local_href=local_href(component.path.parent),
         cdn_href=cdn_href())
 
 
@@ -477,6 +499,43 @@ def data_audit() -> list[str]:
     return problems
 
 
+def asset_problems(html: str, expect_local: str) -> list[str]:
+    """Every generated page must link the bundle TWICE OVER: the local copy, and
+    the CDN one that covers the local copy going missing.
+
+    Neither half fails loudly on its own — a page that lost its CDN fallback
+    still renders perfectly in the tree where it was built and only breaks once
+    someone opens it somewhere else, which is the worst moment to find out. So
+    the pair is asserted here, on the rendered head, rather than trusted to
+    whoever next edits the template."""
+    problems, cdn = [], cdn_href()
+    for asset in ("css/bundle.css", "js/bundle.js"):
+        if f"{cdn}/{asset}" not in html:
+            problems.append(f"head links no CDN {asset}")
+        if expect_local and f'"{expect_local}/{asset}"' not in html:
+            problems.append(f"head links no local {asset} (expected {expect_local}/)")
+    # `onerror="` with the quote: the css handler's body contains `onerror=null`
+    # and a bare substring count would see three where there are two.
+    if expect_local and html.count('onerror="') != 2:
+        problems.append("head links local assets with no onerror fallback on both")
+    return problems
+
+
+SPEC_TAG_RE = re.compile(r"<pre class=\"chart[^\"]*\"[^>]*>")
+
+
+def spec_problems(html: str) -> list[str]:
+    """Every chart spec must be shipped hidden.
+
+    The spec is data for the engine, and a visible one is what a reader stares
+    at while the engine loads. Nothing at render time catches a missing
+    `hidden` — the page is valid, it just shows a wall of JSON for a second on
+    every load, which is exactly the kind of thing that gets reintroduced by a
+    well-meaning edit to the engine macro and noticed by a reader instead."""
+    return [f"chart spec is not hidden: {tag}"
+            for tag in SPEC_TAG_RE.findall(html) if " hidden" not in tag]
+
+
 def _family_tally() -> str:
     tally = {}
     charts = COMPONENTS_DIR / "charts"
@@ -522,10 +581,12 @@ def cmd_build(name: str, rest: list[str], out_dir: str, force: bool) -> int:
     print(f"shaping and asserting …", flush=True)
     d = module.shape(payloads)
 
-    html = compose_report(name, d)
+    # Resolve the destination BEFORE rendering: the head's local asset href is
+    # relative to it, so the report has to know where it is going.
+    out = Path(out_dir).resolve()
+    html = compose_report(name, d, out)
 
     stem = d.get("slug") or name
-    out = Path(out_dir).resolve()
     out.mkdir(parents=True, exist_ok=True)
     target = out / f"{stem}-{name}.html" if not stem.endswith(name) else out / f"{stem}.html"
     if target.exists() and not force:
@@ -557,10 +618,18 @@ def cmd_check() -> int:
     failures = 0
     reports = report_dirs()
 
+    # `check` renders in memory and writes nothing, so it has no destination of
+    # its own — but compose_report needs one, and asserting the asset pair means
+    # knowing what the local href SHOULD be. So it names a stand-in explicitly
+    # rather than leaning on a default: the skill root, which every report can
+    # reach, and which makes the expected href plain to read here.
+    pretend_out = SKILL_DIR
+    expect_local = local_href(pretend_out)
+
     for name in sorted(reports):
         try:
             module = load_report_module(name)
-            out = compose_report(name, module.shape(module.sample()))
+            out = compose_report(name, module.shape(module.sample()), pretend_out)
         except Exception as e:                   # noqa: BLE001 — report, don't crash
             print(f"  {name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
             failures += 1
@@ -568,6 +637,9 @@ def cmd_check() -> int:
         left = re.search(r"\{%.{0,60}", out, re.S)
         if left:
             print(f"  {name:<30} UNRENDERED: {left.group(0)!r}")
+            failures += 1
+        for problem in asset_problems(out, expect_local) + spec_problems(out):
+            print(f"  {name:<30} {problem}")
             failures += 1
 
     # Per-component showcases — the render-coverage net. Only financial-profile
@@ -588,6 +660,10 @@ def cmd_check() -> int:
         left = re.search(r"\{%.{0,60}", out, re.S)
         if left:
             print(f"  {component.name:<30} UNRENDERED: {left.group(0)!r}")
+            failures += 1
+        for problem in (asset_problems(out, local_href(component.path.parent))
+                        + spec_problems(out)):
+            print(f"  {component.name:<30} {problem}")
             failures += 1
 
     uncovered = [c.name for c in load_components() if c.name not in shown_names]
@@ -667,7 +743,9 @@ def main(argv: list[str]) -> int:
 
     build = sub.add_parser("build", help="build a report from live data")
     build.add_argument("report", help="report name")
-    build.add_argument("--out", default="docs", help="output directory (default: ./docs)")
+    build.add_argument("--out", required=True,
+                       help="output directory — required: the report's local "
+                            "asset links are relative to it")
     build.add_argument("--force", action="store_true", help="overwrite an existing file")
 
     sub.add_parser("check", help="build every report from sample(); fail on anything unrendered")

@@ -60,7 +60,7 @@ sit in matching places.
 | `math.css` | formula blocks (`.math`) — spacing, overflow, and the readable-LaTeX fallback before/without KaTeX |
 | `diagrams.css` | **shared, engine-agnostic**: the `.diagram-figure` viewport, `.diagram-canvas` pan surface, `.diagram-tools` glyph toolbar, `.diagram-resize` grip, fullscreen + print |
 | `diagram-mermaid.css` | Mermaid-only: the `pre.mermaid` source-box fallback and the ✎ editor panel (surface, overlay, scrollbars). One `diagram-<engine>.css` per engine — a new engine adds a file here, it never edits `diagrams.css` |
-| `charts.css` | **shared, engine-agnostic**: the `.chart-figure` card (the validated `bg-soft` surface), the `.chart-canvas` an engine draws into, the `.chart-tools` toolbar, and the `pre.chart` readable-spec fallback — one definition for every engine, selected by the shared `chart` marker class. The categorical palette is data, not CSS: it lives in `js/modules/charts.js` (with the sequential ramp and the semantic direction tones). Also `.chart-note`, the one-line reading under a chart |
+| `charts.css` | **shared, engine-agnostic**: the `.chart-figure` card (the validated `bg-soft` surface), the `.chart-canvas` an engine draws into, the `.chart-tools` toolbar, the `pre.chart` spec block (shipped `hidden`; revealed only by `show source` on a failed chart) and the `.chart-failed` card that states what went wrong — one definition for every engine, selected by the shared `chart` marker class. The categorical palette is data, not CSS: it lives in `js/modules/charts.js` (with the sequential ramp and the semantic direction tones). Also `.chart-note`, the one-line reading under a chart |
 | `chart-apache-echarts.css` | Apache ECharts only: containment for the wrapper div the engine generates. Deliberately small — anything a second engine would also need belongs in `charts.css`. One `chart-<engine>.css` per engine, exactly as `diagram-<engine>.css` |
 
 ## Namespacing the domain modules
@@ -119,9 +119,14 @@ Shared modules are for styles used across MANY documents. CSS that styles
 ONE page only does **not** belong there — it lives in that page, in a
 `{% block head %}` `<style>` (the base shell exposes `{% block head %}` just
 before `</head>`, after the design-system link, so the page reads the same
-tokens). The component gallery is the worked example: all its `gx-*` chrome is a
-`<style>` inside `../showcases/components.html.j2`, not a shared module — so a
-document never downloads a byte of showcase styling.
+tokens).
+
+Reach for it last, though. The per-component showcase pages
+(`components/_showcase.html.j2`) are the worked example of NOT needing it: the
+frame around a demo — cover block, case heading, separating rule — is
+`.doc-meta`, `<h3>` and `<hr>`, all already styled by the bundle. If a page
+seems to need its own CSS, first check that an
+existing element does not already look right.
 
 ## Theme and rebranding
 

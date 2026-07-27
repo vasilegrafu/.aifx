@@ -121,7 +121,7 @@
         try {
           jobs.push({ pre, option: JSON.parse(pre.textContent), source: pre.textContent });
         } catch (e) {
-          docsHtml.chart.markError(pre);   // stays visible; source is the fallback
+          docsHtml.chart.fail(pre, `chart spec is not valid JSON — ${e.message}`);
         }
       }
       if (!jobs.length) return;
@@ -147,13 +147,26 @@
           // document; see docsHtml.chart.resolveColors.
           docsHtml.chart.resolveColors(option);
 
-          const chart = window.echarts.init(frame.canvas, THEME_NAME, { renderer: "svg" });
-          chart.setOption(option);
-
-          // Reflow on width change (responsive labels/layout, still crisp SVG).
-          frame.onResize(() => chart.resize());
+          // A spec can be valid JSON and still be one the engine refuses. That
+          // used to leave the card standing empty; say it instead, in the same
+          // words as any other failure.
+          try {
+            const chart = window.echarts.init(frame.canvas, THEME_NAME, { renderer: "svg" });
+            chart.setOption(option);
+            // Reflow on width change (responsive labels/layout, still crisp SVG).
+            frame.onResize(() => chart.resize());
+          } catch (e) {
+            frame.figure.remove();
+            docsHtml.chart.fail(pre, `chart could not be drawn — ${e.message}`);
+          }
         });
-      }).catch(() => {});   // CDN down → the JSON spec stays visible, readable
+      }).catch(() => {
+        // The engine never arrived. Nothing is on screen and the specs are
+        // hidden, so every chart on the page would be an invisible gap — one
+        // message each, where each chart should have been.
+        jobs.forEach(({ pre }) =>
+          docsHtml.chart.fail(pre, "chart engine unavailable — it could not be loaded"));
+      });
     },
   });
 })();
