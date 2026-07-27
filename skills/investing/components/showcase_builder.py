@@ -12,7 +12,6 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 COMPONENTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = COMPONENTS_DIR.parent
 
-SHELL = "showcase.master.html.j2"
 CONTROLLER = "showcase_controller.py"
 VIEW = "showcase.html.j2"
 
@@ -83,8 +82,10 @@ def f_fmt(value, spec="num", *a, **kw):
     return FORMATS[spec](value, *a, **kw)
 
 
-FILTERS = {"money": f_money, "pct": f_pct, "signed": f_signed, "bps": f_bps,
-           "num": f_num, "fmt": f_fmt}
+#: What the env exposes. Derived from FORMATS rather than restated, so the two
+#: cannot drift — `fmt` dispatches over exactly the names available directly.
+#: `raw` comes along as the identity filter, which is what it already meant.
+FILTERS = {**FORMATS, "fmt": f_fmt}
 
 
 # --------------------------------------------------------------------------
@@ -150,15 +151,22 @@ class Showcases:
     def __init__(self, root: Path = COMPONENTS_DIR):
         self.root = Path(root).resolve()
         self._env: Environment | None = None
+        self._all: list[Component] | None = None
 
     # ---------------------------------------------------------------- find
     def all(self) -> list[Component]:
-        """Scan components/ once, recursively.
+        """Scan components/ once, recursively — then remember it.
+
+        Cached for the same reason the env is: a scan walks the whole tree, and
+        env(), showable() and write() each want the list. A process that added a
+        component to disk mid-run would not see it, which no CLI invocation does.
 
         components/ is organized in CATEGORY folders that exist purely for
         humans — a component's identity stays its own folder name (macro = name
         with - -> _), so category moves never touch templates. Names must be
         unique across categories."""
+        if self._all is not None:
+            return self._all
         components, seen = [], {}
         for markup in sorted(self.root.rglob("component.html.j2")):
             name = markup.parent.name
@@ -169,16 +177,8 @@ class Showcases:
             components.append(Component(name=name,
                                         macro=name.replace("-", "_"),
                                         path=markup))
+        self._all = components
         return components
-
-    def find(self, name: str) -> Component | None:
-        """By folder name or by macro name — `metric-trend` and `metric_trend`
-        both reach the same component, because a view writes one and the
-        directory is called the other."""
-        for component in self.all():
-            if name in (component.name, component.macro):
-                return component
-        return None
 
     def showable(self) -> tuple[list[Component], list[str]]:
         """Components that ship BOTH halves, and complaints about the rest.

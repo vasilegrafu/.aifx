@@ -52,7 +52,6 @@ sys.path.insert(0, str(SKILL_DIR))
 
 from components import showcase_builder                  # noqa: E402
 
-SHELL = "report.master.html.j2"
 CONTROLLER = "report_controller.py"
 VIEW = "report.html.j2"
 
@@ -68,12 +67,16 @@ class Reports:
     def __init__(self, root: Path = REPORTS_DIR):
         self.root = Path(root).resolve()
         self.components = showcase_builder.Showcases()
+        self._all: dict[str, Path] | None = None
 
     # ---------------------------------------------------------------- find
     def all(self) -> dict[str, Path]:
         """Every report folder, discovered recursively: name -> directory.
 
-        Same rule as components: found, never registered."""
+        Same rule as components: found, never registered. Cached like the
+        component scan — one build() asks three times over."""
+        if self._all is not None:
+            return self._all
         dirs: dict[str, Path] = {}
         for view in sorted(self.root.rglob(VIEW)):
             name = view.parent.name
@@ -81,6 +84,7 @@ class Reports:
                 raise SystemExit(f"duplicate report name: {name!r} "
                                  f"({dirs[name]} and {view.parent})")
             dirs[name] = view.parent
+        self._all = dirs
         return dirs
 
     def resolve(self, name: str) -> str:
