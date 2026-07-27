@@ -7,20 +7,29 @@ Usage:
 THIS FILE DISPATCHES AND NOTHING ELSE. Each directory owns the code that builds
 what lives in it, and each runs perfectly well on its own:
 
-    reports/report.builder.py        the report engine
-    components/showcase.builder.py   the showcase engine
+    reports/report_builder.py        the report engine
+    components/showcase_builder.py   the showcase engine
 
-    python reports/report.builder.py financial-profile INTC --out DIR
-    python components/showcase.builder.py bar
+    python reports/report_builder.py financial-profile INTC --out DIR
+    python components/showcase_builder.py bar
+
+NAMESPACE PACKAGES, NO __init__.py. `components` and `reports` are ordinary
+directories that Python treats as namespace packages because the skill root is
+on sys.path. Both names are generic: in a process that put this skill on the
+path alongside some other `components` package, they would shadow one another.
+That is fine for a CLI and would matter if anything ever imported this skill
+into a larger application.
 
 So this exists for one reason: to be the single place that says what this skill
 can do. Delete it and both engines still work — you would only lose the list.
 
 THE PIECES. Both sides are the same three files, deliberately:
 
-                    shell                    controller          view
-    reports/        report.master.html.j2    report.controller.py    report.html.j2
-    components/     showcase.master.html.j2  showcase.controller.py  showcase.html.j2
+                    shell                    controller              view
+    reports/        report.master.html.j2    report_controller.py    report.html.j2
+    components/     showcase.master.html.j2  showcase_controller.py  showcase.html.j2
+
+Python files use underscores so they can be imported; templates keep the dots.
 
 A CONTROLLER BUILDS DATA. A VIEW EMITS MARKUP. The controller returns a plain
 dict, handed to the view as `d`, and the view is the only thing that calls a
@@ -40,24 +49,14 @@ anything without a key, and it covers components, not reports.
 """
 
 import argparse
-import importlib.util
 import sys
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SKILL_DIR))          # so both engines resolve by name
 
-
-def _engine(relative: str, alias: str):
-    """Load one of the two engines BY PATH.
-
-    Their filenames carry dots — report.builder.py, showcase.builder.py — so
-    neither can be reached by `import`. Path-loading is this skill's idiom
-    anyway: controllers on both sides are loaded the same way, and no folder
-    here is a package or wants an __init__.py."""
-    spec = importlib.util.spec_from_file_location(alias, SKILL_DIR / relative)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+from components.showcase_builder import Showcases        # noqa: E402
+from reports.report_builder import Reports               # noqa: E402
 
 
 def main(argv: list[str]) -> int:
@@ -81,11 +80,9 @@ def main(argv: list[str]) -> int:
 
     args, rest = parser.parse_known_args(argv)
     if args.cmd == "build":
-        reports = _engine("reports/report.builder.py", "report_engine")
-        return reports.Reports().build(args.report, rest, args.out, args.force)
+        return Reports().build(args.report, rest, args.out, args.force)
     if args.cmd == "showcase":
-        showcases = _engine("components/showcase.builder.py", "showcase_engine")
-        return showcases.Showcases().write(args.name)
+        return Showcases().write(args.name)
     parser.print_help()
     return 1
 

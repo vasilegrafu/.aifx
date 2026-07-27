@@ -1,0 +1,28 @@
+{# How a generated page links THE SCRIPT — local first, CDN if the local copy
+   is absent. It lives beside the bundle it loads; css/css.loader.html.j2 is
+   its twin, and both shells include the pair:
+
+     {% include "css/css.loader.html.j2" %}
+     {% include "js/js.loader.html.j2" %}
+
+   `local_href` is the relative path from WHERE THE FILE IS WRITTEN back to the
+   skill — a showcase three folders deep gets `../../..`, a report in docs/ gets
+   whatever reaches the skill from there. It is empty when no relative path
+   exists (a different Windows drive), and then only the CDN is linked.
+
+   WHY THIS HALF IS DIFFERENT. The stylesheet retargets its own element; a
+   <script> cannot. Once a script has failed the browser will NOT re-fetch it by
+   assigning a new src, so the handler has to append a FRESH element instead.
+   Getting this wrong looks like it works — the assignment is silent — and the
+   page simply has no JavaScript.
+
+   The replacement arrives late, after the document has parsed, and still
+   initialises the page: js/modules/main.js checks `document.readyState` and
+   calls init() directly when the DOM is already parsed, which is exactly this
+   case. `defer` on the local tag keeps the normal path non-blocking. #}
+{% if local_href %}
+  <script src="{{ local_href }}/js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='{{ cdn_href }}/js/bundle.js';document.head.appendChild(s)"></script>
+{% else %}
+  <script src="{{ cdn_href }}/js/bundle.js" defer></script>
+{% endif %}

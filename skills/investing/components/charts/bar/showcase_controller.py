@@ -1,6 +1,6 @@
 """Showcase controller for the `bar` component.
 
-CONTRACT (every showcase.controller.py follows it):
+CONTRACT (every showcase_controller.py follows it):
 
     context() -> dict
 

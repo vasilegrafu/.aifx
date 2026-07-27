@@ -3,13 +3,13 @@
 RUNNABLE ON ITS OWN. This directory builds its own reports with no reference to
 ../builder.py:
 
-    python reports/report.builder.py financial-profile INTC --peers AMD --out DIR
+    python reports/report_builder.py financial-profile INTC --peers AMD --out DIR
 
 THE SHAPE, and it is the showcase's shape exactly:
 
-    report.master.html.j2        the shell        showcase.master.html.j2
-    <name>/report.controller.py  fetch() + shape()  showcase.controller.py
-    <name>/report.html.j2        the view         showcase.html.j2
+    report.master.html.j2        the shell          showcase.master.html.j2
+    <name>/report_controller.py  fetch() + shape()  showcase_controller.py
+    <name>/report.html.j2        the view           showcase.html.j2
 
 A CONTROLLER BUILDS DATA. A VIEW EMITS MARKUP. The controller fetches and does
 arithmetic; the view decides which components appear and in what order, and is
@@ -45,28 +45,18 @@ from types import SimpleNamespace
 REPORTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = REPORTS_DIR.parent
 
+# Run standalone, sys.path[0] is reports/ — not the skill root — so `components`
+# would not resolve. One insert fixes it, and it is the same idiom
+# <name>/report_controller.py already uses to reach data_providers.
+sys.path.insert(0, str(SKILL_DIR))
+
+from components import showcase_builder                  # noqa: E402
+
 SHELL = "report.master.html.j2"
-CONTROLLER = "report.controller.py"
+CONTROLLER = "report_controller.py"
 VIEW = "report.html.j2"
 
 REPORT_NAME_RE = re.compile(r"\{#\s*report-name:\s*(.+?)\s*#\}")
-
-
-def _components():
-    """The components package's engine, loaded BY PATH.
-
-    Its filename carries a dot — `showcase.builder.py`, matching this file's
-    naming — so it can never be reached by `import`. Path-loading is this
-    skill's idiom anyway: controllers on both sides are loaded the same way,
-    and no folder here is a package or wants an __init__.py."""
-    path = SKILL_DIR / "components" / "showcase.builder.py"
-    spec = importlib.util.spec_from_file_location("components_showcase", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-components = _components()
 
 
 class Reports:
@@ -77,7 +67,7 @@ class Reports:
 
     def __init__(self, root: Path = REPORTS_DIR):
         self.root = Path(root).resolve()
-        self.components = components.Showcases()
+        self.components = showcase_builder.Showcases()
 
     # ---------------------------------------------------------------- find
     def all(self) -> dict[str, Path]:
@@ -109,7 +99,7 @@ class Reports:
         raise SystemExit(f"ambiguous report {name!r}: {', '.join(sorted(matches))}")
 
     def controller(self, name: str):
-        """Import <name>/report.controller.py by path.
+        """Import <name>/report_controller.py by path.
 
         By path rather than by package, so a report folder needs no
         __init__.py and the discovery rule stays 'a directory containing
@@ -145,8 +135,8 @@ class Reports:
             d=SimpleNamespace(**d) if isinstance(d, dict) else d,
             title=title or d.get("title", display),
             report_name=display,
-            local_href=components.local_href(out_dir),
-            cdn_href=components.cdn_href())
+            local_href=showcase_builder.local_href(out_dir),
+            cdn_href=showcase_builder.cdn_href())
 
     def build(self, name: str, rest: list[str], out_dir: str,
               force: bool = False) -> int:
@@ -154,7 +144,7 @@ class Reports:
         name = self.resolve(name)
         module = self.controller(name)
 
-        parser = argparse.ArgumentParser(prog=f"report.builder.py {name}")
+        parser = argparse.ArgumentParser(prog=f"report_builder.py {name}")
         if hasattr(module, "add_args"):
             module.add_args(parser)
         args = parser.parse_args(rest)
@@ -190,7 +180,7 @@ class Reports:
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
-        prog="report.builder.py",
+        prog="report_builder.py",
         description="build a report from live data")
     parser.add_argument("report", help="report name (or a unique prefix)")
     parser.add_argument("--out", required=True,

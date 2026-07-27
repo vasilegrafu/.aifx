@@ -3,13 +3,13 @@
 RUNNABLE ON ITS OWN. This directory builds its own showcases with no reference
 to ../builder.py:
 
-    python components/showcase.builder.py          every component that has one
-    python components/showcase.builder.py bar      just this one
+    python components/showcase_builder.py          every component that has one
+    python components/showcase_builder.py bar      just this one
 
 THE SHAPE, and it is the report's shape exactly:
 
     showcase.master.html.j2            the shell        report.master.html.j2
-    <cat>/<n>/showcase.controller.py   context() -> d   report.controller.py
+    <cat>/<n>/showcase_controller.py   context() -> d   report_controller.py
     <cat>/<n>/showcase.html.j2         the view         report.html.j2
 
 A CONTROLLER BUILDS DATA. A VIEW EMITS MARKUP. The controller returns a plain
@@ -53,7 +53,7 @@ COMPONENTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = COMPONENTS_DIR.parent
 
 SHELL = "showcase.master.html.j2"
-CONTROLLER = "showcase.controller.py"
+CONTROLLER = "showcase_controller.py"
 VIEW = "showcase.html.j2"
 
 
@@ -202,7 +202,7 @@ def cdn_href() -> str:
 
 def local_href(out_dir: Path) -> str:
     """Path back to the skill FROM WHERE THE PAGE IS WRITTEN — the local half
-    of the asset pair (_assets.html.j2 links both).
+    of the asset pair (css/css.loader.html.j2 and js/js.loader.html.j2).
 
     A showcase lands beside its component, three or four folders deep, and the
     page cannot know how deep that is. Whoever is about to write it does.
@@ -307,7 +307,7 @@ class Showcases:
 
     # -------------------------------------------------------------- render
     def context(self, component: Component) -> dict:
-        """Import <name>/showcase.controller.py and return its context().
+        """Import <name>/showcase_controller.py and return its context().
 
         By path, so a component folder needs no __init__.py and the discovery
         rule stays 'a directory containing component.html.j2'. The contract is
@@ -378,7 +378,7 @@ class Showcases:
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
-        prog="showcase.builder.py",
+        prog="showcase_builder.py",
         description="render each component's showcase.html from its controller + view")
     parser.add_argument("name", nargs="?",
                         help="only this component (folder or macro name)")

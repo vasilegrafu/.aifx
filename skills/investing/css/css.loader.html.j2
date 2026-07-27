@@ -1,0 +1,30 @@
+{# How a generated page links THE STYLESHEET — local first, CDN if the local
+   copy is absent. It lives beside the bundle it loads; js/js.loader.html.j2 is
+   its twin, and both shells include the pair:
+
+     {% include "css/css.loader.html.j2" %}
+     {% include "js/js.loader.html.j2" %}
+
+   `local_href` is the relative path from WHERE THE FILE IS WRITTEN back to the
+   skill — a showcase three folders deep gets `../../..`, a report in docs/ gets
+   whatever reaches the skill from there. It is empty when no relative path
+   exists (a different Windows drive), and then only the CDN is linked.
+
+   WHY BOTH. Local first, so a page previews the CURRENT tree the moment it is
+   generated — no publish, no cache, no version bump between editing a
+   stylesheet and seeing it. CDN second, so the same file still renders once it
+   leaves the tree: copied elsewhere, emailed, opened from a download folder.
+   The fallback is what makes a generated page portable AND live.
+
+   HOW THE FALLBACK FIRES, and why this half is the easy one. `onerror` on the
+   tag itself — the browser tells us the local file is missing, so nothing has
+   to poll or guess, and a page whose local assets are present pays nothing. A
+   stylesheet can retarget the SAME element, because a <link> re-fetches when
+   its href changes. `this.onerror=null` first, so a CDN that is also
+   unreachable cannot loop. The script half cannot do this — see its file. #}
+{% if local_href %}
+  <link rel="stylesheet" href="{{ local_href }}/css/bundle.css"
+        onerror="this.onerror=null;this.href='{{ cdn_href }}/css/bundle.css'">
+{% else %}
+  <link rel="stylesheet" href="{{ cdn_href }}/css/bundle.css">
+{% endif %}
