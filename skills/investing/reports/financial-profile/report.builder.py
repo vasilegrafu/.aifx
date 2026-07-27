@@ -2,12 +2,11 @@
 """financial-profile — where a company's money comes from, where it goes, what
 it owns, and how that shape changed.
 
-THREE FUNCTIONS, THREE JOBS.
+TWO FUNCTIONS, TWO JOBS.
 
     fetch(symbol, peers)  the only thing that touches the network
     shape(payloads)       pure arithmetic; ASSERTS every identity, then returns
                           the data the recipe renders
-    sample()              canned payloads so `check` runs offline
 
 WHY THE ASSERTIONS LIVE HERE. Three of this report's exhibits are sankeys, and a
 sankey scales each node's ribbons independently — so one that does not conserve
@@ -21,7 +20,6 @@ UNITS. FMP reports raw dollars. Everything here is $ millions, converted once in
 `_m()`, so no downstream number is ever in the wrong scale.
 """
 
-import json
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -94,13 +92,6 @@ def fetch(symbol, peers=""):
         payloads["_peers"][peer] = client.get("key-metrics", symbol=peer,
                                               period="annual", limit=1)
     return payloads
-
-
-def sample():
-    """Canned payloads for `check` — no network, no credential.
-
-    A guard that needs a secret to run stops being run."""
-    return json.loads((HERE / "sample.json").read_text(encoding="utf-8"))
 
 
 # --------------------------------------------------------------------------

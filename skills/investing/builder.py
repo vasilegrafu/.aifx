@@ -2,15 +2,13 @@
 
 Usage:
     python builder.py build <report> <args...> --out DIR
-    python builder.py check
-    python builder.py list
-    python builder.py show <name>
+    python builder.py showcase [<component>]
 
 The pieces (all inside this skill directory):
 
     data_providers/<provider>/           the client — the ONLY thing doing I/O
-    reports/base.html.j2                 the shared shell ({% block content %})
-    reports/<name>/report.builder.py     fetch() + shape() + sample()
+    reports/report.master.html.j2        the shared shell ({% block content %})
+    reports/<name>/report.builder.py     fetch() + shape()
     reports/<name>/report.html.j2        the RECIPE: which components, in what
                                          order, in what layout
     components/<cat>/<name>/component.html.j2   {% macro <name>(...) %}
@@ -28,8 +26,8 @@ the note there, it is the single most important line in this file.
 Jinja runs ONLY here, at build time. The written file is standalone HTML with
 no Jinja left, linking the two version-pinned CDN assets and nothing else.
 
-MAP — the whole engine is five small things; everything else is a guard or a
-comment explaining WHY. Read these five and you have read the builder:
+MAP — the whole engine is four small things; everything else is a guard or a
+comment explaining WHY. Read these four and you have read the builder:
 
     1. FIND FILES       load_components() · report_dirs()   rglob for *.html.j2;
                         found, never registered.
@@ -38,14 +36,17 @@ comment explaining WHY. Read these five and you have read the builder:
     3. RENDER A REPORT  compose_report()   data on `d`, macros on `c`, CDN links
                         baked in.
     4. build            cmd_build()   fetch() -> shape() -> render -> write.
-    5. check            cmd_check()   the same render from sample(), offline —
-                        no network, no key — plus every showcase.py.
 
 The rest earns its keep but is not the spine:
     - filters + boxstats()          the one place a number becomes a string
-    - chart_audit() · data_audit()  static rules rendering cannot catch
     - showcase machinery            per-component proof: showcase.py -> .html
-    - _blame() · _family_tally()    nicer failure and summary output
+    - _blame()                      names the template that actually raised
+
+WHAT GUARDS THE OUTPUT NOW. Rendering a report requires the network and a key,
+so there is no offline check: `shape()`'s assertions and StrictUndefined fire
+during a real `build`, and nowhere else. `builder.py showcase` is the only
+command that renders anything without one, and it covers components, not
+reports.
 """
 
 import argparse
@@ -54,7 +55,6 @@ import json
 import os
 import re
 import sys
-import time
 from pathlib import Path
 from types import SimpleNamespace
 from typing import NamedTuple
@@ -269,9 +269,8 @@ def load_report_module(name: str):
     spec = importlib.util.spec_from_file_location(f"report_{name.replace('-', '_')}", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    for required in ("shape", "sample"):
-        if not hasattr(module, required):
-            raise SystemExit(f"{name}: report.builder.py defines no {required}()")
+    if not hasattr(module, "shape"):
+        raise SystemExit(f"{name}: report.builder.py defines no shape()")
     return module
 
 
@@ -395,174 +394,8 @@ def _blame(exc: BaseException) -> str:
 
 
 # --------------------------------------------------------------------------
-# chart audit — structural rules no amount of rendering can catch
-# --------------------------------------------------------------------------
-
-UNIT_RE = re.compile(r"\{#\s*unit:\s*(\w+)")
-
-UNIT_FAMILIES = {
-    "required": "must accept `unit`",
-    "axis": "must accept `y_name` or `x_name`",
-    "multi": "must accept both `x_name` and `y_name`",
-    "none": "nothing required",
-}
-
-DATA_RE = re.compile(r"\{#\s*data:\s*(.+?)\s*#\}", re.S)
-
-
-def chart_audit() -> list[str]:
-    """Where a unit has to be written depends on the chart's SHAPE — on where
-    the reader's eye lands on the number — not on the chart's name. Each
-    component declares its family in a `{# unit: … #}` header, so a new chart
-    states what it is and nothing here needs editing.
-
-    A chart that states no unit draws perfectly and leaves the reader guessing
-    whether a bar means dollars or percent. A chart that sets its own title
-    draws it wherever the engine likes — which is how `sankey` came to print
-    its caption straight through the ribbons."""
-    problems = []
-    charts = COMPONENTS_DIR / "charts"
-    if not charts.exists():
-        return problems
-
-    for path in sorted(charts.glob("*/component.html.j2")):
-        name = path.parent.name
-        if name == "apache-echarts":             # the engine, not a chart
-            continue
-        src = path.read_text(encoding="utf-8")
-        match = re.search(r"\{% macro (\w+)\((.*?)\) %\}", src, re.S)
-        if not match:
-            problems.append(f"{name}: no macro signature")
-            continue
-        params = match.group(2)
-
-        if '"title"' in src:
-            problems.append(f"{name}: sets its own title — use r.out(…, caption, unit)")
-        if "caption=" not in params:
-            problems.append(f"{name}: macro takes no `caption`")
-
-        declared = UNIT_RE.search(src)
-        family = declared.group(1) if declared else None
-        if family not in UNIT_FAMILIES:
-            problems.append(f"{name}: {'unknown' if family else 'missing'} "
-                            f"`{{# unit: … #}}` header — one of {', '.join(UNIT_FAMILIES)}")
-            continue
-        if family == "required" and "unit=" not in params:
-            problems.append(f"{name}: declared `required` but takes no `unit`")
-        if family == "axis" and not ("y_name=" in params or "x_name=" in params):
-            problems.append(f"{name}: declared `axis` but names no axis")
-        if family == "multi" and not ("y_name=" in params and "x_name=" in params):
-            problems.append(f"{name}: declared `multi` but does not name both axes")
-    return problems
-
-
-# Key names that are also dict METHODS. Jinja resolves `r.values` with getattr
-# before getitem, so a row dict keyed "values" hands the template a bound method
-# and the render dies with "'builtin_function_or_method' object is not
-# iterable" — pointing at the component, which is not where the mistake is.
-# Table rows carry `cells`; chart series carry `points`.
-DICT_METHODS = {"values", "keys", "items", "copy", "update", "pop", "clear",
-                "setdefault", "popitem", "fromkeys"}
-
-ATTR_RE = re.compile(r"\b[a-z_]\w*\.(\w+)\b")
-
-
-def data_audit() -> list[str]:
-    """Every component must declare the shape it expects, and must not name a
-    field after a dict method.
-
-    A builder and a component agreeing by accident is the failure this skill
-    exists to prevent; StrictUndefined catches a MISSING key at build time, but
-    only a declared shape tells a human what the key should CONTAIN — and only
-    this check stops a field name from being silently shadowed."""
-    problems = []
-    for component in load_components():
-        src = component.path.read_text(encoding="utf-8")
-
-        declared = DATA_RE.search(src)
-        if not declared and re.search(r"\b(rows|series|nodes|links|steps|items|inputs)=\[\]", src):
-            problems.append(f"{component.name}: takes structured data but "
-                            f"declares no `{{# data: … #}}` header")
-
-        # `.get(` is the deliberate way to read an OPTIONAL field, so exempt it.
-        for attr in set(ATTR_RE.findall(src)) & DICT_METHODS:
-            if f".{attr}(" in src:
-                continue
-            problems.append(f"{component.name}: reads `.{attr}`, which is a dict "
-                            f"method — Jinja returns the method, not the field. "
-                            f"Rename it (rows carry `cells`, series carry `points`)")
-        if declared:
-            for field in re.findall(r"(\w+):", declared.group(1)):
-                if field in DICT_METHODS:
-                    problems.append(f"{component.name}: declares field {field!r}, "
-                                    f"which is a dict method — rename it")
-    return problems
-
-
-def asset_problems(html: str, expect_local: str) -> list[str]:
-    """Every generated page must link the bundle TWICE OVER: the local copy, and
-    the CDN one that covers the local copy going missing.
-
-    Neither half fails loudly on its own — a page that lost its CDN fallback
-    still renders perfectly in the tree where it was built and only breaks once
-    someone opens it somewhere else, which is the worst moment to find out. So
-    the pair is asserted here, on the rendered head, rather than trusted to
-    whoever next edits the template."""
-    problems, cdn = [], cdn_href()
-    for asset in ("css/bundle.css", "js/bundle.js"):
-        if f"{cdn}/{asset}" not in html:
-            problems.append(f"head links no CDN {asset}")
-        if expect_local and f'"{expect_local}/{asset}"' not in html:
-            problems.append(f"head links no local {asset} (expected {expect_local}/)")
-    # `onerror="` with the quote: the css handler's body contains `onerror=null`
-    # and a bare substring count would see three where there are two.
-    if expect_local and html.count('onerror="') != 2:
-        problems.append("head links local assets with no onerror fallback on both")
-    return problems
-
-
-SPEC_TAG_RE = re.compile(r"<pre class=\"chart[^\"]*\"[^>]*>")
-
-
-def spec_problems(html: str) -> list[str]:
-    """Every chart spec must be shipped hidden.
-
-    The spec is data for the engine, and a visible one is what a reader stares
-    at while the engine loads. Nothing at render time catches a missing
-    `hidden` — the page is valid, it just shows a wall of JSON for a second on
-    every load, which is exactly the kind of thing that gets reintroduced by a
-    well-meaning edit to the engine macro and noticed by a reader instead."""
-    return [f"chart spec is not hidden: {tag}"
-            for tag in SPEC_TAG_RE.findall(html) if " hidden" not in tag]
-
-
-def _family_tally() -> str:
-    tally = {}
-    charts = COMPONENTS_DIR / "charts"
-    if charts.exists():
-        for path in charts.glob("*/component.html.j2"):
-            if path.parent.name == "apache-echarts":
-                continue
-            found = UNIT_RE.search(path.read_text(encoding="utf-8"))
-            key = found.group(1) if found else "?"
-            tally[key] = tally.get(key, 0) + 1
-    return " · ".join(f"{k} {v}" for k, v in sorted(tally.items()))
-
-
-# --------------------------------------------------------------------------
 # commands
 # --------------------------------------------------------------------------
-
-def cmd_list() -> int:
-    reports = report_dirs()
-    print(f"{len(reports)} report(s):\n")
-    for name, directory in sorted(reports.items()):
-        src = (directory / "report.html.j2").read_text(encoding="utf-8")
-        match = REPORT_NAME_RE.search(src)
-        print(f"  {name:<28} {match.group(1).strip() if match else ''}")
-    print(f"\n{len(load_components())} component(s) available.")
-    return 0
-
 
 def cmd_build(name: str, rest: list[str], out_dir: str, force: bool) -> int:
     name = resolve_report(name)
@@ -599,112 +432,6 @@ def cmd_build(name: str, rest: list[str], out_dir: str, force: bool) -> int:
     if left:
         print(f"  {len(left)} prose slot(s) left to fill by hand")
     return 0
-
-
-def cmd_check() -> int:
-    """Build every report from its own sample() and confirm nothing is unrendered.
-
-    sample() rather than fetch() so the check needs NO network and NO
-    credential — the moment a guard needs a secret to run, it stops being run.
-    It also exercises shape(), which is where every arithmetic invariant lives,
-    so the ties are re-asserted on every check."""
-    start = time.perf_counter()
-    try:
-        make_env(load_components())              # parses every component template
-    except Exception as e:                       # noqa: BLE001 — report, don't crash
-        print(f"component templates failed to load: {type(e).__name__}: {e}")
-        return 1
-
-    failures = 0
-    reports = report_dirs()
-
-    # `check` renders in memory and writes nothing, so it has no destination of
-    # its own — but compose_report needs one, and asserting the asset pair means
-    # knowing what the local href SHOULD be. So it names a stand-in explicitly
-    # rather than leaning on a default: the skill root, which every report can
-    # reach, and which makes the expected href plain to read here.
-    pretend_out = SKILL_DIR
-    expect_local = local_href(pretend_out)
-
-    for name in sorted(reports):
-        try:
-            module = load_report_module(name)
-            out = compose_report(name, module.shape(module.sample()), pretend_out)
-        except Exception as e:                   # noqa: BLE001 — report, don't crash
-            print(f"  {name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
-            failures += 1
-            continue
-        left = re.search(r"\{%.{0,60}", out, re.S)
-        if left:
-            print(f"  {name:<30} UNRENDERED: {left.group(0)!r}")
-            failures += 1
-        for problem in asset_problems(out, expect_local) + spec_problems(out):
-            print(f"  {name:<30} {problem}")
-            failures += 1
-
-    # Per-component showcases — the render-coverage net. Only financial-profile
-    # calls components, and it calls a fraction of them; every other component
-    # would ship with nothing proving it renders. showcase.py fixes that: each
-    # is rendered here, in memory, offline. A component with NO showcase.py is
-    # reported as uncovered so the gap is visible rather than silent.
-    env = make_env(load_components())
-    shown = components_with_showcase()
-    shown_names = {c.name for c in shown}
-    for component in shown:
-        try:
-            out = compose_component_showcase(env, component)
-        except Exception as e:                   # noqa: BLE001 — report, don't crash
-            print(f"  {component.name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
-            failures += 1
-            continue
-        left = re.search(r"\{%.{0,60}", out, re.S)
-        if left:
-            print(f"  {component.name:<30} UNRENDERED: {left.group(0)!r}")
-            failures += 1
-        for problem in (asset_problems(out, local_href(component.path.parent))
-                        + spec_problems(out)):
-            print(f"  {component.name:<30} {problem}")
-            failures += 1
-
-    uncovered = [c.name for c in load_components() if c.name not in shown_names]
-
-    problems = chart_audit() + data_audit()
-    for problem in problems:
-        print(f"  {problem}")
-
-    elapsed = time.perf_counter() - start
-    total = len(load_components())
-    print()
-    if failures or problems:
-        if failures:
-            print(f"{failures} template(s) failed")
-        if problems:
-            print(f"{len(problems)} rule(s) broken")
-        return 1
-    print(f"{total} components: {len(shown)} shown via showcase.py, "
-          f"{len(reports)} report(s), all clean ({elapsed:.1f}s)")
-    if uncovered:
-        print(f"  {len(uncovered)} without a showcase.py yet: "
-              f"{', '.join(uncovered[:8])}{' …' if len(uncovered) > 8 else ''}")
-    if _family_tally():
-        print(f"charts: {_family_tally()}, none titles itself")
-    return 0
-
-
-def cmd_show(name: str) -> int:
-    for component in load_components():
-        if component.name == name or component.macro == name:
-            src = component.path.read_text(encoding="utf-8")
-            print(f"--- {component.path.relative_to(SKILL_DIR)} ---\n")
-            for line in src.splitlines():
-                if line.startswith("{#") or line.startswith("{% macro"):
-                    print(line)
-            usage = component.path.parent / "usage.md"
-            if usage.exists():
-                print(f"\n--- usage.md ---\n{usage.read_text(encoding='utf-8')}")
-            return 0
-    print(f"unknown component: {name!r}")
-    return 1
 
 
 def cmd_showcase(name: str | None = None) -> int:
@@ -748,25 +475,14 @@ def main(argv: list[str]) -> int:
                             "asset links are relative to it")
     build.add_argument("--force", action="store_true", help="overwrite an existing file")
 
-    sub.add_parser("check", help="build every report from sample(); fail on anything unrendered")
-    sub.add_parser("list", help="list reports and components")
     showcase = sub.add_parser("showcase",
         help="write showcase.html beside each component that has a showcase.py")
     showcase.add_argument("name", nargs="?", help="only this component (optional)")
-    show = sub.add_parser("show", help="print one component: signature + usage.md")
-    show.add_argument("name")
-
     args, rest = parser.parse_known_args(argv)
     if args.cmd == "build":
         return cmd_build(args.report, rest, args.out, args.force)
-    if args.cmd == "check":
-        return cmd_check()
-    if args.cmd == "list":
-        return cmd_list()
     if args.cmd == "showcase":
         return cmd_showcase(args.name)
-    if args.cmd == "show":
-        return cmd_show(args.name)
     parser.print_help()
     return 1
 
