@@ -1,43 +1,3 @@
-"""components — the showcase engine: discover components, render their pages.
-
-RUNNABLE ON ITS OWN. This directory builds its own showcases with no reference
-to ../builder.py:
-
-    python components/showcase_builder.py          every component that has one
-    python components/showcase_builder.py bar      just this one
-
-THE SHAPE, and it is the report's shape exactly:
-
-    showcase.master.html.j2            the shell        report.master.html.j2
-    <cat>/<n>/showcase_controller.py   context() -> d   report_controller.py
-    <cat>/<n>/showcase.html.j2         the view         report.html.j2
-
-A CONTROLLER BUILDS DATA. A VIEW EMITS MARKUP. The controller returns a plain
-dict, handed to the view as `d` — and the view is the only thing that calls a
-macro. That is not decoration: this skill's whole claim is "the builder never
-emits markup; the template never fetches", and the previous design broke it by
-calling macros from Python and passing rendered HTML into the shell. A showcase
-now exercises the same path a report does, through the same env, so a macro
-that draws here draws there.
-
-WHY THE VIEW IS REQUIRED, not optional. Once macro calls live in templates,
-there is nothing generic left to fall back to — a shared loop would have to
-call the macro itself, which is the thing being removed. Each component writes
-its own view, exactly as each report does, and gets to lay its cases out.
-
-WHY THE ENV IS ROOTED HERE. The loader's FIRST root is components/, so no
-template under this directory ever names its own parent — `charts/_render…`,
-not `components/charts/_render…`. That is what makes the directory movable.
-SKILL_DIR follows as a SECOND root purely so ../builder.py can share this env
-to render reports, whose templates live outside here.
-
-WHAT THIS DIRECTORY CANNOT OWN. A page has to link css/bundle.css and
-js/bundle.js at the skill root, and the CDN fallback is pinned from
-version.json at the repo root. Neither is a component. So compose() TAKES both
-hrefs as arguments and only computes them as a default — the package renders
-what it is given, and the caller may say otherwise.
-"""
-
 import argparse
 import importlib.util
 import json
@@ -61,7 +21,7 @@ VIEW = "showcase.html.j2"
 # formatting — the one place a number becomes a string
 # --------------------------------------------------------------------------
 #
-# These live in components/ because only components use them: 21 call sites
+# These live in components/ because only components use them: 20 call sites
 # across components/*.j2 and none in reports/*.j2. A report's builder does
 # arithmetic and hands over NUMBERS; the macro it calls turns them into
 # strings. That is why this directory does not reach outside itself.
@@ -123,43 +83,8 @@ def f_fmt(value, spec="num", *a, **kw):
     return FORMATS[spec](value, *a, **kw)
 
 
-def boxstats(values: list) -> dict:
-    """Five-number summary + Tukey outliers, for the box-plot preset.
-
-    A Jinja filter rather than template arithmetic: quartiles need sorting and
-    interpolation, which Jinja can express only badly. It still runs at build
-    time, so the rendered spec carries the derived numbers and a reader can
-    check them.
-
-    Quartiles use linear interpolation between order statistics (R's type 7 /
-    numpy's `percentile` default). Whiskers are Tukey's: the furthest point
-    within 1.5 x IQR of the box, NOT the extremes — points beyond come back
-    separately so they draw as outliers rather than silently stretching the
-    whisker, which is how a fat tail disappears."""
-    data = sorted(float(v) for v in values)
-    if not data:
-        return {"box": [0, 0, 0, 0, 0], "outliers": []}
-
-    def q(p: float) -> float:
-        if len(data) == 1:
-            return data[0]
-        pos = p * (len(data) - 1)
-        lo = int(pos)
-        hi = min(lo + 1, len(data) - 1)
-        return data[lo] + (pos - lo) * (data[hi] - data[lo])
-
-    q1, med, q3 = q(.25), q(.5), q(.75)
-    iqr = q3 - q1
-    lo_fence, hi_fence = q1 - 1.5 * iqr, q3 + 1.5 * iqr
-    inside = [v for v in data if lo_fence <= v <= hi_fence] or data
-    return {
-        "box": [round(v, 4) for v in (inside[0], q1, med, q3, inside[-1])],
-        "outliers": [round(v, 4) for v in data if v < lo_fence or v > hi_fence],
-    }
-
-
 FILTERS = {"money": f_money, "pct": f_pct, "signed": f_signed, "bps": f_bps,
-           "num": f_num, "fmt": f_fmt, "boxstats": boxstats}
+           "num": f_num, "fmt": f_fmt}
 
 
 # --------------------------------------------------------------------------
