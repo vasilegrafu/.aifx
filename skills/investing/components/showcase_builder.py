@@ -5,13 +5,13 @@ import os
 import sys
 from pathlib import Path
 from types import SimpleNamespace
-from typing import NamedTuple
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 COMPONENTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = COMPONENTS_DIR.parent
 
+MARKUP = "component.html.j2"        # what makes a directory a component
 CONTROLLER = "showcase_controller.py"
 VIEW = "showcase.html.j2"
 
@@ -92,13 +92,6 @@ FILTERS = {**FORMATS, "fmt": f_fmt}
 # the component library
 # --------------------------------------------------------------------------
 
-class Component(NamedTuple):
-    """One entry of components/<cat>/<name>/component.html.j2."""
-    name: str        # directory name, e.g. "metric-trend"
-    macro: str       # macro/callable name, e.g. "metric_trend"
-    path: Path       # the component.html.j2 file
-
-
 def _blame(exc: BaseException) -> str:
     """Which TEMPLATE actually raised — the part of a Jinja traceback worth
     printing. Jinja rewrites tracebacks so template frames appear as real
@@ -141,6 +134,56 @@ def local_href(out_dir: Path) -> str:
         return ""
 
 
+# --------------------------------------------------------------------------
+# what both engines do identically
+# --------------------------------------------------------------------------
+#
+# reports/report_builder.py imports these. They are plain functions rather than
+# a base class on purpose: a base would have to live somewhere, and either
+# components/ imports from outside itself — losing the self-containment that is
+# the point of this directory — or it owns a generic "engine" concept that has
+# nothing to do with components. Two functions cost neither, and each engine
+# still reads on its own.
+
+def resolve_name(name: str, names, kind: str, alias=None) -> str:
+    """A name, an alias of one, or the single name it is a prefix of.
+
+    So `build financial` reaches financial-profile and `showcase bar_negative`
+    reaches bar-negative. An ambiguous prefix says which ones it matched rather
+    than picking the first."""
+    names = list(names)
+    if name in names:
+        return name
+    if alias:
+        for known in names:
+            if alias(known) == name:
+                return known
+    matches = [n for n in names if n.startswith(name)]
+    if len(matches) == 1:
+        return matches[0]
+    if not matches:
+        raise SystemExit(f"unknown {kind}: {name!r}\n"
+                         f"known: {', '.join(sorted(names))}")
+    raise SystemExit(f"ambiguous {kind} {name!r}: {', '.join(sorted(matches))}")
+
+
+def load_controller(path: Path, alias: str, requires: str):
+    """Path-load one controller and check it honours its contract.
+
+    By path rather than by package, so an item folder needs no __init__.py and
+    the discovery rule stays 'a directory containing the markup'. Both sides
+    load the same way; only the function they require differs — shape() for a
+    report, context() for a showcase."""
+    if not path.exists():
+        raise SystemExit(f"{path.parent.name}: no {path.name}")
+    spec = importlib.util.spec_from_file_location(alias, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if not hasattr(module, requires):
+        raise SystemExit(f"{path.parent.name}: {path.name} defines no {requires}()")
+    return module
+
+
 class Showcases:
     """The component library, and everything needed to show it.
 
@@ -151,15 +194,19 @@ class Showcases:
     def __init__(self, root: Path = COMPONENTS_DIR):
         self.root = Path(root).resolve()
         self._env: Environment | None = None
-        self._all: list[Component] | None = None
+        self._all: dict[str, Path] | None = None
 
     # ---------------------------------------------------------------- find
-    def all(self) -> list[Component]:
-        """Scan components/ once, recursively — then remember it.
+    def all(self) -> dict[str, Path]:
+        """Every component, discovered recursively: name -> directory.
+
+        Same shape reports/report_builder.py returns, so resolve() is the same
+        function on both sides rather than a similar one.
 
         Cached for the same reason the env is: a scan walks the whole tree, and
-        env(), showable() and write() each want the list. A process that added a
-        component to disk mid-run would not see it, which no CLI invocation does.
+        env(), showable() and write() each want it. A process that added a
+        component to disk mid-run would not see it, which no CLI invocation
+        does.
 
         components/ is organized in CATEGORY folders that exist purely for
         humans — a component's identity stays its own folder name (macro = name
@@ -167,35 +214,41 @@ class Showcases:
         unique across categories."""
         if self._all is not None:
             return self._all
-        components, seen = [], {}
-        for markup in sorted(self.root.rglob("component.html.j2")):
+        dirs: dict[str, Path] = {}
+        for markup in sorted(self.root.rglob(MARKUP)):
             name = markup.parent.name
-            if name in seen:
+            if name in dirs:
                 raise SystemExit(f"duplicate component name: {name!r} "
-                                 f"({seen[name]} and {markup.parent})")
-            seen[name] = markup.parent
-            components.append(Component(name=name,
-                                        macro=name.replace("-", "_"),
-                                        path=markup))
-        self._all = components
-        return components
+                                 f"({dirs[name]} and {markup.parent})")
+            dirs[name] = markup.parent
+        self._all = dirs
+        return dirs
 
-    def showable(self) -> tuple[list[Component], list[str]]:
+    @staticmethod
+    def macro(name: str) -> str:
+        """`metric-trend` is the folder; `metric_trend` is what a view calls."""
+        return name.replace("-", "_")
+
+    def resolve(self, name: str) -> str:
+        """Folder name, macro name, or a unique prefix of either."""
+        return resolve_name(name, self.all(), "component", alias=self.macro)
+
+    def showable(self) -> tuple[list[str], list[str]]:
         """Components that ship BOTH halves, and complaints about the rest.
 
         A component with a controller and no view (or the reverse) is half
         written. Skipping it silently is how it stays half written, so it comes
         back as a complaint the caller prints."""
         ready, half = [], []
-        for c in self.all():
-            has_controller = (c.path.parent / CONTROLLER).exists()
-            has_view = (c.path.parent / VIEW).exists()
+        for name, directory in self.all().items():
+            has_controller = (directory / CONTROLLER).exists()
+            has_view = (directory / VIEW).exists()
             if has_controller and has_view:
-                ready.append(c)
+                ready.append(name)
             elif has_controller:
-                half.append(f"{c.name}: has {CONTROLLER} but no {VIEW}")
+                half.append(f"{name}: has {CONTROLLER} but no {VIEW}")
             elif has_view:
-                half.append(f"{c.name}: has {VIEW} but no {CONTROLLER}")
+                half.append(f"{name}: has {VIEW} but no {CONTROLLER}")
         return ready, half
 
     # ----------------------------------------------------------------- env
@@ -221,81 +274,71 @@ class Showcases:
         env.filters.update(FILTERS)
 
         c = SimpleNamespace()
-        for component in self.all():
+        for name, directory in self.all().items():
+            macro = self.macro(name)
             module = env.get_template(
-                component.path.relative_to(self.root).as_posix()).module
-            if hasattr(module, component.macro):
-                setattr(c, component.macro, getattr(module, component.macro))
+                (directory / MARKUP).relative_to(self.root).as_posix()).module
+            if hasattr(module, macro):
+                setattr(c, macro, getattr(module, macro))
         env.globals["c"] = c    # templates call {{ c.<macro>(…) }} — no imports
         self._env = env
         return env
 
     # -------------------------------------------------------------- render
-    def context(self, component: Component) -> dict:
-        """Import <name>/showcase_controller.py and return its context().
+    def controller(self, name: str):
+        """<name>/showcase_controller.py, path-loaded, honouring context()."""
+        return load_controller(self.all()[name] / CONTROLLER,
+                               f"showcase_{self.macro(name)}", "context")
 
-        By path, so a component folder needs no __init__.py and the discovery
-        rule stays 'a directory containing component.html.j2'. The contract is
-        one function, context() -> dict; the dict reaches the view as `d`."""
-        path = component.path.parent / CONTROLLER
-        spec = importlib.util.spec_from_file_location(
-            f"showcase_{component.macro}", path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        if not hasattr(module, "context"):
-            raise SystemExit(f"{component.name}: {CONTROLLER} defines no context()")
-        d = module.context()
-        if not isinstance(d, dict):
-            raise SystemExit(f"{component.name}: context() returned "
-                             f"{type(d).__name__}, expected dict")
-        return d
-
-    def compose(self, component: Component,
+    def compose(self, name: str,
                 local: str | None = None, cdn: str | None = None) -> str:
         """Render one component's view with the data its controller produced.
 
         Nothing here calls a macro. The view does, through the same `c`
         namespace and the same env a report uses."""
-        env = self.env()
-        d = self.context(component)
-        view = (component.path.parent / VIEW).relative_to(self.root).as_posix()
+        directory = self.all()[name]
+        d = self.controller(name).context()
+        if not isinstance(d, dict):
+            raise SystemExit(f"{name}: context() returned "
+                             f"{type(d).__name__}, expected dict")
+        view = (directory / VIEW).relative_to(self.root).as_posix()
 
-        return env.get_template(view).render(
+        return self.env().get_template(view).render(
             d=SimpleNamespace(**d),
-            title=f"{component.name} — showcase",
-            component_name=component.name,
-            local_href=local if local is not None
-            else local_href(component.path.parent),
+            title=f"{name} — showcase",
+            component_name=name,
+            local_href=local if local is not None else local_href(directory),
             cdn_href=cdn if cdn is not None else cdn_href())
 
     def write(self, name: str | None = None) -> int:
         """Write showcase.html beside every component that ships both halves.
 
-        The output is a build artifact: this is a PUBLIC repo and 110 generated
+        The output is a build artifact: this is a PUBLIC repo and 109 generated
         pages have no business being served by the CDN. Regenerate them locally
         to browse; the controller and the view are the source."""
-        components, half = self.showable()
+        ready, half = self.showable()
         if name:
-            components = [c for c in components if name in (c.name, c.macro)]
-            if not components:
-                print(f"no component with a {CONTROLLER} + {VIEW} named {name!r}")
+            wanted = self.resolve(name)
+            if wanted not in ready:
+                print(f"{wanted}: no {CONTROLLER} + {VIEW} to show")
                 for complaint in half:
                     print(f"  {complaint}")
                 return 1
+            ready = [wanted]
 
-        for component in components:
-            out = component.path.parent / "showcase.html"
+        for item in ready:
+            out = self.all()[item] / "showcase.html"
             try:
-                out.write_text(self.compose(component), encoding="utf-8")
+                out.write_text(self.compose(item), encoding="utf-8")
             except Exception as e:          # noqa: BLE001 — report, don't crash
-                print(f"  {component.name:<30} FAILED{_blame(e)}: "
+                print(f"  {item:<30} FAILED{_blame(e)}: "
                       f"{type(e).__name__}: {e}")
                 return 1
             print(f"composed: {out.relative_to(SKILL_DIR)}")
 
-        if not components and not name:
+        if not ready and not name:
             print(f"no showcases yet — add {CONTROLLER} + {VIEW} "
-                  f"beside a component.html.j2")
+                  f"beside a {MARKUP}")
         for complaint in half:
             print(f"  half-written — {complaint}")
         return 0

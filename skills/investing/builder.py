@@ -80,7 +80,7 @@ def main(argv: list[str]) -> int:
 
     args, rest = parser.parse_known_args(argv)
     if args.cmd == "build":
-        return Reports().build(args.report, rest, args.out, args.force)
+        return Reports().write(args.report, rest, args.out, args.force)
     if args.cmd == "showcase":
         return Showcases().write(args.name)
     parser.print_help()
