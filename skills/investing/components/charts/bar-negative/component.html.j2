@@ -1,5 +1,5 @@
 {# purpose: a measure that crosses zero — variance, surprise, contribution #}
-{# unit: axis — one measured axis; s.name it with y_name #}
+{# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
 {% import "charts/_render.html.j2" as r %}
 
@@ -17,11 +17,11 @@
                              "itemStyle": {"color": "token:positive" if value >= 0
                                                     else "token:negative"}}) %}
 {%   endfor %}
-{%   set _ = built.append({"type": "bar", "s.name": s.name, "data": marks}) %}
+{%   set _ = built.append({"type": "bar", "name": s.name, "data": marks}) %}
 {% endfor %}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
-{%   set _ = y_axis.update({"s.name": y_name, "nameLocation": "middle",
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
                             "nameGap": 46, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {

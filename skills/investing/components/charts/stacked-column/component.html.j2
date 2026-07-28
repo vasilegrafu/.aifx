@@ -1,5 +1,5 @@
 {# purpose: parts summing to a whole across categories — vertical stacked bars #}
-{# unit: axis — one measured axis; s.name it with y_name #}
+{# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
 {% import "charts/_render.html.j2" as r %}
 
@@ -10,12 +10,12 @@
 {# One shared stack, so each column's height is the category total and each
    segment is a part. Only the bottom segment sits on the axis; the others are
    compared as lengths, so put the series that matters most at the bottom. #}
-{%   set _ = built.append({"type": "bar", "s.name": s.name, "stack": "total",
+{%   set _ = built.append({"type": "bar", "name": s.name, "stack": "total",
                            "data": s.points}) %}
 {% endfor %}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
-{%   set _ = y_axis.update({"s.name": y_name, "nameLocation": "middle",
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
                             "nameGap": 46, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {

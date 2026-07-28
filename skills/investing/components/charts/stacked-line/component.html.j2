@@ -1,5 +1,5 @@
 {# purpose: several series summed at each point, drawn as lines — the total and its parts #}
-{# unit: axis — one measured axis; s.name it with y_name #}
+{# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
 {% import "charts/_render.html.j2" as r %}
 
@@ -10,13 +10,13 @@
 {# Every series shares one stack, so the TOP line is the total and each band is
    a part. Only the bottom series is read against the axis; the rest are read
    as thicknesses, which is the trade this kind makes. #}
-{%   set _ = built.append({"type": "line", "s.name": s.name, "stack": "total",
+{%   set _ = built.append({"type": "line", "name": s.name, "stack": "total",
                            "showSymbol": categories | length <= 24,
                            "data": s.points}) %}
 {% endfor %}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
-{%   set _ = y_axis.update({"s.name": y_name, "nameLocation": "middle",
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
                             "nameGap": 46, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {

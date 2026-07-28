@@ -7,15 +7,15 @@
 {# Built as data and serialised once — see the note in line/component.html.j2. #}
 {% set built = [] %}
 {% for s in series %}
-{%   set _ = built.append({"type": "bar", "s.name": s.name, "stack": "total",
+{%   set _ = built.append({"type": "bar", "name": s.name, "stack": "total",
                            "data": s.points}) %}
 {% endfor %}
 {# The axes are swapped, so `y_name` names the HORIZONTAL value axis. It must
-   not be rotated — a rotated s.name on a horizontal axis reads sideways — and
+   not be rotated — a rotated name on a horizontal axis reads sideways — and
    the bottom margin widens instead of the left. #}
 {% set value_axis = {"type": "value"} %}
 {% if y_name %}
-{%   set _ = value_axis.update({"s.name": y_name, "nameLocation": "middle",
+{%   set _ = value_axis.update({"name": y_name, "nameLocation": "middle",
                                 "nameGap": 28}) %}
 {% endif %}
 {# Without `inverse` the FIRST category lands at the bottom and the whole

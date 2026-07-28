@@ -1,5 +1,5 @@
 {# purpose: a measure over time drawn as a smooth curve — trend over tick-by-tick detail #}
-{# unit: axis — one measured axis; s.name it with y_name #}
+{# unit: axis — one measured axis; name it with y_name #}
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
 {% import "charts/_render.html.j2" as r %}
 
@@ -10,13 +10,13 @@
 {# `smooth` invents the path BETWEEN observations: the curve still passes
    through every point, but what happens between them is drawn, not measured.
    Only reach for this kind where the tick-by-tick detail is noise. #}
-{%   set _ = built.append({"type": "line", "s.name": s.name, "smooth": true,
+{%   set _ = built.append({"type": "line", "name": s.name, "smooth": true,
                            "showSymbol": categories | length <= 24,
                            "data": s.points}) %}
 {% endfor %}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
-{%   set _ = y_axis.update({"s.name": y_name, "nameLocation": "middle",
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
                             "nameGap": 46, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {
