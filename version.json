@@ -1,5 +1,5 @@
 {
   "version": "4.4.2",
   "date": "2026-07-28",
-  "cdn": "https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@{version}/skills/{skill}"
+  "cdn": "https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@{version}"
 }

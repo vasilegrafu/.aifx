@@ -18,6 +18,52 @@ Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
 
 ---
 
+## 4.4.2 — 2026-07-28
+
+**Patch.** Six axis charts in `investing` name their series again.
+
+A rename had written the ECharts key as `"s.name"` where `"name"` was meant,
+in `line`, `smoothed-line`, `stacked-line`, `stacked-column`,
+`stacked-horizontal-bar` and `bar-negative`. 4.4.1 fixed `area`; this finishes
+the family.
+
+The engine received an unknown key and no name at all, which fails twice and
+silently. The legend is keyed by name, so past one series it drew blank
+swatches; and the axis label never rendered while the grid still widened its
+margin to 46px to make room for it, leaving a reserved gutter with nothing in
+it. The chart still drew, and drew almost right, which is how it survived a
+rename and a release.
+
+Documents built on 4.4.0 or earlier are unaffected — a chart's option is baked
+into the page at build time, so an existing document already carries whatever
+its series were named when it was composed.
+
+---
+
+## 4.4.1 — 2026-07-28
+
+**Patch.** A divider no longer double-spaces the heading beneath it.
+
+A heading straight after an `<hr>` — or after `.doc-meta`'s bottom border —
+stacked its own prose lead-in on top of the divider's `--block-gap`. Adjacent
+margins collapse to the LARGER of the two, so the 1.6rem `h3` lead-in won:
+every rule sat 16px below the block above it and 26px above the heading below,
+off-centre in a gap half again bigger than the page's rhythm. Both are now 16px.
+
+The rule needs two arms, because a bare `<section>` has no padding or border
+and its first heading's margin collapses THROUGH it: the adjacency is
+`hr + section`, and `hr + h3` never matches. That is the shape every component
+showcase has.
+
+Reports are untouched — they carry no `<hr>`, and a `<nav class="toc">` sits
+between the header and the first section, so neither arm matches.
+
+Also in `investing`: showcases for the `area` and `apache-echarts` components,
+and `area/component.html.j2` picked up the `"s.name"` fix that 4.4.2 extends to
+the rest.
+
+---
+
 ## 4.4.0 — 2026-07-28
 
 **Minor.** Two shipped changes in the `investing` bundle, plus a build-side

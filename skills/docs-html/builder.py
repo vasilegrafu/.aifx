@@ -44,6 +44,7 @@ from jinja2 import Environment, FileSystemLoader
 # --------------------------------------------------------------------------
 
 SKILL_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SKILL_DIR.parent.parent    # skills/<name>/ -> the repo
 COMPONENTS_DIR = SKILL_DIR / "components"
 DOCTYPES_DIR = SKILL_DIR / "doc-types"
 
@@ -227,16 +228,29 @@ def cdn_href() -> str:
 
     Read from version.json (the single source of truth) at compose time, so
     every generated file is pinned to the design-system version it was authored
-    against. The cdn field is a template containing "{version}" (the version
-    sits mid-URL when the assets live in a repo subfolder, e.g.
-    …/gh/<user>/<repo>@{version}/skills/docs-html); a plain base URL gets
-    "@version" appended. It is the only asset path the builder emits, so a
-    missing cdn is a hard error rather than a silent broken link."""
-    info = json.loads((SKILL_DIR.parent.parent / "version.json").read_text(encoding="utf-8"))
+    against. The cdn field is the REPO pin and nothing more: a base URL with
+    "{version}" in it, e.g. …/gh/<user>/<repo>@{version}.
+
+    Where inside that repo THIS skill sits is not something one shared file can
+    speak for — version.json serves every skill — so it is derived here from
+    the same REPO_ROOT used to find version.json in the first place. The two
+    therefore cannot disagree, which is the point: a hardcoded "skills/<name>"
+    in the config was a second, silent claim about the layout.
+
+    It is the only asset path the builder emits, so a missing cdn is a hard
+    error rather than a silent broken link."""
+    info = json.loads((REPO_ROOT / "version.json").read_text(encoding="utf-8"))
     cdn, version = info.get("cdn"), info["version"]
     if not cdn:
         sys.exit("version.json has no \"cdn\" — every document links the CDN; set it first.")
-    return cdn.replace("{version}", version).replace("{skill}", SKILL_DIR.name)
+    # A config left half-migrated would otherwise put a literal "{skill}" in
+    # every URL in the head — and a document is CDN-only, so it would render
+    # unstyled everywhere rather than degrading somewhere visible.
+    if "{skill}" in cdn:
+        sys.exit("version.json still carries \"{skill}\": the skill path is "
+                 "derived from the tree now; drop it from the template.")
+    return (cdn.replace("{version}", version).rstrip("/")
+            + "/" + SKILL_DIR.relative_to(REPO_ROOT).as_posix())
 
 
 # --------------------------------------------------------------------------

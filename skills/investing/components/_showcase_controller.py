@@ -37,6 +37,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 COMPONENTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = COMPONENTS_DIR.parent
+REPO_ROOT = SKILL_DIR.parent.parent    # skills/<name>/ -> the repo
 
 MARKUP = "component.html.j2"        # what makes a directory a component
 VIEW = "showcase.html.j2"
@@ -61,15 +62,28 @@ def cdn_href() -> str:
     the design-system version it was built against. Published tags are
     immutable, so a page that has left the tree keeps rendering as it did.
 
+    TWO HALVES, AND EACH IS OWNED WHERE IT IS KNOWN. version.json names the
+    repo and the version — the things one shared file can speak for. Where
+    inside that repo THIS skill sits is not one of them, so it is derived here
+    from the same REPO_ROOT used to find version.json in the first place. The
+    two therefore cannot disagree, which is the whole point: a hardcoded
+    "skills/<name>" in the config was a second, silent claim about the layout.
+
     THE OBLIGATION THIS CREATES: change anything under css/ or js/ and the
     version has to be bumped and tagged, or pages falling back to the CDN keep
     getting the previous behaviour while local ones move on."""
-    info = json.loads((SKILL_DIR.parent.parent / "version.json")
-                      .read_text(encoding="utf-8"))
+    info = json.loads((REPO_ROOT / "version.json").read_text(encoding="utf-8"))
     cdn, version = info.get("cdn"), info["version"]
     if not cdn:
         sys.exit('version.json has no "cdn" — every page links it; set it first.')
-    return cdn.replace("{version}", version).replace("{skill}", SKILL_DIR.name)
+    # A config left half-migrated would otherwise put a literal "{skill}" in
+    # every URL on the page — a 404 that only shows up once a file has left
+    # the tree, which is the one place nobody is looking.
+    if "{skill}" in cdn:
+        sys.exit('version.json still carries "{skill}"; the skill path is '
+                 'derived from the tree now, so drop it from the template.')
+    return (cdn.replace("{version}", version).rstrip("/")
+            + "/" + SKILL_DIR.relative_to(REPO_ROOT).as_posix())
 
 
 def local_href(out_dir: Path) -> str:

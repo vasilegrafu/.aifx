@@ -122,8 +122,8 @@ never fall back — a missing `cdn` in `version.json` is a hard error.
 **Versioning.** One version governs the whole `.aifx` repo and every skill
 under it; it lives in exactly two files at the **repo root** and NOWHERE else
 (not per skill, not in the CSS, not in the JS): `version.json` (machine-readable
-source of truth: `version`, `date`, `cdn` template with `{version}` and
-`{skill}`) and `version.md` (the human changelog, one entry per release, semver
+source of truth: `version`, `date`, and `cdn` — the repo pin, a base URL
+templated on `{version}` alone) and `version.md` (the human changelog, one entry per release, semver
 contract documented at its top). On a CDN the version is carried by the URL path
 (`…/.aifx@X.Y.Z/skills/docs-html/css/docs-html.css`) — relative `@import`s and the
 JS loader's self-resolved base pin the whole asset tree to one version
@@ -133,8 +133,12 @@ automatically. See the `release` command below.
 links the local tree, so it reflects your working-tree edits immediately, no
 release needed. Documents, by contrast, pin the CDN version from `version.json`
 and pick up improvements only by a deliberate head edit to a newer `@X.Y.Z` —
-never silently. The `cdn` field in the root `version.json` is the URL template
-with `{version}` and `{skill}`.
+never silently. The `cdn` field in the root `version.json` is the repo pin and
+nothing more — `https://cdn.jsdelivr.net/gh/vasilegrafu/.aifx@{version}`. The
+`skills/<name>` segment is NOT in it: `version.json` serves every skill, so it
+cannot speak for where any one of them sits. Each skill's `cdn_href()` derives
+that from its own position in the tree, using the same repo root it read
+`version.json` from, so the two cannot disagree.
 
 ## How documents are composed
 
