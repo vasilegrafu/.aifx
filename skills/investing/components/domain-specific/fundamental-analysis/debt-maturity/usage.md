@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `debt-maturity` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The maturity wall: how much debt comes due in each year, at what coupon, in
 what instrument. Solvency is a timing question before it is a leverage

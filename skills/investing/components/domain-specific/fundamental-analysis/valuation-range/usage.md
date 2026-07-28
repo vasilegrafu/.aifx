@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `valuation-range` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The football field: one horizontal bar per valuation method, all on a shared
 price axis, with today's price marked straight through them. It answers the

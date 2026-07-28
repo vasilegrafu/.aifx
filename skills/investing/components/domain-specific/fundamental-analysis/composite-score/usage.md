@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `composite-score` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 A published composite — Altman Z, Piotroski F, Beneish M, Ohlson O — shown with
 its formula, every input, each input's contribution, and the band the result

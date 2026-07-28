@@ -15,4 +15,4 @@ A, B, C… — never wrap each appendix separately.
 {% endcall %}
 ```
 
-Styled by: `css/blocks.css` (`.appendices > section.appendix`).
+Styled by: `css/foundational/blocks.css` (`.appendices > section.appendix`).

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `unit-economics` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 What one customer costs to acquire, what one customer is worth, and how long
 the money is out. For any subscription, marketplace or lending business this

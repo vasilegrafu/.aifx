@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `variance-analysis` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Budget against actual, with the variance and an explicit favourable or adverse
 verdict. The verdict column exists because the sign of a variance does not tell

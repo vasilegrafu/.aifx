@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `trade-log` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Executed trades with the reasoning attached to each one, written at the time
 of the trade. The rationale row is the component's reason to exist: a log of

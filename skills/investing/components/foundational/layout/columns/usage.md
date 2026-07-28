@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `columns` component — when to use it, how, and the rules._
 
-Styled by: `css/layout.css`
+Styled by: `css/foundational/layout.css`
 
 A responsive row that places its child [[column]] cells side by side. Cells are
 equal width by default; they **wrap and stack** when the row gets narrow, and

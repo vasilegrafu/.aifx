@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `grid` component — when to use it, how, and the rules._
 
-Styled by: `css/layout.css`
+Styled by: `css/foundational/layout.css`
 
 An auto-fit grid of **equal** tiles: it fits as many columns as the width allows,
 then wraps — no column count to declare. Ideal for a row of [[card]]s, small

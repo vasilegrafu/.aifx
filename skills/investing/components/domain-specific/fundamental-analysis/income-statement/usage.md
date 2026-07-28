@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `income-statement` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The income statement as an investor reads it: several periods side by side, the
 mandatory subtotal ladder intact, and common-size margin lines under the

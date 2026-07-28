@@ -113,6 +113,21 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 strong { font-weight: 650; }
 hr { border: none; border-top: 1px solid var(--border); margin: var(--block-gap) 0; }
+/* A heading straight after a divider must not add its own lead-in on top of
+   it. That top margin (1.6rem on h3, 2.2rem on h2) exists to open space after
+   a PARAGRAPH, where nothing else marks the break; stacked on a rule it is
+   redundant, and because adjacent margins collapse to the LARGER of the two it
+   silently wins against the divider's own `--block-gap` — leaving the rule
+   sitting 16px below the block above it and 26px above the heading below,
+   off-centre in a gap half again bigger than the page's rhythm.
+   Both dividers count: <hr>, and .doc-meta's bottom border, which is the same
+   1px line doing the same job under the cover block.
+   The :first-child arm is the collapse case. A bare <section> has no padding
+   or border, so its first heading's margin collapses THROUGH it and becomes
+   the section's own — the adjacency is hr + section, and `hr + h3` never
+   matches. That is the shape every component showcase has. */
+:is(hr, .doc-meta) + :is(h2, h3, h4),
+:is(hr, .doc-meta) + section > :is(h2, h3, h4):first-child { margin-top: 0; }
 img { max-width: 100%; }
 code, pre, kbd, samp { font-family: var(--font-mono); }
 

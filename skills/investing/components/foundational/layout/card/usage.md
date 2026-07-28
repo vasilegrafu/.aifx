@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `card` component — when to use it, how, and the rules._
 
-Styled by: `css/layout.css`
+Styled by: `css/foundational/layout.css`
 
 A titled, bordered surface that groups a few components into one visual unit. Use
 it standalone to box a related cluster, or as the cell inside a [[grid]] / [[columns]].

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `thesis-pillars` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The three to five arguments the position actually rests on. Each pillar states
 a claim, the evidence behind it, and the observation that would prove it wrong.

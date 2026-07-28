@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `stress-test` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Named stresses, what triggers each one, what it does to the portfolio, and what
 you would actually do about it. The response column is what separates a stress

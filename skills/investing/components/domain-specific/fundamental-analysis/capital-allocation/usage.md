@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `capital-allocation` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Where the cash went, over several years, as a share of the cash that came in.
 No filing presents this table — you build it — and it is the single most direct

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `catalyst-timeline` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The dated events that can re-rate the position, each with the direction you
 expect and how likely it is. This is the monitoring list a thesis is checked

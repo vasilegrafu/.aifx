@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `risk-metrics` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The risk and risk-adjusted-return statistics of a strategy or portfolio, each
 against the same statistic for the benchmark, with a one-line reading. The

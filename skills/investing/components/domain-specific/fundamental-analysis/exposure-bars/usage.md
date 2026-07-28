@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `exposure-bars` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 One breakdown of the portfolio as labelled bars — by sector, geography, asset
 class, currency, factor, or liquidity. Use it wherever the question is "how

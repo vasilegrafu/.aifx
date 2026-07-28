@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `peer-comparison` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The subject company set against its named comparables on whatever metrics
 decide the argument — growth, margin, returns, leverage, multiple. The subject

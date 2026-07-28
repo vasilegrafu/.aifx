@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `scorecard` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Scores a candidate against weighted criteria and shows the weighted total —
 the component for any judgement that has to be repeatable across names:

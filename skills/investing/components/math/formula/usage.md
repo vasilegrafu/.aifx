@@ -5,7 +5,7 @@ _Authoring guidance for the `formula` component — when to use it, how, and the
 Styled by: `css/math/math.css` (+ KaTeX's own stylesheet at view time)
 
 A display formula: LaTeX source as plain text, rendered in the browser by
-KaTeX (loaded lazily from CDN by `docs-html.js`). Inline math inside prose is
+KaTeX (loaded lazily from CDN by `bundle.js`). Inline math inside prose is
 hand-written: `<span class="math">E = mc^2</span>`.
 
 ```jinja

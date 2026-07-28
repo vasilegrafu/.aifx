@@ -21,5 +21,5 @@ user story, use case, or test case. Leaf macro:
     then=["the login is refused", "the failed-attempt counter increments"]) }}
 ```
 
-Styled by: `css/blocks.css` (`.acceptance`, `.gwt`). Pairs with
+Styled by: `css/foundational/blocks.css` (`.acceptance`, `.gwt`). Pairs with
 [[requirement]] cards and the [[steps]] main-flow list.

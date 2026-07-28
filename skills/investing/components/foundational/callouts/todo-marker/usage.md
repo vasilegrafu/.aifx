@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `todo-marker` component — when to use it, how, and the rules._
 
-Styled by: `css/callouts.css`
+Styled by: `css/foundational/callouts.css`
 
 Markup skeleton: `component.html.j2` in this folder — the canonical source the builder composes (parameters, if any, declared at its top). The example(s) below are filled illustrations.
 

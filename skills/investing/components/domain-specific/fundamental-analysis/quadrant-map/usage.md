@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `quadrant-map` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 A 2×2 with items placed by two scores: growth against profitability, quality
 against valuation, share against growth. The oldest strategy graphic there is,

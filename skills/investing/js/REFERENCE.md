@@ -1,16 +1,16 @@
 # js/ — internals reference
 
-Deep reference for the docs-html script: the module tree, module roles, how to
+Deep reference for the bundled script: the module tree, module roles, how to
 add a feature, and the diagrams engine/editor internals. The authoring contract
 and the "what to do" live in `../SKILL.md`; this file is the on-demand detail.
 
-Every document links exactly one script, `docs-html.js`. Like the CSS entry, it
+Every document links exactly one script, `bundle.js`. Like the CSS entry, it
 holds no logic — it loads `modules/` in list order (classic `<script>`
 injection; ES modules are blocked on `file://`, where documents open). The
 modules form a tree on the one `docsHtml` namespace.
 
 ```
-docs-html.js          entry/loader: the MODULES list + injector — order IS dependency order
+bundle.js          entry/loader: the MODULES list + injector — order IS dependency order
 └── modules/
     ├── core.js       the trunk: docsHtml namespace — register(), init(), data()
     ├── util.js       leaf helpers: loadScript (deduped), copyText, downloadBlob
@@ -57,9 +57,9 @@ exists:
    `docsHtml.util.loadScript(<pinned CDN url>)`, inside `init`.
 2. `css/diagrams/diagram-<name>.css` — style `pre.<name>` as a readable code box
    (the CDN-down fallback) and `pre.<name>[hidden] { display: none }`.
-3. Add `"diagram-<name>"` to `MODULES` in `js/docs-html.js`, after `"diagrams"`.
+3. Add `"diagram-<name>"` to `MODULES` in `js/bundle.js`, after `"diagrams"`.
 4. Add `@import url("modules/diagram-<name>.css") layer(diagrams);` to
-   `css/docs-html.css`.
+   `css/bundle.css`.
 5. `components/diagrams/diagram-<name>/` (`component.html.j2` + `usage.md`) so
    the builder and the catalog know about it.
 
@@ -83,9 +83,9 @@ steps, touching nothing that exists:
 2. `css/charts/chart-<name>.css` — engine specifics ONLY. The card, the
    toolbar, and the `pre.chart` fallback box are already shared, selected by the
    `chart` marker class every engine wears.
-3. Add `"chart-<name>"` to `MODULES` in `js/docs-html.js`, after `"charts"`.
+3. Add `"chart-<name>"` to `MODULES` in `js/bundle.js`, after `"charts"`.
 4. Add `@import url("modules/chart-<name>.css") layer(charts);` to
-   `css/docs-html.css`.
+   `css/bundle.css`.
 5. `components/charts/<name>/` (`component.html.j2` + `usage.md`) — the
    macro emits `<pre class="chart <name>">` — so the builder and catalog know
    about it. (The component drops the `chart-` prefix that the JS/CSS modules
@@ -156,10 +156,10 @@ twenty-one of them in `components/charts/`; `bar` is the simplest model and
    (`drawdown-curve` derives the running peak, `waterfall` the cumulative
    placeholder, `stacked-normalized` the column shares — so the document carries
    the inputs and the arithmetic is inspectable).
-6. List the kind in `components/charts/usage.md` — the chart-kind catalogue —
-   under the question it answers, and name its CSS twin if one exists
-   (`waterfall`/`bridge`, `funnel-chart`/`funnel`, `gauge`/`meter`). A twin that
-   needs no engine and prints is often the better answer.
+6. Write `components/charts/<name>/usage.md` — the question the kind answers,
+   and its CSS twin if one exists (`waterfall`/`bridge`, `funnel-chart`/`funnel`,
+   `gauge`/`meter`). A twin that needs no engine and prints is often the better
+   answer, and its own usage.md is the only place that can say so.
 
 The card, the toolbar, download-SVG, copy-source, `data-height` and the resize
 dispatch come free.
@@ -172,12 +172,12 @@ the author already writes.
 
 ## Adding a feature
 
-Create `modules/<name>.js` and add `<name>` to `MODULES` in `docs-html.js`
+Create `modules/<name>.js` and add `<name>` to `MODULES` in `bundle.js`
 (before `main`). Nothing else changes — not `core.js`, not `main.js`, not any
 other feature. Skeleton:
 
 ```js
-/* docs-html/<name> — one sentence: what it does, what markup activates it. */
+/* bundle/<name> — one sentence: what it does, what markup activates it. */
 
 "use strict";
 

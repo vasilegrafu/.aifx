@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `ownership-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Who owns the company and what they did last quarter. Ownership answers
 questions no financial statement does: who can force a change, how much stock

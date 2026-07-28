@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `cycle-position` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Marks where you believe the economy, a sector, or a market sits on a phased
 cycle, with the evidence for the call written into the phase itself. It turns

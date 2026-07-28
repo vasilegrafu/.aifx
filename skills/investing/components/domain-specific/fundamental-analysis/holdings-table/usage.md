@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `holdings-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Every position in the portfolio with its weight drawn as a bar, then whatever
 columns the review needs — cost, price, value, unrealised, contribution. The

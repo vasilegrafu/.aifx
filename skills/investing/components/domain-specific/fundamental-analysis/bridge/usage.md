@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `bridge` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The waterfall: how a total got from one value to another, one contribution per
 row. The most-used analytical graphic in finance — revenue bridges, EBITDA

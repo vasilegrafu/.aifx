@@ -13,7 +13,7 @@
    so the output carries no `{{...}}` prompts and needs no hand editing. The
    report is what the numbers say; interpretation is the reader's.
 #}
-{% extends "reports/report.master.html.j2" %}
+{% extends "reports/_report.master.html.j2" %}
 {% block content %}
   {{ c.toc([
       {"id": "snapshot",  "label": "Snapshot"},

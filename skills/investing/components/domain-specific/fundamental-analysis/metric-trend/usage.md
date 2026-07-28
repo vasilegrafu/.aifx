@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `metric-trend` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The operating history in one table: a metric per row, a reporting period per
 column, then the compound growth rate and a direction glyph. Use it for the

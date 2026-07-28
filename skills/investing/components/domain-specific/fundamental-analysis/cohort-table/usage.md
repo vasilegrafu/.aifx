@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `cohort-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Cohorts down the side, periods since acquisition across the top, forming the
 characteristic triangle — recent cohorts have fewer observations, so their rows

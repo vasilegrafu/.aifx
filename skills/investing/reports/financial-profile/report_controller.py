@@ -20,6 +20,7 @@ UNITS. FMP reports raw dollars. Everything here is $ millions, converted once in
 `_m()`, so no downstream number is ever in the wrong scale.
 """
 
+import math
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -62,38 +63,6 @@ QUARTER = [
     ("cash-flow-quarter",        "cash-flow-statement",      {"limit": 2}),
 ]
 
-def add_args(parser):
-    parser.add_argument("symbol", help="ticker, e.g. ORCL")
-    parser.add_argument("--peers", default="",
-                        help="comma-separated tickers. A peer group chosen by an "
-                             "API is not a peer group — name them deliberately.")
-
-
-# --------------------------------------------------------------------------
-# fetch
-# --------------------------------------------------------------------------
-
-def fetch(symbol, peers=""):
-    """Live, in one pass, uncached. ~13 calls, ~13 seconds.
-
-    Statements are pulled twice: ANNUAL for the multi-year exhibits, and the
-    last few QUARTERS for the flow/position exhibits that describe the most
-    recent reported quarter."""
-    symbol = symbol.upper()
-    client = FmpClient()
-    payloads = client.get_many(
-        [(endpoint, dict(symbol=symbol, **params)) for endpoint, params in ENDPOINTS])
-    for key, endpoint, params in QUARTER:
-        payloads[key] = client.get(endpoint, symbol=symbol, period="quarter", **params)
-    payloads["_symbol"] = symbol
-    payloads["_fetched"] = datetime.now().isoformat(timespec="seconds")
-    payloads["_peers"] = {}
-    for peer in [p.strip().upper() for p in peers.split(",") if p.strip()]:
-        payloads["_peers"][peer] = client.get("key-metrics", symbol=peer,
-                                              period="annual", limit=1)
-    return payloads
-
-
 # --------------------------------------------------------------------------
 # helpers
 # --------------------------------------------------------------------------
@@ -130,6 +99,23 @@ def _q(row):
     return f"{row['period']} FY{row['fiscalYear']}"
 
 
+def _nonfinite(value, path="d"):
+    """Every path in a nested structure holding a NaN or an infinity.
+
+    Reports nest: a number lives in a row, inside a list, under a key. A flat
+    check would miss all of them, and the one that reaches the page is fatal
+    rather than merely wrong."""
+    if isinstance(value, float) and not math.isfinite(value):
+        return [f"{path}={value}"]
+    if isinstance(value, dict):
+        return [hit for key, item in value.items()
+                for hit in _nonfinite(item, f"{path}.{key}")]
+    if isinstance(value, (list, tuple)):
+        return [hit for i, item in enumerate(value)
+                for hit in _nonfinite(item, f"{path}[{i}]")]
+    return []
+
+
 def _seg_label(name):
     """Tidy FMP's product-line labels without inventing a per-company map.
 
@@ -144,462 +130,572 @@ def _seg_label(name):
     return name.replace(" And ", " and ")
 
 
+# The skill root on sys.path, so the base imports PACKAGE-QUALIFIED: reached
+# under two names it would be two module objects, each with its own env.
+if str(HERE.parents[1]) not in sys.path:
+    sys.path.insert(0, str(HERE.parents[1]))
+
+from reports._report_controller import ReportController    # noqa: E402
+
 # --------------------------------------------------------------------------
-# shape
+# the controller
 # --------------------------------------------------------------------------
 
-def shape(p):                                        # noqa: C901 — one long, flat derivation
-    inc = _chron(p["income-statement"])            # annual — trends, per share, margins
-    cf = _chron(p["cash-flow-statement"])          # annual — free cash flow per share
-    km = _chron(p["key-metrics"])                  # annual — ROIC, peers
-    incq = _chron(p["income-statement-quarter"])   # quarterly — income sankey, snapshot
-    bsq = _chron(p["balance-sheet-quarter"])       # quarterly — balance sheet exhibits
-    cfq = _chron(p["cash-flow-quarter"])           # quarterly — cash sankey
-    scores = p["financial-scores"][0]
-    profile = p["profile"][0]
-    quote = p["quote"][0]
-    symbol = p.get("_symbol", profile["symbol"])
+class FinancialProfileReportController(ReportController):
+    """Where a company's money comes from, where it goes, what it owns, and
+    how that shape changed.
 
-    years = [_fy(r) for r in inc]                  # annual period labels
-    latest = incq[-1]                              # THE last reported quarter
-    latest_a = inc[-1]                             # latest full year — Altman Z flows
-    q_label = _q(latest)
-    # The balance sheet compares the latest quarter with the SAME quarter a year
-    # ago (seasonality-neutral); fall back to the oldest quarter fetched if a
-    # full year is not available.
-    bs_now = bsq[-1]
-    bs_prev = bsq[-5] if len(bsq) >= 5 else bsq[0]
-    cash = cfq[-1]                                 # last reported quarter's cash flow
-    km_now = km[-1]
+    The three hooks are the three stages: _fetch is the only thing that
+    touches the network, _build_context is pure arithmetic that asserts every
+    identity before a single component is called, and _filename says what the
+    file is called once the data has named the company."""
 
-    report_date = date.today()
-    period_end = datetime.strptime(latest["date"], "%Y-%m-%d").date()
-    filed = datetime.strptime(latest["filingDate"], "%Y-%m-%d").date()
+    TITLE = "Financial Profile"
 
-    # ---------------------------------------------------------------- income
-    rev = _m(latest["revenue"])
-    cogs, gross = _m(latest["costOfRevenue"]), _m(latest["grossProfit"])
-    rd = _m(latest["researchAndDevelopmentExpenses"])
-    sga = _m(latest["sellingGeneralAndAdministrativeExpenses"])
-    opinc, pretax = _m(latest["operatingIncome"]), _m(latest["incomeBeforeTax"])
-    tax, net = _m(latest["incomeTaxExpense"]), _m(latest["netIncome"])
-    net_cont = _m(latest["netIncomeFromContinuingOperations"])
+    def _filename(self, d):
+        """<symbol>-financial-profile.html. The report is ABOUT a company, so
+        the company belongs in the name; two builds for two symbols must not
+        land on the same file."""
+        return f"{d['slug']}-{self.name}.html"
 
-    assert cogs + gross == rev, f"{symbol}: cost + gross != revenue ({cogs}+{gross}≠{rev})"
+    def _add_args(self, parser):
+        """No defaults. Every argument is stated, including the one that says
+        there is no peer group.
 
-    # The statement does not always sum to its own subtotals. ORCL FY2026 leaves
-    # a $7m gap between the expense lines and operating income. A diagram that
-    # must conserve needs that gap NAMED and disclosed — never buried inside a
-    # legitimate line, where it would silently misstate a real expense.
-    other_opex = gross - rd - sga - opinc
-    assert other_opex >= 0, (
-        f"{symbol}: expense lines exceed gross profit by {-other_opex}m. This report's "
-        f"income sankey assumes other operating costs are a cost; here they are income. "
-        f"Extend the sankey rather than forcing the sign.")
+        `--peers` used to default to empty, which meant a report could ship a
+        comparison exhibit containing one company because nobody mentioned
+        peers. CHOOSING NOBODY IS STILL CHOOSING, and an editorial decision
+        must not be the shape of an unset flag. `none` says it out loud."""
+        parser.add_argument("symbol", help="ticker, e.g. ORCL")
+        parser.add_argument("--peers", required=True,
+                            help='comma-separated tickers, or "none". Required '
+                                 'and with no default: a peer group chosen by '
+                                 'an API is not a peer group, and neither is '
+                                 'one chosen by omission.')
 
-    non_op = opinc - pretax
-    nci = net_cont - net
-    assert tax + nci + net == pretax, (
-        f"{symbol}: tax {tax} + NCI {nci} + net {net} != pre-tax {pretax}")
+    @staticmethod
+    def _peer_list(peers):
+        """Tickers, or nothing when the caller said `none` out loud."""
+        if peers.strip().lower() in ("none", ""):
+            return []
+        return [p.strip().upper() for p in peers.split(",") if p.strip()]
 
-    inc_nodes = [{"name": "Revenue", "role": "source"},
-                 {"name": "Cost of revenue", "role": "cost"},
-                 {"name": "Gross profit", "role": "stage"},
-                 {"name": "Research & development", "role": "cost"},
-                 {"name": "Sales, general & administrative", "role": "cost"}]
-    inc_links = [{"source": "Revenue", "target": "Cost of revenue", "value": cogs},
-                 {"source": "Revenue", "target": "Gross profit", "value": gross},
-                 {"source": "Gross profit", "target": "Research & development", "value": rd},
-                 {"source": "Gross profit", "target": "Sales, general & administrative",
-                  "value": sga}]
-    if other_opex:
-        inc_nodes.append({"name": "Other operating", "role": "cost"})
-        inc_links.append({"source": "Gross profit", "target": "Other operating",
-                          "value": other_opex})
-    inc_nodes.append({"name": "Operating income", "role": "stage"})
-    inc_links.append({"source": "Gross profit", "target": "Operating income", "value": opinc})
+    def _fetch(self, symbol, peers):
+        """Live, in one pass, uncached. ~13 calls, ~13 seconds.
 
-    # Non-operating items are a COST when they consume operating income and a
-    # SOURCE when they add to it. A company with net interest income has the
-    # second shape, and forcing it into the first would draw a negative ribbon.
-    if non_op >= 0:
-        inc_nodes.append({"name": "Interest and other, net", "role": "cost"})
-        inc_links.append({"source": "Operating income", "target": "Interest and other, net",
-                          "value": non_op})
-        inc_links.append({"source": "Operating income", "target": "Pre-tax income",
-                          "value": pretax})
-    else:
-        inc_nodes.append({"name": "Interest and other, net", "role": "source"})
-        inc_links.append({"source": "Operating income", "target": "Pre-tax income",
-                          "value": opinc})
-        inc_links.append({"source": "Interest and other, net", "target": "Pre-tax income",
-                          "value": -non_op})
-    inc_nodes.append({"name": "Pre-tax income", "role": "stage"})
-    inc_nodes.append({"name": "Income tax", "role": "cost"})
-    inc_links.append({"source": "Pre-tax income", "target": "Income tax", "value": tax})
-    if nci:
-        inc_nodes.append({"name": "Non-controlling interests", "role": "cost"})
-        inc_links.append({"source": "Pre-tax income", "target": "Non-controlling interests",
-                          "value": nci})
-    inc_nodes.append({"name": "Net income", "role": "retained"})
-    inc_links.append({"source": "Pre-tax income", "target": "Net income", "value": net})
+        Statements are pulled twice: ANNUAL for the multi-year exhibits, and the
+        last few QUARTERS for the flow/position exhibits that describe the most
+        recent reported quarter."""
+        symbol = symbol.upper()
+        client = FmpClient()
+        payloads = client.get_many(
+            [(endpoint, dict(symbol=symbol, **params)) for endpoint, params in ENDPOINTS])
+        for key, endpoint, params in QUARTER:
+            payloads[key] = client.get(endpoint, symbol=symbol, period="quarter", **params)
+        payloads["_symbol"] = symbol
+        payloads["_fetched"] = datetime.now().isoformat(timespec="seconds")
+        payloads["_peers"] = {}
+        for peer in self._peer_list(peers):
+            payloads["_peers"][peer] = client.get("key-metrics", symbol=peer,
+                                                  period="annual", limit=1)
+        return payloads
 
-    # ------------------------------------------------------------------ cash
-    ocf = _m(cash["netCashProvidedByOperatingActivities"])
-    capex = abs(_m(cash["investmentsInPropertyPlantAndEquipment"]))
-    purchases = abs(_m(cash["purchasesOfInvestments"]))
-    maturities = abs(_m(cash["salesMaturitiesOfInvestments"]))
-    debt_issued = _m(cash["netDebtIssuance"])
-    stock_issued = _m(cash["netStockIssuance"])
-    dividends = abs(_m(cash["netDividendsPaid"]))
-    other_fin = abs(_m(cash["otherFinancingActivities"]))
-    cash_up = _m(cash["netChangeInCash"])
+    def _build_context(self, p):                                        # noqa: C901 — one long, flat derivation
+        inc = _chron(p["income-statement"])            # annual — trends, per share, margins
+        cf = _chron(p["cash-flow-statement"])          # annual — free cash flow per share
+        km = _chron(p["key-metrics"])                  # annual — ROIC, peers
+        incq = _chron(p["income-statement-quarter"])   # quarterly — income sankey, snapshot
+        bsq = _chron(p["balance-sheet-quarter"])       # quarterly — balance sheet exhibits
+        cfq = _chron(p["cash-flow-quarter"])           # quarterly — cash sankey
+        scores = p["financial-scores"][0]
+        profile = p["profile"][0]
+        quote = p["quote"][0]
+        symbol = p.get("_symbol", profile["symbol"])
 
-    sources = [("Operating cash flow", ocf), ("Debt issued, net", debt_issued),
-               ("Stock issued, net", stock_issued), ("Investment maturities", maturities)]
-    uses = [("Capital expenditure", capex), ("Investment purchases", purchases),
-            ("Dividends", dividends), ("Other financing", other_fin)]
-    sources = [(n, v) for n, v in sources if v > 0]
-    uses = [(n, v) for n, v in uses if v > 0]
+        years = [_fy(r) for r in inc]                  # annual period labels
+        latest = incq[-1]                              # THE last reported quarter
+        latest_a = inc[-1]                             # latest full year — Altman Z flows
+        q_label = _q(latest)
+        # The balance sheet compares the latest quarter with the SAME quarter a year
+        # ago (seasonality-neutral); fall back to the oldest quarter fetched if a
+        # full year is not available.
+        bs_now = bsq[-1]
+        bs_prev = bsq[-5] if len(bsq) >= 5 else bsq[0]
+        cash = cfq[-1]                                 # last reported quarter's cash flow
+        km_now = km[-1]
 
-    # Currency effects plus whatever the statement does not reconcile. Named and
-    # shown as its own ribbon, because a plug folded into a real line is a lie
-    # about that line. ORCL FY2026: $96m forex + $96m the source does not explain.
-    retained_cash = max(cash_up, 0)
-    plug = (sum(v for _, v in uses) + retained_cash) - sum(v for _, v in sources)
-    if plug > 0:
-        sources.append(("Other and currency, net", plug))
-    elif plug < 0:
-        uses.append(("Other and currency, net", -plug))
+        report_date = date.today()
+        period_end = datetime.strptime(latest["date"], "%Y-%m-%d").date()
+        filed = datetime.strptime(latest["filingDate"], "%Y-%m-%d").date()
 
-    available = sum(v for _, v in sources)
-    assert available == sum(v for _, v in uses) + retained_cash, (
-        f"{symbol}: cash sources {available} != uses {sum(v for _, v in uses)} "
-        f"+ retained {retained_cash}")
+        # ---------------------------------------------------------------- income
+        rev = _m(latest["revenue"])
+        cogs, gross = _m(latest["costOfRevenue"]), _m(latest["grossProfit"])
+        rd = _m(latest["researchAndDevelopmentExpenses"])
+        sga = _m(latest["sellingGeneralAndAdministrativeExpenses"])
+        opinc, pretax = _m(latest["operatingIncome"]), _m(latest["incomeBeforeTax"])
+        tax, net = _m(latest["incomeTaxExpense"]), _m(latest["netIncome"])
+        net_cont = _m(latest["netIncomeFromContinuingOperations"])
 
-    cash_nodes = ([{"name": n, "role": "source"} for n, _ in sources]
-                  + [{"name": "Cash available", "role": "stage"}]
-                  + [{"name": n, "role": "cost"} for n, _ in uses]
-                  + [{"name": "Increase in cash", "role": "retained"}])
-    cash_links = ([{"source": n, "target": "Cash available", "value": v} for n, v in sources]
-                  + [{"source": "Cash available", "target": n, "value": v} for n, v in uses]
-                  + [{"source": "Cash available", "target": "Increase in cash",
-                      "value": retained_cash}])
+        assert cogs + gross == rev, f"{symbol}: cost + gross != revenue ({cogs}+{gross}≠{rev})"
 
-    # -------------------------------------------------------------- position
-    def bs_pair(fn):
-        return [fn(bs_prev), fn(bs_now)]
+        # The statement does not always sum to its own subtotals. ORCL FY2026 leaves
+        # a $7m gap between the expense lines and operating income. A diagram that
+        # must conserve needs that gap NAMED and disclosed — never buried inside a
+        # legitimate line, where it would silently misstate a real expense.
+        other_opex = gross - rd - sga - opinc
+        assert other_opex >= 0, (
+            f"{symbol}: expense lines exceed gross profit by {-other_opex}m. This report's "
+            f"income sankey assumes other operating costs are a cost; here they are income. "
+            f"Extend the sankey rather than forcing the sign.")
 
-    cash_inv = bs_pair(lambda r: _m(r["cashAndShortTermInvestments"]) + _m(r["longTermInvestments"]))
-    receiv = bs_pair(lambda r: _m(r["netReceivables"]))
-    ppe = bs_pair(lambda r: _m(r["propertyPlantEquipmentNet"]))
-    goodwill = bs_pair(lambda r: _m(r["goodwillAndIntangibleAssets"]))
-    assets = bs_pair(lambda r: _m(r["totalAssets"]))
-    payables = bs_pair(lambda r: _m(r["totalPayables"]))
-    debt = bs_pair(lambda r: _m(r["totalDebt"]))
-    liab = bs_pair(lambda r: _m(r["totalLiabilities"]))
-    equity = bs_pair(lambda r: _m(r["totalEquity"]))
-    other_assets = [assets[i] - cash_inv[i] - receiv[i] - ppe[i] - goodwill[i] for i in (0, 1)]
-    other_liab = [liab[i] - payables[i] - debt[i] for i in (0, 1)]
+        non_op = opinc - pretax
+        nci = net_cont - net
+        assert tax + nci + net == pretax, (
+            f"{symbol}: tax {tax} + NCI {nci} + net {net} != pre-tax {pretax}")
 
-    for i in (0, 1):
-        assert liab[i] + equity[i] == assets[i], (
-            f"{symbol}: assets != liabilities + equity in column {i}")
+        inc_nodes = [{"name": "Revenue", "role": "source"},
+                     {"name": "Cost of revenue", "role": "cost"},
+                     {"name": "Gross profit", "role": "stage"},
+                     {"name": "Research & development", "role": "cost"},
+                     {"name": "Sales, general & administrative", "role": "cost"}]
+        inc_links = [{"source": "Revenue", "target": "Cost of revenue", "value": cogs},
+                     {"source": "Revenue", "target": "Gross profit", "value": gross},
+                     {"source": "Gross profit", "target": "Research & development", "value": rd},
+                     {"source": "Gross profit", "target": "Sales, general & administrative",
+                      "value": sga}]
+        if other_opex:
+            inc_nodes.append({"name": "Other operating", "role": "cost"})
+            inc_links.append({"source": "Gross profit", "target": "Other operating",
+                              "value": other_opex})
+        inc_nodes.append({"name": "Operating income", "role": "stage"})
+        inc_links.append({"source": "Gross profit", "target": "Operating income", "value": opinc})
 
-    bs_assets = [("Cash and investments", cash_inv), ("Receivables", receiv),
-                 ("Property, plant and equipment", ppe),
-                 ("Goodwill and intangibles", goodwill), ("Other assets", other_assets)]
-    bs_claims = [("Payables", payables, "cost"), ("Debt, including leases", debt, "cost"),
-                 ("Other liabilities", other_liab, "cost"), ("Equity", equity, "retained")]
+        # Non-operating items are a COST when they consume operating income and a
+        # SOURCE when they add to it. A company with net interest income has the
+        # second shape, and forcing it into the first would draw a negative ribbon.
+        if non_op >= 0:
+            inc_nodes.append({"name": "Interest and other, net", "role": "cost"})
+            inc_links.append({"source": "Operating income", "target": "Interest and other, net",
+                              "value": non_op})
+            inc_links.append({"source": "Operating income", "target": "Pre-tax income",
+                              "value": pretax})
+        else:
+            inc_nodes.append({"name": "Interest and other, net", "role": "source"})
+            inc_links.append({"source": "Operating income", "target": "Pre-tax income",
+                              "value": opinc})
+            inc_links.append({"source": "Interest and other, net", "target": "Pre-tax income",
+                              "value": -non_op})
+        inc_nodes.append({"name": "Pre-tax income", "role": "stage"})
+        inc_nodes.append({"name": "Income tax", "role": "cost"})
+        inc_links.append({"source": "Pre-tax income", "target": "Income tax", "value": tax})
+        if nci:
+            inc_nodes.append({"name": "Non-controlling interests", "role": "cost"})
+            inc_links.append({"source": "Pre-tax income", "target": "Non-controlling interests",
+                              "value": nci})
+        inc_nodes.append({"name": "Net income", "role": "retained"})
+        inc_links.append({"source": "Pre-tax income", "target": "Net income", "value": net})
 
-    bs_rows = ([{"label": "Assets", "cells": ["", ""], "kind": "section"}]
-               + [{"label": n, "cells": v, "kind": "detail"} for n, v in bs_assets]
-               + [{"label": "Total assets", "cells": assets, "kind": "subtotal"},
-                  {"label": "Liabilities", "cells": ["", ""], "kind": "section"}]
-               + [{"label": n, "cells": v, "kind": "detail"}
-                  for n, v, _ in bs_claims if n != "Equity"]
-               + [{"label": "Total liabilities", "cells": liab, "kind": "subtotal"},
-                  {"label": "Equity", "cells": equity, "kind": "total"}])
+        # ------------------------------------------------------------------ cash
+        ocf = _m(cash["netCashProvidedByOperatingActivities"])
+        capex = abs(_m(cash["investmentsInPropertyPlantAndEquipment"]))
+        purchases = abs(_m(cash["purchasesOfInvestments"]))
+        maturities = abs(_m(cash["salesMaturitiesOfInvestments"]))
+        debt_issued = _m(cash["netDebtIssuance"])
+        stock_issued = _m(cash["netStockIssuance"])
+        dividends = abs(_m(cash["netDividendsPaid"]))
+        other_fin = abs(_m(cash["otherFinancingActivities"]))
+        cash_up = _m(cash["netChangeInCash"])
 
-    bs_nodes = ([{"name": n, "role": "source"} for n, _ in bs_assets]
-                + [{"name": "Total assets", "role": "stage"}]
-                + [{"name": n, "role": r} for n, _, r in bs_claims])
-    bs_links = ([{"source": n, "target": "Total assets", "value": v[1]} for n, v in bs_assets]
-                + [{"source": "Total assets", "target": n, "value": v[1]}
-                   for n, v, _ in bs_claims])
+        sources = [("Operating cash flow", ocf), ("Debt issued, net", debt_issued),
+                   ("Stock issued, net", stock_issued), ("Investment maturities", maturities)]
+        uses = [("Capital expenditure", capex), ("Investment purchases", purchases),
+                ("Dividends", dividends), ("Other financing", other_fin)]
+        sources = [(n, v) for n, v in sources if v > 0]
+        uses = [(n, v) for n, v in uses if v > 0]
 
-    # The picture and the table are fed from the same lists above, so they cannot
-    # disagree — but assert it anyway, because "cannot" has a short half-life.
-    assert sum(v[1] for _, v in bs_assets) == assets[1], f"{symbol}: sankey assets != total"
-    assert sum(v[1] for _, v, _ in bs_claims) == assets[1], f"{symbol}: sankey claims != total"
-    table_labels = {r["label"] for r in bs_rows}
-    for name, _ in bs_assets:
-        assert name in table_labels, f"{symbol}: sankey node {name!r} not in the table"
+        # Currency effects plus whatever the statement does not reconcile. Named and
+        # shown as its own ribbon, because a plug folded into a real line is a lie
+        # about that line. ORCL FY2026: $96m forex + $96m the source does not explain.
+        retained_cash = max(cash_up, 0)
+        plug = (sum(v for _, v in uses) + retained_cash) - sum(v for _, v in sources)
+        if plug > 0:
+            sources.append(("Other and currency, net", plug))
+        elif plug < 0:
+            uses.append(("Other and currency, net", -plug))
 
-    equity_share = 100 * equity[1] / assets[1]
+        available = sum(v for _, v in sources)
+        assert available == sum(v for _, v in uses) + retained_cash, (
+            f"{symbol}: cash sources {available} != uses {sum(v for _, v in uses)} "
+            f"+ retained {retained_cash}")
 
-    # ----------------------------------------------------------- composite Z
-    # Altman Z mixes point-in-time STOCKS with a year of FLOWS. The stocks come
-    # from the latest quarter's balance sheet; the flows (EBIT, revenue) must be
-    # the full YEAR, not the quarter — a single quarter's revenue would divide
-    # the S/A term by roughly four and understate the score.
-    working_capital = _m(bs_now["totalCurrentAssets"]) - _m(bs_now["totalCurrentLiabilities"])
-    retained_earnings = _m(bs_now["retainedEarnings"])
-    ebit = _m(latest_a["ebit"])
-    rev_a = _m(latest_a["revenue"])
-    market_cap = _m(quote["marketCap"])
-    z_inputs = [("Working capital / assets", 1.2, working_capital / assets[1]),
-                ("Retained earnings / assets", 1.4, retained_earnings / assets[1]),
-                ("EBIT / assets", 3.3, ebit / assets[1]),
-                ("Market cap / liabilities", 0.6, market_cap / liab[1]),
-                ("Revenue / assets", 1.0, rev_a / assets[1])]
-    z_score = sum(c * v for _, c, v in z_inputs)
-    z_band, z_tone = (("Distress", "bad") if z_score < 1.8
-                      else ("Grey", "neutral") if z_score < 3.0 else ("Safe", "good"))
+        cash_nodes = ([{"name": n, "role": "source"} for n, _ in sources]
+                      + [{"name": "Cash available", "role": "stage"}]
+                      + [{"name": n, "role": "cost"} for n, _ in uses]
+                      + [{"name": "Increase in cash", "role": "retained"}])
+        cash_links = ([{"source": n, "target": "Cash available", "value": v} for n, v in sources]
+                      + [{"source": "Cash available", "target": n, "value": v} for n, v in uses]
+                      + [{"source": "Cash available", "target": "Increase in cash",
+                          "value": retained_cash}])
 
-    # ------------------------------------------------------------- per share
-    shares = [r["weightedAverageShsOut"] / 1e6 for r in inc]
-    eps = [r["eps"] for r in inc]
-    revenue_series = [_m(r["revenue"]) for r in inc]
-    fcf_series = [_m(r["freeCashFlow"]) for r in cf][-len(inc):]
-    n = len(inc)
-    # Round the endpoints FIRST, then derive the movement as their difference.
-    # Rounding opening, closing and movement independently breaks the tie
-    # (round(a) + round(b-a) != round(b) in general) — which the assertion below
-    # caught on AAPL, where the endpoints are ~15,000M and the movement is small.
-    sh_round = [round(s) for s in shares]
-    roll_rows = [
-        {"label": "Opening", "cells": sh_round[:-1], "kind": "opening"},
-        {"label": "Net shares issued",
-         "cells": [sh_round[i + 1] - sh_round[i] for i in range(n - 1)], "kind": "movement"},
-        {"label": "Closing", "cells": sh_round[1:], "kind": "closing"},
-    ]
-    for i in range(n - 1):
-        assert (roll_rows[0]["cells"][i] + roll_rows[1]["cells"][i]
-                == roll_rows[2]["cells"][i]), f"{symbol}: share roll-forward does not tie"
+        # -------------------------------------------------------------- position
+        def bs_pair(fn):
+            return [fn(bs_prev), fn(bs_now)]
 
-    rps = [r / s for r, s in zip(revenue_series, shares)]
-    fps = [f / s for f, s in zip(fcf_series, shares)]
-    pershare_rows = [
-        {"label": "Revenue per share", "cells": [round(v, 2) for v in rps],
-         "cagr": _cagr(rps[0], rps[-1], n - 1), "dir": _arrow(_cagr(rps[0], rps[-1], n - 1))},
-        {"label": "Earnings per share", "cells": eps,
-         "cagr": _cagr(eps[0], eps[-1], n - 1), "dir": _arrow(_cagr(eps[0], eps[-1], n - 1))},
-        {"label": "Free cash flow per share", "cells": [round(v, 2) for v in fps],
-         "cagr": _cagr(fps[0], fps[-1], n - 1), "dir": _arrow(_cagr(fps[0], fps[-1], n - 1))},
-    ]
+        cash_inv = bs_pair(lambda r: _m(r["cashAndShortTermInvestments"]) + _m(r["longTermInvestments"]))
+        receiv = bs_pair(lambda r: _m(r["netReceivables"]))
+        ppe = bs_pair(lambda r: _m(r["propertyPlantEquipmentNet"]))
+        goodwill = bs_pair(lambda r: _m(r["goodwillAndIntangibleAssets"]))
+        assets = bs_pair(lambda r: _m(r["totalAssets"]))
+        payables = bs_pair(lambda r: _m(r["totalPayables"]))
+        debt = bs_pair(lambda r: _m(r["totalDebt"]))
+        liab = bs_pair(lambda r: _m(r["totalLiabilities"]))
+        equity = bs_pair(lambda r: _m(r["totalEquity"]))
+        other_assets = [assets[i] - cash_inv[i] - receiv[i] - ppe[i] - goodwill[i] for i in (0, 1)]
+        other_liab = [liab[i] - payables[i] - debt[i] for i in (0, 1)]
 
-    # -------------------------------------------------------------- segments
-    seg_raw = sorted(p["revenue-product-segmentation"], key=lambda r: r["fiscalYear"])[-5:]
-    seg_years = [f"FY{r['fiscalYear']}" for r in seg_raw]
-    seg_names = sorted({k for r in seg_raw for k in r["data"]},
-                       key=lambda k: -seg_raw[-1]["data"].get(k, 0))
-    # `points`, not `values` — a chart series feeds stacked_area/stacked_normalized,
-    # and `values` is a dict method Jinja would resolve before the key.
-    seg_series = [{"name": _seg_label(k), "points": [_m(r["data"].get(k, 0)) for r in seg_raw]}
-                  for k in seg_names]
-    seg_totals = [sum(s["points"][i] for s in seg_series) for i in range(len(seg_raw))]
+        for i in (0, 1):
+            assert liab[i] + equity[i] == assets[i], (
+                f"{symbol}: assets != liabilities + equity in column {i}")
 
-    # NO PROFIT KEYS. `revenue-product-segmentation` publishes revenue only, and
-    # the component now omits the profit columns rather than being handed
-    # revenue twice — which would have rendered a margin of 100% for every
-    # segment and looked entirely plausible.
-    seg_rows = []
-    for s in seg_series:
-        last = s["points"][-1]
-        seg_rows.append({
-            "segment": s["name"], "revenue": last,
-            "rev_share": 100 * last / seg_totals[-1],
-            "growth": 100 * (last / s["points"][-2] - 1) if s["points"][-2] else 0,
-        })
-    seg_total_row = {"label": "Total",
-                     "cells": [f"{seg_totals[-1]:,}", "100.0%",
-                               f"{100 * (seg_totals[-1] / seg_totals[-2] - 1):.1f}%"]}
+        bs_assets = [("Cash and investments", cash_inv), ("Receivables", receiv),
+                     ("Property, plant and equipment", ppe),
+                     ("Goodwill and intangibles", goodwill), ("Other assets", other_assets)]
+        bs_claims = [("Payables", payables, "cost"), ("Debt, including leases", debt, "cost"),
+                     ("Other liabilities", other_liab, "cost"), ("Equity", equity, "retained")]
 
-    seg_trend_rows = [
-        {"label": s["name"], "cells": s["points"],
-         "cagr": _cagr(s["points"][0], s["points"][-1], len(seg_raw) - 1),
-         "dir": _arrow(_cagr(s["points"][0], s["points"][-1], len(seg_raw) - 1))}
-        for s in seg_series
-    ] + [{"label": "Total revenue", "cells": seg_totals,
-          "cagr": _cagr(seg_totals[0], seg_totals[-1], len(seg_raw) - 1),
-          "dir": _arrow(_cagr(seg_totals[0], seg_totals[-1], len(seg_raw) - 1))}]
+        bs_rows = ([{"label": "Assets", "cells": ["", ""], "kind": "section"}]
+                   + [{"label": n, "cells": v, "kind": "detail"} for n, v in bs_assets]
+                   + [{"label": "Total assets", "cells": assets, "kind": "subtotal"},
+                      {"label": "Liabilities", "cells": ["", ""], "kind": "section"}]
+                   + [{"label": n, "cells": v, "kind": "detail"}
+                      for n, v, _ in bs_claims if n != "Equity"]
+                   + [{"label": "Total liabilities", "cells": liab, "kind": "subtotal"},
+                      {"label": "Equity", "cells": equity, "kind": "total"}])
 
-    deltas = sorted(((s["name"], s["points"][-1] - s["points"][0]) for s in seg_series),
-                    key=lambda kv: -kv[1])
-    bridge_steps = ([{"label": f"{seg_years[0]} revenue", "delta": seg_totals[0], "kind": "start"}]
-                    + [{"label": nm, "delta": dv, "kind": "up" if dv >= 0 else "down"}
-                       for nm, dv in deltas]
-                    + [{"label": f"{seg_years[-1]} revenue", "delta": seg_totals[-1],
-                        "kind": "end"}])
-    assert seg_totals[0] + sum(d for _, d in deltas) == seg_totals[-1], (
-        f"{symbol}: bridge steps do not carry {seg_totals[0]} to {seg_totals[-1]}")
+        bs_nodes = ([{"name": n, "role": "source"} for n, _ in bs_assets]
+                    + [{"name": "Total assets", "role": "stage"}]
+                    + [{"name": n, "role": r} for n, _, r in bs_claims])
+        bs_links = ([{"source": n, "target": "Total assets", "value": v[1]} for n, v in bs_assets]
+                    + [{"source": "Total assets", "target": n, "value": v[1]}
+                       for n, v, _ in bs_claims])
 
-    # The bridge scale must bound the RUNNING TOTAL through the walk, not just the
-    # endpoints. When a company renames segments (AMD: old lines fall to zero as
-    # new ones rise), the deltas are large +/- pairs and the cumulative peaks well
-    # above the final revenue mid-walk. Scaling to seg_totals[-1] then pushes those
-    # bars off the right of the track. Walk it and take the true peak and trough.
-    bridge_cum, bridge_peak, bridge_trough = seg_totals[0], seg_totals[0], seg_totals[0]
-    for _, dv in deltas:
-        bridge_cum += dv
-        bridge_peak = max(bridge_peak, bridge_cum)
-        bridge_trough = min(bridge_trough, bridge_cum)
-    bridge_peak = max(bridge_peak, seg_totals[-1])
-    bridge_trough = min(bridge_trough, 0)
+        # The picture and the table are fed from the same lists above, so they cannot
+        # disagree — but assert it anyway, because "cannot" has a short half-life.
+        assert sum(v[1] for _, v in bs_assets) == assets[1], f"{symbol}: sankey assets != total"
+        assert sum(v[1] for _, v, _ in bs_claims) == assets[1], f"{symbol}: sankey claims != total"
+        table_labels = {r["label"] for r in bs_rows}
+        for name, _ in bs_assets:
+            assert name in table_labels, f"{symbol}: sankey node {name!r} not in the table"
 
-    # --------------------------------------------------------------- margins
-    def ratio(values):
-        return [100 * v / r for v, r in zip(values, revenue_series)]
+        equity_share = 100 * equity[1] / assets[1]
 
-    gm = ratio([_m(r["grossProfit"]) for r in inc])
-    om = ratio([_m(r["operatingIncome"]) for r in inc])
-    roic = [100 * (r.get("returnOnInvestedCapital") or 0) for r in km]
-    margin_rows = []
-    for label, vals in [("Gross margin", gm),
-                        ("R&D / revenue", ratio([_m(r["researchAndDevelopmentExpenses"]) for r in inc])),
-                        ("Operating margin", om),
-                        ("Net margin", ratio([_m(r["netIncome"]) for r in inc])),
-                        ("Return on invested capital", roic)]:
-        delta = vals[-1] - vals[0]
-        margin_rows.append({"label": label, "cells": [round(v, 1) for v in vals],
-                            "cagr": delta * 100, "cagr_fmt": "bps", "dir": _arrow(delta)})
+        # ----------------------------------------------------------- composite Z
+        # Altman Z mixes point-in-time STOCKS with a year of FLOWS. The stocks come
+        # from the latest quarter's balance sheet; the flows (EBIT, revenue) must be
+        # the full YEAR, not the quarter — a single quarter's revenue would divide
+        # the S/A term by roughly four and understate the score.
+        working_capital = _m(bs_now["totalCurrentAssets"]) - _m(bs_now["totalCurrentLiabilities"])
+        retained_earnings = _m(bs_now["retainedEarnings"])
+        ebit = _m(latest_a["ebit"])
+        rev_a = _m(latest_a["revenue"])
+        market_cap = _m(quote["marketCap"])
+        z_inputs = [("Working capital / assets", 1.2, working_capital / assets[1]),
+                    ("Retained earnings / assets", 1.4, retained_earnings / assets[1]),
+                    ("EBIT / assets", 3.3, ebit / assets[1]),
+                    ("Market cap / liabilities", 0.6, market_cap / liab[1]),
+                    ("Revenue / assets", 1.0, rev_a / assets[1])]
+        z_score = sum(c * v for _, c, v in z_inputs)
+        z_band, z_tone = (("Distress", "bad") if z_score < 1.8
+                          else ("Grey", "neutral") if z_score < 3.0 else ("Safe", "good"))
 
-    # ----------------------------------------------------------------- peers
-    peer_headers = ["ROIC", "Capex / revenue", "R&D / revenue", "SBC / revenue", "EV/EBITDA"]
-    peer_formats = ["pct", "pct", "pct", "pct", "num"]
+        # ------------------------------------------------------------- per share
+        shares = [r["weightedAverageShsOut"] / 1e6 for r in inc]
+        eps = [r["eps"] for r in inc]
+        revenue_series = [_m(r["revenue"]) for r in inc]
+        fcf_series = [_m(r["freeCashFlow"]) for r in cf][-len(inc):]
+        n = len(inc)
+        # Round the endpoints FIRST, then derive the movement as their difference.
+        # Rounding opening, closing and movement independently breaks the tie
+        # (round(a) + round(b-a) != round(b) in general) — which the assertion below
+        # caught on AAPL, where the endpoints are ~15,000M and the movement is small.
+        sh_round = [round(s) for s in shares]
+        roll_rows = [
+            {"label": "Opening", "cells": sh_round[:-1], "kind": "opening"},
+            {"label": "Net shares issued",
+             "cells": [sh_round[i + 1] - sh_round[i] for i in range(n - 1)], "kind": "movement"},
+            {"label": "Closing", "cells": sh_round[1:], "kind": "closing"},
+        ]
+        for i in range(n - 1):
+            assert (roll_rows[0]["cells"][i] + roll_rows[1]["cells"][i]
+                    == roll_rows[2]["cells"][i]), f"{symbol}: share roll-forward does not tie"
 
-    def peer_cells(metrics):
-        return [100 * (metrics.get("returnOnInvestedCapital") or 0),
-                100 * (metrics.get("capexToRevenue") or 0),
-                100 * (metrics.get("researchAndDevelopementToRevenue") or 0),
-                100 * (metrics.get("stockBasedCompensationToRevenue") or 0),
-                metrics.get("evToEBITDA") or 0]
+        rps = [r / s for r, s in zip(revenue_series, shares)]
+        fps = [f / s for f, s in zip(fcf_series, shares)]
+        pershare_rows = [
+            {"label": "Revenue per share", "cells": [round(v, 2) for v in rps],
+             "cagr": _cagr(rps[0], rps[-1], n - 1), "dir": _arrow(_cagr(rps[0], rps[-1], n - 1))},
+            {"label": "Earnings per share", "cells": eps,
+             "cagr": _cagr(eps[0], eps[-1], n - 1), "dir": _arrow(_cagr(eps[0], eps[-1], n - 1))},
+            {"label": "Free cash flow per share", "cells": [round(v, 2) for v in fps],
+             "cagr": _cagr(fps[0], fps[-1], n - 1), "dir": _arrow(_cagr(fps[0], fps[-1], n - 1))},
+        ]
 
-    peer_rows = [{"name": profile.get("companyName", symbol), "cells": peer_cells(km_now),
-                  "subject": True}]
-    for ticker, metrics in (p.get("_peers") or {}).items():
-        peer_rows.append({"name": ticker, "cells": peer_cells(metrics[0]), "subject": False})
-    # `headers` is the METRIC columns only — the macro emits Company itself.
-    for row in peer_rows:
-        assert len(row["cells"]) == len(peer_headers), (
-            f"{symbol}: peer row {row['name']!r} has {len(row['cells'])} cells "
-            f"for {len(peer_headers)} headers")
+        # -------------------------------------------------------------- segments
+        seg_raw = sorted(p["revenue-product-segmentation"], key=lambda r: r["fiscalYear"])[-5:]
+        seg_years = [f"FY{r['fiscalYear']}" for r in seg_raw]
+        seg_names = sorted({k for r in seg_raw for k in r["data"]},
+                           key=lambda k: -seg_raw[-1]["data"].get(k, 0))
+        # `points`, not `values` — a chart series feeds stacked_area/stacked_normalized,
+        # and `values` is a dict method Jinja would resolve before the key.
+        seg_series = [{"name": _seg_label(k), "points": [_m(r["data"].get(k, 0)) for r in seg_raw]}
+                      for k in seg_names]
+        seg_totals = [sum(s["points"][i] for s in seg_series) for i in range(len(seg_raw))]
 
-    # ------------------------------------------------- sankey label hygiene
-    # Sankey labels are drawn as CANVAS TEXT and never pass an HTML parser, so
-    # "&amp;" would render as five literal characters.
-    for group in (inc_nodes, cash_nodes, bs_nodes):
-        for node in group:
-            assert "&" not in node["name"] or "&amp;" not in node["name"], \
-                f"{symbol}: HTML entity in sankey label {node['name']!r}"
-            assert "&rsquo;" not in node["name"] and "&nbsp;" not in node["name"], \
-                f"{symbol}: HTML entity in sankey label {node['name']!r}"
+        # NO PROFIT KEYS. `revenue-product-segmentation` publishes revenue only, and
+        # the component now omits the profit columns rather than being handed
+        # revenue twice — which would have rendered a margin of 100% for every
+        # segment and looked entirely plausible.
+        seg_rows = []
+        for s in seg_series:
+            last = s["points"][-1]
+            seg_rows.append({
+                "segment": s["name"], "revenue": last,
+                "rev_share": 100 * last / seg_totals[-1],
+                "growth": 100 * (last / s["points"][-2] - 1) if s["points"][-2] else 0,
+            })
+        seg_total_row = {"label": "Total",
+                         "cells": [f"{seg_totals[-1]:,}", "100.0%",
+                                   f"{100 * (seg_totals[-1] / seg_totals[-2] - 1):.1f}%"]}
 
-    # --------------------------------------------------------------- assemble
-    unit = "$ millions"
-    d = {
-        "slug": symbol.lower(),
-        "title": f"{profile.get('companyName', symbol)} — Financial Profile",
-        "ticker": symbol,
-        "company": profile.get("companyName", symbol),
-        "exchange": profile.get("exchange", ""),
-        "sector": profile.get("sector", ""),
-        "unit": unit,
-        "period": q_label,
-        "period_end": period_end.strftime("%d %B %Y"),
-        "filed": filed.strftime("%d %B %Y"),
-        "report_date": report_date.strftime("%d %B %Y"),
-        "staleness_days": (report_date - period_end).days,
-        "price": quote["price"],
-        "price_date": report_date.strftime("%d %B %Y"),
-        "market_cap": market_cap,
-        "header_facts": [
-            {"label": "Price", "value": f"${quote['price']:,.2f}"},
-            {"label": "Market cap", "value": f"${market_cap / 1000:,.0f}B"},
-            {"label": f"Revenue {q_label}", "value": f"${rev / 1000:,.1f}B"},
-            {"label": f"Net income {q_label}", "value": f"${net / 1000:,.1f}B"},
-            {"label": "Sector", "value": profile.get("sector", "—")},
-        ],
-        "basis_facts": [
-            {"term": "Report date",
-             "value": f"{report_date:%d %B %Y} — every date below is measured against it"},
-            {"term": "Latest period",
-             "value": f"{q_label}, ended {period_end:%d %B %Y} — "
-                      f"{(report_date - period_end).days} days before this report"},
-            {"term": "Filed", "value": f"{filed:%d %B %Y}"},
-            {"term": "Reporting basis",
-             "value": (f"the income, cash-flow and balance-sheet exhibits are the last "
-                       f"reported quarter ({q_label}); the segment, per-share, margin and "
-                       f"peer exhibits are ANNUAL ({years[0]}–{years[-1]}), because "
-                       f"product-line revenue and per-company metrics are not available "
-                       f"quarterly on this data plan. Each exhibit's caption states its "
-                       f"own period")},
-            {"term": "Price as of",
-             "value": f"{report_date:%d %B %Y}. A market price is not a filing date; "
-                      f"market-cap-sensitive figures below carry this one"},
-            {"term": "Currency and unit",
-             "value": f"{latest.get('reportedCurrency', 'USD')}, {unit} unless stated"},
-            {"term": "Segment exhibits",
-             "value": f"annual, {seg_years[0]}–{seg_years[-1]} — the latest full years, "
-                      f"which run behind the quarterly statements above"},
-            {"term": "Derived figures",
-             "value": (f"free cash flow per share and the Altman Z are computed here; the "
-                       f"Z uses the latest full year's EBIT and revenue over the quarter-end "
-                       f"balance sheet"
-                       + (f"; the ${other_opex:,}m 'other operating' line absorbs an "
-                          f"inconsistency in the source between operating income and the "
-                          f"expense lines" if other_opex else "")
-                       + (f"; the ${abs(plug):,}m 'other and currency' cash line absorbs "
-                          f"currency effects and what the statement does not reconcile"
-                          if plug else ""))},
-            {"term": "Source",
-             "value": "company filings via Financial Modeling Prep; derived figures marked"},
-        ],
-        # income
-        "inc_nodes": inc_nodes, "inc_links": inc_links,
-        "inc_caption": f"{profile.get('companyName', symbol)} {q_label} — revenue to net income",
-        "seg_rows": seg_rows,
-        "seg_total_row": seg_total_row,
-        "seg_caption": f"Revenue by segment, {seg_years[-1]}",
-        "seg_years": seg_years,
-        # cash
-        "cash_nodes": cash_nodes, "cash_links": cash_links,
-        "cash_caption": f"{profile.get('companyName', symbol)} {q_label} — cash generated and deployed",
-        # position
-        "bs_nodes": bs_nodes, "bs_links": bs_links,
-        "bs_periods": [_q(bs_prev), _q(bs_now)],
-        "bs_rows": bs_rows,
-        "bs_caption": f"Balance sheet — {_q(bs_now)} against {_q(bs_prev)}",
-        "bs_sankey_caption": f"{profile.get('companyName', symbol)} {q_label} — what it owns and who has a claim on it",
-        "bs_check": f"{assets[1]:,} = {liab[1]:,} + {equity[1]:,}",
-        "bs_unit": f"{unit}, at {period_end:%d %B %Y}",
-        "equity_share": equity_share,
-        "z_name": "Altman Z",
-        "z_formula": "Z = 1.2·WC/A + 1.4·RE/A + 3.3·EBIT/A + 0.6·MC/L + 1.0·S/A",
-        "z_inputs": [{"component": c, "coefficient": k, "value": v, "contribution": k * v}
-                     for c, k, v in z_inputs],
-        "z_score": round(z_score, 2), "z_band": z_band, "z_tone": z_tone,
-        "z_bands": [{"label": "Distress", "range": "< 1.8", "tone": "bad"},
-                    {"label": "Grey", "range": "1.8–3.0", "tone": "neutral"},
-                    {"label": "Safe", "range": "> 3.0", "tone": "good"}],
-        "piotroski": scores.get("piotroskiScore"),
-        # per share
-        "share_periods": years[1:],
-        "roll_rows": roll_rows,
-        "pershare_rows": pershare_rows,
-        "periods": years,
-        # evolution
-        "seg_trend_rows": seg_trend_rows,
-        "seg_series": seg_series,
-        "seg_totals": seg_totals,
-        "bridge_steps": bridge_steps,
-        "bridge_min": bridge_trough,
-        "bridge_max": int(bridge_peak * 1.05),
-        "bridge_caption": f"Revenue bridge, {seg_years[0]} to {seg_years[-1]} ({unit})",
-        "margin_rows": margin_rows,
-        # peers
-        "peer_headers": peer_headers, "peer_formats": peer_formats, "peer_rows": peer_rows,
-        "peer_caption": "Peers — fiscal years ending on different dates",
-    }
-    return d
+        seg_trend_rows = [
+            {"label": s["name"], "cells": s["points"],
+             "cagr": _cagr(s["points"][0], s["points"][-1], len(seg_raw) - 1),
+             "dir": _arrow(_cagr(s["points"][0], s["points"][-1], len(seg_raw) - 1))}
+            for s in seg_series
+        ] + [{"label": "Total revenue", "cells": seg_totals,
+              "cagr": _cagr(seg_totals[0], seg_totals[-1], len(seg_raw) - 1),
+              "dir": _arrow(_cagr(seg_totals[0], seg_totals[-1], len(seg_raw) - 1))}]
+
+        deltas = sorted(((s["name"], s["points"][-1] - s["points"][0]) for s in seg_series),
+                        key=lambda kv: -kv[1])
+        bridge_steps = ([{"label": f"{seg_years[0]} revenue", "delta": seg_totals[0], "kind": "start"}]
+                        + [{"label": nm, "delta": dv, "kind": "up" if dv >= 0 else "down"}
+                           for nm, dv in deltas]
+                        + [{"label": f"{seg_years[-1]} revenue", "delta": seg_totals[-1],
+                            "kind": "end"}])
+        assert seg_totals[0] + sum(d for _, d in deltas) == seg_totals[-1], (
+            f"{symbol}: bridge steps do not carry {seg_totals[0]} to {seg_totals[-1]}")
+
+        # The bridge scale must bound the RUNNING TOTAL through the walk, not just the
+        # endpoints. When a company renames segments (AMD: old lines fall to zero as
+        # new ones rise), the deltas are large +/- pairs and the cumulative peaks well
+        # above the final revenue mid-walk. Scaling to seg_totals[-1] then pushes those
+        # bars off the right of the track. Walk it and take the true peak and trough.
+        bridge_cum, bridge_peak, bridge_trough = seg_totals[0], seg_totals[0], seg_totals[0]
+        for _, dv in deltas:
+            bridge_cum += dv
+            bridge_peak = max(bridge_peak, bridge_cum)
+            bridge_trough = min(bridge_trough, bridge_cum)
+        bridge_peak = max(bridge_peak, seg_totals[-1])
+        bridge_trough = min(bridge_trough, 0)
+
+        # --------------------------------------------------------------- margins
+        def ratio(values):
+            return [100 * v / r for v, r in zip(values, revenue_series)]
+
+        gm = ratio([_m(r["grossProfit"]) for r in inc])
+        om = ratio([_m(r["operatingIncome"]) for r in inc])
+        roic = [100 * (r.get("returnOnInvestedCapital") or 0) for r in km]
+        margin_rows = []
+        for label, vals in [("Gross margin", gm),
+                            ("R&D / revenue", ratio([_m(r["researchAndDevelopmentExpenses"]) for r in inc])),
+                            ("Operating margin", om),
+                            ("Net margin", ratio([_m(r["netIncome"]) for r in inc])),
+                            ("Return on invested capital", roic)]:
+            delta = vals[-1] - vals[0]
+            margin_rows.append({"label": label, "cells": [round(v, 1) for v in vals],
+                                "cagr": delta * 100, "cagr_fmt": "bps", "dir": _arrow(delta)})
+
+        # ----------------------------------------------------------------- peers
+        peer_headers = ["ROIC", "Capex / revenue", "R&D / revenue", "SBC / revenue", "EV/EBITDA"]
+        peer_formats = ["pct", "pct", "pct", "pct", "num"]
+
+        def peer_cells(metrics):
+            return [100 * (metrics.get("returnOnInvestedCapital") or 0),
+                    100 * (metrics.get("capexToRevenue") or 0),
+                    100 * (metrics.get("researchAndDevelopementToRevenue") or 0),
+                    100 * (metrics.get("stockBasedCompensationToRevenue") or 0),
+                    metrics.get("evToEBITDA") or 0]
+
+        peer_rows = [{"name": profile.get("companyName", symbol), "cells": peer_cells(km_now),
+                      "subject": True}]
+        for ticker, metrics in (p.get("_peers") or {}).items():
+            peer_rows.append({"name": ticker, "cells": peer_cells(metrics[0]), "subject": False})
+        # `headers` is the METRIC columns only — the macro emits Company itself.
+        for row in peer_rows:
+            assert len(row["cells"]) == len(peer_headers), (
+                f"{symbol}: peer row {row['name']!r} has {len(row['cells'])} cells "
+                f"for {len(peer_headers)} headers")
+
+        # ------------------------------------------------- sankey label hygiene
+        # Sankey labels are drawn as CANVAS TEXT and never pass an HTML parser, so
+        # "&amp;" would render as five literal characters.
+        for group in (inc_nodes, cash_nodes, bs_nodes):
+            for node in group:
+                assert "&" not in node["name"] or "&amp;" not in node["name"], \
+                    f"{symbol}: HTML entity in sankey label {node['name']!r}"
+                assert "&rsquo;" not in node["name"] and "&nbsp;" not in node["name"], \
+                    f"{symbol}: HTML entity in sankey label {node['name']!r}"
+
+        # --------------------------------------------------------------- assemble
+        unit = "$ millions"
+        d = {
+            "slug": symbol.lower(),
+            "title": f"{profile.get('companyName', symbol)} — Financial Profile",
+            "ticker": symbol,
+            "company": profile.get("companyName", symbol),
+            "exchange": profile.get("exchange", ""),
+            "sector": profile.get("sector", ""),
+            "unit": unit,
+            "period": q_label,
+            "period_end": period_end.strftime("%d %B %Y"),
+            "filed": filed.strftime("%d %B %Y"),
+            "report_date": report_date.strftime("%d %B %Y"),
+            "staleness_days": (report_date - period_end).days,
+            "price": quote["price"],
+            "price_date": report_date.strftime("%d %B %Y"),
+            "market_cap": market_cap,
+            "header_facts": [
+                {"label": "Price", "value": f"${quote['price']:,.2f}"},
+                {"label": "Market cap", "value": f"${market_cap / 1000:,.0f}B"},
+                {"label": f"Revenue {q_label}", "value": f"${rev / 1000:,.1f}B"},
+                {"label": f"Net income {q_label}", "value": f"${net / 1000:,.1f}B"},
+                {"label": "Sector", "value": profile.get("sector", "—")},
+            ],
+            "basis_facts": [
+                {"term": "Report date",
+                 "value": f"{report_date:%d %B %Y} — every date below is measured against it"},
+                {"term": "Latest period",
+                 "value": f"{q_label}, ended {period_end:%d %B %Y} — "
+                          f"{(report_date - period_end).days} days before this report"},
+                {"term": "Filed", "value": f"{filed:%d %B %Y}"},
+                {"term": "Reporting basis",
+                 "value": (f"the income, cash-flow and balance-sheet exhibits are the last "
+                           f"reported quarter ({q_label}); the segment, per-share, margin and "
+                           f"peer exhibits are ANNUAL ({years[0]}–{years[-1]}), because "
+                           f"product-line revenue and per-company metrics are not available "
+                           f"quarterly on this data plan. Each exhibit's caption states its "
+                           f"own period")},
+                {"term": "Price as of",
+                 "value": f"{report_date:%d %B %Y}. A market price is not a filing date; "
+                          f"market-cap-sensitive figures below carry this one"},
+                {"term": "Currency and unit",
+                 "value": f"{latest.get('reportedCurrency', 'USD')}, {unit} unless stated"},
+                {"term": "Segment exhibits",
+                 "value": f"annual, {seg_years[0]}–{seg_years[-1]} — the latest full years, "
+                          f"which run behind the quarterly statements above"},
+                {"term": "Derived figures",
+                 "value": (f"free cash flow per share and the Altman Z are computed here; the "
+                           f"Z uses the latest full year's EBIT and revenue over the quarter-end "
+                           f"balance sheet"
+                           + (f"; the ${other_opex:,}m 'other operating' line absorbs an "
+                              f"inconsistency in the source between operating income and the "
+                              f"expense lines" if other_opex else "")
+                           + (f"; the ${abs(plug):,}m 'other and currency' cash line absorbs "
+                              f"currency effects and what the statement does not reconcile"
+                              if plug else ""))},
+                {"term": "Source",
+                 "value": "company filings via Financial Modeling Prep; derived figures marked"},
+            ],
+            # income
+            "inc_nodes": inc_nodes, "inc_links": inc_links,
+            "inc_caption": f"{profile.get('companyName', symbol)} {q_label} — revenue to net income",
+            "seg_rows": seg_rows,
+            "seg_total_row": seg_total_row,
+            "seg_caption": f"Revenue by segment, {seg_years[-1]}",
+            "seg_years": seg_years,
+            # cash
+            "cash_nodes": cash_nodes, "cash_links": cash_links,
+            "cash_caption": f"{profile.get('companyName', symbol)} {q_label} — cash generated and deployed",
+            # position
+            "bs_nodes": bs_nodes, "bs_links": bs_links,
+            "bs_periods": [_q(bs_prev), _q(bs_now)],
+            "bs_rows": bs_rows,
+            "bs_caption": f"Balance sheet — {_q(bs_now)} against {_q(bs_prev)}",
+            "bs_sankey_caption": f"{profile.get('companyName', symbol)} {q_label} — what it owns and who has a claim on it",
+            "bs_check": f"{assets[1]:,} = {liab[1]:,} + {equity[1]:,}",
+            "bs_unit": f"{unit}, at {period_end:%d %B %Y}",
+            "equity_share": equity_share,
+            "z_name": "Altman Z",
+            "z_formula": "Z = 1.2·WC/A + 1.4·RE/A + 3.3·EBIT/A + 0.6·MC/L + 1.0·S/A",
+            "z_inputs": [{"component": c, "coefficient": k, "value": v, "contribution": k * v}
+                         for c, k, v in z_inputs],
+            "z_score": round(z_score, 2), "z_band": z_band, "z_tone": z_tone,
+            "z_bands": [{"label": "Distress", "range": "< 1.8", "tone": "bad"},
+                        {"label": "Grey", "range": "1.8–3.0", "tone": "neutral"},
+                        {"label": "Safe", "range": "> 3.0", "tone": "good"}],
+            "piotroski": scores.get("piotroskiScore"),
+            # per share
+            "share_periods": years[1:],
+            "roll_rows": roll_rows,
+            "pershare_rows": pershare_rows,
+            "periods": years,
+            # evolution
+            "seg_trend_rows": seg_trend_rows,
+            "seg_series": seg_series,
+            "seg_totals": seg_totals,
+            "bridge_steps": bridge_steps,
+            "bridge_min": bridge_trough,
+            "bridge_max": int(bridge_peak * 1.05),
+            "bridge_caption": f"Revenue bridge, {seg_years[0]} to {seg_years[-1]} ({unit})",
+            "margin_rows": margin_rows,
+            # peers
+            "peer_headers": peer_headers, "peer_formats": peer_formats, "peer_rows": peer_rows,
+            "peer_caption": "Peers — fiscal years ending on different dates",
+        }
+        return d
+
+    #: Every `d.<name>` report.html.j2 reads, extracted from the view. The list
+    #: is what makes the next method a CONTRACT rather than a spot check: a key
+    #: the recipe stops using, or starts using, shows up here as a diff.
+    READS = (
+        "basis_facts", "bridge_caption", "bridge_max", "bridge_min",
+        "bridge_steps", "bs_caption", "bs_check", "bs_links", "bs_nodes",
+        "bs_periods", "bs_rows", "bs_sankey_caption", "bs_unit", "cash_caption",
+        "cash_links", "cash_nodes", "company", "exchange", "header_facts",
+        "inc_caption", "inc_links", "inc_nodes", "margin_rows", "peer_caption",
+        "peer_formats", "peer_headers", "peer_rows", "periods", "pershare_rows",
+        "price_date", "roll_rows", "seg_caption", "seg_rows", "seg_series",
+        "seg_total_row", "seg_trend_rows", "seg_years", "share_periods",
+        "ticker", "unit", "z_band", "z_bands", "z_formula", "z_inputs",
+        "z_name", "z_score", "z_tone",
+    )
+
+    def _validate_context(self, d):
+        """What the VIEW needs, checked before anything is rendered.
+
+        Distinct from the 13 assertions in _build_context, and deliberately:
+        those check the ARITHMETIC — that a sankey conserves, that a bridge
+        reaches its endpoint — and belong beside the derivation that produces
+        them. These check the CONTRACT with the recipe, which the arithmetic
+        knows nothing about.
+
+        Two checks, because two things go wrong that nothing else catches."""
+        missing = [key for key in self.READS if key not in d]
+        assert not missing, \
+            (f"financial-profile: the recipe reads {len(missing)} key(s) the "
+             f"controller never built: {', '.join(missing)}")
+
+        # NaN and the infinities are float instances, so no type check sees
+        # them. They travel all the way into `| tojson`, which writes them
+        # into the chart's <pre> unquoted; that is not JSON, so the browser's
+        # JSON.parse throws and the exhibit renders as nothing at all. Deep,
+        # because a report's numbers live inside rows, nodes, links and
+        # series, never at the top level.
+        broken = sorted(_nonfinite(d))
+        assert not broken, \
+            (f"financial-profile: {len(broken)} non-finite number(s) would "
+             f"reach the page and break JSON.parse: {', '.join(broken[:8])}"
+             + (" ..." if len(broken) > 8 else ""))
+

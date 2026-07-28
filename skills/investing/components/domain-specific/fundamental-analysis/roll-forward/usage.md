@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `roll-forward` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Opening balance, every movement, closing balance. The universal shape of a note
 to the accounts — property and equipment, goodwill, provisions, deferred

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `dupont` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Return on equity broken into the drivers that multiply to produce it, tracked
 across periods. Two companies at 25% ROE are not the same company: one earns it

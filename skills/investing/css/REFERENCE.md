@@ -6,12 +6,12 @@ contract lives in `../SKILL.md`; this is the on-demand detail.
 
 ## The single stylesheet
 
-Every document links exactly one file, `css/docs-html.css`. It carries no rules
+Every document links exactly one file, `css/bundle.css`. It carries no rules
 of its own — it declares the cascade order once with `@layer`, then `@import`s
 the modules:
 
 ```css
-@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, business, investing,
+@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, investing,
        code, math, diagrams, charts;
 ```
 
@@ -51,12 +51,11 @@ sit in matching places.
 | `layout.css` | spatial primitives: `columns`/`column` (responsive flex row), `grid` (auto-fit tiles), `card` (titled surface). Collapses to one column on narrow width + print |
 | `toc.css` | the static TOC |
 | `content.css` | table, plain code, figure, collapsible, quote, comparison-table |
-| `code.css` | framed code blocks (`figure.code` title bar) + the runtime syntax palette (`.token.*`, applied by docs-html.js/Prism) |
+| `code.css` | framed code blocks (`figure.code` title bar) + the runtime syntax palette (`.token.*`, applied by bundle.js/Prism) |
 | `callouts.css` | callout, todo-marker |
 | `lists.css` | facts, steps, checklist, trace-id |
 | `blocks.css` | requirement card, acceptance-criteria (Given/When/Then), kpi-tiles, timeline, glossary, revision-note, meter, risk-matrix, footnotes, ISO front/back matter |
-| `business.css` | **domain-specific**, classes namespaced `business-`: financial-table, journal-entry, scenarios, pros-cons, swot-grid, party-block |
-| `investing.css` | **domain-specific**, classes namespaced `investing-`. The investing category (44 components) and the largest module. Opens with ONE shared numeric-table skin selected by an `investing-fin` marker class (`<table class="investing-fin investing-multiples">`), so a new table component inherits alignment, tabular figures and micro-headers for free and the skin is defined once. Three further shared skins follow: `.statement` (income-statement, balance-sheet, cash-flow-statement, dcf-summary — they differ only in which lines are mandatory, which is guidance, not styling), the labelled-bar figure row (bridge, debt-maturity, funnel), and the level-graded cell grid (heatmap, cohort-table, sensitivity-table). Every bar width, bar offset and plot position comes from a `data-` attribute via typed `attr()` — never `style=`; that syntax is Chromium-only today, so `js/modules/attr-fallback.js` applies the same geometry on other engines. It no longer borrows anything from `business` — `.badge` moved to `foundational/blocks.css` when the domains were namespaced. |
+| `domain-specific/fundamental-analysis.css` | **domain-specific** and the largest module — one analysis discipline, classes namespaced `investing-` (the skill's name, not the discipline's, so a component can move between disciplines without a class rename). Opens with ONE shared numeric-table skin selected by an `investing-fin` marker class (`<table class="investing-fin investing-multiples">`), so a new table component inherits alignment, tabular figures and micro-headers for free and the skin is defined once. Three further shared skins follow: `.statement` (income-statement, balance-sheet, cash-flow-statement, dcf-summary — they differ only in which lines are mandatory, which is guidance, not styling), the labelled-bar figure row (bridge, debt-maturity, funnel), and the level-graded cell grid (heatmap, cohort-table, sensitivity-table). Every bar width, bar offset and plot position comes from a `data-` attribute via typed `attr()` — never `style=`; that syntax is Chromium-only today, so `js/modules/attr-fallback.js` applies the same geometry on other engines. It is the only discipline so far; `technical-analysis` or `portfolio` would sit beside it. |
 | `math.css` | formula blocks (`.math`) — spacing, overflow, and the readable-LaTeX fallback before/without KaTeX |
 | `diagrams.css` | **shared, engine-agnostic**: the `.diagram-figure` viewport, `.diagram-canvas` pan surface, `.diagram-tools` glyph toolbar, `.diagram-resize` grip, fullscreen + print |
 | `diagram-mermaid.css` | Mermaid-only: the `pre.mermaid` source-box fallback and the ✎ editor panel (surface, overlay, scrollbars). One `diagram-<engine>.css` per engine — a new engine adds a file here, it never edits `diagrams.css` |
@@ -65,17 +64,18 @@ sit in matching places.
 
 ## Namespacing the domain modules
 
-Every class in `domain-specific/` starts with its domain: `.investing-bridge-bar`,
-`.business-swot`. The markup then says who owns a class, and the two domains
-cannot reach into each other's names.
+Every class in `domain-specific/` starts with its namespace:
+`.investing-bridge-bar`. The markup then says who owns a class, and two
+disciplines could not reach into each other's names.
 
 The rule has a useful side effect: **a class that resists the prefix is telling
 you it isn't domain-specific.** Two failed the test when this was applied and
 moved to `foundational/` instead:
 
-- **`.badge`** — business.css's own comment called it "a generic status/rating
-  pill", and three investing components used it. A shared name across two
-  domains is the definition of foundational.
+- **`.badge`** — the business module's own comment called it "a generic
+  status/rating pill", and three investing components used it. A shared name
+  across two domains is the definition of foundational. (That module has since
+  gone; `fundamental-analysis` is the only discipline left.)
 - **`.neg`** — "this number is negative" is arithmetic, not a domain concept.
   It was the system's only genuine class collision (both domain modules defined
   it), and it is hand-written in doc-type markup across accounting, finance and
@@ -104,14 +104,14 @@ That rule matters because the treatment used to be restated in every domain
 file: the same four declarations appeared **15 times**, at `.72rem` uppercase
 soft-grey — within `.02rem` and `.02em` of the column-header row directly
 beneath them. The title had no rank of its own and read as a second header row.
-Since `content` sits before `business` and `investing` in the layer order,
+Since `content` sits before `investing` in the layer order,
 those copies won; deleting them was the fix, not adding a rule.
 
 Two exceptions are deliberate: `figure.code > figcaption` is a code header with
 a language badge rather than a title (and its `code` layer sits after
 `content`), and `.investing-disclosures-caption` / `.investing-forces-caption`
 sit on a `<p>`, which no element selector can reach — they share one rule in
-`investing.css` that mirrors this one.
+`fundamental-analysis.css` that mirrors this one.
 
 ## Page-specific CSS
 
@@ -122,7 +122,8 @@ before `</head>`, after the design-system link, so the page reads the same
 tokens).
 
 Reach for it last, though. The per-component showcase pages
-(`components/_showcase.html.j2`) are the worked example of NOT needing it: the
+(`components/_showcase.master.html.j2` and the views that extend it) are the
+worked example of NOT needing it: the
 frame around a demo — cover block, case heading, separating rule — is
 `.doc-meta`, `<h3>` and `<hr>`, all already styled by the bundle. If a page
 seems to need its own CSS, first check that an
@@ -172,7 +173,8 @@ paper size, margins and pagination come from the print dialog, not from CSS.
 What remains is the `@media print` block each module keeps for itself:
 `base.css` hides the floating toolbar, `diagrams.css` and
 `diagram-mermaid.css` freeze diagrams to static fully-visible images,
-`layout.css` collapses columns to one, `charts.css` and `investing.css` adjust
+`layout.css` collapses columns to one, `charts.css` and
+`fundamental-analysis.css` adjust
 their own blocks. Those exist to stop screen-only UI reaching paper; they
 impose no layout of their own. A new module that needs print behaviour adds its
 own `@media print` block rather than a shared file.
@@ -186,7 +188,7 @@ New styles for a new component category go in `css/<group>/<name>.css` — pick
 the group by asking who may use it: `foundational/` if any document might,
 `domain-specific/` if exactly one domain owns it (and then namespace every class
 with that domain's name). Add its `@import` and its layer name to the `@layer`
-list in `css/docs-html.css`. Because layer order is declared up front, where you
+list in `css/bundle.css`. Because layer order is declared up front, where you
 put the `@import` does not matter — only the layer list does.
 
 Put the matching component under the same group in `components/`, so the pair

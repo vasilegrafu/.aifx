@@ -1,0 +1,63 @@
+{# The `apache-echarts` showcase — the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called, exactly as
+   a report's report.html.j2 is. Each <section> is one state worth seeing.
+
+   This component is the ENGINE, not a wrapper over it, so the states that
+   matter are different in kind from bar's or area's. There is no "one series
+   vs two" here — there is "what can this reach that the wrappers cannot", and
+   "what happens when the spec is wrong".
+
+   BOTH invocation forms appear below, because the macro takes either:
+   {% raw %}{% call %}{% endraw %} hands it a body, `option=` hands it a string. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a form no component wraps — candlestick, via a {% raw %}{% call %}{% endraw %} block</h3>
+      {% call c.apache_echarts() %}{{ d.candlestick }}{% endcall %}
+      <p class="chart-note">OHLC has no wrapper macro, and this is the honest
+        reason to reach past them for the engine itself. ECharts reads the data
+        as [open, close, low, high].</p>
+    </section>
+    <hr>
+    <section>
+      <h3>naming a design colour — via the <code>option=</code> parameter</h3>
+      {{ c.apache_echarts(option=d.named_colours) }}
+      <p class="chart-note">The target line asks for a specific tone, so the
+        spec names one — <code>token:positive</code> — rather than writing a
+        hex. The document carries no colour value; the browser resolves it.</p>
+    </section>
+    <hr>
+    <section>
+      <h3>a non-default height — the macro emits <code>data-height</code></h3>
+      {{ c.apache_echarts(option=d.heatmap, height=d.tall) }}
+      <p class="chart-note">Two categorical axes against one measure, on the
+        sequential ramp rather than the categorical palette: these buckets are
+        degrees of one thing, not unrelated series.</p>
+    </section>
+    <hr>
+    <section>
+      <h3>the authoring idiom — literal JSON in the template</h3>
+      {# The ONE spec on this page the controller does not validate, and
+         deliberately: it is here to show what an author actually types, which
+         is the form usage.md documents. Everything else arrives as context, so
+         everything else is checked. Keep this one small enough to read whole. #}
+      {% call c.apache_echarts(height=280) %}
+{
+  "xAxis": { "type": "category", "data": ["Q1", "Q2", "Q3", "Q4"] },
+  "yAxis": { "type": "value" },
+  "series": [{ "type": "bar", "name": "Revenue", "data": [12.4, 13.1, 13.9, 15.2] }]
+}
+      {% endcall %}
+      <p class="chart-note">No tooltip, no legend, no aria in the source — the
+        feature adds all three, and only where the author did not.</p>
+    </section>
+    <hr>
+    <section>
+      <h3>degradation — a spec that is not valid JSON</h3>
+      {{ c.apache_echarts(option=d.broken) }}
+      <p class="chart-note">Invalid on purpose: one trailing comma. The card
+        never renders, the source shows instead with a red border, and the
+        engine is not downloaded on its account. This is the only state of this
+        component that cannot be seen any other way.</p>
+    </section>
+{% endblock %}

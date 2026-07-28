@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `valuation-multiples` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Every multiple judged twice: against what peers trade at, and against what
 this company itself has traded at. The premium column is the only number most

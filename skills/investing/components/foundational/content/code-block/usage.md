@@ -11,7 +11,7 @@ filled illustrations.
 
 Source code, configuration, terminal output. Two forms. **Documents hold code
 as PLAIN TEXT** — the language is declared with `data-lang`, and coloring
-happens at view time in the browser (`docs-html.js` loads Prism lazily from
+happens at view time in the browser (`bundle.js` loads Prism lazily from
 CDN; palette in `code.css`). No token markup is ever written into a document.
 
 ## Form 1 — plain (always valid, hand-editing friendly)

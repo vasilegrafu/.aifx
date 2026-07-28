@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `cash-flow-statement` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The three cash sections across periods, plus the derivation that the statement
 itself never prints: free cash flow, written out as arithmetic. The `fcf`

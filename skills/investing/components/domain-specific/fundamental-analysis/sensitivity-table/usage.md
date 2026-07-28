@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `sensitivity-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The two-way grid: one output across two assumptions, colour-graded, with the
 base case outlined. The standard output of any discounted cash flow — value per

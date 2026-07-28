@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `working-capital` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Days sales outstanding, days inventory, days payable, and the cash conversion
 cycle they produce. A negative cycle means suppliers fund the business, which is

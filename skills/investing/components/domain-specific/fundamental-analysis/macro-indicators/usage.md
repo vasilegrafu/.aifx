@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `macro-indicators` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The macro dashboard: each indicator with its latest print, the prior print,
 what was expected, the surprise, and the direction of travel. The opening

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `footnote-disclosures` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The numbered notes to the accounts, each anchored at `id="note-<num>"` so that
 `note=` on any line of `income_statement`, `balance_sheet` or

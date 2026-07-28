@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `aging-schedule` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Receivables (or payables) split into ageing buckets, with each counterparty's
 overdue share drawn as a bar. Ageing is where revenue quality shows up first:

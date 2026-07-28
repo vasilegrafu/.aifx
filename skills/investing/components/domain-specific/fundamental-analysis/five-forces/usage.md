@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `five-forces` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Porter's five forces, each rated and evidenced, from the incumbent's point of
 view. Where `swot_grid` (business category) inventories what a company has,

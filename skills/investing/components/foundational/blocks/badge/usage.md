@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `badge` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/business.css`
+Styled by: `css/foundational/blocks.css`
 
 A generic inline status/rating pill: Buy/Hold/Sell, Pass/Fail, risk ratings,
 lifecycle states — any short verdict, in any domain.

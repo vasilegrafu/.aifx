@@ -1,10 +1,11 @@
 {# Shared tail for every chart component: title the chart, reserve room for that
    title, hand the option to the engine, and print the reading beneath it.
 
-   NOT a component — the file is not named component.html.j2, so the builder
-   never registers it and it never appears in CATALOG.md. It exists so that
-   twenty-one chart macros do not each repeat this, and so a second engine
-   changes one line rather than twenty-one.
+   NOT a component — the file is not named component.html.j2, so nothing
+   discovers it, no macro of its own reaches `c`, and it never appears in
+   CATALOG.md. The leading underscore says the same thing to a reader. It
+   exists so that twenty-one chart macros do not each repeat this, and so a
+   second engine changes one line rather than twenty-one.
 
    It owns the TITLE on purpose. When each component set its own title and then
    separately guessed its own top margin, the two drifted: sixteen charts

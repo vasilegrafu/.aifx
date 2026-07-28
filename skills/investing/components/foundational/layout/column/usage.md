@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `column` component — when to use it, how, and the rules._
 
-Styled by: `css/layout.css`
+Styled by: `css/foundational/layout.css`
 
 One cell inside a [[columns]] row. Holds any components; they flow top-to-bottom
 inside the cell with the normal `--block-gap` rhythm (first/last margins trimmed).

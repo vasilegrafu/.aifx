@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `performance-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Returns by period for the portfolio, the benchmark it is measured against, and
 the excess between them. Three-row minimum: without the benchmark row a return

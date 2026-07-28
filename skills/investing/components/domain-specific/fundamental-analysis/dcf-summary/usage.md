@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `dcf-summary` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The discounted cash flow build in one table: projected free cash flow, its
 present value, the terminal value, then the bridge from enterprise value down to

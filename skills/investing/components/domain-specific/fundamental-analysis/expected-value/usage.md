@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `expected-value` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Scenarios with probabilities attached and the arithmetic done: the bridge
 between "here is what could happen" and "therefore this is worth owning at

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `drawdown-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The worst drawdowns a strategy actually delivered, each with the date it peaked,
 the date it bottomed, the date it got back to even, and how long each leg took.

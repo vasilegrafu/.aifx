@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `covenant-table` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Each financial covenant with its test, its limit, where the company actually
 sits, and how much room is left. Covenants are the mechanism by which a slow

@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `recommendation` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The call, stated once and early: what to do, at what price, over what horizon,
 with how much conviction. A reader who reads nothing else reads this block, so

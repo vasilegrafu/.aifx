@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `width` component — when to use it, how, and the rules._
 
-Styled by: `css/layout.css`
+Styled by: `css/foundational/layout.css`
 
 Constrains any component(s) to a **fixed width** instead of filling the column.
 Every other component is full-width by design (the container owns geometry); wrap

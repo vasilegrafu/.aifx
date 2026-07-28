@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `balance-sheet` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 The balance sheet across periods, using the same line kinds as
 `income_statement`, plus one thing the income statement does not need: an

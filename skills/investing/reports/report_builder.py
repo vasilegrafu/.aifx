@@ -1,189 +1,193 @@
-"""reports — the report engine: fetch live data, shape it, render a report.
+"""Build a report from live data, addressed by NAME.
 
-RUNNABLE ON ITS OWN, with no reference to ../builder.py:
+    ReportBuilder().build("financial-profile", ["INTC", "--peers", "none"], out)
 
-    python reports/report_builder.py financial-profile INTC --peers AMD --out DIR
+    python reports/report_builder.py financial-profile INTC --peers none --out DIR
+    python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 
-Discovery, resolve, controller, compose, write — the same five stages
-components/showcase_builder.py has, and two of them are literally its
-functions. The extra arguments here are the two things a report has and a
-showcase does not: per-report CLI arguments to fetch with, and a destination of
-its own.
+A name rather than a path, because reports sit one level deep and the name IS
+the path — components/showcase_builder.py takes `charts/bar` for the same
+reason, since components nest two to four levels.
 
-The env comes from components/, borrowed rather than built — see SKILL.md for
-that and for the shell/controller/view shape both sides share.
+Nothing is registered. A directory holding report.html.j2 IS a report, so
+adding one means adding files and nothing else, and the builder does no lookup:
+find the directory, path-load the controller, find the ReportController
+subclass, hand it the arguments and the destination.
+
+The builder finds the CLASS rather than being told its name. `financial-profile`
+holding FinancialProfileReportController is a convention worth keeping, but
+deriving one from the other would make the convention load-bearing. A subclass
+of ReportController in the module is unambiguous.
+
+The class does the finding; ReportController.build() does the four stages, and
+this file never touches Jinja or the network.
 """
 
 import argparse
+import importlib.util
 import re
 import sys
 from pathlib import Path
-from types import SimpleNamespace
 
 REPORTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = REPORTS_DIR.parent
 
-# Run standalone, sys.path[0] is reports/ — not the skill root — so `components`
-# would not resolve. One insert fixes it, and it is the same idiom
-# <name>/report_controller.py already uses to reach data_providers.
-sys.path.insert(0, str(SKILL_DIR))
+# PACKAGE-QUALIFIED, and the skill root on the path to make it resolve. It has
+# to match how a leaf controller imports the base: reached under two different
+# names the base would be two module objects, and `issubclass` below would fail
+# against the wrong one.
+if str(SKILL_DIR) not in sys.path:
+    sys.path.insert(0, str(SKILL_DIR))
 
-from components import showcase_builder                  # noqa: E402
-from components.showcase_builder import (                # noqa: E402
-    _blame, load_controller, resolve_name)
+from reports._report_controller import VIEW, ReportController      # noqa: E402
 
 CONTROLLER = "report_controller.py"
-VIEW = "report.html.j2"
 
-REPORT_NAME_RE = re.compile(r"\{#\s*report-name:\s*(.+?)\s*#\}")
+#: The one-line `{# purpose: … #}` header every report view declares, matching
+#: the convention components/ already follows. Read as TEXT rather than through
+#: Jinja: it is a comment, so rendering the template discards it.
+PURPOSE = re.compile(r"\{#\s*purpose:\s*(.+?)\s*#\}", re.S)
 
 
-class Reports:
-    """Every report, and everything needed to build one.
+class ReportBuilder:
 
-    Holds a Showcases so the Jinja environment is built ONCE and shared: the
-    same `c` namespace, the same filters, the same StrictUndefined."""
-
-    def __init__(self, root: Path = REPORTS_DIR):
-        self.root = Path(root).resolve()
-        self.components = showcase_builder.Showcases()
-        self._all: dict[str, Path] | None = None
-
-    # ---------------------------------------------------------------- find
     def all(self) -> dict[str, Path]:
-        """Every report folder, discovered recursively: name -> directory.
+        """Every report, discovered recursively: name -> directory.
 
-        Same rule as components: found, never registered. Cached like the
-        component scan — one write() asks three times over."""
-        if self._all is not None:
-            return self._all
-        dirs: dict[str, Path] = {}
-        for view in sorted(self.root.rglob(VIEW)):
+        Found, never registered — the same rule components use, with
+        report.html.j2 in place of component.html.j2."""
+        found: dict[str, Path] = {}
+        for view in sorted(REPORTS_DIR.rglob(VIEW)):
             name = view.parent.name
-            if name in dirs:
+            if name in found:
                 raise SystemExit(f"duplicate report name: {name!r} "
-                                 f"({dirs[name]} and {view.parent})")
-            dirs[name] = view.parent
-        self._all = dirs
-        return dirs
+                                 f"({found[name]} and {view.parent})")
+            found[name] = view.parent
+        return found
 
-    def resolve(self, name: str) -> str:
-        """Report name, or a unique prefix of one."""
-        return resolve_name(name, self.all(), "report")
+    def parser_for(self, name: str):
+        """The controller, and the parser IT declared.
 
-    def buildable(self) -> tuple[list[str], list[str]]:
-        """Reports that ship BOTH halves, and complaints about the rest.
+        Public because three callers need the pair: build(), help(), and
+        catalog_builder.py, which tabulates what each report accepts."""
+        reports = self.all()
+        if name not in reports:
+            known = ", ".join(sorted(reports)) or "none"
+            raise SystemExit(f"unknown report: {name!r}\nknown: {known}")
+        directory = reports[name]
+        if not (directory / CONTROLLER).exists():
+            raise SystemExit(f"{name}: no {CONTROLLER}")
 
-        Discovery is by the VIEW, so a report always has one — only the
-        controller can be missing, and a report missing it used to fail at
-        build time rather than say so up front."""
-        ready, half = [], []
-        for name, directory in self.all().items():
-            if (directory / CONTROLLER).exists():
-                ready.append(name)
-            else:
-                half.append(f"{name}: has {VIEW} but no {CONTROLLER}")
-        return ready, half
+        controller = self._controller(directory)()
+        parser = argparse.ArgumentParser(
+            prog=f"report_builder.py {name}",
+            description=controller.TITLE or name)
+        controller._add_args(parser)
+        return controller, parser
 
-    def controller(self, name: str):
-        """<name>/report_controller.py, path-loaded, honouring shape()."""
-        return load_controller(self.all()[name] / CONTROLLER,
-                               f"report_{name.replace('-', '_')}", "shape")
+    def build(self, name: str, argv: list[str], out_dir) -> Path:
+        """Build report `name` with `argv` as its own arguments.
 
-    # -------------------------------------------------------------- render
-    def display_name(self, name: str) -> str:
-        """The title a reader sees, from the view's {# report-name: … #} header.
+        `argv` is whatever the CLI did not claim: the report declares what it
+        accepts through _add_args, so the engine never knows what a symbol is.
 
-        Read as TEXT, not through Jinja — the header is a comment, so rendering
-        the template would discard it. Falls back to the folder name."""
-        src = (self.all()[name] / VIEW).read_text(encoding="utf-8")
-        match = REPORT_NAME_RE.search(src)
-        return match.group(1).strip() if match else name.replace("-", " ").title()
+        Raises rather than returning a code: a report asked for by name and
+        not built is a mistake worth stopping for."""
+        controller, parser = self.parser_for(name)
+        # Before the arguments are parsed and long before ~13 network calls: a
+        # malformed report should cost nothing to discover.
+        self.purpose(self.all()[name])
+        args = parser.parse_args(argv)
+        return controller.build(out_dir, **vars(args))
 
-    def compose(self, name: str, d: dict, out_dir: Path | str) -> str:
-        """Render one report's view with the data its controller produced.
+    @staticmethod
+    def purpose(directory: Path) -> str:
+        """The report's one line, from the `{# purpose: … #}` header of its view.
 
-        `out_dir` is where the file is about to be written, and it has NO
-        DEFAULT on purpose: the head's local asset href is relative to it, so a
-        report composed without naming its destination would link assets
-        relative to a directory nobody chose. Whoever knows where the file is
-        going passes it."""
-        rel = (self.all()[name].relative_to(SKILL_DIR) / VIEW).as_posix()
-        display = self.display_name(name)
+        REQUIRED, and checked on every build rather than merely conventional.
+        components/ enforces the same header — catalog_builder.py fails without
+        it — and a report that ships without one is a report nobody can choose
+        from a list. Checking it while the convention still holds is what keeps
+        a reports catalogue free to write later; discovering it across a dozen
+        reports is what makes such a catalogue never get written.
 
-        return self.components.env().get_template(rel).render(
-            d=SimpleNamespace(**d) if isinstance(d, dict) else d,
-            title=d.get("title", display),
-            report_name=display,
-            local_href=showcase_builder.local_href(out_dir),
-            cdn_href=showcase_builder.cdn_href())
+        Returned rather than merely asserted, because the accessor and the
+        check are the same operation: whatever lists reports needs this string,
+        and nothing else should re-implement reading it."""
+        view = directory / VIEW
+        match = PURPOSE.search(view.read_text(encoding="utf-8"))
+        if not match:
+            raise SystemExit(
+                f"{directory.name}: {VIEW} has no {{# purpose: ... #}} header. "
+                f"One line saying what the report is for, as components do.")
+        return " ".join(match.group(1).split())
 
-    def write(self, name: str, rest: list[str], out_dir: str,
-              force: bool = False) -> int:
-        """fetch() -> shape() -> compose -> write the file.
+    def help(self, name: str) -> None:
+        """Print what THIS report accepts."""
+        self.parser_for(name)[1].print_help()
 
-        Named write() to match Showcases.write(); the extra arguments are the
-        two things a report has and a showcase does not — per-report CLI
-        arguments to fetch with, and a destination of its own."""
-        name = self.resolve(name)
-        ready, half = self.buildable()
-        if name not in ready:
-            for complaint in half:
-                print(f"  {complaint}")
-            return 1
-        module = self.controller(name)
+    @staticmethod
+    def _controller(directory: Path) -> type[ReportController]:
+        """Path-load <directory>/report_controller.py and return the class.
 
-        parser = argparse.ArgumentParser(prog=f"report_builder.py {name}")
-        if hasattr(module, "add_args"):
-            module.add_args(parser)
-        args = parser.parse_args(rest)
+        By path rather than by import, so a report folder needs no
+        __init__.py and the rule stays "a directory containing the view".
+        Registered in sys.modules under its own name because a module that
+        path-loads without one is invisible to anything resolving a class back
+        to its file."""
+        source = directory / CONTROLLER
+        alias = f"report_{directory.name}".replace("-", "_")
 
-        if not hasattr(module, "fetch"):
-            raise SystemExit(f"{name}: {CONTROLLER} defines no fetch()")
+        spec = importlib.util.spec_from_file_location(alias, source)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[alias] = module
+        spec.loader.exec_module(module)
 
-        print("fetching …", flush=True)
-        payloads = module.fetch(**vars(args))
-        print("shaping and asserting …", flush=True)
-        d = module.shape(payloads)
-
-        # Resolve the destination BEFORE rendering: the head's local asset href
-        # is relative to it, so the report has to know where it is going.
-        out = Path(out_dir).resolve()
-        try:
-            html = self.compose(name, d, out)
-        except Exception as e:              # noqa: BLE001 — report, don't crash
-            print(f"  {name:<30} FAILED{_blame(e)}: {type(e).__name__}: {e}")
-            return 1
-
-        stem = d.get("slug") or name
-        out.mkdir(parents=True, exist_ok=True)
-        target = (out / f"{stem}-{name}.html" if not stem.endswith(name)
-                  else out / f"{stem}.html")
-        if target.exists() and not force:
-            print(f"refusing to overwrite {target.name} (pass --force)")
-            return 1
-        target.write_text(html, encoding="utf-8")
-
-        left = re.findall(r"\{\{[^{}]{0,60}", html)
-        print(f"built: {target}")
-        if left:
-            print(f"  {len(left)} prose slot(s) left to fill by hand")
-        return 0
+        found = [value for value in vars(module).values()
+                 if isinstance(value, type)
+                 and issubclass(value, ReportController)
+                 and value is not ReportController]
+        if not found:
+            raise SystemExit(f"{directory.name}: {CONTROLLER} defines no "
+                             f"ReportController subclass")
+        if len(found) > 1:
+            raise SystemExit(f"{directory.name}: {CONTROLLER} defines "
+                             f"{len(found)} controllers: "
+                             f"{', '.join(c.__name__ for c in found)}")
+        return found[0]
 
 
-def main(argv: list[str]) -> int:
+def main(argv: list[str] | None = None) -> int:
+    """The terminal entry point.
+
+    parse_known_args, because the arguments after the report name belong to
+    the REPORT, not to this parser: it cannot know what a symbol is, and
+    should not have to.
+
+    Plain hyphens in anything printed: stdout is cp1252 on Windows, where an
+    em dash shows as a replacement character."""
     parser = argparse.ArgumentParser(
         prog="report_builder.py",
-        description="build a report from live data")
-    parser.add_argument("report", help="report name (or a unique prefix)")
+        description="build a report from live data",
+        epilog="example: python reports/report_builder.py financial-profile "
+               "INTC --peers AMD,NVDA --out ./out")
+    parser.add_argument("report", help="report name, e.g. financial-profile")
     parser.add_argument("--out", required=True,
-                        help="output directory — required: the report's local "
-                             "asset links are relative to it")
-    parser.add_argument("--force", action="store_true",
-                        help="overwrite an existing file")
+                        help="output directory. Required and with no default: "
+                             "the page's local asset links are relative to it")
+    # `report_builder.py <report> --help` has to reach the REPORT's parser.
+    # The arguments after the name belong to it, and argparse fires this
+    # parser's own -h during parse_known_args, so the report's would never be
+    # seen. Checked before parsing rather than after, for that reason.
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and not argv[0].startswith("-") and {"-h", "--help"} & set(argv[1:]):
+        ReportBuilder().help(argv[0])
+        return 0
+
     args, rest = parser.parse_known_args(argv)
-    return Reports().write(args.report, rest, args.out, args.force)
+    print(ReportBuilder().build(args.report, rest, args.out))
+    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv[1:]))
+    raise SystemExit(main())

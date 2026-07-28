@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `funnel` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Magnitudes narrowing from a wide top to a specific bottom. Two canonical uses:
 market sizing (total addressable market down to what this company can realistically

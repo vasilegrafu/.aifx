@@ -2,7 +2,7 @@
 
 _Authoring guidance for the `segment-reporting` component — when to use it, how, and the rules._
 
-Styled by: `css/domain-specific/investing.css`
+Styled by: `css/domain-specific/fundamental-analysis.css`
 
 Each segment's revenue and profit with TWO share bars — share of revenue and
 share of profit — because the gap between them is usually the whole analysis.
