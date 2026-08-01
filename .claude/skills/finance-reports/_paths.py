@@ -1,4 +1,4 @@
-"""Where this skill sits, and what it can find from there.
+"""Where things are: this skill in its project, and a controller in this skill.
 
 ONE ASCENT, ONE MARKER: the `.claude` directory. Everything else is derived
 from it, so the things that need a path cannot disagree about the layout.
@@ -47,3 +47,27 @@ VERSION_FILE = PROJECT_ROOT / "version.json"
 
 #: Where this skill sits inside the published repo -- the CDN path suffix.
 CDN_SUFFIX = SKILL_DIR.relative_to(PROJECT_ROOT).as_posix()
+
+
+def owning_directory(instance, base: type, hook: str = "_build_context") -> Path:
+    """The folder of the file where `instance`'s SUBCLASS defined `hook`.
+
+    A component and a report are both identified by the directory they live in,
+    and both bases have to find it the same way -- from the subclass, never
+    from themselves.
+
+    Read off the function the subclass wrote. Not __file__, which names the
+    base module and would put every page in one folder. Not inspect.getfile,
+    which resolves a class through sys.modules[cls.__module__] and so raises
+    "is a built-in class" for a controller loaded BY PATH, since importlib
+    registers nothing there. A code object carries its own filename, so a
+    controller reached by import and one reached by path land in the same
+    place.
+    """
+    for klass in type(instance).__mro__:
+        if klass is base:
+            break                   # reached the base without finding one
+        own = klass.__dict__.get(hook)
+        if own is not None:
+            return Path(own.__code__.co_filename).resolve().parent
+    raise NotImplementedError(f"{type(instance).__name__} defines no {hook}()")

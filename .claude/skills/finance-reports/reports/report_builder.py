@@ -5,29 +5,21 @@
     python reports/report_builder.py financial-profile INTC --peers none --out DIR
     python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 
-A name rather than a path, and no longer because they coincide: a report sits
-under its SUBJECT (`company/financial-profile`), so the name is the leaf, not
-the path. It stays the address because the domain is a taxonomy for READERS —
-it says what the report is about — and asking whoever runs one to know which
-folder it was filed under would make that shelving load-bearing. Discovery is
-recursive and the name must therefore be unique across every domain; `all()`
-refuses a duplicate rather than picking one.
+A NAME, not a path: a report sits under its SUBJECT (`company/…`), and the
+domain is a taxonomy for readers, so nobody running one should have to know
+which folder it was filed under. Discovery is recursive, so the name must be
+unique across every domain — `all()` refuses a duplicate rather than picking
+one. (`components/showcase_builder.py` takes `charts/bar` instead, because
+components nest two to four levels.)
 
-(`components/showcase_builder.py` takes `charts/bar` instead, because
-components nest two to four levels — same idea at two depths.)
+NOTHING IS REGISTERED. A directory holding report.html.j2 IS a report: find the
+directory, path-load the controller, find the ReportController subclass, hand
+it the arguments and the destination. The class is found rather than named —
+deriving `FinancialProfileReportController` from `financial-profile` would make
+that convention load-bearing; a subclass in the module is unambiguous.
 
-Nothing is registered. A directory holding report.html.j2 IS a report, so
-adding one means adding files and nothing else, and the builder does no lookup:
-find the directory, path-load the controller, find the ReportController
-subclass, hand it the arguments and the destination.
-
-The builder finds the CLASS rather than being told its name. `financial-profile`
-holding FinancialProfileReportController is a convention worth keeping, but
-deriving one from the other would make the convention load-bearing. A subclass
-of ReportController in the module is unambiguous.
-
-The class does the finding; ReportController.build() does the four stages, and
-this file never touches Jinja or the network.
+ReportController.build() does the four stages; this file never touches Jinja or
+the network.
 """
 
 import argparse
@@ -98,10 +90,7 @@ class ReportBuilder:
         """Build report `name` with `argv` as its own arguments.
 
         `argv` is whatever the CLI did not claim: the report declares what it
-        accepts through _add_args, so the engine never knows what a symbol is.
-
-        Raises rather than returning a code: a report asked for by name and
-        not built is a mistake worth stopping for."""
+        accepts through _add_args, so the engine never knows what a symbol is."""
         controller, parser = self.parser_for(name)
         # Before the arguments are parsed and long before ~13 network calls: a
         # malformed report should cost nothing to discover.
@@ -113,16 +102,12 @@ class ReportBuilder:
     def purpose(directory: Path) -> str:
         """The report's one line, from the `{# purpose: … #}` header of its view.
 
-        REQUIRED, and checked on every build rather than merely conventional.
-        components/ enforces the same header — catalog_builder.py fails without
-        it — and a report that ships without one is a report nobody can choose
-        from a list. Checking it while the convention still holds is what keeps
-        a reports catalogue free to write later; discovering it across a dozen
-        reports is what makes such a catalogue never get written.
+        REQUIRED, and checked on every build rather than merely conventional:
+        the catalogue is generated from it, and a header enforced late is a
+        header a dozen reports have already skipped.
 
-        Returned rather than merely asserted, because the accessor and the
-        check are the same operation: whatever lists reports needs this string,
-        and nothing else should re-implement reading it."""
+        Returned rather than merely asserted — the accessor and the check are
+        the same operation, so nothing re-implements reading it."""
         view = directory / VIEW
         match = PURPOSE.search(view.read_text(encoding="utf-8"))
         if not match:

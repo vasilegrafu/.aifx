@@ -15,11 +15,11 @@ and does the arithmetic; a view says which components appear and in what order;
 the output is a standalone HTML file with no placeholders to fill and nothing
 to edit by hand. Regenerate it and you get the same file with newer numbers.
 
-That is the whole difference from `docs-html`, the sibling skill. There a
-doc-type is a **skeleton a human fills** — component calls carrying literal
-placeholder text, edited after generation. Here a report is a **program**: the
-same component calls carry `d.*`, and editing the output would be editing a
-build artifact.
+**The contrast worth holding onto** is with the ordinary way a component
+library gets used: a template is a **skeleton a human fills** — component calls
+carrying literal placeholder text, edited after generation. Here the same
+component calls carry `d.*`, so the document is a **program**, and editing the
+output would be editing a build artifact.
 
 ## Documentation map
 

@@ -35,9 +35,10 @@ text. Use a `{% raw %}{% call %}{% endraw %}` block so the JSON reads cleanly:
 ```
 
 - `height` (default `340`) sets the card height in px; width is the column.
-- The palette, ink, axes, grid, legend, and tooltip come from the built-in
-  **docs-html theme** — do NOT set `color`/`textStyle` per chart. Just describe
-  the data.
+- The palette, ink, axes, grid, legend and tooltip come from **the skill's own
+  theme** — `css/foundational/theme.css`, read once by the chart frame — so do
+  NOT set `color`/`textStyle` per chart. Just describe the data. A hex written
+  here is a chart a retheme cannot reach.
 
 Every rendered chart carries a small toolbar (top-right of the card): **download
 as SVG** and **copy the spec**. Both come from the shared frame, so any future

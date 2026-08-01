@@ -35,7 +35,7 @@ from types import SimpleNamespace
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
-from _paths import CDN_SUFFIX, SKILL_DIR, VERSION_FILE
+from _paths import CDN_SUFFIX, SKILL_DIR, VERSION_FILE, owning_directory
 
 COMPONENTS_DIR = Path(__file__).resolve().parent
 
@@ -50,17 +50,10 @@ PAGE = "showcase.html"              # the build artifact
 #
 # Two hrefs, read by css/css.loader.html.j2 and js/js.loader.html.j2 at the
 # skill root. Every page links the bundle LOCAL-FIRST with the pinned CDN as an
-# onerror fallback, so a file inside the tree renders from the working copy and
-# the same file emailed to someone renders from jsDelivr.
-#
-# THIS IS THE ONLY COPY. reports/ imports both, the same way it imports env().
+# onerror fallback. THIS IS THE ONLY COPY — reports/ imports both.
 
 def cdn_href() -> str:
     """CDN prefix (version-pinned) — the FALLBACK half of the asset pair.
-
-    Read at build time, so every generated file is pinned to the version it was
-    built against; published tags are immutable, so a page that has left the
-    tree keeps rendering as it did.
 
     THE OBLIGATION THIS CREATES: change anything under css/ or js/ and the
     version has to be bumped and tagged, or pages falling back to the CDN keep
@@ -155,23 +148,20 @@ FILTERS = {**FORMATS, "fmt": f_fmt}
 def env() -> Environment:
     """The Jinja environment, built ONCE for the whole process.
 
-    Building it parses every component template in the tree, so 109
-    controllers each making their own would parse the tree 109 times. Cached
-    at module level rather than on the instance because the environment
-    belongs to the library, not to whoever is rendering — which is also what
-    lets reports/ borrow this exact one instead of a second configuration that
-    happens to match.
+    Building it parses every component template in the tree, so a per-instance
+    env would reparse the whole library once per controller. Cached at module
+    level because the environment belongs to the library, not to whoever is
+    rendering — which is what lets reports/ borrow this exact one.
 
     TWO ROOTS, components/ FIRST. A view extends _showcase.master.html.j2 and a
     component.html.j2 imports charts/_render.html.j2 — both named from here.
     The master then includes css/css.loader.html.j2 and js/js.loader.html.j2,
     which live at the skill root. One root cannot resolve both.
 
-    StrictUndefined IS THE POINT. A view reading a key its controller never
-    produced would, by default, render an empty string — a tidy blank cell in
-    an otherwise perfect table, which nobody notices. It raises at build time
-    instead, and since Jinja runs only at build time that failure costs
-    nothing and reaches no reader.
+    StrictUndefined IS THE POINT. A key the view reads and the controller never
+    wrote would otherwise render as an empty string — a tidy blank cell nobody
+    notices. It raises at build time instead, where the failure reaches no
+    reader.
     """
     environment = Environment(
         loader=FileSystemLoader([str(COMPONENTS_DIR), str(SKILL_DIR)]),
@@ -217,37 +207,16 @@ class ShowcaseController:
         """Assert the context matches the {# data: … #} contract of the macro
         the view calls. Raise on anything wrong; return nothing.
 
-        OPTIONAL, and it does the half StrictUndefined cannot. A key the view
-        reads and the controller never wrote already raises at render. What
-        does not is a key present and WRONG — a series carrying five points
-        against four categories draws a chart that looks finished and is
-        silently missing a bar. Same failure class as an unbalanced sankey: it
-        renders beautifully and lies.
-
-        So the checks worth writing are the ones about agreement between
-        values, not about presence."""
+        OPTIONAL, and it does the half StrictUndefined cannot: a key present
+        and WRONG. Five points against four categories draws a chart that looks
+        finished and is silently missing a bar — so the checks worth writing
+        are about agreement between values, not presence."""
 
     # ---------------------------------------------------------------- where
     @property
     def directory(self) -> Path:
-        """The component's folder, taken from the SUBCLASS's own file.
-
-        Read off the function that subclass wrote — not __file__, which names
-        this base module and would put every showcase in components/, and not
-        inspect.getfile(cls), which resolves a class through
-        sys.modules[cls.__module__] and so raises "is a built-in class" for a
-        controller loaded BY PATH, since importlib registers nothing. A code
-        object carries its filename with it and needs no such lookup, so a
-        controller reached by import and one reached by path land in the same
-        place."""
-        for klass in type(self).__mro__:
-            if klass is ShowcaseController:
-                break               # reached the base without finding one
-            own = klass.__dict__.get("_build_context")
-            if own is not None:
-                return Path(own.__code__.co_filename).resolve().parent
-        raise NotImplementedError(
-            f"{type(self).__name__} defines no _build_context()")
+        """The component's folder, taken from the SUBCLASS's own file."""
+        return owning_directory(self, ShowcaseController)
 
     @property
     def name(self) -> str:
@@ -261,11 +230,8 @@ class ShowcaseController:
         the component.
 
         A showcase always lands next to what it shows, so unlike a report it
-        has no destination to be told — the asset hrefs follow from where it
-        goes.
-
-        Raises rather than returning a code: a showcase that cannot be built
-        is a mistake worth stopping for, and the caller owns the reporting."""
+        has no destination to be told. Raises rather than returning a code —
+        the caller owns the reporting."""
         directory = self.directory
         try:
             view = (directory / VIEW).relative_to(COMPONENTS_DIR).as_posix()

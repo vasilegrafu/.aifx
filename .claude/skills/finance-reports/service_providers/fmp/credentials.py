@@ -8,9 +8,7 @@ with no exception.
     key:  $FMP_API_KEY  ->  <project>/secrets.<env>.json  ->  hard error
     env:  $ENVIRONMENT  ->  <project>/environment.json    ->  hard error
 
-First hit wins, and there is deliberately no third place either looks: a skill
-that reads credentials from wherever it can find them is one refactor away
-from reading them from somewhere it should not.
+First hit wins, and there is deliberately no third place either looks.
 
 NO DEFAULT AT ANY POINT. One declaration selects both the config file and the
 secrets file, so a run cannot read dev settings against a prod key, and every
@@ -31,10 +29,8 @@ ENV_VAR = "FMP_API_KEY"
 ENV_NAME_VAR = "ENVIRONMENT"
 KNOWN_ENVS = ("dev", "prod")
 
-#: Which environment this checkout is. TRACKED, unlike the secrets it selects:
-#: it holds no secret, and a name nobody reaches for by reflex is a name that
-#: can be committed safely. `.env` could not — it is where every tutorial in
-#: the world tells you to put an API key.
+#: Which environment this checkout is. TRACKED, unlike the secrets it selects —
+#: deliberately NOT named `.env`; see service_providers/REFERENCE.md.
 ENV_FILE = PROJECT_ROOT / "environment.json"
 
 
@@ -56,10 +52,8 @@ def _from_file() -> str:
 def resolve() -> tuple[str, str]:
     """(environment, where it came from). NO default at any point.
 
-    The source is returned, not just the name, because with two places to look
-    the useful question is not only "which environment" but "why did it think
-    so" — a stale shell variable overriding the checkout's own file is exactly
-    the confusion this prevents, and the build prints the answer."""
+    The source comes back too, so a build can say why it thinks so — a stale
+    shell variable beating the checkout's own file is otherwise silent."""
     name = os.environ.get(ENV_NAME_VAR, "").strip()
     source = f"${ENV_NAME_VAR}"
     if not name:
@@ -107,11 +101,8 @@ The environment comes from ${ENV_NAME_VAR} or {ENV_FILE}; there is no default.""
 def describe() -> str:
     """WHERE the key will come from — never the key itself.
 
-    Exists so a build can say which credential it used. The env var silently
-    beating the file is the failure this prevents: a variable left over in a
-    shell from some earlier command overrides secrets.prod.json with nothing
-    on screen to say so. The FULL path, because two checkouts hold files of
-    the same name and a basename cannot tell you which one paid."""
+    The FULL path: two checkouts hold files of the same name, and a basename
+    cannot tell you which one paid."""
     if os.environ.get(ENV_VAR, "").strip():
         return f"key from ${ENV_VAR}"
     return f"key from {secrets_file()}"

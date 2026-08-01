@@ -44,14 +44,9 @@ SKILL_DIR = REPORTS_DIR.parent
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
-# BORROWED, NOT REBUILT — the same reason env() is. A macro drawn on a report
-# has to link the same assets it links on a showcase, and two copies of the
-# pair would be two claims about that, free to disagree. (They were, and did:
-# the two had already drifted apart in their error strings.)
-#
-# `local_href` is why --out is required and has no default: a report can be
-# written anywhere, and the href back to css/ and js/ depends entirely on
-# where. See reports/REFERENCE.md.
+# BORROWED, NOT REBUILT: a macro drawn on a report must link the same assets it
+# links on a showcase, and two copies of the pair would be free to disagree.
+from _paths import owning_directory                          # noqa: E402
 from components._showcase_controller import (                # noqa: E402
     cdn_href, env, local_href)
 
@@ -63,8 +58,8 @@ def blame(exc: BaseException) -> str:
 
     Jinja rewrites tracebacks so template frames appear as real frames whose
     filename is the .j2 path; the DEEPEST one is the culprit. A report view
-    calls 25 macros across 15 components, so "something in the render failed"
-    is not an answer anyone can act on."""
+    calls macros across a dozen-odd components, so "something in the render
+    failed" is not an answer anyone can act on."""
     frames = [f for f in traceback.extract_tb(exc.__traceback__)
               if f.filename.endswith(".j2")]
     if not frames:
@@ -80,11 +75,7 @@ class ReportController:
     the hooks.
     """
 
-    #: What a reader sees as the document type, above the title. A class
-    #: attribute rather than a {# report-name: … #} comment scraped out of the
-    #: template source: Jinja discards comments before rendering, so reading
-    #: one means parsing the file you are about to render, as text, with a
-    #: regex. Declared here it is simply available.
+    #: What a reader sees as the document type, above the title.
     TITLE = ""
 
     # ------------------------------------------------------------- subclass
@@ -121,21 +112,8 @@ class ReportController:
     # ---------------------------------------------------------------- where
     @property
     def directory(self) -> Path:
-        """The report's folder, taken from the SUBCLASS's own file.
-
-        Read off the function that subclass wrote — not __file__, which names
-        this base module, and not inspect.getfile(cls), which resolves a class
-        through sys.modules[cls.__module__] and so raises for a controller
-        loaded BY PATH, since importlib registers nothing. A code object
-        carries its filename with it and needs no such lookup."""
-        for klass in type(self).__mro__:
-            if klass is ReportController:
-                break               # reached the base without finding one
-            own = klass.__dict__.get("_build_context")
-            if own is not None:
-                return Path(own.__code__.co_filename).resolve().parent
-        raise NotImplementedError(
-            f"{type(self).__name__} defines no _build_context()")
+        """The report's folder, taken from the SUBCLASS's own file."""
+        return owning_directory(self, ReportController)
 
     @property
     def name(self) -> str:
@@ -184,11 +162,8 @@ class ReportController:
             raise SystemExit(f"{self.name}: render failed{blame(e)}: "
                              f"{type(e).__name__}: {e}") from None
 
-        # Overwritten without asking. The output is a BUILD ARTIFACT, the same
-        # as a showcase page: the controller and the view are the source, and
-        # a report regenerated from the same symbol is the same report with
-        # newer numbers. Nothing here is edited by hand, so there is nothing
-        # to protect.
+        # Overwritten without asking: the output is a build artifact, and the
+        # controller and the view are the source.
         out.mkdir(parents=True, exist_ok=True)
         target = out / self._filename(d)
         target.write_text(html, encoding="utf-8")

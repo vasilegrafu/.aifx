@@ -4,20 +4,18 @@
 
     python components/catalog_builder.py
 
-WHY THIS IS GENERATED. An index of 109 items maintained by hand is an index
-that is wrong, and a previous one was deleted for exactly that reason — a
-dangling reference to it outlived the file. Every component already declares
-what it is in the `{# purpose: … #}` header of its own markup, so the catalogue
-is READ FROM THE SOURCE and cannot drift: a component that changes its purpose
-changes this file on the next build, and one that ships without a purpose fails
-the build rather than appearing blank.
+WHY THIS IS GENERATED. An index of a hundred-odd items maintained by hand is an
+index that is wrong. Every component already declares what it is in the
+`{# purpose: … #}` header of its own markup, so the catalogue is READ FROM THE
+SOURCE and cannot drift: a component that changes its purpose changes this file
+on the next build, and one that ships without a purpose fails the build rather
+than appearing blank.
 
-WHAT IT IS FOR, and what it is not. usage.md answers "should I use THIS?" —
-one file per component, opened once you have a candidate. Nothing answered
-"which of the 109?", so choosing meant grepping the tree. This is that missing
-step and nothing more: a name, what it is for, and where to read the rules. It
-carries no parameters and no examples, because those would be a second copy of
-usage.md and would rot.
+WHAT IT IS FOR, and what it is not. usage.md answers "should I use THIS?" — one
+file per component, opened once you have a candidate. Nothing answered "which
+one?", so choosing meant grepping the tree. This is that missing step and
+nothing more: a name, what it is for, and where to read the rules. No parameters
+and no examples — those would be a second copy of usage.md and would rot.
 
 The output is a BUILD ARTIFACT like every other page here. Regenerate it; do
 not edit it.

@@ -1,16 +1,12 @@
 """A thin, deliberately un-clever FMP client. The only thing in this skill
 that touches the network.
 
-NO CACHING, ON PURPOSE. The obvious optimisation here is to cache responses so
-repeated builds are instant, and it is the wrong call: a financial report's
-whole claim is that it describes the world at a stated moment. The ORCL report
-generated on 23 July says the price is $120.04; the live price the next day was
-$118.38. A cache would have reproduced the stale figure perfectly and silently,
-which is exactly the failure the report's own basis-of-preparation block exists
-to prevent. A full report is ~10 calls and about ten seconds. Pay it.
+NO CACHING, ON PURPOSE. A financial report's whole claim is that it describes
+the world at a stated moment, and a cache reproduces a stale price perfectly and
+silently — the failure the basis-of-preparation block exists to prevent. A full
+report is ~13 calls and about ten seconds. Pay it.
 
-The rate limiter is the one concession to politeness, mirroring the convention
-already used in solution.atlas (290 calls / 10 s).
+The rate limiter is politeness, not protection (290 calls / 10 s).
 """
 
 import time
@@ -31,12 +27,10 @@ class FmpError(RuntimeError):
 class FmpClient:
     """`get(endpoint, **params)` -> parsed JSON.
 
-    RAISES RATHER THAN RETURNING EMPTY. The established getters in
-    solution.atlas swallow every exception and return `[]`, which suits a
-    dashboard that would rather show a gap than a stack trace. A report is the
-    opposite case: an empty list here becomes a missing row, a broken sum, and
-    a sankey that no longer conserves — all rendered without complaint. Fail
-    loudly at the source and the tie-checks downstream never see bad input."""
+    RAISES RATHER THAN RETURNING EMPTY. An empty list becomes a missing row,
+    then a broken sum, then a sankey that no longer conserves — all rendered
+    without complaint. Failing loudly at the source is what lets the identity
+    assertions downstream assume their input is real."""
 
     def __init__(self, key: str | None = None, base_url: str | None = None,
                  timeout: float = 30.0):
