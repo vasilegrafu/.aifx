@@ -113,6 +113,30 @@ help here: it has no sensible default to fall back on, and a report written to
 an invented path fails silently in two ways at once, landing where nobody looks
 and computing its asset links against the wrong root.
 
+`output/` at the repo root is the **conventional** destination, gitignored
+except for its `.gitkeep`. A convention, not a default: the builder still
+refuses to run without `--out`.
+
+### `--env` has no default either, and for the same reason
+
+`--env dev|prod` is required. It selects **two** files — `config/config.<env>.json`
+for the API URL and `secrets.<env>.json` for the key — so one omission would
+change both. A default would let a run use the wrong credentials in silence:
+the request succeeds, the numbers arrive, and only the quota or the rate limit
+ever says which key paid for them.
+
+Required rather than optional because a required argument cannot be forgotten,
+and it lands in shell history and CI logs where a variable set in some earlier
+shell does not. `main()` sets `AIFX_ENV` for the process from it, so
+`config.py` and `credentials.py` keep one resolution path rather than being
+handed two answers by two callers.
+
+The build states what it resolved before any network call:
+
+```
+environment: dev   (config.dev.json, key from secrets.dev.json)
+```
+
 `_filename(d)` defaults to `<name>.html`; `financial-profile` overrides it to
 `<slug>-financial-profile.html`, because the report is *about* a company and two
 symbols must not land on the same file.
@@ -146,8 +170,8 @@ never restated in code.
 ## The engine
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --out DIR
-python reports/report_builder.py financial-profile MU --peers INTC,WDC --out DIR
+python reports/report_builder.py financial-profile MU --peers none --env dev --out ./output
+python reports/report_builder.py financial-profile MU --peers INTC,WDC --env dev --out ./output
 python reports/report_builder.py financial-profile --help    # the REPORT's args
 ```
 
@@ -253,10 +277,10 @@ with one report and expensive to backfill across a dozen.
    `{# purpose: … #}` header is required** — the build checks it.
 3. `reports/<domain>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
 4. **`python reports/catalog_builder.py`** — nothing calls it for you.
-5. `python reports/report_builder.py <name> … --out DIR`
+5. `python reports/report_builder.py <name> … --env dev|prod --out ./output`
 
 Nothing to register. Building requires the network and `FMP_API_KEY` — see
-`../data_providers/REFERENCE.md` for the client and the credential order.
+`../service_providers/REFERENCE.md` for the client and the credential order.
 
 **Nothing runs the catalogue automatically.** There is no CI and no git hook
 here, so a report added without step 4 leaves `CATALOG.md` short by one.

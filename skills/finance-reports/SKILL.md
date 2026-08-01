@@ -32,8 +32,8 @@ build artifact.
 | `reports/REFERENCE.md` | the report engine: the four stages, the controller contract, where the guarantees come from |
 | `css/REFERENCE.md` | the stylesheet: `@layer` order, module map, theming |
 | `js/REFERENCE.md` | the runtime: modules, chart frame, the failure states |
-| `data_providers/REFERENCE.md` | the only code doing I/O: the client, credentials, why it raises and never caches |
-| `data_providers/fmp/endpoints.md` | which FMP endpoints exist, and which the plan allows |
+| `service_providers/REFERENCE.md` | the only code doing I/O: the client, credentials, why it raises and never caches |
+| `service_providers/fmp/endpoints.md` | which FMP endpoints exist, and which the plan allows |
 | `components/<cat>/<name>/usage.md` | one per component: when to use it, and the rules |
 | `reports/<domain>/<name>/usage.md` | one per report: what it argues, what it fetches, what it guarantees |
 
@@ -54,7 +54,7 @@ enough to be worth re-deriving each time.
 ## CLI
 
 ```bash
-python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
+python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out ./output
 python components/showcase_builder.py charts/bar
 ```
 
@@ -252,7 +252,7 @@ reports/
 
 css/  css.loader.html.j2       the <link>   + its CDN fallback
 js/   js.loader.html.j2        the <script> + its CDN fallback
-data_providers/fmp/            the client — the ONLY thing doing I/O
+service_providers/fmp/            the client — the ONLY thing doing I/O
 ```
 
 `_showcase_controller.py` is one file because each part of it has exactly one
@@ -333,27 +333,60 @@ This repository is **public**, and jsDelivr's `/gh/` path publishes it — a key
 committed anywhere under this directory is fetchable at a URL by anyone who
 guesses the path.
 
+**Two files per environment, and the split is per-FILE, not per-field:**
+
+```
+config/config.<env>.json    TRACKED     api_url, and anything else not secret
+secrets.<env>.json          GITIGNORED  api_key, and nothing else
+secrets.example.json        TRACKED     the shape, with a placeholder
+```
+
+Set up a clone with `cp secrets.example.json secrets.dev.json` and replace the
+placeholder. **The template and the real file are two filenames on purpose**:
+`git add .` must never be able to stage a file that holds a key, and one name
+cannot be both ignored and tracked.
+
+```json
+config/config.dev.json   { "service_providers": { "fmp": { "api_url": "…" } } }
+secrets.dev.json         { "fmp": { "api_key": "<key>" } }
+```
+
+"Is this safe to commit?" is decided once, for the file, rather than judged
+per field every time someone adds one. An `api_key` in a tracked config is not
+a mistake made deliberately — it is one made by adding a field beside the
+fields already there. `config.py` rejects a `service_providers.*.api_key`
+outright for that reason.
+
+Key resolution, first hit wins:
+
 ```
 1. FMP_API_KEY              environment variable — preferred, and the only
                             option that works in CI, where there is no file
-2. secrets.<env>.json       at the REPO ROOT, gitignored. <env> is AIFX_ENV,
-                            dev | prod, default dev
+2. secrets.<env>.json       at the REPO ROOT, gitignored
 3. hard error naming both
-```
-
-```json
-{ "fmp": { "api_key": "<key>" } }
 ```
 
 **The secrets files sit at the repo root, not inside the skill** — a skill is
 meant to be copied or junctioned as `skills/finance-reports/` and nothing
 above it, so keeping the key outside that subtree means copying the skill
-cannot carry a credential with it.
+cannot carry a credential with it. `config/` sits beside it, and costs nothing
+new: the skill already resolves `REPO_ROOT` to read `version.json`.
 
-`AIFX_ENV` defaults to **dev**, the safe one: an unset variable must not reach
-production credentials, and an unknown value is an error rather than a silent
-fallback to them. It is an environment variable rather than a flag because a
-flag is something you can forget on the one invocation where it matters.
+**`AIFX_ENV` has NO default, and `--env dev|prod` is required.** This is the
+same decision `--out` makes: an absent default is a question, not a gap. A
+default would let a run use the wrong credentials and the wrong config in
+silence — the request succeeds, the numbers arrive, and only the quota ever
+says which key paid. One switch selects both files, so a run cannot read dev
+settings against a prod key.
+
+Every build says what it resolved, before the ~13 calls:
+
+```
+environment: dev   (config.dev.json, key from secrets.dev.json)
+```
+
+That line also exposes the one silent override left: a stale `FMP_API_KEY` in
+your shell beats the file, and now says so.
 
 There is deliberately no third place it looks.
 
@@ -376,7 +409,7 @@ There is deliberately no third place it looks.
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
-4. `python reports/report_builder.py <name> … --out DIR`
+4. `python reports/report_builder.py <name> … --env dev|prod --out ./output`
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so

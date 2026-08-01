@@ -1,4 +1,4 @@
-# data_providers/ — reference
+# service_providers/ — reference
 
 Deep reference for the **only code in this skill that touches the network**:
 the client, the credential resolution, and the four decisions that make a
@@ -6,7 +6,8 @@ report's numbers trustworthy. The authoring contract lives in `../SKILL.md`;
 what the provider itself does and does not serve is in `fmp/endpoints.md`.
 
 ```
-data_providers/
+service_providers/
+  config.py          non-secret settings, from config/config.<env>.json
   fmp/
     client.py        FmpClient — get(), get_many(), rate limiting
     credentials.py   api_key() — a two-place resolution order
@@ -15,11 +16,36 @@ data_providers/
 
 One provider so far. A second would sit beside `fmp/` with the same three
 files; nothing in the skill imports a provider by any name but its own.
+`config.py` is shared, because the environment is a property of the run rather
+than of any one provider.
+
+## Config and secrets are two files, split per FILE
+
+```
+config/config.<env>.json    TRACKED     api_url, timeouts, anything not secret
+secrets.<env>.json          GITIGNORED  api_key, and nothing else
+secrets.example.json        TRACKED     the shape, with a placeholder
+```
+
+Both at the repo root, both chosen by the same `<env>`, so a run cannot read
+dev settings against a prod key.
+
+**The split is per-file rather than per-field on purpose.** This repository is
+public and served by jsDelivr, so "is this safe to commit?" must be a property
+of the FILE, decided once — not a judgement made per field every time someone
+adds one. Nobody puts an `api_key` in a tracked config deliberately; they do it
+by adding a field beside the fields already there. `config.service_provider()`
+therefore rejects a `service_providers.*.api_key` outright and says where the
+key belongs.
+
+`client.py` holds no URL of its own: `base_url` defaults to
+`service_provider("fmp")["api_url"]`, so pointing a run at a different FMP
+surface is a config edit rather than a code change.
 
 ## The API
 
 ```python
-from data_providers.fmp import FmpClient
+from service_providers.fmp import FmpClient
 
 client = FmpClient()                     # key resolved for you
 data   = client.get("profile", symbol="MU")
@@ -89,7 +115,7 @@ served by jsDelivr; a key in a pasted traceback is a leaked key.
 1. FMP_API_KEY            environment variable — preferred, and the only one
                           that works in CI, where there is no file
 2. secrets.<env>.json     {"fmp": {"api_key": "..."}} at the REPO ROOT,
-                          gitignored. <env> is AIFX_ENV, dev | prod, default dev
+                          gitignored. <env> is AIFX_ENV — no default
 3. hard error naming both
 ```
 
@@ -104,14 +130,41 @@ copy; one kept above it cannot.
 
 **Why two environments.** A dev key and a production key have different rate
 limits and different blast radii, and the way that goes wrong is someone
-burning a production quota on a test run. `AIFX_ENV` defaults to `dev` — the
-safe end — and an unrecognised value is a hard error, so a typo cannot fall
-through to production.
+burning a production quota on a test run.
 
-The tracked repo carries **no** `secrets.*.json`; `.gitignore` covers the
-pattern. The placeholder each file ships with (`"<your-fmp-dev-api-key>"`) is
-detected and rejected by name, rather than being sent to the API so the reader
-has to work backwards from a 401.
+**Why there is no default environment.** The same reason `--out` has none: an
+absent default is a question, not a gap. A default would let a run use the
+wrong key and the wrong config in silence — the request succeeds, the numbers
+arrive, and only the quota ever says which key paid. `AIFX_ENV` unset is a hard
+error, an unrecognised value is a hard error, and `report_builder.py` takes
+`--env dev|prod` as a **required** argument. Required rather than optional
+because a required argument cannot be forgotten, and it lands in shell history
+and CI logs where a variable set in some earlier shell does not.
+
+**Every build says what it resolved**, before any network call:
+
+```
+environment: dev   (config.dev.json, key from secrets.dev.json)
+```
+
+`credentials.describe()` produces the second half and never returns the key
+itself. It exists for the one silent override left in the order above: a stale
+`FMP_API_KEY` in a shell beats `secrets.prod.json` with nothing on screen to
+say so.
+
+**The template is a separate filename, and that is the whole safety property.**
+`secrets.example.json` is tracked and carries a placeholder; `secrets.<env>.json`
+is ignored and carries the key. One name cannot be both, and the failure mode
+is not hypothetical here — `git.commit&push.bat` runs `git add .`, so a tracked
+file holding a real key would be pushed to a public repo on the next run with
+nothing to stop it. Set up a clone with:
+
+```bash
+cp secrets.example.json secrets.dev.json     # then replace the placeholder
+```
+
+The placeholder is detected and rejected by name at build time, rather than
+being sent to the API so the reader has to work backwards from a 401.
 
 ## Adding an endpoint
 
@@ -125,6 +178,6 @@ has to work backwards from a 401.
 
 ## Adding a provider
 
-Create `data_providers/<name>/` with the same three files. Keep the same two
+Create `service_providers/<name>/` with the same three files. Keep the same two
 contracts — **raise rather than return empty**, and **never let the key into an
 exception** — because the assertions downstream are written assuming both.

@@ -20,8 +20,6 @@ import httpx
 
 from .credentials import api_key
 
-BASE_URL = "https://financialmodelingprep.com/stable"
-
 # FMP's Starter plan. See endpoints.md for what this plan cannot reach.
 RATE_LIMIT, RATE_WINDOW = 290, 10.0
 
@@ -40,10 +38,16 @@ class FmpClient:
     a sankey that no longer conserves — all rendered without complaint. Fail
     loudly at the source and the tie-checks downstream never see bad input."""
 
-    def __init__(self, key: str | None = None, base_url: str = BASE_URL,
+    def __init__(self, key: str | None = None, base_url: str | None = None,
                  timeout: float = 30.0):
+        # Both resolved lazily and from the SAME environment: the URL out of
+        # the tracked config/config.<env>.json, the key out of the gitignored
+        # secrets.<env>.json. Neither is a constant in this file, so pointing a
+        # run at a different FMP surface is a config edit, not a code change.
+        from ..config import service_provider
+
         self._key = key or api_key()
-        self._base = base_url.rstrip("/")
+        self._base = (base_url or service_provider("fmp")["api_url"]).rstrip("/")
         self._timeout = timeout
         self._calls: deque[float] = deque()
 

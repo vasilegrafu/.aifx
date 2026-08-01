@@ -16,8 +16,8 @@ this report describes, it does not argue a position.
 ## Build it
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --out DIR
-python reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --out DIR
+python reports/report_builder.py financial-profile MU --peers none --env dev --out ./output
+python reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --env dev --out ./output
 python reports/report_builder.py financial-profile --help
 ```
 
@@ -70,7 +70,7 @@ quarterly for the three that describe the last reported quarter.
 **Plan constraint.** On the Starter plan, `key-metrics` and
 `revenue-product-segmentation` serve annual only — quarterly returns HTTP 402.
 That is why every exhibit downstream of them stays annual. See
-`data_providers/fmp/endpoints.md` before adding an endpoint.
+`service_providers/fmp/endpoints.md` before adding an endpoint.
 
 **Units.** FMP reports raw dollars. Everything is converted to **$ millions
 once**, in `_m()`, so no downstream number is ever in the wrong scale.

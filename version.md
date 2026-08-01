@@ -136,29 +136,71 @@ the seam leaking: those rules are true of ECharts and false of the next engine.
 canvas before it draws, and the three rules hang off that. Safe to change — the
 canvas and its class are built at runtime, so no published document names them.
 
-### Credentials move out of the skill, and split dev from prod
+### `data_providers/` becomes `service_providers/`, with config beside secrets
+
+The directory is renamed in place — it stays **inside** the skill, so the
+README's Option B still works: junction `skills/finance-reports/` and the data
+layer comes with it. `service_providers` also matches the key the config
+document uses.
+
+Settings now come in two files per environment, and **the split is per FILE,
+not per field**:
+
+```
+config/config.<env>.json    TRACKED     api_url, and anything else not secret
+secrets.<env>.json          GITIGNORED  api_key, and nothing else
+secrets.example.json        TRACKED     the shape, with a placeholder
+```
+
+The template is a **separate filename** from the real file, deliberately. One
+name cannot be both ignored and tracked, and the repo's own
+`git.commit&push.bat` runs `git add .` — so a tracked file that holds a key
+would be pushed to a public repo on the next run. Set up a clone with
+`cp secrets.example.json secrets.dev.json`.
+
+This repository is public and served by jsDelivr, so "is this safe to commit?"
+has to be a property of the file, decided once, rather than a judgement made
+per field every time someone adds one. Nobody puts an `api_key` in a tracked
+config deliberately; they do it by adding a field beside the fields already
+there. `config.service_provider()` rejects a `service_providers.*.api_key`
+outright and says where the key belongs.
+
+`client.py` loses its `BASE_URL` constant: `base_url` defaults to
+`service_provider("fmp")["api_url"]`, so pointing a run at a different FMP
+surface is a config edit rather than a code change.
 
 `credentials.local.json`, which sat beside `credentials.py`, is replaced by
-**`secrets.dev.json` / `secrets.prod.json` at the REPO ROOT**, selected by
-`AIFX_ENV` (default `dev`). The shape is `{"fmp": {"api_key": "…"}}`, and
-`FMP_API_KEY` still wins over both — it is the only option that works in CI,
-where there is no file.
+`secrets.<env>.json` **at the repo root** — outside the skill on purpose, since
+a credential kept inside that subtree travels with every copy of the skill and
+one kept above it cannot. `config/` sits beside it and costs nothing new: the
+skill already resolves `REPO_ROOT` to read `version.json`. `FMP_API_KEY` still
+wins over both; it is the only option that works in CI, where there is no file.
 
-Out of the skill on purpose. A skill is meant to be copied or junctioned as
-`skills/finance-reports/` and nothing above it, so a credential kept inside
-that subtree travels with every copy; one kept above it cannot.
+### There is no default environment
 
-Two environments because a dev key and a production key have different rate
-limits and different blast radii, and the way that goes wrong is someone
-burning a production quota on a test run. `AIFX_ENV` defaults to the safe end,
-and an unrecognised value is a hard error rather than a silent fallback to
-production. The placeholder the files ship with is detected by name and
-refused, instead of being sent to the API so the reader has to work backwards
-from a 401.
+`--env dev|prod` is **required** on `report_builder.py`, and `AIFX_ENV` unset
+is a hard error. This is the decision `--out` already made one directory over:
+an absent default is a question, not a gap.
+
+A default would let a run use the wrong credentials and the wrong config in
+silence — the request succeeds, the numbers arrive, and only the quota or the
+rate limit ever says which key paid for them. One switch selects both files, so
+a run cannot read dev settings against a prod key. Required rather than
+optional because a required argument cannot be forgotten, and it lands in shell
+history and CI logs where a variable set in some earlier shell does not.
+
+Every build now states what it resolved, before the ~13 calls:
+
+```
+environment: dev   (config.dev.json, key from secrets.dev.json)
+```
+
+That line also exposes the one silent override left in the order: a stale
+`FMP_API_KEY` in a shell beats `secrets.prod.json`, and now says so.
 
 **Migrating:** move your key out of `credentials.local.json` into
-`secrets.dev.json` and delete the old file. `.gitignore` now covers
-`secrets.*.json`.
+`secrets.dev.json` and delete the old file; add `--env` to every build command.
+`.gitignore` covers `secrets.*.json` and does **not** cover `config/`.
 
 ### Tooling: a declared environment and an output shelf
 
@@ -321,7 +363,7 @@ that does not affect the shipped CSS/JS bundle.
 ## 4.3.0 — 2026-07-24
 
 **Minor.** Adds the **`investing`** skill — a data-driven report generator
-(`data_providers/fmp` → `report.builder.py` → `report.html.j2` → thin
+(`service_providers/fmp` → `report.builder.py` → `report.html.j2` → thin
 components → HTML), with 110 components seeded from docs-html 4.2.0 and one
 report (`financial-profile`). No change to docs-html markup: a 4.2.0 document
 upgrades, if desired, by repointing its two head links to `@4.3.0`, and still

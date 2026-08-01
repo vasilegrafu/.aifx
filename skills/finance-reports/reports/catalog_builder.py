@@ -89,7 +89,7 @@ class CatalogBuilder:
             "it fetches, what that costs, and what its assertions guarantee.",
             "",
             "```bash",
-            "python reports/report_builder.py <report> <args...> --out DIR",
+            "python reports/report_builder.py <report> <args...> --env dev|prod --out ./output",
             "```",
             "",
             "| report | title | what it argues | arguments | docs |",

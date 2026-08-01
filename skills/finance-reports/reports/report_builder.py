@@ -2,8 +2,8 @@
 
     ReportBuilder().build("financial-profile", ["INTC", "--peers", "none"], out)
 
-    python reports/report_builder.py financial-profile INTC --peers none --out DIR
-    python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
+    python reports/report_builder.py financial-profile INTC --peers none --env dev --out ./output
+    python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out ./output
 
 A name rather than a path, and no longer because they coincide: a report sits
 under its SUBJECT (`company/financial-profile`), so the name is the leaf, not
@@ -32,6 +32,7 @@ this file never touches Jinja or the network.
 
 import argparse
 import importlib.util
+import os
 import re
 import sys
 from pathlib import Path
@@ -47,6 +48,9 @@ if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
 from reports._report_controller import VIEW, ReportController      # noqa: E402
+from service_providers.config import config_file                   # noqa: E402
+from service_providers.fmp.credentials import (                    # noqa: E402
+    ENV_NAME_VAR, KNOWN_ENVS, describe)
 
 CONTROLLER = "report_controller.py"
 
@@ -177,8 +181,13 @@ def main(argv: list[str] | None = None) -> int:
         prog="report_builder.py",
         description="build a report from live data",
         epilog="example: python reports/report_builder.py financial-profile "
-               "INTC --peers AMD,NVDA --out ./out")
+               "INTC --peers AMD,NVDA --env dev --out ./output")
     parser.add_argument("report", help="report name, e.g. financial-profile")
+    parser.add_argument("--env", required=True, choices=KNOWN_ENVS,
+                        help="which environment to run as. Required and with "
+                             "no default: it selects both config/config.<env>."
+                             "json and secrets.<env>.json, and a run that does "
+                             "not say cannot be told apart afterwards")
     parser.add_argument("--out", required=True,
                         help="output directory. Required and with no default: "
                              "the page's local asset links are relative to it")
@@ -192,6 +201,17 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     args, rest = parser.parse_known_args(argv)
+
+    # Set the environment for the process rather than threading it through, so
+    # config.py and credentials.py keep ONE resolution path and cannot be
+    # handed two different answers by two callers.
+    os.environ[ENV_NAME_VAR] = args.env
+
+    # Say which credentials and which settings this build used, BEFORE the
+    # ~13 network calls. Otherwise the only record of it is the quota.
+    print(f"environment: {args.env}   "
+          f"({config_file().name}, {describe()})", flush=True)
+
     print(ReportBuilder().build(args.report, rest, args.out))
     return 0
 

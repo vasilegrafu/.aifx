@@ -12,6 +12,10 @@ __pycache__/
 # Keys live in the FMP_API_KEY environment variable, or in these files, which
 # never leave the machine. Selected by AIFX_ENV (dev | prod, default dev).
 secrets.*.json
+# ...except the TEMPLATE, which carries a placeholder and is never read by any
+# code. It is a separate filename on purpose: `git add .` must never be able to
+# stage a file that holds a real key, and the two roles cannot share a name.
+!secrets.example.json
 
 # Generated reports. A report is a build artifact — the controller and the view
 # are the source, and regenerating from the same symbol gives the same file
