@@ -60,8 +60,11 @@ repo's cannot reach it.
 
 ```bash
 git -C <path-to>/aifx-finance pull            # latest
-git -C <path-to>/aifx-finance checkout v1.1.0 # or pin a released version
+git -C <path-to>/aifx-finance checkout v8.0.0 # or pin a released version
 ```
+
+What a version number promises is in [Versioning](#versioning) below — worth
+reading before you pull across a major.
 
 ---
 
@@ -173,6 +176,43 @@ command, what must be true of the output, and what each failure mode points at.
 ```powershell
 python .claude/skills/finance-reports/reports/report_builder.py financial-profile --help
 ```
+
+---
+
+## Versioning
+
+**One version governs the whole repository** — every skill under
+`.claude/skills/`, the CSS, the JS, all of it. The single source of truth is
+`version.json` at the root; no version number lives anywhere else. A skill that
+versioned itself would let two skills in one clone disagree about which CSS
+they were written against, and every generated page links that CSS by tag.
+
+Each release is the git tag `v<version>`, and jsDelivr serves it at
+`…/aifx-finance@<version>/.claude/skills/<skill>/…`.
+
+**A published version is immutable.** Any change, however small, is a new
+version — never a re-tag. Documents that have left this tree link their assets
+by tag, so moving one would silently restyle pages nobody can find any more.
+
+| bump | what changed | what it costs you |
+|---|---|---|
+| **PATCH** | a visual fix, no markup contract change | nothing — safe for every existing document |
+| **MINOR** | additive: a new component, style, JS feature, or skill | nothing — old documents render unchanged |
+| **MAJOR** | a markup contract changed, a skill was removed, **or a published command changed shape** | documents must opt in; a linked directory can vanish; a command from the previous release may stop working |
+
+The MAJOR clause covers three different kinds of breakage because each one
+arrived and found the contract silent about it. A removed skill did, before
+5.0.0. A changed CLI did, at 7.0.0 — `--env` was dropped, no document was
+affected at all, and it was still a break for anyone with the old command in a
+script. **A release is major if a thing that worked stops working**, whether
+the thing is a page, a link, or a line someone typed.
+
+**Upgrading across a major is opt-in by construction.** An existing page keeps
+pointing at the tag it was built against and keeps rendering; it moves only
+when you regenerate it. Read the tag message — `git show v8.0.0` — for what
+broke and what to do about it.
+
+---
 
 ## License
 
