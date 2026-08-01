@@ -1,8 +1,0 @@
-{# purpose: key/value definition list #}
-{% macro facts(rows) %}
-  <dl class="facts">
-  {% for term, desc in rows %}
-    <dt>{{ term }}</dt><dd>{{ desc }}</dd>
-  {% endfor %}
-  </dl>
-{% endmacro %}

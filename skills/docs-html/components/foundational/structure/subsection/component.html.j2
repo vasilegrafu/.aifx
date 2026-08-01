@@ -1,7 +1,0 @@
-{# purpose: nested subsection: heading plus body #}
-{% macro subsection(id, heading) %}
-  <section id="{{ id }}">
-    <h3>{{ heading }}</h3>
-    {{ caller() }}
-  </section>
-{% endmacro %}

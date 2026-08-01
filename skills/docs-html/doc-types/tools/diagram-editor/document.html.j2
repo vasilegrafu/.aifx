@@ -1,7 +1,0 @@
-{# type-name: Diagram Editor #}
-{# purpose: single-diagram scratchpad for drafting a Mermaid diagram #}
-{% extends "doc-types/base.html.j2" %}
-{% block content %}
-  {% call c.mermaid() %}{% raw %}flowchart LR
-  hello[Hello] --> world[World]{% endraw %}{% endcall %}
-{% endblock %}

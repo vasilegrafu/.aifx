@@ -3,18 +3,53 @@
 The SINGLE source of truth for the version is `version.json` at the **repo root**
 (machine-readable); this file is its human ledger — newest release first, one
 entry per version, written when the version is bumped. **One version governs the
-whole repository** and every skill under `skills/` (docs-html, investing, …); no
+whole repository** and every skill under `skills/` (investing, …); no
 version number lives anywhere else (not in the CSS, not in the JS, not in
 documents, not per skill).
 
 Semver contract:
 - **PATCH** — visual fix, no markup contract change. Safe for every document.
 - **MINOR** — additive: new component, new style, new JS feature, new skill.
-- **MAJOR** — a markup contract changed; documents must opt in to upgrade.
+- **MAJOR** — a markup contract changed, or a skill was removed; documents
+  must opt in to upgrade, and a consumer may lose a directory it linked.
 
 A published version is immutable: any change, however small, is a new version.
 Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
 `…/.aifx@<version>/skills/<skill>/…`.
+
+---
+
+## 5.0.0 — 2026-08-01
+
+**Major.** The `docs-html` skill is removed. `investing` is the whole repo.
+
+447 files and 23,180 lines: 116 components, 83 doc-types across ten domains,
+`builder.py` and its five subcommands, the showcase gallery, and a second copy
+of the design system. It was capable and too hard to use — composing a document
+meant learning a doc-type catalog, a component catalog and a builder CLI before
+writing a sentence, and what came out was still a skeleton to fill in by hand.
+
+**Nothing already published breaks.** A document composed against docs-html
+links `…/.aifx@4.4.2/skills/docs-html/…`, and a published tag is immutable, so
+every document ever generated keeps rendering from the version it was authored
+against. That is what the pin has always been for.
+
+**What does break:** a project that junctioned or symlinked `skills/docs-html`
+into its `.claude/skills/` loses that directory on the next pull, and no new
+document can be composed. Both are recoverable from tag `v4.4.2` or from
+history — which is why this is MAJOR rather than MINOR. The contract above had
+no clause for removing a skill; it does now.
+
+**The duplication goes with it.** Each skill carried a full copy of the design
+system and the copies had already drifted: `charts.js`, `foundational/base.css`
+and `charts/charts.css` differed between the trees while the rest stayed
+identical. A fix like 4.4.2's had two homes and reached one. There is now
+exactly one `theme.css`, one chart frame, one set of chart components.
+
+`investing` is unchanged by this release and never depended on docs-html: its
+`bundle.css` resolves only its own modules, and no path in the tree pointed
+across. The `/* docs-html — … */` headers still sitting in its CSS are stale
+comments from the original copy, not references.
 
 ---
 

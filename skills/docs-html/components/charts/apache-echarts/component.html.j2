@@ -1,7 +1,0 @@
-{# purpose: declarative data chart (bar/line/pie/scatter/candlestick…) via Apache ECharts, view-time SVG #}
-{# `chart` is the shared marker every engine wears; `apache-echarts` selects the engine #}
-{% macro apache_echarts(option="", height=340) %}
-  <pre class="chart apache-echarts"{% if height != 340 %} data-height="{{ height }}"{% endif %}>
-{{ caller() if caller else option }}
-  </pre>
-{% endmacro %}
