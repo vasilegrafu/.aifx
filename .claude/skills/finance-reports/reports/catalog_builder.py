@@ -4,18 +4,9 @@
 
     python reports/catalog_builder.py
 
-The twin of components/catalog_builder.py, and it answers the same question one
-level up: usage.md tells you whether to run THIS report, once you have a
-candidate; nothing told you which of them to consider. With one report that is
-not yet a real question — it becomes one the moment two reports could plausibly
-answer the same request, and a report costs ~13 network calls, so choosing
-wrong is more expensive here than picking the wrong component.
-
-Built now rather than later on purpose: the conventions it depends on hold
-while there is one report to keep honest, and every report from here on inherits
-them. An index that arrives after a dozen reports is an index someone has to
-backfill, which is the same reason the components catalogue is generated rather
-than written.
+The twin of components/catalog_builder.py, one level up: usage.md tells you
+whether to run THIS report; nothing told you which to consider. Choosing wrong
+costs ~13 network calls here, rather than a glance.
 
 READ FROM THE SOURCE, so it cannot drift:
 

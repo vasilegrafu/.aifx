@@ -25,8 +25,14 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[1]))
+# Skill root on sys.path, located by the marker `_paths.py`: leaves sit two to
+# four folders deep, so a parent COUNT is wrong at the next depth. The base is
+# then imported PACKAGE-QUALIFIED -- reached under a second name it would be a
+# second module object, with its own cached env().
+_SKILL_DIR = next(p for p in Path(__file__).resolve().parents
+                  if (p / "_paths.py").exists())
+if str(_SKILL_DIR) not in sys.path:
+    sys.path.insert(0, str(_SKILL_DIR))
 
 from service_providers.fmp import FmpClient       # noqa: E402
 
@@ -129,11 +135,6 @@ def _seg_label(name):
         name = name[:-len(" Business")]
     return name.replace(" And ", " and ")
 
-
-# The skill root on sys.path, so the base imports PACKAGE-QUALIFIED: reached
-# under two names it would be two module objects, each with its own env.
-if str(HERE.parents[1]) not in sys.path:
-    sys.path.insert(0, str(HERE.parents[1]))
 
 from reports._report_controller import ReportController    # noqa: E402
 

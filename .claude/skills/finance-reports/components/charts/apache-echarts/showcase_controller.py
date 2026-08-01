@@ -22,13 +22,12 @@ import json
 import sys
 from pathlib import Path
 
-# The skill root on sys.path, so the base imports PACKAGE-QUALIFIED — ONE
-# module object, and therefore the one cached env() every controller shares. A
-# bare `from _showcase_controller import` would resolve too, but as a second
-# module for anything that reached it the other way, and each copy would parse
-# the component tree again. Found by walking up rather than by a fixed index:
-# components sit two to four folders deep depending on their category.
-_SKILL_DIR = next(p.parent for p in Path(__file__).resolve().parents if p.name == "components")
+# Skill root on sys.path, located by the marker `_paths.py`: leaves sit two to
+# four folders deep, so a parent COUNT is wrong at the next depth. The base is
+# then imported PACKAGE-QUALIFIED -- reached under a second name it would be a
+# second module object, with its own cached env().
+_SKILL_DIR = next(p for p in Path(__file__).resolve().parents
+                  if (p / "_paths.py").exists())
 if str(_SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(_SKILL_DIR))
 

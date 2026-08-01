@@ -421,10 +421,18 @@ is viewable straight from the CDN without cloning anything. Regenerate it
 whenever you change the component or its controller, or the committed page
 describes a version of the component that no longer exists.
 
-Copy `charts/bar/showcase_controller.py` for the four-line preamble that puts
-the skill root on `sys.path`. A leaf needs it to import the base
-package-qualified, and it walks up to the `components` folder rather than
-counting parents, because components sit two to four levels deep.
+Copy the preamble from `charts/bar/showcase_controller.py` — every leaf needs
+it, and it is the same in all of them, reports included:
+
+```python
+_SKILL_DIR = next(p for p in Path(__file__).resolve().parents
+                  if (p / "_paths.py").exists())
+```
+
+It locates the skill root by the **marker `_paths.py`**, never by counting
+parents: leaves sit two to four folders deep and a count is wrong at the next
+depth. The base is then imported package-qualified — reached under a second
+name it would be a second module object with its own cached `env()`.
 
 ## The shape of a usage.md
 
