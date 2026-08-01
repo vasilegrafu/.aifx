@@ -2,8 +2,8 @@
 
     ReportBuilder().build("financial-profile", ["INTC", "--peers", "none"], out)
 
-    python reports/report_builder.py financial-profile INTC --peers none --env dev --out ./output
-    python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out ./output
+    python reports/report_builder.py financial-profile INTC --peers none --env dev --out DIR
+    python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out DIR
 
 A name rather than a path, and no longer because they coincide: a report sits
 under its SUBJECT (`company/financial-profile`), so the name is the leaf, not
@@ -181,7 +181,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="report_builder.py",
         description="build a report from live data",
         epilog="example: python reports/report_builder.py financial-profile "
-               "INTC --peers AMD,NVDA --env dev --out ./output")
+               "INTC --peers AMD,NVDA --env dev --out DIR")
     parser.add_argument("report", help="report name, e.g. financial-profile")
     parser.add_argument("--env", required=True, choices=KNOWN_ENVS,
                         help="which environment to run as. Required and with "

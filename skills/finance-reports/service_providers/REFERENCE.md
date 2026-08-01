@@ -24,7 +24,6 @@ than of any one provider.
 ```
 config/config.<env>.json    TRACKED     api_url, timeouts, anything not secret
 secrets.<env>.json          GITIGNORED  api_key, and nothing else
-secrets.example.json        TRACKED     the shape, with a placeholder
 ```
 
 Both at the repo root, both chosen by the same `<env>`, so a run cannot read
@@ -115,7 +114,7 @@ served by jsDelivr; a key in a pasted traceback is a leaked key.
 1. FMP_API_KEY            environment variable — preferred, and the only one
                           that works in CI, where there is no file
 2. secrets.<env>.json     {"fmp": {"api_key": "..."}} at the REPO ROOT,
-                          gitignored. <env> is AIFX_ENV — no default
+                          gitignored. <env> is ENVIRONMENT — no default
 3. hard error naming both
 ```
 
@@ -135,7 +134,7 @@ burning a production quota on a test run.
 **Why there is no default environment.** The same reason `--out` has none: an
 absent default is a question, not a gap. A default would let a run use the
 wrong key and the wrong config in silence — the request succeeds, the numbers
-arrive, and only the quota ever says which key paid. `AIFX_ENV` unset is a hard
+arrive, and only the quota ever says which key paid. `ENVIRONMENT` unset is a hard
 error, an unrecognised value is a hard error, and `report_builder.py` takes
 `--env dev|prod` as a **required** argument. Required rather than optional
 because a required argument cannot be forgotten, and it lands in shell history
@@ -152,19 +151,18 @@ itself. It exists for the one silent override left in the order above: a stale
 `FMP_API_KEY` in a shell beats `secrets.prod.json` with nothing on screen to
 say so.
 
-**The template is a separate filename, and that is the whole safety property.**
-`secrets.example.json` is tracked and carries a placeholder; `secrets.<env>.json`
-is ignored and carries the key. One name cannot be both, and the failure mode
-is not hypothetical here — `git.commit&push.bat` runs `git add .`, so a tracked
-file holding a real key would be pushed to a public repo on the next run with
-nothing to stop it. Set up a clone with:
+**There is no template file, and its absence is the safety property.**
+`.gitignore` matches `secrets.*.json` with **no exception**, so nothing by that
+name is trackable under any circumstance. A shipped `secrets.example.json`
+would need a negation to stay tracked, and the failure mode is not hypothetical
+here: `git.commit&push.bat` runs `git add .` against a repository that is
+public *and* served by jsDelivr. One mis-ordered line in `.gitignore` and a key
+is fetchable at a URL. Four lines of JSON written by hand from `README.md` are
+cheaper than that.
 
-```bash
-cp secrets.example.json secrets.dev.json     # then replace the placeholder
-```
-
-The placeholder is detected and rejected by name at build time, rather than
-being sent to the API so the reader has to work backwards from a 401.
+A placeholder of the form `<...>` is still detected and rejected by name at
+build time, rather than being sent to the API so the reader has to work
+backwards from a 401.
 
 ## Adding an endpoint
 

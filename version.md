@@ -149,14 +149,15 @@ not per field**:
 ```
 config/config.<env>.json    TRACKED     api_url, and anything else not secret
 secrets.<env>.json          GITIGNORED  api_key, and nothing else
-secrets.example.json        TRACKED     the shape, with a placeholder
 ```
 
-The template is a **separate filename** from the real file, deliberately. One
-name cannot be both ignored and tracked, and the repo's own
-`git.commit&push.bat` runs `git add .` — so a tracked file that holds a key
-would be pushed to a public repo on the next run. Set up a clone with
-`cp secrets.example.json secrets.dev.json`.
+**There is no `secrets.example.json` to copy**, deliberately: `.gitignore`
+matches `secrets.*.json` with no exception, so nothing by that name is
+trackable under any circumstance. A shipped template would need a negation, and
+the repo's own `git.commit&push.bat` runs `git add .` against a public,
+CDN-served repository — one mis-ordered line and a key is fetchable at a URL.
+The shape is documented in `README.md`, which also gained the setup it never
+had: venv, config, secrets, and the run command.
 
 This repository is public and served by jsDelivr, so "is this safe to commit?"
 has to be a property of the file, decided once, rather than a judgement made
@@ -178,7 +179,7 @@ wins over both; it is the only option that works in CI, where there is no file.
 
 ### There is no default environment
 
-`--env dev|prod` is **required** on `report_builder.py`, and `AIFX_ENV` unset
+`--env dev|prod` is **required** on `report_builder.py`, and `ENVIRONMENT` unset
 is a hard error. This is the decision `--out` already made one directory over:
 an absent default is a question, not a gap.
 
@@ -202,7 +203,7 @@ That line also exposes the one silent override left in the order: a stale
 `secrets.dev.json` and delete the old file; add `--env` to every build command.
 `.gitignore` covers `secrets.*.json` and does **not** cover `config/`.
 
-### Tooling: a declared environment and an output shelf
+### Tooling: a declared environment, and scenarios instead of an output shelf
 
 `requirements.txt` names the two libraries the tree needs — Jinja renders every
 template, httpx is the only thing that touches the network — with `.venv/`
@@ -210,12 +211,17 @@ gitignored. Nothing here builds the published CSS or JS; those are still served
 raw from the git tag, which is what keeps a published tag immutable without
 qualification.
 
-`output/` is the conventional destination for a generated report, gitignored
-except for its `.gitkeep`. **`--out` is still required and still has no
-default** — the page's local asset href is computed relative to where the file
-is written, so a report built without naming its destination would link its
-assets relative to a directory nobody chose. `output/` is a convention, not a
-default; see `reports/REFERENCE.md`.
+**`skills_testing_scenarios/`** holds a runnable scenario per report, at an
+address mirroring the skill's own taxonomy —
+`finance-reports/company/financial-profile/test-scenario.md`. Each states the
+command, what must be true of the output, what it costs, and what each failure
+mode points at. The generated `.html` is gitignored: it carries live market
+data and would churn on every run.
+
+There is no `output/` shelf, deliberately. `--out` is required and has no
+default, and a conventional directory is the beginning of a default — the
+page's local asset href is computed relative to where the file is written, so
+the destination is a decision, not a habit.
 
 ### Migrating
 

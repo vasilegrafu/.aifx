@@ -54,7 +54,7 @@ enough to be worth re-deriving each time.
 ## CLI
 
 ```bash
-python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out ./output
+python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out DIR
 python components/showcase_builder.py charts/bar
 ```
 
@@ -338,13 +338,14 @@ guesses the path.
 ```
 config/config.<env>.json    TRACKED     api_url, and anything else not secret
 secrets.<env>.json          GITIGNORED  api_key, and nothing else
-secrets.example.json        TRACKED     the shape, with a placeholder
 ```
 
-Set up a clone with `cp secrets.example.json secrets.dev.json` and replace the
-placeholder. **The template and the real file are two filenames on purpose**:
-`git add .` must never be able to stage a file that holds a key, and one name
-cannot be both ignored and tracked.
+**There is no template file to copy** — `secrets.<env>.json` is written by
+hand, and its shape is in `README.md`. `.gitignore` matches `secrets.*.json`
+with **no exception**, so nothing by that name can ever be staged. A tracked
+template would require a negation, and `git.commit&push.bat` runs `git add .`
+in a repository that is public and CDN-served: a mis-ordered negation publishes
+a key.
 
 ```json
 config/config.dev.json   { "service_providers": { "fmp": { "api_url": "…" } } }
@@ -372,7 +373,7 @@ above it, so keeping the key outside that subtree means copying the skill
 cannot carry a credential with it. `config/` sits beside it, and costs nothing
 new: the skill already resolves `REPO_ROOT` to read `version.json`.
 
-**`AIFX_ENV` has NO default, and `--env dev|prod` is required.** This is the
+**`ENVIRONMENT` has NO default, and `--env dev|prod` is required.** This is the
 same decision `--out` makes: an absent default is a question, not a gap. A
 default would let a run use the wrong credentials and the wrong config in
 silence — the request succeeds, the numbers arrive, and only the quota ever
@@ -409,7 +410,7 @@ There is deliberately no third place it looks.
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
-4. `python reports/report_builder.py <name> … --env dev|prod --out ./output`
+4. `python reports/report_builder.py <name> … --env dev|prod --out DIR`
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so

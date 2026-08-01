@@ -113,9 +113,11 @@ help here: it has no sensible default to fall back on, and a report written to
 an invented path fails silently in two ways at once, landing where nobody looks
 and computing its asset links against the wrong root.
 
-`output/` at the repo root is the **conventional** destination, gitignored
-except for its `.gitkeep`. A convention, not a default: the builder still
-refuses to run without `--out`.
+There is deliberately **no conventional destination either** — no `output/`
+shelf to fall into by habit. A test run names
+`skills_testing_scenarios/<skill>/<domain>/<report>/`, which mirrors this tree
+so a scenario sits at the same address as the thing it tests; a real
+deliverable goes wherever the reader asked for it.
 
 ### `--env` has no default either, and for the same reason
 
@@ -127,7 +129,7 @@ ever says which key paid for them.
 
 Required rather than optional because a required argument cannot be forgotten,
 and it lands in shell history and CI logs where a variable set in some earlier
-shell does not. `main()` sets `AIFX_ENV` for the process from it, so
+shell does not. `main()` sets `ENVIRONMENT` for the process from it, so
 `config.py` and `credentials.py` keep one resolution path rather than being
 handed two answers by two callers.
 
@@ -170,8 +172,8 @@ never restated in code.
 ## The engine
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --env dev --out ./output
-python reports/report_builder.py financial-profile MU --peers INTC,WDC --env dev --out ./output
+python reports/report_builder.py financial-profile MU --peers none --env dev --out DIR
+python reports/report_builder.py financial-profile MU --peers INTC,WDC --env dev --out DIR
 python reports/report_builder.py financial-profile --help    # the REPORT's args
 ```
 
@@ -277,7 +279,7 @@ with one report and expensive to backfill across a dozen.
    `{# purpose: … #}` header is required** — the build checks it.
 3. `reports/<domain>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
 4. **`python reports/catalog_builder.py`** — nothing calls it for you.
-5. `python reports/report_builder.py <name> … --env dev|prod --out ./output`
+5. `python reports/report_builder.py <name> … --env dev|prod --out DIR`
 
 Nothing to register. Building requires the network and `FMP_API_KEY` — see
 `../service_providers/REFERENCE.md` for the client and the credential order.

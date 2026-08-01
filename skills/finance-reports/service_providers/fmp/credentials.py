@@ -11,7 +11,7 @@ Resolution order, first hit wins:
     1. FMP_API_KEY            environment variable — preferred, and the only
                               option that works in CI, where there is no file
     2. secrets.<env>.json     at the REPO ROOT, gitignored, never leaves the
-                              machine. <env> is AIFX_ENV
+                              machine. <env> is ENVIRONMENT
     3. hard error naming both
 
 THERE IS NO DEFAULT ENVIRONMENT, and that is the same decision `--out` makes
@@ -46,12 +46,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
 ENV_VAR = "FMP_API_KEY"
-ENV_NAME_VAR = "AIFX_ENV"
+ENV_NAME_VAR = "ENVIRONMENT"
 KNOWN_ENVS = ("dev", "prod")
 
 
 def environment() -> str:
-    """Which environment this run is — `AIFX_ENV`, and there is NO default.
+    """Which environment this run is — `ENVIRONMENT`, and there is NO default.
 
     Unset is an error rather than an assumption. A default would let a run use
     the wrong credentials and the wrong config silently, and nothing downstream
@@ -86,10 +86,11 @@ def _missing(path: Path) -> str:
          $env:{ENV_VAR} = "<key>"          (PowerShell)
          export {ENV_VAR}=<key>            (bash)
 
-  2. {path.name} at the repo root — copy the tracked template:
-         cp secrets.example.json {path.name}
-     then replace the placeholder. {path.name} is gitignored; the template is
-     not, which is why they are two filenames and not one. This repo is PUBLIC.
+  2. {path.name} at the repo root, containing
+         {{"fmp": {{"api_key": "<key>"}}}}
+     Write it by hand — there is no template to copy, on purpose: .gitignore
+     matches secrets.*.json with NO exception, so nothing by that name can be
+     staged. This repository is PUBLIC. See README.md.
 
 The environment comes from --env or {ENV_NAME_VAR}; there is no default."""
 
