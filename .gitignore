@@ -12,7 +12,6 @@ __pycache__/
 # Keys live in the FMP_API_KEY environment variable, or in these files, which
 # never leave the machine. Selected by AIFX_ENV (dev | prod, default dev).
 secrets.*.json
-secrets.txt
 
 # Generated reports. A report is a build artifact — the controller and the view
 # are the source, and regenerating from the same symbol gives the same file
@@ -20,3 +19,7 @@ secrets.txt
 # committing.
 output/*
 !output/.gitkeep
+
+
+
+
