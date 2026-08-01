@@ -1,8 +1,11 @@
 # Scenario — `financial-profile` for AMD
 
-Exercises the `finance-reports` skill end to end: `--env` resolution, the FMP
-client, the 15 arithmetic assertions in `_build_context`, the view's contract
+Exercises the `finance-reports` skill end to end: environment resolution, the
+FMP client, the arithmetic assertions in `_build_context`, the view's contract
 check, and the full component render. If this passes, the skill works.
+
+**Requires `ENVIRONMENT` to be declared** — either the variable, or `.env` at
+the repo root containing `ENVIRONMENT=dev`. There is no flag and no default.
 
 The directory mirrors the skill's own taxonomy —
 `finance-reports/company/financial-profile` — so a scenario sits at the same
@@ -16,7 +19,7 @@ From the repo root, with the venv active or by full interpreter path:
 python skills/finance-reports/reports/report_builder.py `
     financial-profile AMD `
     --peers NVDA,INTC `
-    --env dev `
+     `
     --out ./skills_testing_scenarios/finance-reports/company/financial-profile
 ```
 
@@ -39,16 +42,17 @@ fetches and still exercises every single-company exhibit.
 **It must exit 0 and print four lines**, in this order:
 
 ```
-environment: dev   (config.dev.json, key from secrets.dev.json)
+environment: dev (from .env)   config.dev.json, key from secrets.dev.json
 fetching ...
 deriving and asserting ...
 <absolute path to the written file>
 ```
 
-The first line is the point of `--env` being required — a run that does not say
-which credentials it used cannot be told apart afterwards. If it reads
-`key from $FMP_API_KEY`, a stale variable in the shell is overriding
-`secrets.dev.json`; that is legal but rarely intended.
+**Read the first line before trusting the rest.** It names both the environment
+and where it was read from, and two things it can say are worth catching: `from
+$ENVIRONMENT` means a shell variable is overriding this checkout's `.env`, and
+`key from $FMP_API_KEY` means a stale variable is overriding
+`secrets.dev.json`. Both are legal and neither is usually intended.
 
 **The assertions must pass silently.** `_build_context` checks identities the
 data must satisfy — cost + gross == revenue, liabilities + equity == assets,
@@ -97,14 +101,17 @@ broken chart in it.
   name and refused before any request goes out.
 - **Numbers change between runs.** Do not diff two outputs and expect equality;
   compare structure, not values.
-- Uses the **dev** key deliberately. Run this against `--env prod` only if you
-  mean to spend production quota on a test.
+- Uses the **dev** key, because that is what `.env` declares. Run it against
+  prod only if you mean to spend production quota on a test, and say so for one
+  command rather than editing `.env`:
+  `$env:ENVIRONMENT = "prod"`
 
 ## When it fails
 
 | symptom | look at |
 |---|---|
-| `ENVIRONMENT is not set` | `--env` missing from the command |
+| `ENVIRONMENT is not set and .env does not declare it` | no `.env` at the repo root — it is gitignored, so a fresh clone has none |
+| `is not one of dev, prod` | a typo in `.env` or in the shell variable; the message names which |
 | `still holds the placeholder` | real key not yet in `secrets.dev.json` |
 | an assertion raises | `_build_context` in `report_controller.py` — the data broke an identity, or the endpoint changed shape |
 | `StrictUndefined` at render | the view reads a `d.*` key the controller never wrote |

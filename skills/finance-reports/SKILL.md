@@ -54,7 +54,7 @@ enough to be worth re-deriving each time.
 ## CLI
 
 ```bash
-python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --env dev --out DIR
+python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 python components/showcase_builder.py charts/bar
 ```
 
@@ -373,21 +373,31 @@ above it, so keeping the key outside that subtree means copying the skill
 cannot carry a credential with it. `config/` sits beside it, and costs nothing
 new: the skill already resolves `REPO_ROOT` to read `version.json`.
 
-**`ENVIRONMENT` has NO default, and `--env dev|prod` is required.** This is the
-same decision `--out` makes: an absent default is a question, not a gap. A
-default would let a run use the wrong credentials and the wrong config in
-silence — the request succeeds, the numbers arrive, and only the quota ever
-says which key paid. One switch selects both files, so a run cannot read dev
-settings against a prod key.
-
-Every build says what it resolved, before the ~13 calls:
+**The environment is DECLARED, not passed. No default, and no flag:**
 
 ```
-environment: dev   (config.dev.json, key from secrets.dev.json)
+1. ENVIRONMENT     the variable — a shell, CI, or setx
+2. .env            `ENVIRONMENT=dev` at the repo root, gitignored
+3. hard error
 ```
 
-That line also exposes the one silent override left: a stale `FMP_API_KEY` in
-your shell beats the file, and now says so.
+One declaration selects both files, so a run cannot read dev settings against a
+prod key. **There is no `--env`** — a flag reaches only builds driven through
+`report_builder.py` while anything importing the client directly still needs
+the declaration, and a flag cannot be inherited by a shell another tool
+spawned, which is where builds usually run.
+
+`.env` is not a default: a default is a value nobody chose that applies
+everywhere, and this is a file someone wrote naming one checkout. Every build
+says what it resolved and from where, before the ~13 calls:
+
+```
+environment: dev (from .env)   config.dev.json, key from secrets.dev.json
+```
+
+That line names both overrides that would otherwise be silent — a shell
+`ENVIRONMENT` beating this checkout's `.env`, and a stale `FMP_API_KEY` beating
+the secrets file.
 
 There is deliberately no third place it looks.
 
@@ -410,7 +420,7 @@ There is deliberately no third place it looks.
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
-4. `python reports/report_builder.py <name> … --env dev|prod --out DIR`
+4. `python reports/report_builder.py <name> … --out DIR`
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so

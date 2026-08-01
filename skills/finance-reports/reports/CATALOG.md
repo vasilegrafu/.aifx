@@ -7,7 +7,7 @@ _declarations — do not edit; run `python reports/catalog_builder.py`._
 it fetches, what that costs, and what its assertions guarantee.
 
 ```bash
-python reports/report_builder.py <report> <args...> --env dev|prod --out DIR
+python reports/report_builder.py <report> <args...> --out DIR
 ```
 
 | report | title | what it argues | arguments | docs |

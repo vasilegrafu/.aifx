@@ -16,8 +16,8 @@ this report describes, it does not argue a position.
 ## Build it
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --env dev --out DIR
-python reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --env dev --out DIR
+python reports/report_builder.py financial-profile MU --peers none --out DIR
+python reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --out DIR
 python reports/report_builder.py financial-profile --help
 ```
 

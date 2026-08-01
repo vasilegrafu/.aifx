@@ -14,13 +14,28 @@ Resolution order, first hit wins:
                               machine. <env> is ENVIRONMENT
     3. hard error naming both
 
-THERE IS NO DEFAULT ENVIRONMENT, and that is the same decision `--out` makes
-one directory over: an absent default is a question, not a gap. A default here
-would mean a run can use the wrong credentials and say nothing, and the symptom
-— a rate limit, a 401, a quota burned — surfaces three layers from the cause.
-`report_builder.py` therefore takes `--env dev|prod` as a REQUIRED argument.
-One switch selects both this file and config/config.<env>.json, so a run cannot
-read dev settings against a prod key.
+THERE IS NO DEFAULT ENVIRONMENT, and no flag either. It is declared in the
+environment, in one of exactly two places:
+
+    1. ENVIRONMENT        the variable — set by a shell, by CI, or by setx
+    2. .env               at the REPO ROOT, gitignored: `ENVIRONMENT=dev`,
+                          a property of THIS checkout on THIS machine
+    3. hard error
+
+A CLI flag was tried and removed. It could only reach builds driven through
+`report_builder.py`, while anything importing FmpClient directly still needed
+the variable — so the same fact had two homes and they could disagree. And a
+flag cannot be inherited: an editor's terminal settings do not reach a shell
+spawned by another tool, which is exactly where the builds actually run.
+
+An absent default is a question, not a gap — the same decision `--out` makes
+one directory over. A default would let a run use the wrong credentials and say
+nothing, and the symptom (a rate limit, a 401, a quota burned) surfaces three
+layers from the cause. `.env` is not a default: someone wrote it, it names one
+checkout, and every build prints which source it came from.
+
+One declaration selects both this file and config/config.<env>.json, so a run
+cannot read dev settings against a prod key.
 
 THE SECRETS FILES LIVE AT THE REPO ROOT, NOT IN THIS DIRECTORY, and that is
 deliberate. A skill is meant to be copied or junctioned into another project —
@@ -49,29 +64,61 @@ ENV_VAR = "FMP_API_KEY"
 ENV_NAME_VAR = "ENVIRONMENT"
 KNOWN_ENVS = ("dev", "prod")
 
+#: Machine-local declaration of which environment this checkout is.
+DOTENV = REPO_ROOT / ".env"
 
-def environment() -> str:
-    """Which environment this run is — `ENVIRONMENT`, and there is NO default.
 
-    Unset is an error rather than an assumption. A default would let a run use
-    the wrong credentials and the wrong config silently, and nothing downstream
-    can tell the difference: the request succeeds, the numbers arrive, and only
-    the quota or the rate limit ever says which key paid for them.
+def _from_dotenv() -> str:
+    """`ENVIRONMENT=...` out of .env, or "" — deliberately not a dotenv parser.
 
-    `report_builder.py --env dev|prod` sets this for a build, which is why a
-    required flag rather than an optional one — a required argument cannot be
-    forgotten, and it lands in shell history and CI logs where a variable set
-    in some earlier shell does not."""
+    It reads ONE key and understands `KEY=value`, `#` comments and blank lines.
+    Nothing here wants export syntax, interpolation or multi-line values, and a
+    fuller parser would invite putting things in this file that belong in
+    config/ (not secret) or secrets.<env>.json (secret)."""
+    if not DOTENV.exists():
+        return ""
+    # utf-8-sig, not utf-8: a BOM is invisible in every editor and would make
+    # the first key read as "﻿ENVIRONMENT", which matches nothing and
+    # reports as "not declared" — the file looks right and is ignored.
+    # PowerShell 5.1's `Set-Content -Encoding utf8` writes one by default.
+    for line in DOTENV.read_text(encoding="utf-8-sig").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        key, sep, value = line.partition("=")
+        if sep and key.strip() == ENV_NAME_VAR:
+            return value.strip().strip('"').strip("'")
+    return ""
+
+
+def resolve() -> tuple[str, str]:
+    """(environment, where it came from). NO default at any point.
+
+    The source is returned, not just the name, because with two places to look
+    the useful question is not only "which environment" but "why did it think
+    so" — a stale shell variable overriding the checkout's own .env is exactly
+    the confusion this prevents, and the build prints the answer."""
     name = os.environ.get(ENV_NAME_VAR, "").strip()
+    source = f"${ENV_NAME_VAR}"
+    if not name:
+        name, source = _from_dotenv(), DOTENV.name
     if not name:
         raise SystemExit(
-            f"{ENV_NAME_VAR} is not set, and there is no default.\n"
-            f"  build a report with:  --env {'|'.join(KNOWN_ENVS)}\n"
-            f"  or set it directly :  $env:{ENV_NAME_VAR} = \"dev\"")
+            f"{ENV_NAME_VAR} is not set and {DOTENV.name} does not declare it. "
+            f"There is no default.\n"
+            f"  for this checkout :  write {DOTENV.name} at the repo root "
+            f"containing  {ENV_NAME_VAR}=dev\n"
+            f"  or for one shell  :  $env:{ENV_NAME_VAR} = \"dev\"")
     if name not in KNOWN_ENVS:
         raise SystemExit(
-            f"{ENV_NAME_VAR}={name!r} is not one of {', '.join(KNOWN_ENVS)}.")
-    return name
+            f"{ENV_NAME_VAR}={name!r} (from {source}) is not one of "
+            f"{', '.join(KNOWN_ENVS)}.")
+    return name, source
+
+
+def environment() -> str:
+    """Which environment this run is."""
+    return resolve()[0]
 
 
 def secrets_file(env: str | None = None) -> Path:
@@ -92,7 +139,7 @@ def _missing(path: Path) -> str:
      matches secrets.*.json with NO exception, so nothing by that name can be
      staged. This repository is PUBLIC. See README.md.
 
-The environment comes from --env or {ENV_NAME_VAR}; there is no default."""
+The environment comes from {ENV_NAME_VAR} or {DOTENV.name}; there is no default."""
 
 
 def describe() -> str:

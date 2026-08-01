@@ -119,25 +119,41 @@ shelf to fall into by habit. A test run names
 so a scenario sits at the same address as the thing it tests; a real
 deliverable goes wherever the reader asked for it.
 
-### `--env` has no default either, and for the same reason
+### The environment is DECLARED, not passed — and there is no flag
 
-`--env dev|prod` is required. It selects **two** files — `config/config.<env>.json`
-for the API URL and `secrets.<env>.json` for the key — so one omission would
-change both. A default would let a run use the wrong credentials in silence:
-the request succeeds, the numbers arrive, and only the quota or the rate limit
-ever says which key paid for them.
-
-Required rather than optional because a required argument cannot be forgotten,
-and it lands in shell history and CI logs where a variable set in some earlier
-shell does not. `main()` sets `ENVIRONMENT` for the process from it, so
-`config.py` and `credentials.py` keep one resolution path rather than being
-handed two answers by two callers.
-
-The build states what it resolved before any network call:
+It comes from `ENVIRONMENT`, or from `.env` at the repo root, and nowhere else:
 
 ```
-environment: dev   (config.dev.json, key from secrets.dev.json)
+1. ENVIRONMENT     the variable — a shell, CI, or setx
+2. .env            `ENVIRONMENT=dev`, gitignored, this checkout on this machine
+3. hard error
 ```
+
+It selects **two** files — `config/config.<env>.json` for the API URL and
+`secrets.<env>.json` for the key — so one declaration cannot put them out of
+step.
+
+**A `--env` flag existed in 6.0.0 and was removed.** Two reasons, and the
+second is the one that killed it:
+
+- It could only reach builds driven through `report_builder.py`. Anything
+  importing `FmpClient` directly still needed the declaration, so the same fact
+  had two homes and they were free to disagree.
+- **A flag cannot be inherited.** An editor's terminal settings do not reach a
+  shell spawned by another tool, and that is where builds actually run — so the
+  flag had to be retyped by whoever was driving, every time.
+
+`.env` is **not** a default. A default is a value nobody chose that applies
+everywhere; this is a file someone wrote, naming one checkout, and the build
+prints both the value and where it read it:
+
+```
+environment: dev (from .env)   config.dev.json, key from secrets.dev.json
+```
+
+That line is the safety property the required flag was reaching for. What it
+prevents is not "unstated" but "unnoticed" — including a stale `ENVIRONMENT` in
+some shell silently overriding this checkout's own `.env`, which it names.
 
 `_filename(d)` defaults to `<name>.html`; `financial-profile` overrides it to
 `<slug>-financial-profile.html`, because the report is *about* a company and two
@@ -172,8 +188,8 @@ never restated in code.
 ## The engine
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --env dev --out DIR
-python reports/report_builder.py financial-profile MU --peers INTC,WDC --env dev --out DIR
+python reports/report_builder.py financial-profile MU --peers none --out DIR
+python reports/report_builder.py financial-profile MU --peers INTC,WDC --out DIR
 python reports/report_builder.py financial-profile --help    # the REPORT's args
 ```
 
@@ -279,7 +295,7 @@ with one report and expensive to backfill across a dozen.
    `{# purpose: … #}` header is required** — the build checks it.
 3. `reports/<domain>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
 4. **`python reports/catalog_builder.py`** — nothing calls it for you.
-5. `python reports/report_builder.py <name> … --env dev|prod --out DIR`
+5. `python reports/report_builder.py <name> … --out DIR`
 
 Nothing to register. Building requires the network and `FMP_API_KEY` — see
 `../service_providers/REFERENCE.md` for the client and the credential order.

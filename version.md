@@ -10,12 +10,71 @@ documents, not per skill).
 Semver contract:
 - **PATCH** — visual fix, no markup contract change. Safe for every document.
 - **MINOR** — additive: new component, new style, new JS feature, new skill.
-- **MAJOR** — a markup contract changed, or a skill was removed; documents
-  must opt in to upgrade, and a consumer may lose a directory it linked.
+- **MAJOR** — a markup contract changed, a skill was removed, **or a published
+  command changed shape**; documents must opt in to upgrade, a consumer may
+  lose a directory it linked, and a command from the previous release may stop
+  working.
 
 A published version is immutable: any change, however small, is a new version.
 Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
 `…/aifx-finance@<version>/skills/<skill>/…`.
+
+---
+
+## 7.0.0 — 2026-08-01
+
+**Major.** `--env` is removed. A command that worked on 6.0.0 now fails with
+*unrecognized arguments*, which is the whole reason this is MAJOR rather than
+minor — **no document is affected**, and a 6.0.0 page renders identically on
+7.0.0 assets.
+
+The semver contract above gained a clause for it. It covered a markup change
+and a removed skill; it had nothing to say about the CLI, exactly as it had
+nothing to say about removing a skill before 5.0.0 needed it to.
+
+### The environment is declared, not passed
+
+```
+1. ENVIRONMENT     the variable — a shell, CI, or setx
+2. .env            `ENVIRONMENT=dev` at the repo root, gitignored
+3. hard error
+```
+
+**Why the flag went.** Two reasons, and the second is decisive:
+
+- It reached only builds driven through `report_builder.py`. Anything importing
+  `FmpClient` directly still needed the declaration, so one fact had two homes
+  and they were free to disagree.
+- **A flag cannot be inherited.** 6.0.0 assumed whoever ran a build would type
+  it. In practice builds are driven by a tool that spawns its own shell, which
+  inherits nothing from an editor's terminal settings — so the flag had to be
+  retyped on every invocation by someone who had no way to make it stick.
+
+**`.env` is not the default coming back.** A default is a value nobody chose
+that applies everywhere. This is a file someone wrote, gitignored, naming one
+checkout on one machine — a fresh clone has none and fails loudly until it
+declares one. What 6.0.0's required flag was protecting against was not
+*unstated* but *unnoticed*, and that protection is stronger now, because the
+build prints the source as well as the value:
+
+```
+environment: dev (from .env)   config.dev.json, key from secrets.dev.json
+```
+
+That names the two overrides that were previously silent: a shell `ENVIRONMENT`
+beating this checkout's `.env`, and a stale `FMP_API_KEY` beating the secrets
+file. `resolve()` returns `(value, source)` for the first; `describe()` reports
+the second without ever returning the key.
+
+`_from_dotenv()` reads one key and understands `KEY=value`, `#` comments and
+blank lines — deliberately not a dotenv parser, since a fuller one invites
+putting things in that file that belong in `config/` (not secret) or
+`secrets.<env>.json` (secret). It reads **utf-8-sig**: a BOM is invisible in
+every editor and would make the first key match nothing, so the file would look
+correct and be silently ignored. PowerShell 5.1 writes one by default.
+
+**Migrating:** drop `--env dev` from every command and write `.env` at the repo
+root containing `ENVIRONMENT=dev`. Nothing else changes.
 
 ---
 
@@ -179,7 +238,7 @@ wins over both; it is the only option that works in CI, where there is no file.
 
 ### There is no default environment
 
-`--env dev|prod` is **required** on `report_builder.py`, and `ENVIRONMENT` unset
+`` is **required** on `report_builder.py`, and `ENVIRONMENT` unset
 is a hard error. This is the decision `--out` already made one directory over:
 an absent default is a question, not a gap.
 

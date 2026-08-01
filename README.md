@@ -125,17 +125,31 @@ all.
 
 ```powershell
 python skills/finance-reports/reports/report_builder.py `
-    financial-profile AMD --peers NVDA,INTC --env dev --out ./some/directory
+    financial-profile AMD --peers NVDA,INTC --out ./some/directory
 ```
 
-**`--env` and `--out` are both required and neither has a default.** `--env`
-picks `config.<env>.json` *and* `secrets.<env>.json` together, so a run cannot
-read dev settings against a prod key; `--out` has no default because the page's
-local asset links are computed relative to wherever it is written. Every build
-says what it resolved before spending ~13 API calls:
+`--out` is required and has no default: the page's local asset links are
+computed relative to wherever it is written, so the destination is a decision.
+
+**The environment is declared, not passed.** Write `.env` at the repo root —
+gitignored, a property of this checkout on this machine:
 
 ```
-environment: dev   (config.dev.json, key from secrets.dev.json)
+ENVIRONMENT=dev
+```
+
+Or set `ENVIRONMENT` in the shell, which wins over the file. There is **no
+flag and no default**: a flag would reach only builds driven through
+`report_builder.py` while anything importing the client directly still needs
+the declaration, and it cannot be inherited by a shell another tool spawned —
+which is where builds usually run.
+
+One declaration picks `config.<env>.json` *and* `secrets.<env>.json` together,
+so a run cannot read dev settings against a prod key. Every build says what it
+resolved, and from where, before spending ~13 API calls:
+
+```
+environment: dev (from .env)   config.dev.json, key from secrets.dev.json
 fetching ...
 deriving and asserting ...
 <path to the written file>

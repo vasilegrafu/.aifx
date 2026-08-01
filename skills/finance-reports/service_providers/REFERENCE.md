@@ -114,7 +114,7 @@ served by jsDelivr; a key in a pasted traceback is a leaked key.
 1. FMP_API_KEY            environment variable — preferred, and the only one
                           that works in CI, where there is no file
 2. secrets.<env>.json     {"fmp": {"api_key": "..."}} at the REPO ROOT,
-                          gitignored. <env> is ENVIRONMENT — no default
+                          gitignored. <env> is declared, never defaulted
 3. hard error naming both
 ```
 
@@ -131,25 +131,44 @@ copy; one kept above it cannot.
 limits and different blast radii, and the way that goes wrong is someone
 burning a production quota on a test run.
 
-**Why there is no default environment.** The same reason `--out` has none: an
-absent default is a question, not a gap. A default would let a run use the
-wrong key and the wrong config in silence — the request succeeds, the numbers
-arrive, and only the quota ever says which key paid. `ENVIRONMENT` unset is a hard
-error, an unrecognised value is a hard error, and `report_builder.py` takes
-`--env dev|prod` as a **required** argument. Required rather than optional
-because a required argument cannot be forgotten, and it lands in shell history
-and CI logs where a variable set in some earlier shell does not.
+**Which environment, and where that comes from.** Declared, never passed:
+
+```
+1. ENVIRONMENT     the variable — a shell, CI, or setx
+2. .env            `ENVIRONMENT=dev` at the REPO ROOT, gitignored
+3. hard error
+```
+
+Unset is a hard error and an unrecognised value is a hard error. There is no
+default, because a default would let a run use the wrong key and the wrong
+config in silence — the request succeeds, the numbers arrive, and only the
+quota ever says which key paid.
+
+**There is no `--env` flag.** One existed in 6.0.0. It reached only builds
+driven through `report_builder.py` — anything importing `FmpClient` directly
+still needed the declaration, so the same fact had two homes — and a flag
+cannot be inherited by a shell that another tool spawned, which is where builds
+usually run.
+
+`.env` is not a default. A default is a value nobody chose that applies
+everywhere; this is a file someone wrote, naming one checkout on one machine.
+`_from_dotenv()` reads exactly one key and understands `KEY=value`, `#`
+comments and blank lines — deliberately not a dotenv parser, because a fuller
+one invites putting things in that file that belong in `config/` or in
+`secrets.<env>.json`. It reads **utf-8-sig**: a BOM is invisible in an editor
+and would make the first key match nothing, so the file would look right and be
+ignored.
 
 **Every build says what it resolved**, before any network call:
 
 ```
-environment: dev   (config.dev.json, key from secrets.dev.json)
+environment: dev (from .env)   config.dev.json, key from secrets.dev.json
 ```
 
-`credentials.describe()` produces the second half and never returns the key
-itself. It exists for the one silent override left in the order above: a stale
-`FMP_API_KEY` in a shell beats `secrets.prod.json` with nothing on screen to
-say so.
+`resolve()` returns the source as well as the value, and `describe()` produces
+the second half without ever returning the key. Between them they name the two
+overrides that would otherwise be silent: a shell `ENVIRONMENT` beating this
+checkout's `.env`, and a stale `FMP_API_KEY` beating `secrets.prod.json`.
 
 **There is no template file, and its absence is the safety property.**
 `.gitignore` matches `secrets.*.json` with **no exception**, so nothing by that

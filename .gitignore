@@ -17,6 +17,12 @@ __pycache__/
 # mis-ordered line away from publishing a key.
 secrets.*.json
 
+# Which environment this checkout runs as (ENVIRONMENT=dev|prod). Machine-local
+# by definition: a clone on another machine, or a CI runner, decides for itself.
+# It holds no secret — but tracking it would make one checkout's choice the
+# repository's default, which is the assumption this project refuses to make.
+.env
+
 # Generated reports land beside the scenario that produced them. A report is a
 # build artifact — the controller and the view are the source, and regenerating
 # from the same symbol gives the same file with newer numbers. The scenario
