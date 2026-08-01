@@ -20,7 +20,6 @@ From the repo root, with the venv active or by full interpreter path:
 python .claude/skills/finance-reports/reports/report_builder.py `
     financial-profile AMD `
     --peers NVDA,INTC `
-     `
     --out ./.claude_testing_scenarios/finance-reports/company/financial-profile
 ```
 

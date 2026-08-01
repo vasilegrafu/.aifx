@@ -5,17 +5,5 @@ __pycache__/
 
 secrets.*.json
 
-# NOT `.env`, deliberately. Which environment a checkout runs as is TRACKED, in
-# environment.json — it holds no secret, and it is worth committing so a clone
-# starts somewhere rather than nowhere. `.env` could not be: it is the file
-# every tutorial in the world tells you to put an API key in, so tracking that
-# NAME would make the safety of this repo depend on nobody ever following the
-# convention. The name is the safeguard.
-
-# Generated reports land beside the scenario that produced them. A report is a
-# build artifact — the controller and the view are the source, and regenerating
-# from the same symbol gives the same file with newer numbers. The scenario
-# (.md) is tracked; its output carries live market data and would churn on
-# every run, so it is not.
 .claude_testing_scenarios/**/*.html
 
