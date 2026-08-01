@@ -167,7 +167,7 @@ deriving and asserting ...
 <path to the written file>
 ```
 
-Runnable scenarios live in `skills_testing_scenarios/`, each stating its
+Runnable scenarios live in `.claude_testing_scenarios/`, each stating its
 command, what must be true of the output, and what each failure mode points at.
 
 ```powershell

@@ -18,7 +18,7 @@ build prints what it resolved and from where before it spends a call.
 
 The reasoning — why declared rather than passed, why two environments, why the
 files sit beside .claude/ rather than inside the skill — is in
-service_providers/REFERENCE.md. The history of it is in version.md.
+service_providers/REFERENCE.md.
 """
 
 import json

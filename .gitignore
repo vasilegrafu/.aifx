@@ -1,20 +1,8 @@
-# Python bytecode — builders are run in place from the repo, so these appear
-# next to the sources. They are build artifacts, never content.
 __pycache__/
 *.py[cod]
 
-# The virtual environment. requirements.txt is the tracked half; the installed
-# tree is per-machine and per-platform.
 .venv/
 
-# Credentials. This repo is PUBLIC and jsDelivr serves it, so anything
-# committed here is fetchable at a URL by anyone who guesses the path.
-# Keys live in the FMP_API_KEY environment variable, or in these files, which
-# never leave the machine. Selected by ENVIRONMENT (dev | prod) — no default.
-# No exception, and no template file to make one necessary: nothing matching
-# this pattern is ever trackable. The shape is documented in README.md instead,
-# because `git.commit&push.bat` runs `git add .` — a negation here is one
-# mis-ordered line away from publishing a key.
 secrets.*.json
 
 # NOT `.env`, deliberately. Which environment a checkout runs as is TRACKED, in
@@ -29,8 +17,5 @@ secrets.*.json
 # from the same symbol gives the same file with newer numbers. The scenario
 # (.md) is tracked; its output carries live market data and would churn on
 # every run, so it is not.
-skills_testing_scenarios/**/*.html
-
-
-
+.claude_testing_scenarios/**/*.html
 

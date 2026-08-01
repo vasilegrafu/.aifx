@@ -21,7 +21,7 @@ python .claude/skills/finance-reports/reports/report_builder.py `
     financial-profile AMD `
     --peers NVDA,INTC `
      `
-    --out ./skills_testing_scenarios/finance-reports/company/financial-profile
+    --out ./.claude_testing_scenarios/finance-reports/company/financial-profile
 ```
 
 Writes `amd-financial-profile.html` beside this file. The output is gitignored:
@@ -65,7 +65,7 @@ the engine scales each node's ribbons independently.
 **The rendered page must carry no stale class names.** After a build:
 
 ```powershell
-$h = Get-Content .\skills_testing_scenarios\finance-reports\company\financial-profile\amd-financial-profile.html -Raw
+$h = Get-Content .\.claude_testing_scenarios\finance-reports\company\financial-profile\amd-financial-profile.html -Raw
 ([regex]::Matches($h,'investing-')).Count      # must be 0
 ([regex]::Matches($h,'\bfa-')).Count           # must be > 0
 ```

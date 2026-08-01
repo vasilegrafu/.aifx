@@ -230,8 +230,8 @@ Two things the loader must get right, both verified:
 ## Layout
 
 ```
-../../version.json             the CDN pin every generated page carries, in
-                               .claude/ — it travels with the skills
+../../../version.json          the CDN pin every generated page carries, at the
+                               project root beside config/secrets/environment
 _paths.py                      the ONE ascent: find .claude/, derive the rest
 
 components/                    the library: macros, filters, env, assets, showcases

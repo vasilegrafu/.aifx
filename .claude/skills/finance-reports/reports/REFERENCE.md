@@ -115,7 +115,7 @@ and computing its asset links against the wrong root.
 
 There is deliberately **no conventional destination either** — no `output/`
 shelf to fall into by habit. A test run names
-`skills_testing_scenarios/<skill>/<domain>/<report>/`, which mirrors this tree
+`.claude_testing_scenarios/<skill>/<domain>/<report>/`, which mirrors this tree
 so a scenario sits at the same address as the thing it tests; a real
 deliverable goes wherever the reader asked for it.
 

@@ -3,8 +3,8 @@
 ONE ASCENT, ONE MARKER: the `.claude` directory. Everything else is derived
 from it, so the things that need a path cannot disagree about the layout.
 
-    <project>/                      PROJECT_ROOT  config, secrets, environment
-      .claude/                      CLAUDE_DIR    version.json
+    <project>/                      PROJECT_ROOT  version, config, secrets, environment
+      .claude/                      CLAUDE_DIR
         skills/finance-reports/     SKILL_DIR     this skill
 
 The shape is the same in this repository and in a project the skill is
@@ -38,10 +38,12 @@ def _ascend(start: Path, marker: str) -> Path:
 PROJECT_ROOT = _ascend(SKILL_DIR, ".claude")
 CLAUDE_DIR = PROJECT_ROOT / ".claude"
 
-#: The version pin every generated page carries. Beside the skills rather than
-#: at the project root: it travels with them, and a consuming project has its
-#: own version of its own things.
-VERSION_FILE = CLAUDE_DIR / "version.json"
+#: The version pin every generated page carries -- at the project root, beside
+#: the other facts about which checkout this is. A COPIED skill therefore needs
+#: one written beside it; if a consuming project already has a version.json of
+#: its own, `cdn_href()` rejects it by name for having no "cdn" key rather than
+#: pinning every page to a version that means something else.
+VERSION_FILE = PROJECT_ROOT / "version.json"
 
 #: Where this skill sits inside the published repo -- the CDN path suffix.
 CDN_SUFFIX = SKILL_DIR.relative_to(PROJECT_ROOT).as_posix()
