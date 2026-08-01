@@ -5,9 +5,16 @@
     python reports/report_builder.py financial-profile INTC --peers none --out DIR
     python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 
-A name rather than a path, because reports sit one level deep and the name IS
-the path — components/showcase_builder.py takes `charts/bar` for the same
-reason, since components nest two to four levels.
+A name rather than a path, and no longer because they coincide: a report sits
+under its SUBJECT (`company/financial-profile`), so the name is the leaf, not
+the path. It stays the address because the domain is a taxonomy for READERS —
+it says what the report is about — and asking whoever runs one to know which
+folder it was filed under would make that shelving load-bearing. Discovery is
+recursive and the name must therefore be unique across every domain; `all()`
+refuses a duplicate rather than picking one.
+
+(`components/showcase_builder.py` takes `charts/bar` instead, because
+components nest two to four levels — same idea at two depths.)
 
 Nothing is registered. A directory holding report.html.j2 IS a report, so
 adding one means adding files and nothing else, and the builder does no lookup:

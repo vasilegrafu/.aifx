@@ -12,8 +12,35 @@ reports/
   report_builder.py         ReportBuilder.build(name, argv, out) + the CLI
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
   CATALOG.md                every report by what it argues — generated
-  financial-profile/        one report
+  company/                  a domain, holding its reports
+    financial-profile/      one report
+  portfolio/                empty — a .gitkeep holds the shelf
+  market/                     ”
+  economy/                    ”
 ```
+
+**A report is filed by its SUBJECT — the thing it is about.** Not by method,
+and that is the whole point: a good company report already draws on
+fundamental, macro and quantitative work at once, so a method-shaped shelf
+would make every filing decision a judgement call. The subject does not blend.
+
+| domain | the report is about | typical |
+|---|---|---|
+| `company/` | one business | financial profile, thesis, earnings note |
+| `portfolio/` | a book you hold | review, attribution, risk, drawdown |
+| `market/` | many securities compared, or a sector | screens, peer tables, breadth |
+| `economy/` | no security at all | macro dashboard, cycle position |
+
+**Where `company/` ends and `market/` begins:** one company under the lens,
+with others present only as context, is `company/` — `financial-profile` takes
+`--peers` and stays a company report. A set compared as a set, with no single
+subject, is `market/`.
+
+The domains are a taxonomy for a reader choosing a report, not a namespace: a
+report is still addressed by its own name, and the name must be unique across
+all of them. The empty ones are declared rather than created on demand so the
+taxonomy is visible — what belongs where is a decision, and an empty shelf
+states it.
 
 **A leading underscore marks the library half.** `_report_controller.py` is the
 base class, `report_controller.py` is a report's own.
@@ -23,11 +50,15 @@ base class, `report_controller.py` is a report's own.
 A directory containing `report.html.j2`. Nothing is registered anywhere.
 
 ```
-reports/<name>/
+reports/<domain>/<name>/
   report_controller.py   a ReportController subclass
   report.html.j2         the recipe: which exhibits, in what order
   usage.md               what it argues, what it costs        (required)
 ```
+
+Discovery is `rglob`, so the domain level costs the engine nothing — but it
+does mean two domains cannot both hold a `financial-profile`. `all()` raises on
+a duplicate name rather than picking one.
 
 ## Four stages that fail differently
 
@@ -107,8 +138,10 @@ lines with no dependencies, while `env()` has behaviour that must not be
 duplicated (two `@cache`d copies would parse the 109-template tree twice and
 could disagree about what a thousands separator looks like).
 
-The view is named to the env as `reports/<name>/report.html.j2` — relative to
-the **skill root**, the loader's second search path.
+The view is named to the env as `reports/<domain>/<name>/report.html.j2` —
+relative to the **skill root**, the loader's second search path. It is computed
+as `(directory / VIEW).relative_to(SKILL_DIR)`, so the depth of the tree is
+never restated in code.
 
 ## The engine
 
@@ -118,9 +151,12 @@ python reports/report_builder.py financial-profile MU --peers INTC,WDC --out DIR
 python reports/report_builder.py financial-profile --help    # the REPORT's args
 ```
 
-Addressed by **name**, not path: reports are flat one level, so the name is the
-path. (`components/showcase_builder.py` takes `charts/bar` because components
-nest two to four levels — same idea at two depths.)
+Addressed by **name**, not path — and the two no longer coincide, since a
+report sits under its domain. The name stays the address because the domain is
+shelving for a reader, and making it part of the address would force whoever
+runs a report to know how it was filed. (`components/showcase_builder.py` takes
+`charts/bar` because components nest two to four levels — same idea at two
+depths.)
 
 ### Two levels of CLI, and why
 
@@ -205,13 +241,17 @@ with one report and expensive to backfill across a dozen.
 
 ## Adding a report
 
-1. `reports/<name>/report_controller.py` — subclass `ReportController`, set
-   `TITLE`, write `_fetch(**args)` and `_build_context(payloads)`. Declare the
-   endpoints in one table at the top; assert every identity.
-2. `reports/<name>/report.html.j2` — `{% extends "reports/_report.master.html.j2" %}`,
+0. **Choose the domain by SUBJECT** — `company`, `portfolio`, `market`,
+   `economy`. What the report is about, not the method it uses or the
+   endpoints it happens to call. A new domain is a new directory; nothing
+   registers one.
+1. `reports/<domain>/<name>/report_controller.py` — subclass `ReportController`,
+   set `TITLE`, write `_fetch(**args)` and `_build_context(payloads)`. Declare
+   the endpoints in one table at the top; assert every identity.
+2. `reports/<domain>/<name>/report.html.j2` — `{% extends "reports/_report.master.html.j2" %}`,
    `c.<macro>(...)` calls carrying `d.*`. No arithmetic, no I/O. **The
    `{# purpose: … #}` header is required** — the build checks it.
-3. `reports/<name>/usage.md` — see the skeleton in `../SKILL.md`.
+3. `reports/<domain>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
 4. **`python reports/catalog_builder.py`** — nothing calls it for you.
 5. `python reports/report_builder.py <name> … --out DIR`
 

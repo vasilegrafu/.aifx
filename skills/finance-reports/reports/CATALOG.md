@@ -12,4 +12,4 @@ python reports/report_builder.py <report> <args...> --out DIR
 
 | report | title | what it argues | arguments | docs |
 |---|---|---|---|---|
-| `financial-profile` | Financial Profile | where a company's money comes from, where it goes, what it owns, and how that shape changed | `--peers PEERS symbol` | [usage](financial-profile/usage.md) |
+| `financial-profile` | Financial Profile | where a company's money comes from, where it goes, what it owns, and how that shape changed | `--peers PEERS symbol` | [usage](company/financial-profile/usage.md) |

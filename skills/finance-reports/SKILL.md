@@ -1,5 +1,5 @@
 ---
-name: investing
+name: finance-reports
 description: Generate data-driven investing reports as standalone HTML, built
   from live market and fundamentals data rather than hand-filled templates. A
   report is a program - a controller fetches and asserts, a view chooses which
@@ -8,7 +8,7 @@ description: Generate data-driven investing reports as standalone HTML, built
   add a report type, or work on the component library behind them.
 ---
 
-# investing — reports as programs, not documents
+# finance-reports — reports as programs, not documents
 
 Every report here is **generated end to end**. A controller fetches live data
 and does the arithmetic; a view says which components appear and in what order;
@@ -35,7 +35,7 @@ build artifact.
 | `data_providers/REFERENCE.md` | the only code doing I/O: the client, credentials, why it raises and never caches |
 | `data_providers/fmp/endpoints.md` | which FMP endpoints exist, and which the plan allows |
 | `components/<cat>/<name>/usage.md` | one per component: when to use it, and the rules |
-| `reports/<name>/usage.md` | one per report: what it argues, what it fetches, what it guarantees |
+| `reports/<domain>/<name>/usage.md` | one per report: what it argues, what it fetches, what it guarantees |
 
 **Every directory that owns an engine owns a `REFERENCE.md`**, so it can be
 read on its own — the documentation form of the rule the code already follows.
@@ -61,11 +61,14 @@ python components/showcase_builder.py charts/bar
 There is **no top-level dispatcher**. Each directory owns the engine that
 builds what lives in it, and neither knows the other exists as a command.
 
-A showcase is addressed by its **directory path**, a report by its **name** —
-the same idea at two depths, since components nest two to four levels and
-reports are flat. Neither is a registry lookup: the address IS where the
-controller, the view and the output live. Every path derives from `__file__`,
-so both commands work from any working directory.
+A showcase is addressed by its **directory path**, a report by its **name**,
+since components nest two to four levels. A report sits under its subject
+(`company/financial-profile`), but that domain is shelving for a reader rather
+than part of the address — discovery is recursive, so the name alone still
+finds it, and a name must therefore be unique across every domain. Neither is a
+registry lookup: the address IS where the controller, the view and the output
+live. Every path derives from `__file__`, so both commands work from any
+working directory.
 
 `--out` is required and has no default. The page's local asset href is computed
 relative to it, so a report built without naming its destination would link its
@@ -239,7 +242,10 @@ reports/
   _report_controller.py        ReportController + its own copy of the asset pair
   _report.master.html.j2       the shell every report view extends
   report_builder.py            ReportBuilder.build(name, argv, out) + the CLI
-  financial-profile/           one report
+  company/                     a domain, holding its reports
+    financial-profile/         one report
+  portfolio/  market/  economy/
+                               declared and empty — the taxonomy, stated
 
 css/  css.loader.html.j2       the <link>   + its CDN fallback
 js/   js.loader.html.j2        the <script> + its CDN fallback
@@ -335,14 +341,20 @@ environment** rather than copying it into a file that might be committed.
 
 ## Adding a report
 
-1. `reports/<name>/report_controller.py` — subclass `ReportController`, set
-   `TITLE`, write `_fetch(**args)` and `_build_context(payloads)`. Declare the
-   endpoints in one table at the top; assert every identity in
+0. **Choose the domain by SUBJECT** — `company` (one business), `portfolio` (a
+   book you hold), `market` (many securities, or a sector), `economy` (no
+   security at all). What it is *about*, never the method or the endpoints:
+   one company under the lens with peers as context is `company/`, a set
+   compared as a set is `market/`. The name still has to be unique across all
+   of them, since a report is addressed by name alone.
+1. `reports/<domain>/<name>/report_controller.py` — subclass `ReportController`,
+   set `TITLE`, write `_fetch(**args)` and `_build_context(payloads)`. Declare
+   the endpoints in one table at the top; assert every identity in
    `_build_context`. Add `_add_args(parser)` if it takes arguments and
    `_filename(d)` if the data names the file.
-2. `reports/<name>/report.html.j2` — `{% extends "reports/_report.master.html.j2" %}`,
+2. `reports/<domain>/<name>/report.html.j2` — `{% extends "reports/_report.master.html.j2" %}`,
    fill `{% block content %}` with `c.<macro>(...)` calls carrying `d.*`.
-3. `reports/<name>/usage.md` — what it argues, what it fetches and what that
+3. `reports/<domain>/<name>/usage.md` — what it argues, what it fetches and what that
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.

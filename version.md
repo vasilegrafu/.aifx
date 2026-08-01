@@ -1,9 +1,9 @@
-# .aifx — version history
+# aifx-finance — version history
 
 The SINGLE source of truth for the version is `version.json` at the **repo root**
 (machine-readable); this file is its human ledger — newest release first, one
 entry per version, written when the version is bumped. **One version governs the
-whole repository** and every skill under `skills/` (investing, …); no
+whole repository** and every skill under `skills/` (finance-reports, …); no
 version number lives anywhere else (not in the CSS, not in the JS, not in
 documents, not per skill).
 
@@ -15,7 +15,7 @@ Semver contract:
 
 A published version is immutable: any change, however small, is a new version.
 Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
-`…/.aifx@<version>/skills/<skill>/…`.
+`…/aifx-finance@<version>/skills/<skill>/…`.
 
 ---
 

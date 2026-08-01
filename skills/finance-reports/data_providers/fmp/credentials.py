@@ -1,9 +1,9 @@
 """Where the FMP key comes from — and, more importantly, where it must not be.
 
-THIS REPOSITORY IS PUBLIC. `.aifx` is served by jsDelivr, whose `/gh/` path
-only publishes public GitHub repos, so a key committed anywhere under this
-directory is not merely "in a repo" — it is fetchable at a URL by anyone who
-guesses the path. That is why there is no `api_key` field anywhere in this
+THIS REPOSITORY IS PUBLIC. `aifx-finance` is served by jsDelivr, whose `/gh/`
+path only publishes public GitHub repos, so a key committed anywhere under
+this directory is not merely "in a repo" — it is fetchable at a URL by anyone
+who guesses the path. That is why there is no `api_key` field anywhere in this
 skill's tracked files and why `credentials.local.json` is in `.gitignore`.
 
 Resolution order, first hit wins:

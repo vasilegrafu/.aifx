@@ -109,7 +109,12 @@ class CatalogBuilder:
         purpose = reports.purpose(directory)        # raises if the header is gone
         controller, parser = reports.parser_for(name)
 
-        docs = (f"[usage]({name}/{USAGE})" if (directory / USAGE).exists()
+        # Relative to REPORTS_DIR rather than `<name>/`: a report sits under
+        # its domain now, so the name is no longer the path. Derived from the
+        # directory discovery already walked, so the link cannot disagree with
+        # where the file actually is.
+        here = directory.relative_to(REPORTS_DIR).as_posix()
+        docs = (f"[usage]({here}/{USAGE})" if (directory / USAGE).exists()
                 else "**no usage.md**")
         return [f"`{name}`",
                 controller.TITLE or "—",
