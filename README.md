@@ -15,7 +15,7 @@ Grab any skill folder and paste it into your project. The MIT license allows
 exactly this — take it, keep it, modify it.
 
 ```
-<your-project>/.claude/skills/<skill-name>/   ← copied from aifx-finance/skills/<skill-name>/
+<your-project>/.claude/skills/<skill-name>/   ← copied from aifx-finance/.claude/skills/<skill-name>/
 ```
 
 Done. Claude Code discovers it next session. Your copy is frozen — it never
@@ -37,16 +37,24 @@ next to your own:
 
 ```bat
 :: Windows (junction — no admin rights needed)
-mklink /J <project>\.claude\skills\<skill-name> <path-to>\aifx-finance\skills\<skill-name>
+mklink /J <project>\.claude\skills\<skill-name> <path-to>\aifx-finance\.claude\skills\<skill-name>
 ```
 
 ```bash
 # macOS / Linux (symlink)
-ln -s <path-to>/aifx-finance/skills/<skill-name> <project>/.claude/skills/<skill-name>
+ln -s <path-to>/aifx-finance/.claude/skills/<skill-name> <project>/.claude/skills/<skill-name>
 ```
 
 **3. Verify** — open Claude Code in the project: the skill appears in its
 skills list.
+
+**Linking is the better option if you intend to run the builders.** A linked
+skill resolves back through the junction into this clone, so it reads the
+clone's `environment.json`, `config.<env>.json` and `secrets.<env>.json`: one
+set of credentials on the machine, and **nothing lands in your project**. A
+copied skill is a real file tree and needs its own beside `.claude/` — in which
+case add `secrets.*.json` to that project's `.gitignore` yourself, since this
+repo's cannot reach it.
 
 **Update later** — one pull updates every project at once:
 
@@ -78,7 +86,7 @@ served raw from the git tag.
 
 ### 2. Config — tracked
 
-`config/config.dev.json` and `config/config.prod.json` are already in the repo.
+`config.dev.json` and `config.prod.json` are already in the repo.
 They hold what is not secret:
 
 ```json
@@ -115,8 +123,8 @@ than that risk.
 
 The split is per **file**, not per field: config is tracked, secrets are not,
 so "is this safe to commit?" is decided once for the file rather than judged
-every time someone adds a field. An `api_key` in `config/` is rejected at build
-time for that reason.
+every time someone adds a field. An `api_key` in `config.<env>.json` is
+rejected at build time for that reason.
 
 In CI, set `FMP_API_KEY` instead — it wins over the file and needs no file at
 all.
@@ -124,18 +132,18 @@ all.
 ### 4. Run
 
 ```powershell
-python skills/finance-reports/reports/report_builder.py `
+python .claude/skills/finance-reports/reports/report_builder.py `
     financial-profile AMD --peers NVDA,INTC --out ./some/directory
 ```
 
 `--out` is required and has no default: the page's local asset links are
 computed relative to wherever it is written, so the destination is a decision.
 
-**The environment is declared, not passed.** Write `.env` at the repo root —
-gitignored, a property of this checkout on this machine:
+**The environment is declared, not passed.** `environment.json` sits at the
+repo root and is tracked, so a fresh clone starts somewhere:
 
-```
-ENVIRONMENT=dev
+```json
+{ "environment": "dev" }
 ```
 
 Or set `ENVIRONMENT` in the shell, which wins over the file. There is **no
@@ -144,12 +152,16 @@ flag and no default**: a flag would reach only builds driven through
 the declaration, and it cannot be inherited by a shell another tool spawned —
 which is where builds usually run.
 
+It is deliberately **not** called `.env`. That name is where every tutorial
+tells you to put an API key, and this file is tracked; a name nobody reaches
+for by reflex is a name that can be committed safely.
+
 One declaration picks `config.<env>.json` *and* `secrets.<env>.json` together,
 so a run cannot read dev settings against a prod key. Every build says what it
 resolved, and from where, before spending ~13 API calls:
 
 ```
-environment: dev (from .env)   config.dev.json, key from secrets.dev.json
+environment: dev (from D:\...\environment.json)   config.dev.json, key from D:\...\secrets.dev.json
 fetching ...
 deriving and asserting ...
 <path to the written file>
@@ -159,7 +171,7 @@ Runnable scenarios live in `skills_testing_scenarios/`, each stating its
 command, what must be true of the output, and what each failure mode points at.
 
 ```powershell
-python skills/finance-reports/reports/report_builder.py financial-profile --help
+python .claude/skills/finance-reports/reports/report_builder.py financial-profile --help
 ```
 
 ## License

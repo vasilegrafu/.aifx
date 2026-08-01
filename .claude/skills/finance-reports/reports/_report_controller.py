@@ -30,8 +30,6 @@ destination is implied, so it needs neither a fetch nor an --out. Everything
 extra here is a consequence of that one sentence.
 """
 
-import json
-import os
 import sys
 import traceback
 from pathlib import Path
@@ -39,7 +37,6 @@ from types import SimpleNamespace
 
 REPORTS_DIR = Path(__file__).resolve().parent
 SKILL_DIR = REPORTS_DIR.parent
-REPO_ROOT = SKILL_DIR.parent.parent    # skills/<name>/ -> the repo
 
 # The skill root on the path so `components` resolves PACKAGE-QUALIFIED. Same
 # reason the leaf controllers do it: reached under two names the library would
@@ -47,66 +44,18 @@ REPO_ROOT = SKILL_DIR.parent.parent    # skills/<name>/ -> the repo
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
-from components._showcase_controller import env             # noqa: E402
+# BORROWED, NOT REBUILT — the same reason env() is. A macro drawn on a report
+# has to link the same assets it links on a showcase, and two copies of the
+# pair would be two claims about that, free to disagree. (They were, and did:
+# the two had already drifted apart in their error strings.)
+#
+# `local_href` is why --out is required and has no default: a report can be
+# written anywhere, and the href back to css/ and js/ depends entirely on
+# where. See reports/REFERENCE.md.
+from components._showcase_controller import (                # noqa: E402
+    cdn_href, env, local_href)
 
 VIEW = "report.html.j2"
-
-
-# --------------------------------------------------------------------------
-# assets — where a generated page's CSS and JS come from
-# --------------------------------------------------------------------------
-#
-# Two hrefs, read by css/css.loader.html.j2 and js/js.loader.html.j2 at the
-# skill root. Every page links the bundle LOCAL-FIRST with the pinned CDN as an
-# onerror fallback, so a file inside the tree renders from the working copy and
-# the same file emailed to someone renders from jsDelivr.
-
-def cdn_href() -> str:
-    """CDN prefix (version-pinned) — the FALLBACK half of the asset pair.
-
-    Read from version.json at build time, so every generated file is pinned to
-    the design-system version it was built against. Published tags are
-    immutable, so a page that has left the tree keeps rendering as it did.
-
-    TWO HALVES, AND EACH IS OWNED WHERE IT IS KNOWN. version.json names the
-    repo and the version — the things one shared file can speak for. Where
-    inside that repo THIS skill sits is not one of them, so it is derived here
-    from the same REPO_ROOT used to find version.json in the first place. The
-    two therefore cannot disagree, which is the whole point: a hardcoded
-    "skills/<name>" in the config was a second, silent claim about the layout.
-
-    THE OBLIGATION THIS CREATES: change anything under css/ or js/ and the
-    version has to be bumped and tagged, or pages falling back to the CDN keep
-    getting the previous behaviour while local ones move on."""
-    info = json.loads((REPO_ROOT / "version.json").read_text(encoding="utf-8"))
-    cdn, version = info.get("cdn"), info["version"]
-    if not cdn:
-        sys.exit('version.json has no "cdn": every page links it, set it first.')
-    # A config left half-migrated would otherwise put a literal "{skill}" in
-    # every URL on the page — a 404 that only shows up once a file has left
-    # the tree, which is the one place nobody is looking.
-    if "{skill}" in cdn:
-        sys.exit('version.json still carries "{skill}": the skill path is '
-                 'derived from the tree now, so drop it from the template.')
-    return (cdn.replace("{version}", version).rstrip("/")
-            + "/" + SKILL_DIR.relative_to(REPO_ROOT).as_posix())
-
-
-def local_href(out_dir) -> str:
-    """Path back to the skill FROM WHERE THE PAGE IS WRITTEN — the local half
-    of the asset pair.
-
-    THIS is why --out is required and has no default. A report can be written
-    anywhere, and the href back to css/ and js/ depends entirely on where that
-    is. A report composed without naming its destination would link its assets
-    relative to a directory nobody chose.
-
-    Empty when no relative path exists — a different Windows drive — and the
-    loaders then link the CDN alone rather than an href that cannot resolve."""
-    try:
-        return Path(os.path.relpath(SKILL_DIR, Path(out_dir).resolve())).as_posix()
-    except ValueError:
-        return ""
 
 
 def blame(exc: BaseException) -> str:

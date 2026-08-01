@@ -1,10 +1,10 @@
 # aifx-finance — version history
 
-The SINGLE source of truth for the version is `version.json` at the **repo root**
+The SINGLE source of truth for the version is **`.claude/version.json`**
 (machine-readable); this file is its human ledger — newest release first, one
 entry per version, written when the version is bumped. **One version governs the
-whole repository** and every skill under `skills/` (finance-reports, …); no
-version number lives anywhere else (not in the CSS, not in the JS, not in
+whole repository** and every skill under `.claude/skills/` (finance-reports, …);
+no version number lives anywhere else (not in the CSS, not in the JS, not in
 documents, not per skill).
 
 Semver contract:
@@ -17,11 +17,135 @@ Semver contract:
 
 A published version is immutable: any change, however small, is a new version.
 Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
-`…/aifx-finance@<version>/skills/<skill>/…`.
+`…/aifx-finance@<version>/.claude/skills/<skill>/…`. Paths in the entries below
+are the paths as they were **at that release** — 8.0.0 moved them, and rewriting
+history would make every older entry describe a layout that release never had.
 
 ---
 
-## 7.0.0 — 2026-08-01
+## 8.0.0 — 2026-08-02
+
+**Major, twice over.** Every published asset URL moved, and every command's
+path changed:
+
+```
+https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.0.0/.claude/skills/finance-reports/css/bundle.css
+                                                          ^^^^^^^^
+
+python .claude/skills/finance-reports/reports/report_builder.py financial-profile AMD --out ./out
+       ^^^^^^^^
+```
+
+A 7.0.0 document keeps rendering — its links point at `@7.0.0`, and a published
+tag is immutable — but nothing built against 7.0.0's paths finds anything at
+8.0.0's.
+
+**7.0.0 was never published.** Its tag was never pushed, so `@7.0.0` 404s on the
+CDN and no document can be pinned to it. Its entry stays below as the record of
+when `--env` went; in practice 6.0.0 → 8.0.0 is the upgrade anyone makes.
+
+### The move
+
+```
+skills/      →  .claude/skills/          agents/ → .claude/agents/
+config/*.json →  ./config.<env>.json     version.json → .claude/version.json
+.env         →  ./environment.json       (tracked; see below)
+```
+
+**Why.** The repository laid itself out one way and told consumers to install
+it another. A skill lives at `<project>/.claude/skills/<name>/` in every project
+that uses it — that is where Claude Code looks — but here it lived at
+`skills/<name>/`. Two layouts for one thing, and four separate pieces of code
+each counting `..` from wherever they happened to sit to guess the root.
+
+They disagreed. `parents[4]`, `parents[3]` and two `parent.parent`s all landed
+on the same wrong directory once the skill was installed as documented, and the
+failure was a `FileNotFoundError` on `version.json` from a skill that had been
+installed exactly right.
+
+Now there is **one ascent and one marker**. `_paths.py` walks up until it finds
+`.claude`, and everything else is derived from that:
+
+```
+<project>/                      PROJECT_ROOT   config, secrets, environment
+  .claude/                      CLAUDE_DIR     version.json
+    skills/finance-reports/     SKILL_DIR
+```
+
+The repository is now a project that has this skill installed, which is what it
+was always asking everyone else to be. `CDN_SUFFIX` is computed the same way —
+`SKILL_DIR.relative_to(PROJECT_ROOT)` — so the served path cannot drift from
+the real one.
+
+Paths `resolve()`, which follows a Windows junction. A **linked** skill reads
+the clone it was linked from, so one machine keeps one set of credentials and
+nothing lands in the consuming repository. A **copied** skill is a real tree
+and needs its own. That distinction is now a property of the resolver rather
+than a claim in a README.
+
+**jsDelivr serves dot-directories** — verified against `axios` and `vuejs`
+before committing to this, since a 404 on `/.claude/` would have made the whole
+layout unusable.
+
+### `config/*.json` flattened to the root
+
+`config.<env>.json`, `secrets.<env>.json` and `environment.json` now sit
+together beside `.claude/`, where the split is legible at a glance: the pair for
+an environment is one line apart, and the gitignored half is visibly missing
+rather than hidden a directory down. `.vscode/settings.json` nests
+`secrets.<env>.json` under `config.<env>.json` in the explorer so the pairing
+survives the file list too.
+
+A directory named `config/` also invited a third file. The rule is per-FILE, not
+per-field, and a directory quietly weakens it.
+
+### `.env` → `environment.json`, and it is TRACKED
+
+7.0.0's file was gitignored, so a fresh clone had nothing and had to be told
+twice — once to install, once to declare. Tracking the declaration fixes that:
+a clone starts somewhere.
+
+**The rename is what makes tracking safe.** `.env` is where every tutorial in
+the world says to put an API key. Tracking *that* name would make a public
+repository's safety depend on nobody ever following the convention —
+`git.commit&push.bat` runs `git add .`, and jsDelivr serves anything committed
+at a guessable URL. `environment.json` is a name nobody reaches for by reflex.
+`.gitignore` says so where the entry used to be.
+
+The format follows: `{"environment": "dev"}`, read with `json` rather than
+7.0.0's hand-rolled `KEY=value` scanner. Still **utf-8-sig** — PowerShell 5.1
+writes a BOM by default, and a BOM is invisible in an editor, so the file would
+look right and be silently ignored.
+
+Nothing else about resolution changed: `ENVIRONMENT` still wins, unset is still
+a hard error, there is still no default and still no `--env`.
+
+### Errors name files, not basenames
+
+`credentials.py` printed `.name` in its failures, so a user who had written
+`.env` at the repo root was told to write `.env` at the repo root. Unfalsifiable
+advice. Every path in an error is now the full path, matching what `config.py`
+already did — two checkouts hold files of the same name, and a basename cannot
+say which one paid.
+
+### `_showcase_controller.py` owns the asset pair
+
+`cdn_href`/`local_href` existed twice, in the components controller and the
+reports controller, and had already drifted apart in their error strings. The
+reports side now imports them, the same way it already imports `env()`.
+
+### Migrating
+
+- Re-link or re-copy: the skill is at `.claude/skills/<name>/` now, not
+  `skills/<name>/`.
+- `git mv config/config.dev.json ./config.dev.json` (and prod); move your
+  `secrets.<env>.json` up beside `.claude/`.
+- Replace `.env` with `environment.json` containing `{"environment": "dev"}`.
+- Update any pinned CDN URL to `@8.0.0/.claude/skills/…`.
+
+---
+
+## 7.0.0 — 2026-08-01 *(tag never pushed — see 8.0.0)*
 
 **Major.** `--env` is removed. A command that worked on 6.0.0 now fails with
 *unrecognized arguments*, which is the whole reason this is MAJOR rather than

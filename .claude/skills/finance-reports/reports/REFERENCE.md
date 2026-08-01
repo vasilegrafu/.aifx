@@ -121,15 +121,16 @@ deliverable goes wherever the reader asked for it.
 
 ### The environment is DECLARED, not passed — and there is no flag
 
-It comes from `ENVIRONMENT`, or from `.env` at the repo root, and nowhere else:
+It comes from `ENVIRONMENT`, or from `environment.json` beside `.claude/`, and
+nowhere else:
 
 ```
-1. ENVIRONMENT     the variable — a shell, CI, or setx
-2. .env            `ENVIRONMENT=dev`, gitignored, this checkout on this machine
+1. ENVIRONMENT        the variable — a shell, CI, or setx
+2. environment.json   {"environment": "dev"}, tracked, this checkout
 3. hard error
 ```
 
-It selects **two** files — `config/config.<env>.json` for the API URL and
+It selects **two** files — `config.<env>.json` for the API URL and
 `secrets.<env>.json` for the key — so one declaration cannot put them out of
 step.
 
@@ -143,17 +144,17 @@ second is the one that killed it:
   shell spawned by another tool, and that is where builds actually run — so the
   flag had to be retyped by whoever was driving, every time.
 
-`.env` is **not** a default. A default is a value nobody chose that applies
-everywhere; this is a file someone wrote, naming one checkout, and the build
-prints both the value and where it read it:
+The file is not a default in the sense that matters: the build prints both the
+value and where it read it, in full paths, before it spends a call.
 
 ```
-environment: dev (from .env)   config.dev.json, key from secrets.dev.json
+environment: dev (from D:\...\environment.json)   config.dev.json, key from ...
 ```
 
 That line is the safety property the required flag was reaching for. What it
 prevents is not "unstated" but "unnoticed" — including a stale `ENVIRONMENT` in
-some shell silently overriding this checkout's own `.env`, which it names.
+some shell silently overriding this checkout's own file, which it names. See
+`service_providers/REFERENCE.md` for why the file is not called `.env`.
 
 `_filename(d)` defaults to `<name>.html`; `financial-profile` overrides it to
 `<slug>-financial-profile.html`, because the report is *about* a company and two

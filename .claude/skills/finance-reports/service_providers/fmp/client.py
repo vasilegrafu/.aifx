@@ -41,7 +41,7 @@ class FmpClient:
     def __init__(self, key: str | None = None, base_url: str | None = None,
                  timeout: float = 30.0):
         # Both resolved lazily and from the SAME environment: the URL out of
-        # the tracked config/config.<env>.json, the key out of the gitignored
+        # the tracked config.<env>.json, the key out of the gitignored
         # secrets.<env>.json. Neither is a constant in this file, so pointing a
         # run at a different FMP surface is a config edit, not a code change.
         from ..config import service_provider

@@ -195,9 +195,9 @@ def main(argv: list[str] | None = None) -> int:
 
     args, rest = parser.parse_known_args(argv)
 
-    # The environment is DECLARED, not passed: ENVIRONMENT or .env, resolved in
-    # one place. There is no --env flag, because a flag reaches only builds
-    # driven through this file while anything importing FmpClient directly
+    # The environment is DECLARED, not passed: ENVIRONMENT or environment.json,
+    # resolved in one place. There is no --env flag, because a flag reaches only
+    # builds driven through this file while anything importing FmpClient directly
     # still needs the declaration -- two homes for one fact, free to disagree.
     #
     # Said out loud BEFORE the ~13 network calls, with WHERE it came from:

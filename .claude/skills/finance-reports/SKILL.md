@@ -3,9 +3,9 @@ name: finance-reports
 description: Generate data-driven investing reports as standalone HTML, built
   from live market and fundamentals data rather than hand-filled templates. A
   report is a program - a controller fetches and asserts, a view chooses which
-  of 109 components appear - and the output is regenerated, never edited. Use
-  when the user asks to build, extend, or audit a company or portfolio report,
-  add a report type, or work on the component library behind them.
+  components appear - and the output is regenerated, never edited. Use when the
+  user asks to build, extend, or audit a company or portfolio report, add a
+  report type, or work on the component library behind them.
 ---
 
 # finance-reports — reports as programs, not documents
@@ -26,7 +26,7 @@ build artifact.
 | where | what |
 |---|---|
 | **this file** | the shape, the contracts, how to add things |
-| `components/CATALOG.md` | **all 109 by what they are for** — start here to choose one, generated |
+| `components/CATALOG.md` | **all of them by what they are for** — start here to choose one, generated |
 | `components/REFERENCE.md` | the library and its showcase engine: `env()`, the `c` namespace, filters, path-loading |
 | `reports/CATALOG.md` | **every report by what it argues** — start here to choose one, generated |
 | `reports/REFERENCE.md` | the report engine: the four stages, the controller contract, where the guarantees come from |
@@ -180,13 +180,16 @@ the library rather than to whoever is rendering. So a macro that draws on a
 showcase page draws identically in a report: it is the same env, not two
 configurations that happen to match.
 
-Building that env parses all 109 component templates. Cached once it costs
-~0.5s on the first call and nothing after; built per controller it would cost
-that 109 times.
+Building that env parses every component template in the tree. Cached once it
+costs ~0.5s on the first call and nothing after; built per controller it would
+cost that once per component.
 
 **Reports depend on components, never the reverse.** That is why `components/`
-builds its own showcases without knowing reports exist — and it now imports
-**nothing** from outside itself, not even `sys.path` manipulation.
+builds its own showcases without knowing reports exist. It imports exactly one
+thing from outside itself — `_paths`, at the skill root, which answers *where
+is this skill* — and manipulates `sys.path` not at all. That one import is
+shared with `reports/` and `service_providers/` on purpose: a layout question
+with three answers is a layout question with two wrong ones.
 
 ### Nothing is registered — components, reports and showcases are all found
 
@@ -209,8 +212,8 @@ pluralizes (`charts` → `Chart`) already shows how that goes wrong. A subclass
 of `ShowcaseController` in the module is unambiguous.
 
 **Path-loading is what removed the old hyphen constraint.** An `import`
-statement cannot name a folder with a hyphen, which once disqualified most of
-the 109 components — `domain-specific/fundamental-analysis/*` is blocked twice
+statement cannot name a folder with a hyphen, which once disqualified
+most components — `domain-specific/fundamental-analysis/*` is blocked twice
 before you reach the component at all. Loading by path has no such rule, so
 every component is reachable by the same one notation.
 
@@ -227,7 +230,9 @@ Two things the loader must get right, both verified:
 ## Layout
 
 ```
-version.json  (repo root)      the CDN pin every generated page carries
+../../version.json             the CDN pin every generated page carries, in
+                               .claude/ — it travels with the skills
+_paths.py                      the ONE ascent: find .claude/, derive the rest
 
 components/                    the library: macros, filters, env, assets, showcases
   _showcase_controller.py      ShowcaseController + env() + FILTERS + the asset pair
@@ -242,7 +247,7 @@ components/                    the library: macros, filters, env, assets, showca
   diagrams/  math/    2        the two other rendering subsystems
 
 reports/
-  _report_controller.py        ReportController + its own copy of the asset pair
+  _report_controller.py        ReportController; borrows env() AND the asset pair
   _report.master.html.j2       the shell every report view extends
   report_builder.py            ReportBuilder.build(name, argv, out) + the CLI
   company/                     a domain, holding its reports
@@ -333,73 +338,43 @@ This repository is **public**, and jsDelivr's `/gh/` path publishes it — a key
 committed anywhere under this directory is fetchable at a URL by anyone who
 guesses the path.
 
-**Two files per environment, and the split is per-FILE, not per-field:**
+**Three files beside `.claude/`, never inside it.** A skill is copied or linked
+as `.claude/skills/<name>/` and nothing above it, so a credential kept outside
+that subtree cannot travel with a copy of the skill:
 
 ```
-config/config.<env>.json    TRACKED     api_url, and anything else not secret
-secrets.<env>.json          GITIGNORED  api_key, and nothing else
+<project>/
+  environment.json     TRACKED     {"environment": "dev"} — which env this is
+  config.<env>.json    TRACKED     api_url, and anything else not secret
+  secrets.<env>.json   GITIGNORED  api_key, and nothing else
+  .claude/skills/<name>/
 ```
 
-**There is no template file to copy** — `secrets.<env>.json` is written by
-hand, and its shape is in `README.md`. `.gitignore` matches `secrets.*.json`
-with **no exception**, so nothing by that name can ever be staged. A tracked
-template would require a negation, and `git.commit&push.bat` runs `git add .`
-in a repository that is public and CDN-served: a mis-ordered negation publishes
-a key.
-
-```json
-config/config.dev.json   { "service_providers": { "fmp": { "api_url": "…" } } }
-secrets.dev.json         { "fmp": { "api_key": "<key>" } }
-```
-
-"Is this safe to commit?" is decided once, for the file, rather than judged
-per field every time someone adds one. An `api_key` in a tracked config is not
-a mistake made deliberately — it is one made by adding a field beside the
-fields already there. `config.py` rejects a `service_providers.*.api_key`
-outright for that reason.
-
-Key resolution, first hit wins:
+**Two resolutions, both first-hit-wins, both with NO default:**
 
 ```
-1. FMP_API_KEY              environment variable — preferred, and the only
-                            option that works in CI, where there is no file
-2. secrets.<env>.json       at the REPO ROOT, gitignored
-3. hard error naming both
+key:  $FMP_API_KEY   ->  secrets.<env>.json   ->  hard error naming both
+env:  $ENVIRONMENT   ->  environment.json     ->  hard error
 ```
 
-**The secrets files sit at the repo root, not inside the skill** — a skill is
-meant to be copied or junctioned as `skills/finance-reports/` and nothing
-above it, so keeping the key outside that subtree means copying the skill
-cannot carry a credential with it. `config/` sits beside it, and costs nothing
-new: the skill already resolves `REPO_ROOT` to read `version.json`.
-
-**The environment is DECLARED, not passed. No default, and no flag:**
+One declaration selects both `config.<env>.json` and `secrets.<env>.json`, so a
+run cannot read dev settings against a prod key. There is **no `--env` flag**
+and no third place either looks. Every build says what it resolved and from
+where, in full paths, before the ~13 calls:
 
 ```
-1. ENVIRONMENT     the variable — a shell, CI, or setx
-2. .env            `ENVIRONMENT=dev` at the repo root, gitignored
-3. hard error
+environment: dev (from D:\...\environment.json)   config.dev.json, key from ...
 ```
 
-One declaration selects both files, so a run cannot read dev settings against a
-prod key. **There is no `--env`** — a flag reaches only builds driven through
-`report_builder.py` while anything importing the client directly still needs
-the declaration, and a flag cannot be inherited by a shell another tool
-spawned, which is where builds usually run.
+**There is no template for `secrets.<env>.json`** — write it by hand from
+`README.md`. `.gitignore` matches `secrets.*.json` with **no exception**, so
+nothing by that name is trackable; a shipped template would need a negation,
+and `git.commit&push.bat` runs `git add .` against a public, CDN-served repo.
+For the same reason the environment file is **not** called `.env`: that name is
+where every tutorial tells you to put an API key, and it is tracked.
 
-`.env` is not a default: a default is a value nobody chose that applies
-everywhere, and this is a file someone wrote naming one checkout. Every build
-says what it resolved and from where, before the ~13 calls:
-
-```
-environment: dev (from .env)   config.dev.json, key from secrets.dev.json
-```
-
-That line names both overrides that would otherwise be silent — a shell
-`ENVIRONMENT` beating this checkout's `.env`, and a stale `FMP_API_KEY` beating
-the secrets file.
-
-There is deliberately no third place it looks.
+Why declared rather than passed, why two environments, why per-FILE rather than
+per-field — **`service_providers/REFERENCE.md`**. It is written down once.
 
 ## Adding a report
 
@@ -414,8 +389,11 @@ There is deliberately no third place it looks.
    the endpoints in one table at the top; assert every identity in
    `_build_context`. Add `_add_args(parser)` if it takes arguments and
    `_filename(d)` if the data names the file.
-2. `reports/<domain>/<name>/report.html.j2` — `{% extends "reports/_report.master.html.j2" %}`,
-   fill `{% block content %}` with `c.<macro>(...)` calls carrying `d.*`.
+2. `reports/<domain>/<name>/report.html.j2` — open with a one-line
+   `{# purpose: … #}` header, then `{% extends "reports/_report.master.html.j2" %}`
+   and fill `{% block content %}` with `c.<macro>(...)` calls carrying `d.*`.
+   **The header is required** — `reports/CATALOG.md` is generated from it, and
+   the builder refuses a report without one. Components follow the same rule.
 3. `reports/<domain>/<name>/usage.md` — what it argues, what it fetches and what that
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
@@ -438,8 +416,10 @@ reading one meant regex-parsing the template you were about to render.
 3. `python components/showcase_builder.py <cat>/<name>`
 
 There is no step registering it. `showcase.html` is a build artifact — the
-controller and the view are the source, and the generated pages are gitignored
-because this is a public repo and 109 of them have no business on the CDN.
+controller and the view are the source — but it is **tracked**, so a showcase
+is viewable straight from the CDN without cloning anything. Regenerate it
+whenever you change the component or its controller, or the committed page
+describes a version of the component that no longer exists.
 
 Copy `charts/bar/showcase_controller.py` for the four-line preamble that puts
 the skill root on `sys.path`. A leaf needs it to import the base

@@ -1,41 +1,30 @@
 """Non-secret settings for the service providers — the twin of credentials.py.
 
-TWO FILES, AND THE SPLIT IS THE POINT. `config/config.<env>.json` is TRACKED
-and holds everything that is merely configuration; `secrets.<env>.json` is
-gitignored and holds only what must never be published. This repository is
+    <project>/config.<env>.json     TRACKED     api_url, anything not secret
+    <project>/secrets.<env>.json    GITIGNORED  api_key, and nothing else
+
+TWO FILES, AND THE SPLIT IS PER-FILE RATHER THAN PER-FIELD. This repository is
 public and served by jsDelivr, so "is this safe to commit?" has to be a
-property of the FILE, decided once, rather than a judgement made per field
-every time someone adds one. An `api_key` in a tracked config is not a mistake
-anyone makes deliberately — it is one they make by adding a field next to the
-fields already there.
+property of the FILE, decided once, rather than a judgement made every time
+someone adds a field. An `api_key` in a tracked config is not a mistake anyone
+makes deliberately — it is one they make by adding a field beside the fields
+already there, which is why service_provider() refuses it outright.
 
 Both files are chosen by the SAME environment, so a run cannot read dev config
-against a prod key. See credentials.environment(); there is no default, and a
-run must say which environment it is.
-
-    config/config.dev.json      api_url, and whatever else is not a secret
-    config/config.prod.json     same shape, free to diverge
-    secrets.<env>.json          api_key, gitignored
-
-AT THE REPO ROOT, like version.json. The skill already resolves REPO_ROOT to
-read the version it pins its assets to, so this is the same dependency the
-tree already has, not a new one.
+against a prod key. There is no default; see credentials.resolve().
 """
 
 import json
 from pathlib import Path
 
+from _paths import PROJECT_ROOT
+
 from .fmp.credentials import environment
-
-#: skills/<name>/service_providers/config.py -> the repo root.
-REPO_ROOT = Path(__file__).resolve().parents[3]
-
-CONFIG_DIR = REPO_ROOT / "config"
 
 
 def config_file(env: str | None = None) -> Path:
     """Path to the config file for `env` (default: the selected one)."""
-    return CONFIG_DIR / f"config.{env or environment()}.json"
+    return PROJECT_ROOT / f"config.{env or environment()}.json"
 
 
 def load(env: str | None = None) -> dict:

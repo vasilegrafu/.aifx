@@ -17,11 +17,12 @@ __pycache__/
 # mis-ordered line away from publishing a key.
 secrets.*.json
 
-# Which environment this checkout runs as (ENVIRONMENT=dev|prod). Machine-local
-# by definition: a clone on another machine, or a CI runner, decides for itself.
-# It holds no secret — but tracking it would make one checkout's choice the
-# repository's default, which is the assumption this project refuses to make.
-.env
+# NOT `.env`, deliberately. Which environment a checkout runs as is TRACKED, in
+# environment.json — it holds no secret, and it is worth committing so a clone
+# starts somewhere rather than nowhere. `.env` could not be: it is the file
+# every tutorial in the world tells you to put an API key in, so tracking that
+# NAME would make the safety of this repo depend on nobody ever following the
+# convention. The name is the safeguard.
 
 # Generated reports land beside the scenario that produced them. A report is a
 # build artifact — the controller and the view are the source, and regenerating

@@ -7,7 +7,7 @@ what the provider itself does and does not serve is in `fmp/endpoints.md`.
 
 ```
 service_providers/
-  config.py          non-secret settings, from config/config.<env>.json
+  config.py          non-secret settings, from config.<env>.json
   fmp/
     client.py        FmpClient — get(), get_many(), rate limiting
     credentials.py   api_key() — a two-place resolution order
@@ -22,12 +22,13 @@ than of any one provider.
 ## Config and secrets are two files, split per FILE
 
 ```
-config/config.<env>.json    TRACKED     api_url, timeouts, anything not secret
-secrets.<env>.json          GITIGNORED  api_key, and nothing else
+environment.json     TRACKED     which <env> this checkout is
+config.<env>.json    TRACKED     api_url, timeouts, anything not secret
+secrets.<env>.json   GITIGNORED  api_key, and nothing else
 ```
 
-Both at the repo root, both chosen by the same `<env>`, so a run cannot read
-dev settings against a prod key.
+All three sit beside `.claude/`, and the last two are chosen by the same
+`<env>`, so a run cannot read dev settings against a prod key.
 
 **The split is per-file rather than per-field on purpose.** This repository is
 public and served by jsDelivr, so "is this safe to commit?" must be a property
@@ -113,7 +114,7 @@ served by jsDelivr; a key in a pasted traceback is a leaked key.
 ```
 1. FMP_API_KEY            environment variable — preferred, and the only one
                           that works in CI, where there is no file
-2. secrets.<env>.json     {"fmp": {"api_key": "..."}} at the REPO ROOT,
+2. secrets.<env>.json     {"fmp": {"api_key": "..."}} beside `.claude/`,
                           gitignored. <env> is declared, never defaulted
 3. hard error naming both
 ```
@@ -122,10 +123,16 @@ First hit wins. There is deliberately **no third place it looks** — a skill th
 silently reads credentials from wherever it can find them is one refactor away
 from reading them from somewhere it should not.
 
-**Why the repo root rather than beside this file.** A skill is meant to be
-copied or junctioned into another project as `skills/finance-reports/` and
-nothing above it. A credential kept inside that subtree travels with every
-copy; one kept above it cannot.
+**Why beside `.claude/` rather than beside this file.** A skill is copied or
+linked into another project as `.claude/skills/<name>/` and nothing above it. A
+credential kept inside that subtree travels with every copy; one kept above it
+cannot. `_paths.py` finds that directory by locating `.claude` itself, so the
+answer is the same in this repository and in a project the skill is installed
+into — the two layouts are one layout.
+
+A **linked** skill resolves through the junction back into the clone it was
+linked from, so one machine keeps one set of credentials and nothing lands in
+the consuming repository. A **copied** skill is a real tree and needs its own.
 
 **Why two environments.** A dev key and a production key have different rate
 limits and different blast radii, and the way that goes wrong is someone
@@ -134,8 +141,8 @@ burning a production quota on a test run.
 **Which environment, and where that comes from.** Declared, never passed:
 
 ```
-1. ENVIRONMENT     the variable — a shell, CI, or setx
-2. .env            `ENVIRONMENT=dev` at the REPO ROOT, gitignored
+1. ENVIRONMENT        the variable — a shell, CI, or setx
+2. environment.json   {"environment": "dev"} beside `.claude/`, TRACKED
 3. hard error
 ```
 
@@ -150,25 +157,35 @@ still needed the declaration, so the same fact had two homes — and a flag
 cannot be inherited by a shell that another tool spawned, which is where builds
 usually run.
 
-`.env` is not a default. A default is a value nobody chose that applies
-everywhere; this is a file someone wrote, naming one checkout on one machine.
-`_from_dotenv()` reads exactly one key and understands `KEY=value`, `#`
-comments and blank lines — deliberately not a dotenv parser, because a fuller
-one invites putting things in that file that belong in `config/` or in
-`secrets.<env>.json`. It reads **utf-8-sig**: a BOM is invisible in an editor
-and would make the first key match nothing, so the file would look right and be
-ignored.
+**Why `environment.json` and not `.env`.** The file is tracked, and that is
+only safe because of its name. `.env` is where every tutorial in the world
+tells you to put an API key, so tracking *that* name would make the safety of a
+public repository depend on nobody ever following the convention. Committing a
+declaration is worth it — a clone starts somewhere rather than nowhere — but
+only for a file nobody reaches for by reflex.
 
-**Every build says what it resolved**, before any network call:
+`_from_file()` reads exactly one key, and it reads **utf-8-sig**: a BOM is
+invisible in an editor and would make the file parse wrong, so it would look
+right and be ignored. PowerShell 5.1 writes one by default.
+
+**Every build says what it resolved**, before any network call, in full paths:
 
 ```
-environment: dev (from .env)   config.dev.json, key from secrets.dev.json
+environment: dev (from D:\...\environment.json)   config.dev.json, key from ...
 ```
 
 `resolve()` returns the source as well as the value, and `describe()` produces
 the second half without ever returning the key. Between them they name the two
 overrides that would otherwise be silent: a shell `ENVIRONMENT` beating this
-checkout's `.env`, and a stale `FMP_API_KEY` beating `secrets.prod.json`.
+checkout's file, and a stale `FMP_API_KEY` beating `secrets.prod.json`.
+
+**Those two print full paths, not basenames**, because they are the ones that
+can come from somewhere you did not expect — two checkouts hold files of the
+same name and a basename cannot tell you which one paid. `config.<env>.json`
+prints as a name: it is not resolved independently, it is whatever the printed
+environment selected, beside the printed secrets file. Errors print full paths
+throughout — advice you cannot check against your own disk is advice you cannot
+act on.
 
 **There is no template file, and its absence is the safety property.**
 `.gitignore` matches `secrets.*.json` with **no exception**, so nothing by that
