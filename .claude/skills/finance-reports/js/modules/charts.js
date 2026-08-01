@@ -1,4 +1,4 @@
-/* docs-html/charts — the shared chart frame. ENGINE-AGNOSTIC.
+/* finance-reports/charts — the shared chart frame. ENGINE-AGNOSTIC.
 
    Every chart in the system, whatever renders it, ends up as an <svg> inside
    the same card: the validated surface, a fixed canvas height, an icon toolbar

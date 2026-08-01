@@ -3,7 +3,7 @@
 {# data: series[] {name:str, points:num[]}   categories: str[] #}
 {% import "charts/_render.html.j2" as r %}
 
-{% macro stacked_horizontal_bar(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
+{% macro stacked_horizontal_bar(series=[], categories=[], caption="", height=340, note="", y_name="", unit="", label_room=8) %}
 {# Built as data and serialised once — see the note in line/component.html.j2. #}
 {% set built = [] %}
 {% for s in series %}
@@ -19,10 +19,16 @@
                                 "nameGap": 28}) %}
 {% endif %}
 {# Without `inverse` the FIRST category lands at the bottom and the whole
-   ranking reads upside-down. A horizontal bar chart is read top-to-bottom. #}
+   ranking reads upside-down. A horizontal bar chart is read top-to-bottom.
+
+   `containLabel` reserves room for the category labels and then CAPS what it
+   will give, so a long label has its first characters clipped off outside the
+   SVG -- and the chart still draws. This component exists FOR long labels, so
+   it needs the same escape hatch sankey has: `label_room` reserves the left
+   margin explicitly. Default 8 keeps the automatic behaviour. #}
 {% set option = {
      "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-     "grid": {"left": 8, "right": 16,
+     "grid": {"left": label_room, "right": 16,
               "bottom": (34 if y_name else 8), "containLabel": true},
      "xAxis": value_axis,
      "yAxis": {"type": "category", "data": categories, "inverse": true},

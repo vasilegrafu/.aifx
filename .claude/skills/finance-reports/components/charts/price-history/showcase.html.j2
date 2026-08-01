@@ -1,0 +1,22 @@
+{# The `price-history` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two years of monthly bars — candles above, volume beneath, one time axis</h3>
+      {{ c.price_history(bars=d.bars,
+               caption="Share price and volume, monthly",
+               unit="USD",
+               note="Range-bound near 140 for two years, then a slide through late 2026.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>twelve bars — the same component where each candle is readable</h3>
+      {{ c.price_history(bars=d.recent,
+               caption="Share price, last twelve months",
+               unit="USD",
+               height=360,
+               note="The same data at a density where individual candles can be read.") }}
+    </section>
+{% endblock %}

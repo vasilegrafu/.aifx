@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stacked-normalized — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>stacked-normalized</h1>
+  </header>
+
+    <section>
+      <h3>two segments — a legend appears; both columns are 100% tall</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 76
+  },
+  "legend": {
+    "top": 30
+  },
+  "series": [
+    {
+      "barMaxWidth": 44,
+      "data": [
+        87.0,
+        77.7,
+        83.5,
+        77.6
+      ],
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "name": "Product",
+      "stack": "total",
+      "type": "bar"
+    },
+    {
+      "barMaxWidth": 44,
+      "data": [
+        13.0,
+        22.3,
+        16.5,
+        22.4
+      ],
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "name": "Services",
+      "stack": "total",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "text": "Revenue mix, product against services"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "AMD",
+      "NVDA",
+      "INTC",
+      "QCOM"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "max": 100,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">NVDA is 2.3x AMD's size; here the two columns are the same height.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>four segments with y_name — the totals disappear, by design</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 76
+  },
+  "legend": {
+    "top": 30
+  },
+  "series": [
+    {
+      "barMaxWidth": 44,
+      "data": [
+        22.2,
+        29.8,
+        39.4,
+        47.2,
+        55.6
+      ],
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "name": "Cloud",
+      "stack": "total",
+      "type": "bar"
+    },
+    {
+      "barMaxWidth": 44,
+      "data": [
+        48.1,
+        43.8,
+        37.8,
+        32.0,
+        26.5
+      ],
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "name": "License",
+      "stack": "total",
+      "type": "bar"
+    },
+    {
+      "barMaxWidth": 44,
+      "data": [
+        18.4,
+        14.9,
+        11.2,
+        8.4,
+        6.2
+      ],
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "name": "Hardware",
+      "stack": "total",
+      "type": "bar"
+    },
+    {
+      "barMaxWidth": 44,
+      "data": [
+        11.4,
+        11.5,
+        11.6,
+        12.3,
+        11.7
+      ],
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "name": "Services",
+      "stack": "total",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "text": "Revenue mix by fiscal year"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "FY21",
+      "FY22",
+      "FY23",
+      "FY24",
+      "FY25"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "max": 100,
+    "name": "Share of revenue (%)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">FY25 is 2.1x the size of FY21. Nothing here shows that — the mix is the argument.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

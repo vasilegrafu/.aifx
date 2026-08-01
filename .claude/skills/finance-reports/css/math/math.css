@@ -1,6 +1,6 @@
-/* docs-html — math: LaTeX formulas, rendered at view time by KaTeX
-   (docs-html.js `math` feature; engine + fonts from the pinned CDN).
-   Part of docs-html.css (loaded via @import, layer `math`). */
+/* finance-reports — math: LaTeX formulas, rendered at view time by KaTeX
+   (bundle.js `math` feature; engine + fonts from the pinned CDN).
+   Part of bundle.css (loaded via @import, layer `math`). */
 
 div.math {
   margin: var(--block-gap) 0;

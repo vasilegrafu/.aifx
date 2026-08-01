@@ -36,18 +36,81 @@ if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
 from components._showcase_controller import (          # noqa: E402
-    MARKUP, VIEW, ShowcaseController)
+    MARKUP, PAGE, VIEW, ShowcaseController)
 
 CONTROLLER = "showcase_controller.py"
 
 
 class ShowcaseBuilder:
 
+    def all(self) -> list[str]:
+        """Every component that HAS a showcase, as builder paths, sorted.
+
+        A component is showcased when the controller and the view sit beside
+        its markup — the same found-not-registered rule build() enforces one
+        at a time."""
+        return sorted(
+            markup.parent.relative_to(COMPONENTS_DIR).as_posix()
+            for markup in COMPONENTS_DIR.rglob(MARKUP)
+            if (markup.parent / CONTROLLER).exists()
+            and (markup.parent / VIEW).exists())
+
+    def missing(self) -> list[str]:
+        """Every component that has NO showcase yet. The inverse of all()."""
+        has = set(self.all())
+        return sorted(
+            path for path in (
+                markup.parent.relative_to(COMPONENTS_DIR).as_posix()
+                for markup in COMPONENTS_DIR.rglob(MARKUP))
+            if path not in has)
+
+    def build_all(self, check: bool = False) -> list[Path]:
+        """Rebuild every showcase — or, with check=True, verify each is current.
+
+        THE BATCH IS NOT A CONVENIENCE. A showcase page is TRACKED and pins the
+        asset version it was built against, so one theme edit invalidates every
+        page in the tree at once. Rebuilding them one command at a time is how
+        a library ends up with pages describing three different versions of the
+        same CSS.
+
+        `--check` compares without writing, so a hook or a reviewer sees a
+        non-zero exit instead of a stale page nobody opened. It reports EVERY
+        stale page, not the first: told one at a time, you fix one at a time.
+        """
+        stale, built = [], []
+        for path in self.all():
+            page = (COMPONENTS_DIR / path / PAGE)
+            before = page.read_text(encoding="utf-8") if page.exists() else None
+            if check:
+                # Rendered to memory and compared, never written: --check must
+                # leave the tree exactly as it found it, or it is a build.
+                if self._render(path) != before:
+                    stale.append(path)
+            else:
+                built.append(self.build(path))
+        if check and stale:
+            raise SystemExit(
+                f"{len(stale)} showcase page(s) out of date:\n" +
+                "\n".join(f"  {p}" for p in stale) +
+                f"\nRun: python components/showcase_builder.py --all")
+        return built
+
+    def _render(self, path: str) -> str:
+        """The page as a string, so build_all() can compare without writing."""
+        directory = self._directory(path)
+        controller = self._controller(directory)()
+        return controller.render()
+
     def build(self, path: str) -> Path:
         """Render the showcase at `path` — "charts/bar" — and return the page.
 
         Raises rather than returning a code: a showcase asked for by name and
         not built is a mistake worth stopping for."""
+        return self._controller(self._directory(path))().build()
+
+    @staticmethod
+    def _directory(path: str) -> Path:
+        """`charts/bar` -> the component folder, checked before it is used."""
         directory = (COMPONENTS_DIR / path).resolve()
         try:
             directory.relative_to(COMPONENTS_DIR)
@@ -58,8 +121,7 @@ class ShowcaseBuilder:
         for required in (MARKUP, CONTROLLER, VIEW):
             if not (directory / required).exists():
                 raise SystemExit(f"{path}: no {required}")
-
-        return self._controller(directory)().build()
+        return directory
 
     @staticmethod
     def _controller(directory: Path) -> type[ShowcaseController]:
@@ -108,12 +170,35 @@ def main(argv: list[str] | None = None) -> int:
     # Plain hyphens in anything PRINTED: stdout is cp1252 on Windows, where an
     # em dash encodes to 0x97 and the console shows a replacement character.
     # Docstrings keep theirs — those are read in an editor, which is UTF-8.
-    parser.add_argument("path",
+    parser.add_argument("path", nargs="?",
                         help="component directory, relative to components/ "
                              "- e.g. charts/bar")
+    parser.add_argument("--all", action="store_true",
+                        help="rebuild every showcase in the tree")
+    parser.add_argument("--check", action="store_true",
+                        help="with --all, verify every page is current; "
+                             "write nothing, exit non-zero if any is stale")
+    parser.add_argument("--missing", action="store_true",
+                        help="list components that have no showcase yet")
     args = parser.parse_args(argv)
 
-    print(ShowcaseBuilder().build(args.path))
+    builder = ShowcaseBuilder()
+    if args.missing:
+        for path in builder.missing():
+            print(path)
+        return 0
+    if args.all or args.check:
+        pages = builder.build_all(check=args.check)
+        if args.check:
+            print(f"{len(builder.all())} showcase(s) current")
+        else:
+            for page in pages:
+                print(page)
+        return 0
+    if not args.path:
+        parser.error("give a component path, or --all / --check / --missing")
+
+    print(builder.build(args.path))
     return 0
 
 

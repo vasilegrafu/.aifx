@@ -1,4 +1,4 @@
-/* docs-html/attr-fallback — makes the data-attribute bar geometry work outside
+/* finance-reports/attr-fallback — makes the data-attribute bar geometry work outside
    Chromium. A polyfill with a shelf life: delete this file the day Firefox and
    Safari ship typed attr().
 

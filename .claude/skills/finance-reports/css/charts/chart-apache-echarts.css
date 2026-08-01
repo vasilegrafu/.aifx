@@ -1,5 +1,5 @@
-/* docs-html — chart-apache-echarts: Apache ECharts specifics ONLY.
-   Part of docs-html.css (loaded via @import, layer `charts`).
+/* finance-reports — chart-apache-echarts: Apache ECharts specifics ONLY.
+   Part of bundle.css (loaded via @import, layer `charts`).
 
    The card, the canvas, the toolbar and the source fallback are shared and live
    in charts.css — this file exists as the per-engine seam, exactly as

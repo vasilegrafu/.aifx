@@ -22,10 +22,8 @@ import json
 import sys
 from pathlib import Path
 
-# Skill root on sys.path, located by the marker `_paths.py`: leaves sit two to
-# four folders deep, so a parent COUNT is wrong at the next depth. The base is
-# then imported PACKAGE-QUALIFIED -- reached under a second name it would be a
-# second module object, with its own cached env().
+# Skill root on sys.path by marker, so the base imports PACKAGE-QUALIFIED.
+# Why a marker and not a parent count: SKILL.md, "Adding a component showcase".
 _SKILL_DIR = next(p for p in Path(__file__).resolve().parents
                   if (p / "_paths.py").exists())
 if str(_SKILL_DIR) not in sys.path:

@@ -1,4 +1,4 @@
-/* docs-html/util — leaf helpers. No DOM state, no knowledge of any feature.
+/* finance-reports/util — leaf helpers. No DOM state, no knowledge of any feature.
    Everything here is a small, generic capability a feature may borrow. */
 
 "use strict";

@@ -1,4 +1,4 @@
-/* docs-html/icons — the shared SVG icon set: inline Lucide-style strokes,
+/* finance-reports/icons — the shared SVG icon set: inline Lucide-style strokes,
    currentColor so every icon follows its button's text color. No icon files,
    no icon font — each icon is a 24×24 stroke path rendered at 16px. */
 

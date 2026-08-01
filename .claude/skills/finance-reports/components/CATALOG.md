@@ -79,24 +79,24 @@ Engine-backed charts (Apache ECharts). A chart is data; a table is the same data
 | `apache-echarts` | `apache_echarts` | declarative data chart (bar/line/pie/scatter/candlestick…) via Apache ECharts, view-time SVG | [usage](charts/apache-echarts/usage.md) · [showcase](charts/apache-echarts/showcase.html) |
 | `area` | `area` | a measure over time with the region beneath filled — magnitude, not just direction | [usage](charts/area/usage.md) · [showcase](charts/area/showcase.html) |
 | `bar` | `bar` | a measure across categories — the workhorse comparison | [usage](charts/bar/usage.md) · [showcase](charts/bar/showcase.html) |
-| `bar-negative` | `bar_negative` | a measure that crosses zero — variance, surprise, contribution | [usage](charts/bar-negative/usage.md) |
-| `correlation-matrix` | `correlation_matrix` | pairwise relationships across a set — a heatmap on the sequential ramp, not the categorical palette | [usage](charts/correlation-matrix/usage.md) |
-| `drawdown-curve` | `drawdown_curve` | peak-to-trough decline over time — the shape of the losing periods, not the gains | [usage](charts/drawdown-curve/usage.md) |
-| `funnel-chart` | `funnel_chart` | stage-to-stage narrowing — a rendered funnel with proportional bands | [usage](charts/funnel-chart/usage.md) |
-| `gauge` | `gauge` | one value against a range — a dial, for a single bounded measure | [usage](charts/gauge/usage.md) |
-| `line` | `line` | a measure over time — the default form for anything with a date axis | [usage](charts/line/usage.md) |
-| `pie` | `pie` | composition of a single whole — a donut, for a handful of parts | [usage](charts/pie/usage.md) |
-| `price-history` | `price_history` | price action over time — candlestick with volume beneath, one shared time axis | [usage](charts/price-history/usage.md) |
-| `radar` | `radar` | several attributes of a few entities at once — profile shape, not precise values | [usage](charts/radar/usage.md) |
-| `sankey` | `sankey` | flow decomposition — how a total splits, merges or converts across stages | [usage](charts/sankey/usage.md) |
-| `scatter` | `scatter` | two measures per entity — where the relationship between them is the finding | [usage](charts/scatter/usage.md) |
-| `smoothed-line` | `smoothed_line` | a measure over time drawn as a smooth curve — trend over tick-by-tick detail | [usage](charts/smoothed-line/usage.md) |
-| `stacked-area` | `stacked_area` | parts summing to a whole over time — composition and total in one figure | [usage](charts/stacked-area/usage.md) |
-| `stacked-column` | `stacked_column` | parts summing to a whole across categories — vertical stacked bars | [usage](charts/stacked-column/usage.md) |
-| `stacked-horizontal-bar` | `stacked_horizontal_bar` | parts summing to a whole, laid on their side — for long category names | [usage](charts/stacked-horizontal-bar/usage.md) |
-| `stacked-line` | `stacked_line` | several series summed at each point, drawn as lines — the total and its parts | [usage](charts/stacked-line/usage.md) |
-| `stacked-normalized` | `stacked_normalized` | each category as 100% — composition when the shares matter and the totals do not | [usage](charts/stacked-normalized/usage.md) |
-| `waterfall` | `waterfall` | how a total became another total — a bridge of additive steps | [usage](charts/waterfall/usage.md) |
+| `bar-negative` | `bar_negative` | a measure that crosses zero — variance, surprise, contribution | [usage](charts/bar-negative/usage.md) · [showcase](charts/bar-negative/showcase.html) |
+| `correlation-matrix` | `correlation_matrix` | pairwise relationships across a set — a heatmap on the sequential ramp, not the categorical palette | [usage](charts/correlation-matrix/usage.md) · [showcase](charts/correlation-matrix/showcase.html) |
+| `drawdown-curve` | `drawdown_curve` | peak-to-trough decline over time — the shape of the losing periods, not the gains | [usage](charts/drawdown-curve/usage.md) · [showcase](charts/drawdown-curve/showcase.html) |
+| `funnel-chart` | `funnel_chart` | stage-to-stage narrowing — a rendered funnel with proportional bands | [usage](charts/funnel-chart/usage.md) · [showcase](charts/funnel-chart/showcase.html) |
+| `gauge` | `gauge` | one value against a range — a dial, for a single bounded measure | [usage](charts/gauge/usage.md) · [showcase](charts/gauge/showcase.html) |
+| `line` | `line` | a measure over time — the default form for anything with a date axis | [usage](charts/line/usage.md) · [showcase](charts/line/showcase.html) |
+| `pie` | `pie` | composition of a single whole — a donut, for a handful of parts | [usage](charts/pie/usage.md) · [showcase](charts/pie/showcase.html) |
+| `price-history` | `price_history` | price action over time — candlestick with volume beneath, one shared time axis | [usage](charts/price-history/usage.md) · [showcase](charts/price-history/showcase.html) |
+| `radar` | `radar` | several attributes of a few entities at once — profile shape, not precise values | [usage](charts/radar/usage.md) · [showcase](charts/radar/showcase.html) |
+| `sankey` | `sankey` | flow decomposition — how a total splits, merges or converts across stages | [usage](charts/sankey/usage.md) · [showcase](charts/sankey/showcase.html) |
+| `scatter` | `scatter` | two measures per entity — where the relationship between them is the finding | [usage](charts/scatter/usage.md) · [showcase](charts/scatter/showcase.html) |
+| `smoothed-line` | `smoothed_line` | a measure over time drawn as a smooth curve — trend over tick-by-tick detail | [usage](charts/smoothed-line/usage.md) · [showcase](charts/smoothed-line/showcase.html) |
+| `stacked-area` | `stacked_area` | parts summing to a whole over time — composition and total in one figure | [usage](charts/stacked-area/usage.md) · [showcase](charts/stacked-area/showcase.html) |
+| `stacked-column` | `stacked_column` | parts summing to a whole across categories — vertical stacked bars | [usage](charts/stacked-column/usage.md) · [showcase](charts/stacked-column/showcase.html) |
+| `stacked-horizontal-bar` | `stacked_horizontal_bar` | parts summing to a whole, laid on their side — for long category names | [usage](charts/stacked-horizontal-bar/usage.md) · [showcase](charts/stacked-horizontal-bar/showcase.html) |
+| `stacked-line` | `stacked_line` | several series summed at each point, drawn as lines — the total and its parts | [usage](charts/stacked-line/usage.md) · [showcase](charts/stacked-line/showcase.html) |
+| `stacked-normalized` | `stacked_normalized` | each category as 100% — composition when the shares matter and the totals do not | [usage](charts/stacked-normalized/usage.md) · [showcase](charts/stacked-normalized/showcase.html) |
+| `waterfall` | `waterfall` | how a total became another total — a bridge of additive steps | [usage](charts/waterfall/usage.md) · [showcase](charts/waterfall/showcase.html) |
 
 ## domain-specific
 

@@ -1,0 +1,33 @@
+{# The `scatter` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>labelled points, both axes named — the third slot becomes the label</h3>
+      {{ c.scatter(series=[d.semis],
+               caption="R&D intensity against return on capital",
+               x_name="R&D / revenue (%)",
+               y_name="ROIC (%)",
+               note="No relationship in this group: heavy R&D pays off for some and not others.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>two series — a legend appears, and the groups separate</h3>
+      {{ c.scatter(series=[d.semis, d.software],
+               caption="Semiconductors against software",
+               x_name="R&D / revenue (%)",
+               y_name="ROIC (%)",
+               note="Software spends slightly more on R&D as a share, but its returns cluster far tighter.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>no labels — when the cloud is the finding, not the members</h3>
+      {{ c.scatter(series=[d.unlabelled],
+               caption="Return against R&D intensity, Russell 1000",
+               x_name="R&D / revenue (%)",
+               y_name="ROIC (%)",
+               height=320,
+               note="Naming sixteen points would bury the one thing visible here: the slope.") }}
+    </section>
+{% endblock %}

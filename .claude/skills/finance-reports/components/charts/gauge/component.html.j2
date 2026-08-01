@@ -1,5 +1,8 @@
 {# purpose: one value against a range — a dial, for a single bounded measure #}
-{# unit: required — the value is read alone, against nothing #}
+{# unit: required, and a SYMBOL — "%", "x", "bps". It is set beside the value
+   at the centre of the dial rather than as a caption subtext, because on a
+   gauge the number IS the chart; a phrase like "percent of net income" belongs
+   in `caption` or `note`. #}
 {# data: value:num, minimum:num, maximum:num — scalars, no collection #}
 {% import "charts/_render.html.j2" as r %}
 
@@ -19,5 +22,8 @@
                             "formatter": "{value}" ~ unit},
                  "data": [{"value": value}]}],
    } %}
-{{ r.out(option, height, note, caption, unit) }}
+{# The unit is NOT passed on as a subtext: it is already beside the value, and
+   every other chart's subtext sits under the caption where this one would
+   repeat itself. #}
+{{ r.out(option, height, note, caption) }}
 {% endmacro %}

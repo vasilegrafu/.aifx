@@ -225,13 +225,11 @@ class ShowcaseController:
         return self.directory.name
 
     # ---------------------------------------------------------------- build
-    def build(self) -> Path:
-        """Render the view with the controller's data; write the page beside
-        the component.
+    def render(self) -> str:
+        """The page as a string. Everything build() does except writing.
 
-        A showcase always lands next to what it shows, so unlike a report it
-        has no destination to be told. Raises rather than returning a code —
-        the caller owns the reporting."""
+        Split out so `--check` can compare a page against what it WOULD be
+        without touching the tree: a check that writes is a build."""
         directory = self.directory
         try:
             view = (directory / VIEW).relative_to(COMPONENTS_DIR).as_posix()
@@ -248,13 +246,20 @@ class ShowcaseController:
                              f"{type(d).__name__}, expected dict")
         self._validate_context(d)
 
-        html = env().get_template(view).render(
+        return env().get_template(view).render(
             d=SimpleNamespace(**d),
             title=f"{self.name} — showcase",
             component_name=self.name,
             local_href=local_href(directory),
             cdn_href=cdn_href())
 
-        output_file = directory / PAGE
-        output_file.write_text(html, encoding="utf-8")
+    def build(self) -> Path:
+        """Render the view with the controller's data; write the page beside
+        the component.
+
+        A showcase always lands next to what it shows, so unlike a report it
+        has no destination to be told. Raises rather than returning a code —
+        the caller owns the reporting."""
+        output_file = self.directory / PAGE
+        output_file.write_text(self.render(), encoding="utf-8")
         return output_file

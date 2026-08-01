@@ -1,0 +1,23 @@
+{# The `stacked-column` showcase — the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two segments — a legend appears, columns stack to a real total</h3>
+      {{ c.stacked_column(series=[d.data_center, d.client], categories=d.peers,
+               caption="Data centre and client revenue",
+               unit="USD, billions",
+               note="Two very different mixes: NVDA is nearly all data centre, INTC nearly all client.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>three segments with y_name — the column height is the company</h3>
+      {{ c.stacked_column(series=[d.data_center, d.client, d.embedded],
+               categories=d.peers,
+               caption="Revenue by segment, latest fiscal year",
+               unit="USD, billions",
+               y_name="Revenue (USD bn)",
+               note="NVDA is one segment wearing a company; INTC is the opposite.") }}
+    </section>
+{% endblock %}

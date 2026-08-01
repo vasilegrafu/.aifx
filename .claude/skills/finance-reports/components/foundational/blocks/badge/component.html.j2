@@ -1,2 +1,3 @@
 {# purpose: inline status/verdict pill #}
+{# data: label: str   variant: str -- one of the status tones in blocks.css #}
 {% macro badge(label="", variant="") %}<span class="badge{% if variant %} badge-{{ variant }}{% endif %}">{{ label }}</span>{% endmacro %}

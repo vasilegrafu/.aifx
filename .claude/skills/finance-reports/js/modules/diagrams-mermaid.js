@@ -1,4 +1,4 @@
-/* docs-html/diagram-mermaid — Mermaid diagrams, auto-laid-out from text.
+/* finance-reports/diagram-mermaid — Mermaid diagrams, auto-laid-out from text.
 
    Markup (plain Mermaid text in the document, no per-document JS):
      <pre class="mermaid">flowchart LR

@@ -1,5 +1,5 @@
-/* docs-html — layout: spatial arrangement primitives (columns, grid, card).
-   Part of docs-html.css (loaded via @import, layer `layout`). Light theme only.
+/* finance-reports — layout: spatial arrangement primitives (columns, grid, card).
+   Part of bundle.css (loaded via @import, layer `layout`). Light theme only.
 
    The single-column reading model still wins: every layout collapses to ONE
    column on narrow width and in print. The container owns the geometry (gap +

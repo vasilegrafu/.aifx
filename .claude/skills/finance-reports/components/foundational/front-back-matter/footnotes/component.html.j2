@@ -1,4 +1,5 @@
 {# purpose: numbered footnotes list with back-links #}
+{# data: notes: str[] -- rendered 1..n; pair each with its own <sup class="fn"> in the prose #}
 {# notes render numbered; pair each with an inline
    <sup class="fn"><a id="fnref-N" href="#fn-N">N</a></sup> in the prose #}
 {% macro footnotes(notes=[]) %}

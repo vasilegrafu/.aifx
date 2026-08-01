@@ -1,4 +1,5 @@
 {# purpose: captioned image with alt text #}
+{# data: src: str   alt: str -- REQUIRED, never empty   caption: str #}
 {% macro figure(src="", alt="", caption="") %}
   <figure>
     <img src="{{ src }}" alt="{{ alt }}">

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>radar — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>radar</h1>
+  </header>
+
+    <section>
+      <h3>one polygon — the silhouette of a single company</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "radar": {
+    "center": [
+      "50%",
+      "58%"
+    ],
+    "indicator": [
+      {
+        "max": 100,
+        "name": "Growth"
+      },
+      {
+        "max": 100,
+        "name": "Margin"
+      },
+      {
+        "max": 100,
+        "name": "Returns"
+      },
+      {
+        "max": 100,
+        "name": "Balance sheet"
+      },
+      {
+        "max": 100,
+        "name": "Valuation"
+      },
+      {
+        "max": 100,
+        "name": "Momentum"
+      }
+    ],
+    "radius": "62%"
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "name": "AMD",
+          "value": [
+            82,
+            51,
+            24,
+            74,
+            31,
+            68
+          ]
+        }
+      ],
+      "type": "radar"
+    }
+  ],
+  "title": {
+    "text": "AMD, factor scores"
+  },
+  "tooltip": {
+    "trigger": "item"
+  }
+}
+  </pre>
+  <p class="chart-note">Strong on growth and balance sheet, weak on returns. Read the vertices, never the area.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>three polygons — the documented maximum, and a legend appears</h3>
+        <pre class="chart apache-echarts" hidden data-height="380">
+{
+  "legend": {
+    "top": 30
+  },
+  "radar": {
+    "center": [
+      "50%",
+      "60%"
+    ],
+    "indicator": [
+      {
+        "max": 100,
+        "name": "Growth"
+      },
+      {
+        "max": 100,
+        "name": "Margin"
+      },
+      {
+        "max": 100,
+        "name": "Returns"
+      },
+      {
+        "max": 100,
+        "name": "Balance sheet"
+      },
+      {
+        "max": 100,
+        "name": "Valuation"
+      },
+      {
+        "max": 100,
+        "name": "Momentum"
+      }
+    ],
+    "radius": "62%"
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "name": "NVDA",
+          "value": [
+            96,
+            88,
+            94,
+            88,
+            12,
+            91
+          ]
+        },
+        {
+          "name": "AMD",
+          "value": [
+            82,
+            51,
+            24,
+            74,
+            31,
+            68
+          ]
+        },
+        {
+          "name": "INTC",
+          "value": [
+            18,
+            22,
+            8,
+            41,
+            79,
+            21
+          ]
+        }
+      ],
+      "type": "radar"
+    }
+  ],
+  "title": {
+    "text": "Factor scores, three semiconductor designers"
+  },
+  "tooltip": {
+    "trigger": "item"
+  }
+}
+  </pre>
+  <p class="chart-note">Three shapes is the cap; a fourth would make this a web. Axis order is fixed across both figures.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

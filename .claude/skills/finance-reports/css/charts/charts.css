@@ -1,5 +1,5 @@
-/* docs-html — charts: the SHARED, ENGINE-AGNOSTIC chart frame.
-   Part of docs-html.css (loaded via @import, layer `charts`).
+/* finance-reports — charts: the SHARED, ENGINE-AGNOSTIC chart frame.
+   Part of bundle.css (loaded via @import, layer `charts`).
 
    Owns the card every chart renders onto, the canvas an engine draws into, the
    icon toolbar, and the source-block fallback that keeps a document readable
@@ -36,7 +36,7 @@
 }
 
 /* per-chart icon toolbar, top-right inside the card — one chip holding flat
-   SVG-icon buttons (injected by docs-html.js), same look as .doc-toolbar and
+   SVG-icon buttons (injected by bundle.js), same look as .doc-toolbar and
    .diagram-tools. It hangs off the figure, not the canvas: the canvas belongs
    to the engine, which may replace its contents on every redraw. */
 .chart-tools {

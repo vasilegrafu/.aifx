@@ -56,10 +56,19 @@ enough to be worth re-deriving each time.
 ```bash
 python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 python components/showcase_builder.py charts/bar
+python components/showcase_builder.py --all        # rebuild every showcase
+python components/showcase_builder.py --check      # verify each is current
+python components/showcase_builder.py --missing    # components with none yet
 ```
 
 There is **no top-level dispatcher**. Each directory owns the engine that
 builds what lives in it, and neither knows the other exists as a command.
+
+**`--all` is not a convenience.** A showcase page is tracked and pins the asset
+version it was built against, so one edit under `css/` or `js/` invalidates
+every page in the tree at once. `--check` writes nothing and names every stale
+page, so the answer to "did I regenerate them?" is an exit code rather than a
+memory.
 
 A showcase is addressed by its **directory path**, a report by its **name**,
 since components nest two to four levels. A report sits under its subject
@@ -463,6 +472,47 @@ zero because length IS the value, that a peer group is chosen rather than
 screened. A `usage.md` without it is a description, and the code was already
 that.
 
+## The shape of a showcase
+
+A showcase is two files and they divide the same way a report does: the
+controller holds data and calls no macro, the view calls macros and holds no
+data. **Follow this skeleton** — there will be one per component, and 109 of
+them written freehand is 109 dialects.
+
+```python
+# showcase_controller.py — NAMED DATA, never per-state bundles.
+class ChartBarShowcaseController(ShowcaseController):
+    def _build_context(self) -> dict:
+        return {"quarters": [...], "revenue": {...}, "by_segment": {...}}
+```
+
+```jinja
+{# showcase.html.j2 — one <section> per state, <hr> between. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two series — a legend appears, colour is never the only cue</h3>
+      {{ c.bar(series=[d.fy24, d.fy23], categories=d.quarters, ...) }}
+    </section>
+{% endblock %}
+```
+
+Three rules carry the weight:
+
+- **Show the states where the component DECIDES something** — a legend appears
+  past one series, an axis name widens the margin, a negative flips the tone,
+  an empty list has to say so. A second state that exercises no decision is a
+  second copy of the first.
+- **The `<h3>` names the decision, not the data.** "two series — a legend
+  appears" tells a reader what to look at; "another example" does not.
+- **Context keys read as what the data IS**, not which section uses it —
+  `by_segment`, not `example_3`. The view is then free to recombine them, and
+  a new state costs no controller change.
+
+Demo data is chosen, not invented: it should be the kind of thing the component
+exists for, at a plausible magnitude. A `bar` of `[1, 2, 3]` proves the macro
+runs and nothing else.
+
 ## House rules for components
 
 - **No `style=` and no `<style>` in generated documents.** Geometry comes from
@@ -478,3 +528,8 @@ that.
   foundational. The prefix names the DIRECTORY, never the skill.
 - A chart never sets its own title; captions and units go through the shared
   chart frame so every exhibit is labelled the same way.
+- **Every component declares `{# purpose: … #}`. A component declares
+  `{# data: … #}` if and only if its input IS data** — 88 do; the other 21 take
+  a `{% call %}` block and have nothing to declare. That is the test, not a
+  matter of how much effort the component looks like it deserves: a data
+  contract nobody can see is the one a showcase or a report gets wrong.

@@ -1,4 +1,4 @@
-/* docs-html/layout-toggle — the ▯ page-width / ▭ full-width switch.
+/* finance-reports/layout-toggle — the ▯ page-width / ▭ full-width switch.
    Activated by the .doc-toolbar markup base.html.j2 writes into every
    non-presentation document. Only flips the body class; which button looks
    active is decided purely in CSS from that class. */

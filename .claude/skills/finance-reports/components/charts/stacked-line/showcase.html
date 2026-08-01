@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stacked-line — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>stacked-line</h1>
+  </header>
+
+    <section>
+      <h3>two series — a legend appears; the upper line is already a sum</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        4.2,
+        5.1,
+        6.4,
+        7.1,
+        8.3
+      ],
+      "name": "Engineering",
+      "showSymbol": true,
+      "stack": "total",
+      "type": "line"
+    },
+    {
+      "data": [
+        2.8,
+        3.2,
+        3.6,
+        3.9,
+        4.4
+      ],
+      "name": "Sales and marketing",
+      "showSymbol": true,
+      "stack": "total",
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "thousands of employees",
+    "text": "Headcount, engineering and go-to-market"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "FY21",
+      "FY22",
+      "FY23",
+      "FY24",
+      "FY25"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Read the upper line as the pair combined, not as sales alone.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>three series with y_name — the top line is total headcount</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        4.2,
+        5.1,
+        6.4,
+        7.1,
+        8.3
+      ],
+      "name": "Engineering",
+      "showSymbol": true,
+      "stack": "total",
+      "type": "line"
+    },
+    {
+      "data": [
+        2.8,
+        3.2,
+        3.6,
+        3.9,
+        4.4
+      ],
+      "name": "Sales and marketing",
+      "showSymbol": true,
+      "stack": "total",
+      "type": "line"
+    },
+    {
+      "data": [
+        1.1,
+        1.2,
+        1.4,
+        1.5,
+        1.6
+      ],
+      "name": "General and administrative",
+      "showSymbol": true,
+      "stack": "total",
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "thousands of employees",
+    "text": "Headcount by function"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "FY21",
+      "FY22",
+      "FY23",
+      "FY24",
+      "FY25"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "Headcount (thousands)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Total up 77%, and engineering is two thirds of that increase.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

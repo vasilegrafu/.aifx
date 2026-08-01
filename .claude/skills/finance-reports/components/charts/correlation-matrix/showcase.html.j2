@@ -1,0 +1,21 @@
+{# The `correlation-matrix` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>an all-positive set — the ramp uses one half of its range</h3>
+      {{ c.correlation_matrix(labels=d.labels, matrix=d.matrix,
+               caption="Weekly return correlation, semiconductors",
+               vmin=0, vmax=1,
+               note="AMD and NVDA at 0.82: within the sector, diversification is thin.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a set that crosses zero — the default -1..1 span, left unset</h3>
+      {{ c.correlation_matrix(labels=d.macro_labels, matrix=d.macro_matrix,
+               caption="Cross-asset correlation",
+               height=340,
+               note="Gold against the dollar at -0.55, the only strong negative in the grid.") }}
+    </section>
+{% endblock %}

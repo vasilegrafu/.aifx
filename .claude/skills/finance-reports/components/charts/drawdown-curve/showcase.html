@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>drawdown-curve — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.1.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>drawdown-curve</h1>
+  </header>
+
+    <section>
+      <h3>three years of monthly levels — three episodes, one deep</h3>
+        <pre class="chart apache-echarts" hidden data-height="300">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 42,
+    "right": 16,
+    "top": 52
+  },
+  "series": [
+    {
+      "areaStyle": {
+        "color": "token:negative",
+        "opacity": 0.14
+      },
+      "data": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -2.68,
+        -8.04,
+        -14.29,
+        -18.75,
+        -21.43,
+        -16.07,
+        -11.61,
+        -5.36,
+        -0.89,
+        0.0,
+        0.0,
+        0.0,
+        -3.31,
+        -10.74,
+        -18.18,
+        -23.14,
+        -26.45,
+        -28.93,
+        -23.97,
+        -19.83,
+        -14.88,
+        -9.92,
+        -5.79,
+        -1.65,
+        0.0,
+        0.0,
+        -2.34,
+        -7.03,
+        -4.69,
+        -0.78,
+        0.0,
+        0.0
+      ],
+      "lineStyle": {
+        "color": "token:negative",
+        "width": 1.5
+      },
+      "markPoint": {
+        "data": [
+          {
+            "name": "max drawdown",
+            "type": "min"
+          }
+        ],
+        "itemStyle": {
+          "color": "token:negative"
+        },
+        "label": {
+          "fontSize": 10,
+          "offset": [
+            0,
+            0
+          ]
+        },
+        "symbol": "circle",
+        "symbolSize": 46
+      },
+      "name": "drawdown",
+      "showSymbol": false,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "text": "Drawdown from running peak, monthly"
+  },
+  "tooltip": {
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "2023-01",
+      "2023-02",
+      "2023-03",
+      "2023-04",
+      "2023-05",
+      "2023-06",
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "max": 0,
+    "name": "drawdown %",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Three episodes; only the second passes 25%, and it took twelve months to recover.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>a single episode — where the trough is unambiguous</h3>
+        <pre class="chart apache-echarts" hidden data-height="260">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 42,
+    "right": 16,
+    "top": 52
+  },
+  "series": [
+    {
+      "areaStyle": {
+        "color": "token:negative",
+        "opacity": 0.14
+      },
+      "data": [
+        0.0,
+        0.0,
+        -7.55,
+        -16.04,
+        -12.26,
+        -4.72,
+        0.0,
+        0.0
+      ],
+      "lineStyle": {
+        "color": "token:negative",
+        "width": 1.5
+      },
+      "markPoint": {
+        "data": [
+          {
+            "name": "max drawdown",
+            "type": "min"
+          }
+        ],
+        "itemStyle": {
+          "color": "token:negative"
+        },
+        "label": {
+          "fontSize": 10,
+          "offset": [
+            0,
+            0
+          ]
+        },
+        "symbol": "circle",
+        "symbolSize": 46
+      },
+      "name": "drawdown",
+      "showSymbol": false,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "text": "Fund drawdown, quarterly"
+  },
+  "tooltip": {
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "2024-Q1",
+      "2024-Q2",
+      "2024-Q3",
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "max": 0,
+    "name": "drawdown %",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">One trough at -16%, recovered inside a year.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

@@ -1,5 +1,5 @@
-/* docs-html — diagram-mermaid: what is MERMAID-specific.
-   Part of docs-html.css (loaded via @import, layer `diagrams`). The viewport,
+/* finance-reports — diagram-mermaid: what is MERMAID-specific.
+   Part of bundle.css (loaded via @import, layer `diagrams`). The viewport,
    toolbar and pan/zoom chrome are shared — see diagrams.css.
 
    Two things live here: the source block's fallback styling, and the ✎ live
@@ -23,7 +23,7 @@ pre.mermaid {
 pre.mermaid[hidden] { display: none; }   /* rendered: source stays in the DOM, hidden */
 
 /* source editor: the ✎ button opens a side PANEL left of the canvas — its own
-   flex column, never over the diagram (injected by docs-html.js; session-only,
+   flex column, never over the diagram (injected by bundle.js; session-only,
    the copy button is the path back into the document). Kept in fullscreen:
    fullscreen + editor is the full editing workspace. */
 .diagram-mermaid-editor {

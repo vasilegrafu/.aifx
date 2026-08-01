@@ -1,4 +1,4 @@
-/* docs-html/math — LaTeX formulas rendered at view time by KaTeX.
+/* finance-reports/math — LaTeX formulas rendered at view time by KaTeX.
 
    Markup (plain LaTeX text in the document, no images, no per-document JS):
      <div class="math">…LaTeX…</div>    display formula, own line

@@ -1,4 +1,4 @@
-/* docs-html/diagrams — the shared diagram viewport. ENGINE-AGNOSTIC.
+/* finance-reports/diagrams — the shared diagram viewport. ENGINE-AGNOSTIC.
 
    Every diagram in the system, whatever renders it, ends up as an <svg> shown
    in the same bounded viewport: pan by dragging, Ctrl+wheel to zoom, and one

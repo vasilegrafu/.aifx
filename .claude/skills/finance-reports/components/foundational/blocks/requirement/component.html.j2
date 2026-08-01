@@ -1,4 +1,5 @@
 {# purpose: numbered requirement card with priority and fit criterion #}
+{# data: id: str   title: str   priority: str   label: str   description: str   fit: str #}
 {% macro requirement(id="REQ-001", title="", priority="must", label="Must", description="", fit="") %}
   <article class="requirement" id="{{ id }}">
     <header>

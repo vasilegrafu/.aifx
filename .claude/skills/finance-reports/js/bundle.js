@@ -1,6 +1,5 @@
 /* bundle.js — the single script every report links; the entry that loads
-   the real code from js/modules/, exactly like css/bundle.css @imports its
-   css/modules/. NO logic lives here — only the module list and the injector.
+   the real code from js/modules/, exactly like css/bundle.css @imports the files under css/. NO logic lives here — only the module list and the injector.
 
    MODULES order IS the dependency order (core first, main last); async=false
    makes the injected classic scripts execute in that order. Classic <script>

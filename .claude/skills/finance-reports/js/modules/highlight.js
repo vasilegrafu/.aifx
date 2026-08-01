@@ -1,4 +1,4 @@
-/* docs-html/highlight — runtime syntax coloring, shared by the code blocks in
+/* finance-reports/highlight — runtime syntax coloring, shared by the code blocks in
    documents and the diagram source editor (diagrams.js).
 
    Documents hold code as PLAIN TEXT and declare the language with a data-lang

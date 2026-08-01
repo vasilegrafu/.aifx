@@ -1,5 +1,5 @@
-/* docs-html — diagrams: the SHARED diagram viewport. ENGINE-AGNOSTIC.
-   Part of docs-html.css (loaded via @import, layer `diagrams`).
+/* finance-reports — diagrams: the SHARED diagram viewport. ENGINE-AGNOSTIC.
+   Part of bundle.css (loaded via @import, layer `diagrams`).
 
    Every diagram — whatever renders it — is an <svg> inside .diagram-figure:
    a bounded box with a pan/zoom canvas, an icon toolbar, and a resize grip,
@@ -43,7 +43,7 @@
 .diagram-canvas.grabbing > svg { cursor: grabbing; }
 
 /* per-diagram icon toolbar, top-right inside the viewport — one chip holding
-   flat SVG-icon buttons (injected by docs-html.js), same look as .doc-toolbar */
+   flat SVG-icon buttons (injected by bundle.js), same look as .doc-toolbar */
 .diagram-tools {
   position: absolute;
   top: .5rem; right: .5rem;

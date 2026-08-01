@@ -1,4 +1,4 @@
-/* docs-html — code: professional code blocks with title bar and
+/* finance-reports — code: professional code blocks with title bar and
    generation-time syntax highlighting. Requires base.css + content.css.
    Link in developer-facing documents (ADR, architecture, API specs,
    coding standards, runbooks…).
@@ -50,7 +50,7 @@ figure.code pre {
 }
 
 /* ---------- syntax palette ----------
-   Applied at VIEW TIME by docs-html.js (Prism, lazy from CDN) to any
+   Applied at VIEW TIME by bundle.js (Prism, lazy from CDN) to any
    `<pre><code data-lang="…">` — documents hold plain text, never token
    markup. The same palette colors the diagram source editor.
 

@@ -1,4 +1,5 @@
 {# purpose: Given/When/Then acceptance test for a requirement #}
+{# data: id: str   title: str   given: str[]   when: str[]   then: str[] #}
 {% macro acceptance_criteria(id="AC-1", title="", given=[], when=[], then=[]) %}
   <div class="acceptance" id="{{ id }}">
     <div class="ac-head">

@@ -1,4 +1,4 @@
-/* docs-html/core — the trunk of the tree: the one global namespace and the
+/* finance-reports/core — the trunk of the tree: the one global namespace and the
    feature registry. Everything else is a leaf that registers itself.
 
    A feature is { name, selector, init }:
@@ -8,7 +8,7 @@
      init(targets)  called once on DOM-ready with the matched NodeList
 
    Extending the system = drop a new module in js/modules/ that calls
-   docsHtml.register(...), and list it in docs-html.js. core.js, main.js, and
+   docsHtml.register(...), and list it in bundle.js. core.js, main.js, and
    every other feature stay untouched. */
 
 "use strict";

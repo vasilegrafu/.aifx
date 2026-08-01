@@ -35,14 +35,23 @@
 {%     set ns.cum = ns.cum + st.value %}
 {%   endif %}
 {% endfor %}
+{# The axis NAME sits at a fixed offset from the axis, and `containLabel` does
+   not account for it -- so a hardcoded gap collides with the tick labels the
+   moment the values get wide. 46 is right for "12.1" and draws on top of
+   "60,000". Derived from the widest tick instead: digits, plus one character
+   per thousands separator, at roughly 7px each. #}
+{% set _widest = steps | map(attribute="value") | map("abs") | max %}
+{% set _digits = _widest | round(0, "ceil") | int | string | length %}
+{% set _chars = _digits + ((_digits - 1) // 3) %}
+{% set _gap = [46, 24 + _chars * 7] | max %}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
 {%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
-                            "nameGap": 46, "nameRotate": 90}) %}
+                            "nameGap": _gap, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {
      "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-     "grid": {"left": (46 if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
+     "grid": {"left": (_gap if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
      "xAxis": {"type": "category", "data": labels},
      "yAxis": y_axis,
      "series": [
