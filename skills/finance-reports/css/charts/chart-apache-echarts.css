@@ -10,20 +10,25 @@
    layer. Rules land here only when they are true of ECharts and false of the
    next engine. The theme (palette, ink, axes) is NOT styling and is not here —
    ECharts cannot read CSS custom properties, so it is built in
-   js/modules/chart-apache-echarts.js from the shared tokens in
+   js/modules/charts-apache-echarts.js from the shared tokens in
    js/modules/charts.js. */
 
-/* ECharts draws into a generated wrapper div rather than into .chart-canvas
+/* ECharts draws into a generated wrapper div rather than into the canvas
    itself, and appends its tooltip into that same wrapper. Contain both so a
-   wide chart or a tooltip near the edge cannot push the reading column. */
-.chart-canvas > div {
+   wide chart or a tooltip near the edge cannot push the reading column.
+
+   Hung off `.charts-apache-echarts-canvas`, which js/modules/charts-apache-echarts.js
+   adds to the canvas before it draws — NOT off the shared `.chart-canvas`.
+   These rules are true of ECharts and false of the next engine, so an engine
+   file must not reach into the class the shared frame owns. */
+.charts-apache-echarts-canvas > div {
   max-width: 100%;
 }
 
 /* The engine sets an explicit pixel width on its wrapper when it initialises;
    allow it to shrink with the column on reflow rather than holding the old
    measurement until the debounced resize lands. */
-.chart-canvas > div > canvas,
-.chart-canvas > div > svg {
+.charts-apache-echarts-canvas > div > canvas,
+.charts-apache-echarts-canvas > div > svg {
   max-width: 100%;
 }

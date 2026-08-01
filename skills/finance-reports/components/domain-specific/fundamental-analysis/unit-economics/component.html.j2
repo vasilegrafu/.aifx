@@ -2,26 +2,26 @@
 {# data: headline[] {label, value}   rows[] {metric:str, value:str, benchmark:str, reading:str} #}
 {% macro unit_economics(rows=[], headline=[], caption="", verdict="", tone="neutral", benchmark_label="Benchmark", note="") %}
   {% if headline %}
-  <dl class="investing-unit-headline investing-unit-{{ tone }}">
+  <dl class="fa-unit-headline fa-unit-{{ tone }}">
     {% for h in headline %}
     <div><dt>{{ h.label }}</dt><dd>{{ h.value }}</dd></div>
     {% endfor %}
   </dl>
   {% endif %}
-  <table class="investing-fin investing-uniteco">
+  <table class="fin fa-uniteco">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead><tr><th>Metric</th><th>Value</th><th>{{ benchmark_label }}</th><th>Reading</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.metric }}</th>
-        <td class="investing-rm-value">{{ r.value }}</td>
+        <td class="portfolio-rm-value">{{ r.value }}</td>
         <td>{{ r.benchmark }}</td>
-        <td class="investing-rm-note">{{ r.reading }}</td>
+        <td class="portfolio-rm-note">{{ r.reading }}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% if verdict %}<p class="investing-unit-verdict investing-unit-verdict-{{ tone }}">{{ verdict }}</p>{% endif %}
-  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+  {% if verdict %}<p class="fa-unit-verdict fa-unit-verdict-{{ tone }}">{{ verdict }}</p>{% endif %}
+  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
 {% endmacro %}

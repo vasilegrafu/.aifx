@@ -76,11 +76,8 @@
   min-width: 2.4rem;
   text-align: center;
 }
-.diagram-tools .sep {
-  width: 1px; height: 1.1rem;
-  background: var(--border);
-  margin: 0 .15rem;
-}
+/* The group divider (.sep) is foundational/base.css — one rule for this
+   toolbar, .chart-tools and the page's own .doc-toolbar. */
 
 /* resize handle: a full-width strip along the bottom edge with a centered grip
    pill — drag vertically to resize the viewport (it carries .diagram-exclude,

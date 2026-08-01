@@ -1,0 +1,137 @@
+/* portfolio — a book you hold, rather than a company: holdings, performance,
+   attribution, exposure and the risk that comes with them.
+   Part of bundle.css (loaded via @import, layer `domain`).
+
+   Classes are namespaced `portfolio-` after the directory that owns them.
+   The numeric-table skin these tables opt into (`table.fin`) is FOUNDATIONAL —
+   see foundational/content.css; a table of numbers is not a discipline. */
+
+/* ---------- holdings-table ---------- */
+.portfolio-holdings-weight-head { width: 11rem; }
+.portfolio-holdings-weight {
+  display: flex; align-items: center; justify-content: flex-end; gap: .5rem;
+}
+.portfolio-holdings-track {
+  flex: 1 1 auto;
+  min-width: 3rem; max-width: 6rem;
+  height: .45rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.portfolio-holdings-fill {
+  display: block; height: 100%; max-width: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  width: attr(data-pct type(<percentage>), 0%);
+}
+.portfolio-holdings-pct { flex: 0 0 auto; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---------- performance-table ---------- */
+table.portfolio-perf tr.portfolio-benchmark th, table.portfolio-perf tr.portfolio-benchmark td { color: var(--fg-soft); }
+table.portfolio-perf tr.portfolio-excess th, table.portfolio-perf tr.portfolio-excess td {
+  font-weight: 700;
+  border-top: 1px solid var(--fg-soft);
+}
+
+/* ---------- exposure-bars: one allocation dimension ---------- */
+.portfolio-exposure { margin: var(--block-gap) 0; padding: 0; }
+.portfolio-exposure-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 14rem) 1fr minmax(8rem, auto);
+  align-items: center;
+  gap: .75rem;
+  padding: .22rem 0;
+}
+.portfolio-exposure-label { font-size: .9rem; }
+.portfolio-exposure-track {
+  display: block;
+  height: .55rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.portfolio-exposure-fill {
+  display: block; height: 100%; max-width: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  width: attr(data-pct type(<percentage>), 0%);
+}
+.portfolio-exposure-value {
+  font-size: .88rem; font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.portfolio-exposure-value em { font-style: normal; font-weight: 400; color: var(--fg-soft); }
+
+/* ---------- risk-metrics ---------- */
+.portfolio-rm-value { font-weight: 700; }
+/* The reading column is prose: left-aligned in both head and body, but the
+   header keeps the shared micro-header type — scope the size to the cell. */
+table.portfolio-riskmetrics thead th:last-child { text-align: left; }
+table.portfolio-riskmetrics td.portfolio-rm-note {
+  text-align: left;
+  font-size: .88rem;
+  color: var(--fg-soft);
+  font-variant-numeric: normal;
+}
+
+/* ---------- trade-log ---------- */
+/* Date is column 1, so the instrument label (column 2) needs the left
+   alignment the shared skin gives only to first-child. */
+table.portfolio-tradelog th:nth-child(2), table.portfolio-tradelog td:nth-child(2) { text-align: left; }
+.portfolio-trade-date { font-family: var(--font-mono); font-size: .82rem; color: var(--fg-soft); }
+table.portfolio-tradelog tr.portfolio-trade td, table.portfolio-tradelog tr.portfolio-trade th { border-bottom: none; }
+table.portfolio-tradelog tr.portfolio-trade-note td {
+  padding: 0 0 .6rem;
+  text-align: left;
+  font-size: .88rem;
+  color: var(--fg-soft);
+  font-variant-numeric: normal;
+}
+.portfolio-side {
+  display: inline-block;
+  padding: .05em .55em;
+  border-radius: 999px;
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.portfolio-side-buy  { background: var(--decision-bg); color: var(--decision); }
+.portfolio-side-sell { background: var(--risk-bg);     color: var(--risk); }
+
+/* ---------- attribution ---------- */
+table.portfolio-attribution { font-size: .86rem; }
+.portfolio-attr-bench { color: var(--fg-soft); }
+.portfolio-attr-total { font-weight: 700; }
+
+/* ---------- drawdown-table ---------- */
+.portfolio-dd-depth { font-weight: 700; }
+.portfolio-dd-date { font-family: var(--font-mono); font-size: .8rem; color: var(--fg-soft); }
+.portfolio-dd-cause { text-align: left !important; font-size: .85rem; color: var(--fg-soft); font-variant-numeric: normal; }
+table.portfolio-drawdowns thead th:last-child { text-align: left; }
+
+/* ---------- stress-test ---------- */
+.portfolio-stress-impact-head { width: 11rem; }
+.portfolio-stress-trigger { text-align: left !important; font-size: .85rem; color: var(--fg-soft); font-variant-numeric: normal; }
+.portfolio-stress-impact { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+.portfolio-stress-value { flex: 0 0 auto; font-weight: 700; }
+.portfolio-stress-track {
+  flex: 1 1 auto; min-width: 3rem; max-width: 5rem;
+  height: .45rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.portfolio-stress-fill {
+  display: block; height: 100%; max-width: 100%;
+  border-radius: 999px;
+  background: var(--fg-soft);
+  width: attr(data-pct type(<percentage>), 0%);
+}
+.portfolio-stress-fill-bad  { background: var(--risk); }
+.portfolio-stress-fill-warn { background: var(--warning); }
+.portfolio-stress-response { text-align: left !important; font-size: .85rem; font-variant-numeric: normal; }
+table.portfolio-stress thead th:last-child { text-align: left; }

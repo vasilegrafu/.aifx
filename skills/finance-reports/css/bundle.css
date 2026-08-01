@@ -8,11 +8,21 @@
    a file is for before you open it:
 
      foundational/     any report may use it; nothing here knows a discipline
-     domain-specific/  one ANALYSIS DISCIPLINE owns it. fundamental-analysis is
-                       the only one so far; technical-analysis or portfolio
-                       would sit beside it. Classes are namespaced `investing-`
-                       — the skill's name, not the discipline's, so a component
-                       can move between disciplines without a class rename
+     domain-specific/  one ANALYSIS DISCIPLINE owns it: fundamental-analysis,
+                       portfolio, macro. A fourth is a new file and one @import
+
+   ONE NAMING RULE, EVERYWHERE: a class is unprefixed ONLY in foundational/ —
+   anywhere else it carries the name of the directory it lives in. So
+   `.fa-dcf-value`, `.portfolio-holdings-weight`, `.macro-indicator-row`,
+   `.chart-figure`, `.diagram-canvas`, and a bare `.bridge-row` because bridge
+   is foundational. Markup then says which directory owns a rule, and where to
+   go to change it. (Until 6.0.0 the domain prefix was `investing-`, the name
+   of a skill that no longer exists — which is what a prefix naming something
+   other than its own directory decays into.)
+
+   The exceptions are external or contractual, and there are three: `.katex`
+   belongs to KaTeX, and `.mermaid` / `.apache-echarts` are ENGINE markup
+   hooks a published document carries, not directory names.
      math/             the formula subsystem: KaTeX
      diagrams/         the diagram subsystem: shared viewport + one engine
      charts/           the chart subsystem: shared frame + one engine
@@ -29,7 +39,7 @@
 
    base.css itself @imports the web fonts; those come along automatically. */
 
-@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, investing,
+@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, domain,
        code, math, diagrams, charts;
 
 /* ---------- foundational ---------- */
@@ -48,11 +58,15 @@
 @import url("foundational/code.css")     layer(code);
 
 /* ---------- domain-specific ----------
-   One discipline so far: fundamental-analysis (statements, valuation, peers,
-   solvency). The LAYER is still called `investing` because that is the class
-   prefix every rule inside uses; the FILE is named for the discipline, so a
-   sibling like technical-analysis.css can join without renaming anything. */
-@import url("domain-specific/fundamental-analysis.css") layer(investing);
+   Three disciplines, ONE layer. They are mutually exclusive by namespace, so
+   there is nothing for them to fight over in the cascade, and a fourth costs
+   one @import and no layer edit — the same shape charts/ and diagrams/ already
+   use with two files each. The layer is named for the SCOPE, not for any one
+   discipline, which is what let the old `investing` layer name outlive the
+   thing it was named after. */
+@import url("domain-specific/fundamental-analysis.css") layer(domain);
+@import url("domain-specific/portfolio.css")            layer(domain);
+@import url("domain-specific/macro.css")                layer(domain);
 
 /* ---------- math ---------- */
 @import url("math/math.css")                layer(math);       /* KaTeX */

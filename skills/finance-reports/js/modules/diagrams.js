@@ -5,7 +5,7 @@
    icon toolbar (zoom % · fit · reset · fullscreen · download SVG · copy source).
    This file owns all of that and knows nothing about any particular engine.
 
-   An engine module (today only diagram-mermaid.js; the pattern takes more) does
+   An engine module (today only diagrams-mermaid.js; the pattern takes more) does
    exactly two things: turn its source into an <svg>, then hand it here.
 
        new docsHtml.diagram.Viewer({ pre, svg, index, source, copyTitle,

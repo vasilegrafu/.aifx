@@ -8,12 +8,12 @@
          format for all of them would be a lie. Defaults to `num` throughout.
          rows[] {name:str, cells:num[], subject:bool} #}
 {% macro peer_comparison(headers=[], rows=[], formats=[], caption="") %}
-  <table class="investing-fin investing-peers">
+  <table class="fin fa-peers">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead><tr><th>Company</th>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}
-      <tr{% if r.subject %} class="investing-subject"{% endif %}>
+      <tr{% if r.subject %} class="fa-subject"{% endif %}>
         <th scope="row">{{ r.name }}</th>
         {% for v in r.cells %}<td>{{ v | fmt(formats[loop.index0] if loop.index0 < formats | length else 'num') }}</td>{% endfor %}
       </tr>

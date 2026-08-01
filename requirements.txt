@@ -1,0 +1,12 @@
+# Everything needed to build a report or a showcase.
+#
+#   python -m venv .venv
+#   .venv\Scripts\activate        (Windows)   |   source .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# Two libraries, and the tree needs no others: Jinja renders every template,
+# httpx is the only thing that touches the network. Nothing here is a build
+# step for the published CSS/JS — those are served raw from the git tag.
+
+jinja2>=3.1.4
+httpx>=0.27.0

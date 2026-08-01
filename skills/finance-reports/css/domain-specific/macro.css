@@ -1,0 +1,54 @@
+/* macro — the economy itself, with no security in view: indicators and where
+   the cycle sits.
+   Part of bundle.css (loaded via @import, layer `domain`).
+
+   Classes are namespaced `macro-` after the directory that owns them. The
+   direction-glyph column it shares with metric-trend is FOUNDATIONAL — see
+   foundational/content.css. */
+
+/* ---------- macro-indicators ---------- */
+.macro-macro-asof { font-weight: 500; text-transform: none; letter-spacing: 0; }
+.macro-macro-latest { font-weight: 700; }
+
+/* ---------- cycle-position ---------- */
+.macro-cycle { margin: var(--block-gap) 0; padding: 0; }
+.macro-cycle-band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: .35rem;
+  margin: 0; padding: 0;
+  list-style: none;
+  counter-reset: phase;
+}
+.macro-cycle-phase {
+  padding: .5rem .7rem .6rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 6px;
+  color: var(--fg-soft);
+}
+.macro-cycle-phase.macro-current {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  border-top-color: var(--accent);
+  color: var(--fg);
+}
+.macro-cycle-label {
+  display: block;
+  font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.macro-cycle-phase.macro-current .macro-cycle-label { color: var(--accent); }
+.macro-cycle-phase.macro-current .macro-cycle-label::after {
+  content: " ●";
+  font-size: .7em;
+}
+.macro-cycle-note { display: block; margin-top: .3rem; font-size: .85rem; }
+.macro-cycle figcaption { margin-top: .5rem; font-size: .9rem; }
+.macro-cycle-asof { color: var(--fg-soft); font-size: .85rem; }
+
+/* ---------- print ---------- */
+@media print {
+  .macro-cycle-phase { break-inside: avoid; }
+}

@@ -164,7 +164,7 @@ class ChartApacheEchartsShowcaseController(ShowcaseController):
         builds nothing, so nothing structural is its responsibility. What IS
         its responsibility is the text, because the macro interpolates it
         verbatim into a `<pre>` and `JSON.parse` in
-        js/modules/chart-apache-echarts.js is the next thing to touch it. A
+        js/modules/charts-apache-echarts.js is the next thing to touch it. A
         spec that fails there does not draw a wrong chart; it draws no chart,
         and the reader gets a box of source where a figure was meant to be.
 

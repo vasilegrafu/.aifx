@@ -1,0 +1,14 @@
+{# purpose: allocation breakdown as labeled percentage bars — sector, geography, asset class #}
+{# data: items[] {label:str, percent:num, value?:str} — value is free text (amount, target, delta) #}
+{% macro exposure_bars(items=[], caption="") %}
+  <figure class="portfolio-exposure">
+  {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
+    {% for it in items %}
+    <div class="portfolio-exposure-row">
+      <span class="portfolio-exposure-label">{{ it.label }}</span>
+      <span class="portfolio-exposure-track"><span class="portfolio-exposure-fill" data-pct="{{ it.percent }}%"></span></span>
+      <span class="portfolio-exposure-value">{{ it.percent }}%{% if it.get('value') %} <em>{{ it.value }}</em>{% endif %}</span>
+    </div>
+    {% endfor %}
+  </figure>
+{% endmacro %}

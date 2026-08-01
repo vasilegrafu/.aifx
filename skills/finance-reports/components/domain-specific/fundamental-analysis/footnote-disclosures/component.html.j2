@@ -1,16 +1,16 @@
 {# purpose: the numbered accounting disclosures that statement lines cite, with the ones that matter flagged #}
 {# data: items[] {num:int, title:str, body:str, flag?:watch} — anchors at id=note-<num> #}
 {% macro footnote_disclosures(items=[], caption="") %}
-  <div class="investing-disclosures">
-  {% if caption %}<p class="investing-disclosures-caption">{{ caption }}</p>{% endif %}
+  <div class="fa-disclosures">
+  {% if caption %}<p class="fa-disclosures-caption">{{ caption }}</p>{% endif %}
   {% for it in items %}
-    <section class="investing-disclosure{% if it.get('flag') %} investing-disclosure-{{ it.flag }}{% endif %}" id="note-{{ it.num }}">
-      <p class="investing-disclosure-head">
-        <span class="investing-disclosure-num">Note {{ it.num }}</span>
-        <span class="investing-disclosure-title">{{ it.title }}</span>
-        {% if it.get('flag') %}<span class="investing-disclosure-flag">{{ it.flag }}</span>{% endif %}
+    <section class="fa-disclosure{% if it.get('flag') %} fa-disclosure-{{ it.flag }}{% endif %}" id="note-{{ it.num }}">
+      <p class="fa-disclosure-head">
+        <span class="fa-disclosure-num">Note {{ it.num }}</span>
+        <span class="fa-disclosure-title">{{ it.title }}</span>
+        {% if it.get('flag') %}<span class="fa-disclosure-flag">{{ it.flag }}</span>{% endif %}
       </p>
-      <p class="investing-disclosure-body">{{ it.body }}</p>
+      <p class="fa-disclosure-body">{{ it.body }}</p>
     </section>
   {% endfor %}
   </div>

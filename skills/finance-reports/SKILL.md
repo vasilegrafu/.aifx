@@ -209,8 +209,8 @@ pluralizes (`charts` → `Chart`) already shows how that goes wrong. A subclass
 of `ShowcaseController` in the module is unambiguous.
 
 **Path-loading is what removed the old hyphen constraint.** An `import`
-statement cannot name a folder with a hyphen, which once disqualified 72 of the
-109 components — `domain-specific/fundamental-analysis/*` is blocked twice
+statement cannot name a folder with a hyphen, which once disqualified most of
+the 109 components — `domain-specific/fundamental-analysis/*` is blocked twice
 before you reach the component at all. Loading by path has no such rule, so
 every component is reachable by the same one notation.
 
@@ -234,8 +234,11 @@ components/                    the library: macros, filters, env, assets, showca
   _showcase.master.html.j2     the shell every showcase view extends
   showcase_builder.py          ShowcaseBuilder.build(path) + the CLI
   charts/            21        engine-backed charts (Apache ECharts)
-  domain-specific/   45        investing- and business-namespaced
-  foundational/      41        any document may use these
+  domain-specific/   33        one discipline owns each; prefixed after it
+    fundamental-analysis/ 23     `fa-`         the company under the lens
+    portfolio/             8     `portfolio-`  a book you hold
+    macro/                 2     `macro-`      the economy, no security in view
+  foundational/      53        any document may use these; NO prefix
   diagrams/  math/    2        the two other rendering subsystems
 
 reports/
@@ -331,13 +334,28 @@ committed anywhere under this directory is fetchable at a URL by anyone who
 guesses the path.
 
 ```
-1. FMP_API_KEY                  environment variable — preferred
-2. credentials.local.json       beside data_providers/fmp/, gitignored
+1. FMP_API_KEY              environment variable — preferred, and the only
+                            option that works in CI, where there is no file
+2. secrets.<env>.json       at the REPO ROOT, gitignored. <env> is AIFX_ENV,
+                            dev | prod, default dev
 3. hard error naming both
 ```
 
-There is deliberately no third place it looks. Read a key **into the
-environment** rather than copying it into a file that might be committed.
+```json
+{ "fmp": { "api_key": "<key>" } }
+```
+
+**The secrets files sit at the repo root, not inside the skill** — a skill is
+meant to be copied or junctioned as `skills/finance-reports/` and nothing
+above it, so keeping the key outside that subtree means copying the skill
+cannot carry a credential with it.
+
+`AIFX_ENV` defaults to **dev**, the safe one: an unset variable must not reach
+production credentials, and an unknown value is an error rather than a silent
+fallback to them. It is an environment variable rather than a flag because a
+flag is something you can forget on the one invocation where it matters.
+
+There is deliberately no third place it looks.
 
 ## Adding a report
 
@@ -422,7 +440,9 @@ that.
   property in `css/foundational/theme.css`; charts read the chart tokens once at
   load. `--accent` is the rebranding knob.
 - **No animations.**
-- Domain CSS classes carry their domain's prefix — `investing-`, `business-`. A
-  class that resists the prefix is telling you it is foundational.
+- **A class is unprefixed ONLY in `foundational/`.** Anywhere else it carries
+  the name of the directory it lives in — `fa-`, `portfolio-`, `macro-`,
+  `chart-`, `diagram-`. A class that resists its prefix is telling you it is
+  foundational. The prefix names the DIRECTORY, never the skill.
 - A chart never sets its own title; captions and units go through the shared
   chart frame so every exhibit is labelled the same way.

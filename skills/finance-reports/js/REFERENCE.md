@@ -20,11 +20,11 @@ bundle.js          entry/loader: the MODULES list + injector — order IS depend
     ├── highlight.js       feature — runtime code coloring (selector: code[data-lang]; Prism, lazy)
     ├── math.js            feature — LaTeX formulas (selector: .math; KaTeX, lazy)
     ├── diagrams.js        SHARED diagram viewport — docsHtml.diagram.Viewer (no feature, no engine)
-    ├── diagram-mermaid.js feature — Mermaid (selector: pre.mermaid; lazy) + the ✎ source editor
-    │                      …one diagram-<engine>.js per engine; add more beside it
+    ├── diagrams-mermaid.js feature — Mermaid (selector: pre.mermaid; lazy) + the ✎ source editor
+    │                      …one diagrams-<engine>.js per engine; add more beside it
     ├── charts.js          SHARED chart frame — docsHtml.chart (no feature, no engine)
-    ├── chart-apache-echarts.js  feature — Apache ECharts (selector: pre.chart.apache-echarts; lazy, SVG)
-    │                      …one chart-<engine>.js per engine; add more beside it
+    ├── charts-apache-echarts.js  feature — Apache ECharts (selector: pre.chart.apache-echarts; lazy, SVG)
+    │                      …one charts-<engine>.js per engine; add more beside it
     └── main.js       docsHtml.init() on DOM-ready — final, never edited
 ```
 
@@ -40,13 +40,13 @@ bundle.js          entry/loader: the MODULES list + injector — order IS depend
 | `highlight.js` | feature on `code[data-lang]`: runtime syntax coloring (Prism core + autoloader, lazy; grammars on demand). Exposes `docsHtml.highlight.ensure()/element()` for other features |
 | `math.js` | feature on `.math`: LaTeX rendered by KaTeX `0.16.11` (lazy CDN, script + stylesheet). `<div class="math">` = display, `<span class="math">` = inline; CDN down → the LaTeX source stays readable (math.css) |
 | `diagrams.js` | **Not a feature** — the shared, engine-agnostic diagram viewport, exposed as `docsHtml.diagram.Viewer`. Owns `.diagram-figure` (bounded box), `.diagram-canvas` (pan surface), the toolbar from a declarative `BUTTONS` spec, the zoom-% readout, fit/reset/fullscreen/download-SVG/copy-source, the resize grip, and pan/zoom (a small self-contained transform — deliberately **not** an external pan library, so no engine bundle can clobber it with a global of its own). Knows nothing about any engine |
-| `diagram-mermaid.js` | feature on `pre.mermaid`: pins Mermaid `11.4.1` (lazy), renders with `useMaxWidth:false` (natural pixel size, so 100% = natural), hands the SVG to `diagram.Viewer`, and adds the ✎ **live source editor** (its only engine-specific tool — re-renders into the same SVG node so the view survives; reuses `highlight` for the colored overlay) |
+| `diagrams-mermaid.js` | feature on `pre.mermaid`: pins Mermaid `11.4.1` (lazy), renders with `useMaxWidth:false` (natural pixel size, so 100% = natural), hands the SVG to `diagram.Viewer`, and adds the ✎ **live source editor** (its only engine-specific tool — re-renders into the same SVG node so the view survives; reuses `highlight` for the colored overlay) |
 | `charts.js` | **Not a feature** — the shared, engine-agnostic chart frame, exposed as `docsHtml.chart`. Owns `PALETTE` (the 8-slot categorical palette — Okabe-Ito, ordered by contrast, ink substituted for pure black), `RAMP` (sequential, for continuous encodings) and `TOKENS` (ink/axis/grid/surface/font plus the semantic `positive`/`negative`/`caution` direction tones) as **plain data, in no engine's format**, so every engine inherits the same checked colors. Since 4.0.0 those values are **read from `css/foundational/theme.css`'s custom properties** (`--chart-palette-N`, `--chart-ramp-N`, `--chart-*`) once at load via `getComputedStyle`, each with a hardcoded fallback — an engine theme object cannot hold `var()`, and the palette is fixed for the life of the page, so one read is enough and nothing re-renders. Also `resolveColors(spec)`, which substitutes `"palette:3"` / `"token:positive"` / `"ramp:2"` references so a preset never writes a hex into a document — which is what lets a retheme reach every existing chart; `Frame` (the `.chart-figure` card, the `.chart-canvas` an engine draws into, `data-height`, hiding the source `<pre>`, and the toolbar from a declarative `BUTTONS` spec: download-SVG · copy-source); one debounced resize dispatch for the whole page via `frame.onResize(fn)`; and `fail(pre, message)` — the stated failure that takes a chart's place, since the spec now ships hidden and a broken chart would otherwise leave a silent gap. Knows nothing about any engine. **Rebrand the palette in `css/foundational/theme.css`, not here** — and take a published colour-blind-safe reference set rather than hand-picking, since nothing checks it |
-| `chart-apache-echarts.js` | feature on `pre.chart.apache-echarts`: declarative data charts. Parses every JSON `option` **first** (an all-invalid page never fetches the ~900 KB engine), lazy-loads ECharts `5.5.1` (pinned CDN), translates `chart.PALETTE`/`TOKENS` into an ECharts theme, and renders **SVG** into `frame.canvas`; auto-fills `aria`/`tooltip`/`legend` only when unset. Invalid JSON, an option the engine refuses, or the CDN down → `chart.fail()` puts one line saying so where the chart would have been, with the spec behind a `show source` button |
+| `charts-apache-echarts.js` | feature on `pre.chart.apache-echarts`: declarative data charts. Parses every JSON `option` **first** (an all-invalid page never fetches the ~900 KB engine), lazy-loads ECharts `5.5.1` (pinned CDN), translates `chart.PALETTE`/`TOKENS` into an ECharts theme, and renders **SVG** into `frame.canvas`; auto-fills `aria`/`tooltip`/`legend` only when unset. Invalid JSON, an option the engine refuses, or the CDN down → `chart.fail()` puts one line saying so where the chart would have been, with the spec behind a `show source` button |
 | `main.js` | `docsHtml.init()` on DOM-ready — final, never edited |
 
 **Adding a diagram engine.** Mermaid is the only engine today, but the split is
-deliberate — `diagrams.js` is the viewport, `diagram-mermaid.js` is *one* engine
+deliberate — `diagrams.js` is the viewport, `diagrams-mermaid.js` is *one* engine
 beside it. A second engine is five mechanical steps, and touches nothing that
 exists:
 
@@ -70,7 +70,7 @@ dimensions, 100% means fit-to-column-width rather than natural size — both are
 supported, the engine chooses.
 
 **Adding a chart engine.** The same split, one level over: `charts.js` is the
-frame, `chart-apache-echarts.js` is *one* engine beside it. Five mechanical
+frame, `charts-apache-echarts.js` is *one* engine beside it. Five mechanical
 steps, touching nothing that exists:
 
 1. `js/modules/chart-<name>.js` — `docsHtml.register({name, selector:
@@ -219,7 +219,7 @@ docsHtml.register({
 An engine loads from a pinned CDN **only when a document actually contains that
 kind of diagram** — a diagram-free document fetches nothing extra:
 
-- **Mermaid `11.4.1`** (`diagram-mermaid.js`) — renders every
+- **Mermaid `11.4.1`** (`diagrams-mermaid.js`) — renders every
   `<pre class="mermaid">` with `useMaxWidth:false` (natural pixel size; a node's
   box is the same across every diagram regardless of node count), so 100% is
   natural size.

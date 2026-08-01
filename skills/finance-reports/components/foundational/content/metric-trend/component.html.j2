@@ -1,0 +1,19 @@
+{# purpose: one metric per row across reporting periods, with CAGR and direction #}
+{# data: rows[] {label:str, cells:num[], cagr:num|str, dir:up|down|flat}
+         periods: str[] — values must align with periods #}
+{% macro metric_trend(periods=[], rows=[], caption="", unit="", fmt="num", cagr_fmt="pct") %}
+  <table class="fin metric-trend">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+    <thead><tr><th>Metric</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}<th>CAGR</th><th class="trend-head">Trend</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <th scope="row">{{ r.label }}</th>
+        {% for v in r.cells %}<td{% if v is number and v < 0 %} class="neg"{% endif %}>{{ v | fmt(r.get('fmt') or fmt) }}</td>{% endfor %}
+        <td class="metric-cagr">{{ r.cagr | fmt(r.get('cagr_fmt') or cagr_fmt) }}</td>
+        <td class="trend trend-{{ r.dir }}">{{ {"up": "▲", "down": "▼"}.get(r.dir, "▬") }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

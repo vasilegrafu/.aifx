@@ -107,7 +107,7 @@ class ChartBarShowcaseController(ShowcaseController):
                     # NaN and the infinities pass every isinstance test above
                     # and reach _render.html.j2's `| tojson`, which writes them
                     # into the <pre> as bare NaN / Infinity. That is not JSON,
-                    # so chart-apache-echarts.js throws on JSON.parse and the
+                    # so charts-apache-echarts.js throws on JSON.parse and the
                     # page shows no chart at all. Caught here, it costs a line.
                     assert math.isfinite(p), \
                         (f"bar: {key!r} point {i} is {p!r}; tojson writes it "

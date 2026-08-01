@@ -1,16 +1,16 @@
 {# purpose: reported versus consensus for one earnings print, with the surprise #}
 {# data: rows[] {metric:str, consensus:str, actual:str, surprise:str, tone:good|bad|neutral} #}
 {% macro earnings_surprise(rows=[], period="", caption="") %}
-  <table class="investing-fin surprise">
-  {% if caption or period %}<caption>{{ caption }}{% if period %} <span class="investing-surprise-period">{{ period }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin surprise">
+  {% if caption or period %}<caption>{{ caption }}{% if period %} <span class="fa-surprise-period">{{ period }}</span>{% endif %}</caption>{% endif %}
     <thead><tr><th>Metric</th><th>Consensus</th><th>Reported</th><th>Surprise</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.metric }}</th>
         <td>{{ r.consensus }}</td>
-        <td class="investing-surprise-actual">{{ r.actual }}</td>
-        <td class="investing-surprise-delta investing-tone-{{ r.tone }}">{{ r.surprise }}</td>
+        <td class="fa-surprise-actual">{{ r.actual }}</td>
+        <td class="fa-surprise-delta tone-{{ r.tone }}">{{ r.surprise }}</td>
       </tr>
     {% endfor %}
     </tbody>

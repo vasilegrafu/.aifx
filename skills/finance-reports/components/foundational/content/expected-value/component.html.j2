@@ -1,0 +1,22 @@
+{# purpose: probability-weighted scenarios with the expected value total #}
+{# data: rows[] {scenario:str, tone:good|neutral|bad, probability:str, target:str, ret:str, weighted:str} #}
+{% macro expected_value(rows=[], total="", caption="") %}
+  <table class="fin ev">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>Scenario</th><th>Probability</th><th>Price target</th><th>Return</th><th>Weighted</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <th scope="row"><span class="ev-dot ev-{{ r.tone }}" aria-hidden="true"></span>{{ r.scenario }}</th>
+        <td>{{ r.probability }}</td>
+        <td>{{ r.target }}</td>
+        <td>{{ r.ret }}</td>
+        <td>{{ r.weighted }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    {% if total %}
+    <tfoot><tr class="total"><th scope="row">Expected value</th><td>100%</td><td></td><td></td><td>{{ total }}</td></tr></tfoot>
+    {% endif %}
+  </table>
+{% endmacro %}

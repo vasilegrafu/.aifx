@@ -86,8 +86,10 @@ served by jsDelivr; a key in a pasted traceback is a leaked key.
 ## Credentials
 
 ```
-1. FMP_API_KEY               environment variable — preferred
-2. credentials.local.json    {"api_key": "..."} beside credentials.py, gitignored
+1. FMP_API_KEY            environment variable — preferred, and the only one
+                          that works in CI, where there is no file
+2. secrets.<env>.json     {"fmp": {"api_key": "..."}} at the REPO ROOT,
+                          gitignored. <env> is AIFX_ENV, dev | prod, default dev
 3. hard error naming both
 ```
 
@@ -95,10 +97,21 @@ First hit wins. There is deliberately **no third place it looks** — a skill th
 silently reads credentials from wherever it can find them is one refactor away
 from reading them from somewhere it should not.
 
-A key exists in `solution.atlas` at
-`config/config.dev.json -> service_providers:fmp:api_key`, and the error message
-says so. Read it **into the environment**; do not copy it into a file that might
-be committed.
+**Why the repo root rather than beside this file.** A skill is meant to be
+copied or junctioned into another project as `skills/finance-reports/` and
+nothing above it. A credential kept inside that subtree travels with every
+copy; one kept above it cannot.
+
+**Why two environments.** A dev key and a production key have different rate
+limits and different blast radii, and the way that goes wrong is someone
+burning a production quota on a test run. `AIFX_ENV` defaults to `dev` — the
+safe end — and an unrecognised value is a hard error, so a typo cannot fall
+through to production.
+
+The tracked repo carries **no** `secrets.*.json`; `.gitignore` covers the
+pattern. The placeholder each file ships with (`"<your-fmp-dev-api-key>"`) is
+detected and rejected by name, rather than being sent to the API so the reader
+has to work backwards from a 401.
 
 ## Adding an endpoint
 

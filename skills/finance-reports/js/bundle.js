@@ -20,8 +20,8 @@
   // frame; each engine module follows the shared one it builds on.
   var MODULES = ["core", "util", "icons", "attr-fallback",
                  "layout-toggle", "highlight", "math",
-                 "diagrams", "diagram-mermaid",
-                 "charts", "chart-apache-echarts", "main"];
+                 "diagrams", "diagrams-mermaid",
+                 "charts", "charts-apache-echarts", "main"];
   var base = document.currentScript.src.replace(/bundle\.js[^/]*$/, "");
   MODULES.forEach(function (name) {
     var s = document.createElement("script");

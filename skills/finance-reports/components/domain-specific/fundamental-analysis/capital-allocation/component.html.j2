@@ -1,11 +1,11 @@
 {# purpose: where operating cash went — capex, M&A, dividends, buybacks, debt — as a share of it #}
 {# data: rows[] {use:str, cells:str[], cumulative:str, share:num}  source_line? {label, cells, cumulative} — cells pre-formatted #}
 {% macro capital_allocation(periods=[], rows=[], caption="", unit="", source_line=none, note="") %}
-  <table class="investing-fin capalloc">
-  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="investing-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
-    <thead><tr><th>Use of cash</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}<th>Cumulative</th><th class="investing-ca-share-head">% of source</th></tr></thead>
+  <table class="fin capalloc">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+    <thead><tr><th>Use of cash</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}<th>Cumulative</th><th class="fa-ca-share-head">% of source</th></tr></thead>
     {% if source_line %}
-    <tbody class="investing-ca-source">
+    <tbody class="fa-ca-source">
       <tr><th scope="row">{{ source_line.label }}</th>
         {% for v in source_line.cells %}<td>{{ v }}</td>{% endfor %}
         <td>{{ source_line.cumulative }}</td><td></td>
@@ -17,14 +17,14 @@
       <tr>
         <th scope="row">{{ r.use }}</th>
         {% for v in r.cells %}<td{% if v is string and (v.startswith("(") or v.startswith("-") or v.startswith("−")) %} class="neg"{% endif %}>{{ v }}</td>{% endfor %}
-        <td class="investing-ca-cum">{{ r.cumulative }}</td>
-        <td class="investing-ca-share">
-          <span class="investing-ca-track"><span class="investing-ca-fill" data-pct="{{ r.share }}%"></span></span>
-          <span class="investing-ca-pct">{{ r.share }}%</span>
+        <td class="fa-ca-cum">{{ r.cumulative }}</td>
+        <td class="fa-ca-share">
+          <span class="fa-ca-track"><span class="fa-ca-fill" data-pct="{{ r.share }}%"></span></span>
+          <span class="fa-ca-pct">{{ r.share }}%</span>
         </td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
 {% endmacro %}

@@ -185,7 +185,7 @@ matter are relative:
 - **finiteness** — `NaN` and the infinities are `float` instances, so they pass
   every type check and reach `| tojson`, which writes them into the `<pre>`
   unquoted. That is not JSON, so `JSON.parse` in
-  `js/modules/chart-apache-echarts.js` throws and **no chart renders at all**.
+  `js/modules/charts-apache-echarts.js` throws and **no chart renders at all**.
 - **collisions** — a repeated category is two ticks a reader cannot tell apart;
   two series sharing a name collapse into one legend key. Per call, not global:
   `bar` legitimately draws two single-series charts both named `FY24`.

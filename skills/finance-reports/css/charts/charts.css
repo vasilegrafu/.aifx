@@ -63,11 +63,8 @@
 }
 .chart-tools button:hover { background: var(--bg-soft); color: var(--fg); }
 .chart-tools button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
-.chart-tools .sep {
-  width: 1px; height: 1.1rem;
-  background: var(--border);
-  margin: 0 .15rem;
-}
+/* The group divider (.sep) is foundational/base.css — one rule for this
+   toolbar, .diagram-tools and the page's own .doc-toolbar. */
 
 /* The spec block. It ships `hidden` and is no longer what a reader waits in
    front of — see the engine component. It becomes visible only when someone

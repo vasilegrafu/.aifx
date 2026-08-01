@@ -11,7 +11,7 @@ of its own — it declares the cascade order once with `@layer`, then `@import`s
 the modules:
 
 ```css
-@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, investing,
+@layer theme, base, metadata, layout, toc, content, callouts, lists, blocks, domain,
        code, math, diagrams, charts;
 ```
 
@@ -46,44 +46,78 @@ sit in matching places.
 | module | styles |
 |---|---|
 | `theme.css` | **every colour in the system**, as `:root` custom properties — including `--accent`, the brand colour. THE file to edit to retheme or rebrand; no other module may hardcode a colour |
-| `base.css` | fonts (Inter + JetBrains Mono via CDN), non-colour tokens, typography, layout, the layout-toggle toolbar, opt-in numbering — always. **No colour lives here** |
+| `base.css` | fonts (Inter + JetBrains Mono via CDN), non-colour tokens, typography, layout, the layout-toggle toolbar and `.sep`, the divider shared by all three toolbars, opt-in numbering — always. **No colour lives here** |
 | `metadata.css` | metadata-header (cover title block), change-history, approval-block |
 | `layout.css` | spatial primitives: `columns`/`column` (responsive flex row), `grid` (auto-fit tiles), `card` (titled surface). Collapses to one column on narrow width + print |
 | `toc.css` | the static TOC |
-| `content.css` | table, plain code, figure, collapsible, quote, comparison-table |
+| `content.css` | table, plain code, figure, collapsible, quote, comparison-table. Also **`table.fin`**, the one numeric-table skin every discipline opts into (`<table class="fin fa-multiples">`) — alignment, tabular figures and micro-headers defined once — with its `.tone-*` and `.trend-*` companions; and six table components promoted from domain-specific in 6.0.0: sensitivity-table, roll-forward, cohort-table, variance-analysis, metric-trend, expected-value |
 | `code.css` | framed code blocks (`figure.code` title bar) + the runtime syntax palette (`.token.*`, applied by bundle.js/Prism) |
 | `callouts.css` | callout, todo-marker |
 | `lists.css` | facts, steps, checklist, trace-id |
-| `blocks.css` | requirement card, acceptance-criteria (Given/When/Then), kpi-tiles, timeline, glossary, revision-note, meter, risk-matrix, footnotes, ISO front/back matter |
-| `domain-specific/fundamental-analysis.css` | **domain-specific** and the largest module — one analysis discipline, classes namespaced `investing-` (the skill's name, not the discipline's, so a component can move between disciplines without a class rename). Opens with ONE shared numeric-table skin selected by an `investing-fin` marker class (`<table class="investing-fin investing-multiples">`), so a new table component inherits alignment, tabular figures and micro-headers for free and the skin is defined once. Three further shared skins follow: `.statement` (income-statement, balance-sheet, cash-flow-statement, dcf-summary — they differ only in which lines are mandatory, which is guidance, not styling), the labelled-bar figure row (bridge, debt-maturity, funnel), and the level-graded cell grid (heatmap, cohort-table, sensitivity-table). Every bar width, bar offset and plot position comes from a `data-` attribute via typed `attr()` — never `style=`; that syntax is Chromium-only today, so `js/modules/attr-fallback.js` applies the same geometry on other engines. It is the only discipline so far; `technical-analysis` or `portfolio` would sit beside it. |
+| `blocks.css` | requirement card, acceptance-criteria (Given/When/Then), kpi-tiles, timeline, glossary, revision-note, meter, risk-matrix, footnotes, ISO front/back matter. Also the **labelled-bar figure row** — a label, a track, a value, with only the track geometry differing — and six shape components promoted from domain-specific in 6.0.0: bridge, funnel, heatmap, quadrant-map, scorecard, composite-score. Their bar widths and plot positions come from `data-` attributes via typed `attr()`, never `style=`; that syntax is Chromium-only today, so `js/modules/attr-fallback.js` applies the same geometry elsewhere |
+| `domain-specific/fundamental-analysis.css` | The company under the lens — statements, valuation, peers, solvency, thesis. 23 components, classes namespaced `fa-`. Holds `.statement`, the one skin behind income-statement, balance-sheet, cash-flow-statement and dcf-summary: they differ only in which lines are mandatory, which is guidance, not styling. |
+| `domain-specific/portfolio.css` | A book you hold rather than a company — holdings, performance, attribution, exposure, risk. 8 components, namespaced `portfolio-`. Its tables opt into the foundational `table.fin` skin; it defines no table skin of its own. |
+| `domain-specific/macro.css` | The economy with no security in view — indicators and cycle position. 2 components, namespaced `macro-`. Shares the foundational `.trend-*` glyph column with metric-trend. |
 | `math.css` | formula blocks (`.math`) — spacing, overflow, and the readable-LaTeX fallback before/without KaTeX |
 | `diagrams.css` | **shared, engine-agnostic**: the `.diagram-figure` viewport, `.diagram-canvas` pan surface, `.diagram-tools` glyph toolbar, `.diagram-resize` grip, fullscreen + print |
 | `diagram-mermaid.css` | Mermaid-only: the `pre.mermaid` source-box fallback and the ✎ editor panel (surface, overlay, scrollbars). One `diagram-<engine>.css` per engine — a new engine adds a file here, it never edits `diagrams.css` |
 | `charts.css` | **shared, engine-agnostic**: the `.chart-figure` card (the validated `bg-soft` surface), the `.chart-canvas` an engine draws into, the `.chart-tools` toolbar, the `pre.chart` spec block (shipped `hidden`; revealed only by `show source` on a failed chart) and the `.chart-failed` card that states what went wrong — one definition for every engine, selected by the shared `chart` marker class. The categorical palette is data, not CSS: it lives in `js/modules/charts.js` (with the sequential ramp and the semantic direction tones). Also `.chart-note`, the one-line reading under a chart |
 | `chart-apache-echarts.css` | Apache ECharts only: containment for the wrapper div the engine generates. Deliberately small — anything a second engine would also need belongs in `charts.css`. One `chart-<engine>.css` per engine, exactly as `diagram-<engine>.css` |
 
-## Namespacing the domain modules
+## Namespacing — one rule for the whole system
 
-Every class in `domain-specific/` starts with its namespace:
-`.investing-bridge-bar`. The markup then says who owns a class, and two
-disciplines could not reach into each other's names.
+> **A class is unprefixed ONLY in `foundational/`. Anywhere else it carries the
+> name of the directory it lives in.**
 
-The rule has a useful side effect: **a class that resists the prefix is telling
-you it isn't domain-specific.** Two failed the test when this was applied and
-moved to `foundational/` instead:
+```
+foundational/                 .bridge-row   .badge   .neg   table.fin
+domain-specific/fundamental-analysis/   .fa-dcf-value
+domain-specific/portfolio/              .portfolio-holdings-weight
+domain-specific/macro/                  .macro-indicator-row
+charts/                                 .chart-figure
+diagrams/                               .diagram-canvas
+```
+
+The markup then says which **directory** owns a rule — which is the same thing
+as saying where to go to change it — and two disciplines cannot reach into each
+other's names.
+
+**The prefix names the directory, never the skill.** Until 6.0.0 every domain
+class was `investing-`, and `bundle.css` defended it as "the skill's name, not
+the discipline's." That was a rationalisation of a coincidence: 4.0.0 created
+the convention with *two* prefixes, `investing-` and `business-`, which were
+domains. When `business` went in 5.0.0 the survivor happened to share the
+skill's name — and then the skill was renamed and the prefix named nothing at
+all. A prefix that names something other than its own directory has no way to
+stay true.
+
+**Anchoring, not spelling.** The rule is about what a selector is reachable
+through, not about every token in it. `.diagram-tools .zoom-label`,
+`.mermaid-editor .editor-surface` and `.diagram-canvas.grabbing` all satisfy
+it: the unprefixed part is a descendant or compound of a prefixed class and
+cannot be selected on its own.
+
+Three exceptions are external or contractual: **`.katex`** belongs to KaTeX,
+and **`.mermaid`** / **`.apache-echarts`** are engine markup hooks a published
+document carries — renaming those would break documents, not tidy them.
+
+The rule has a useful side effect: **a class that resists its prefix is telling
+you it isn't domain-specific.** Four have failed that test:
 
 - **`.badge`** — the business module's own comment called it "a generic
-  status/rating pill", and three investing components used it. A shared name
-  across two domains is the definition of foundational. (That module has since
-  gone; `fundamental-analysis` is the only discipline left.)
+  status/rating pill", and three domain components used it.
 - **`.neg`** — "this number is negative" is arithmetic, not a domain concept.
   It was the system's only genuine class collision (both domain modules defined
-  it), and it is hand-written in doc-type markup across accounting, finance and
-  general documents.
+  it), and it is hand-written across accounting, finance and general documents.
+- **`.sep`** — the 1px divider between toolbar button groups. `charts.css` and
+  `diagrams.css` each carried a byte-identical copy until 6.0.0; it now sits in
+  `foundational/base.css` beside `.doc-toolbar`, which was already there.
+- **`table.fin`** and its `.tone-*` / `.trend-*` companions — a numeric table is
+  a shape, not a discipline, and all three disciplines opt into it.
 
-Where a class name arrives as a **macro argument** — `financial_table` takes
-rows of `("subtotal", …)` from 11 doc-types — the macro adds the prefix, so
-authoring keeps its plain vocabulary and only the emitted markup is namespaced.
+Where a class name arrives as a **macro argument** — a table takes rows of
+`("subtotal", …)` — the macro adds the prefix, so authoring keeps its plain
+vocabulary and only the emitted markup is namespaced.
 
 ## The exhibit title
 
@@ -104,12 +138,12 @@ That rule matters because the treatment used to be restated in every domain
 file: the same four declarations appeared **15 times**, at `.72rem` uppercase
 soft-grey — within `.02rem` and `.02em` of the column-header row directly
 beneath them. The title had no rank of its own and read as a second header row.
-Since `content` sits before `investing` in the layer order,
+Since `content` sits before `domain` in the layer order,
 those copies won; deleting them was the fix, not adding a rule.
 
 Two exceptions are deliberate: `figure.code > figcaption` is a code header with
 a language badge rather than a title (and its `code` layer sits after
-`content`), and `.investing-disclosures-caption` / `.investing-forces-caption`
+`content`), and `.fa-disclosures-caption` / `.fa-forces-caption`
 sit on a `<p>`, which no element selector can reach — they share one rule in
 `fundamental-analysis.css` that mirrors this one.
 

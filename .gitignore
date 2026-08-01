@@ -1,9 +1,22 @@
-# Python bytecode — builder.py is run in place from the repo, so these appear
+# Python bytecode — builders are run in place from the repo, so these appear
 # next to the sources. They are build artifacts, never content.
 __pycache__/
 *.py[cod]
 
+# The virtual environment. requirements.txt is the tracked half; the installed
+# tree is per-machine and per-platform.
+.venv/
+
 # Credentials. This repo is PUBLIC and jsDelivr serves it, so anything
-# committed here is fetchable at a URL. Keys live in the FMP_API_KEY
-# environment variable, or in this file, which never leaves the machine.
-credentials.local.json
+# committed here is fetchable at a URL by anyone who guesses the path.
+# Keys live in the FMP_API_KEY environment variable, or in these files, which
+# never leave the machine. Selected by AIFX_ENV (dev | prod, default dev).
+secrets.*.json
+secrets.txt
+
+# Generated reports. A report is a build artifact — the controller and the view
+# are the source, and regenerating from the same symbol gives the same file
+# with newer numbers. Nothing in here is hand-edited, so nothing is worth
+# committing.
+output/*
+!output/.gitkeep

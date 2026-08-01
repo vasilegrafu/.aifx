@@ -49,7 +49,7 @@ PURPOSE = re.compile(r"\{#\s*purpose:\s*(.+?)\s*#\}", re.S)
 CATEGORIES = {
     "foundational": "Any document may use these. Nothing here knows a discipline.",
     "charts": "Engine-backed charts (Apache ECharts). A chart is data; a table is the same data you can read.",
-    "domain-specific": "One analysis discipline owns these. Classes namespaced `investing-`.",
+    "domain-specific": "One analysis discipline owns these — fundamental-analysis, portfolio, macro. Classes are namespaced after the directory that owns them (`fa-`, `portfolio-`, `macro-`).",
     "diagrams": "The diagram subsystem: a shared viewport and one engine.",
     "math": "The formula subsystem: KaTeX, with a readable-LaTeX fallback.",
 }

@@ -1,26 +1,26 @@
 {# purpose: receivables or payables split into ageing buckets, with the overdue share #}
 {# data: rows[] {counterparty:str, cells:str[], total:str, overdue_share:num, tone?:str}  total_row? {label, cells} — cells pre-formatted #}
 {% macro aging_schedule(buckets=[], rows=[], caption="", unit="", total_row=none, note="") %}
-  <table class="investing-fin aging">
-  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="investing-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
-    <thead><tr><th>Counterparty</th>{% for b in buckets %}<th>{{ b }}</th>{% endfor %}<th>Total</th><th class="investing-aging-share-head">Overdue</th></tr></thead>
+  <table class="fin aging">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+    <thead><tr><th>Counterparty</th>{% for b in buckets %}<th>{{ b }}</th>{% endfor %}<th>Total</th><th class="fa-aging-share-head">Overdue</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.counterparty }}</th>
         {% for v in r.cells %}<td>{{ v }}</td>{% endfor %}
         {% for _ in range(buckets | length - r.cells | length) %}<td></td>{% endfor %}
-        <td class="investing-aging-total">{{ r.total }}</td>
-        <td class="investing-aging-share">
-          <span class="investing-aging-track"><span class="investing-aging-fill{% if r.tone %} investing-aging-fill-{{ r.tone }}{% endif %}" data-pct="{{ r.overdue_share }}%"></span></span>
-          <span class="investing-aging-pct">{{ r.overdue_share }}%</span>
+        <td class="fa-aging-total">{{ r.total }}</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill{% if r.tone %} fa-aging-fill-{{ r.tone }}{% endif %}" data-pct="{{ r.overdue_share }}%"></span></span>
+          <span class="fa-aging-pct">{{ r.overdue_share }}%</span>
         </td>
       </tr>
     {% endfor %}
     </tbody>
     {% if total_row %}
-    <tfoot><tr class="investing-total"><th scope="row">{{ total_row.label }}</th>{% for v in total_row.cells %}<td>{{ v }}</td>{% endfor %}</tr></tfoot>
+    <tfoot><tr class="total"><th scope="row">{{ total_row.label }}</th>{% for v in total_row.cells %}<td>{{ v }}</td>{% endfor %}</tr></tfoot>
     {% endif %}
   </table>
-  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
 {% endmacro %}

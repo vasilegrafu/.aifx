@@ -32,7 +32,8 @@ docsHtml.register({
   selector: "[data-pct],[data-lo],[data-span],[data-at],[data-x],[data-y]",
 
   init(targets) {
-    // Mirrors the declarations in investing.css and blocks.css exactly.
+    // Mirrors the declarations in foundational/blocks.css and the
+    // domain-specific/ modules exactly.
     const GEOMETRY = {
       pct:  "width",         // every *-fill and .funnel-bar
       lo:   "margin-left",   // .bridge-bar, .valrange-bar — offset within the track

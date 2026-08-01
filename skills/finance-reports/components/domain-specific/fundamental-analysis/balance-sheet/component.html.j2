@@ -5,13 +5,13 @@
    when the figures genuinely do not tie, and say why — the report's shape()
    asserts the tie, so a false here means a deliberate, explained exception. #}
 {% macro balance_sheet(periods=[], rows=[], caption="", unit="", source="", check="", balanced=true, fmt="money") %}
-  <table class="investing-fin investing-statement st-balance">
-  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="investing-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin fa-statement st-balance">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
     <thead><tr><th>{{ "" }}</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}
-      <tr class="investing-st-{{ r.get('kind') or 'line' }}">
-        <th scope="row">{{ r.label }}{% if r.get('note') %} <a class="investing-st-note" href="#note-{{ r.note }}">{{ r.note }}</a>{% endif %}</th>
+      <tr class="fa-st-{{ r.get('kind') or 'line' }}">
+        <th scope="row">{{ r.label }}{% if r.get('note') %} <a class="fa-st-note" href="#note-{{ r.note }}">{{ r.note }}</a>{% endif %}</th>
         {% for v in r.cells %}<td{% if v is number and v < 0 %} class="neg"{% endif %}>{{ v | fmt(fmt) }}</td>{% endfor %}
         {% for _ in range(periods | length - r.cells | length) %}<td></td>{% endfor %}
       </tr>
@@ -19,9 +19,9 @@
     </tbody>
   </table>
   {% if check %}
-    <p class="investing-st-check{{ '' if balanced else ' investing-st-check-fail' }}">
-      <span class="investing-st-check-tag">{{ "Balances" if balanced else "Does not balance" }}</span> {{ check }}
+    <p class="fa-st-check{{ '' if balanced else ' fa-st-check-fail' }}">
+      <span class="fa-st-check-tag">{{ "Balances" if balanced else "Does not balance" }}</span> {{ check }}
     </p>
   {% endif %}
-  {% if source %}<p class="investing-st-source">{{ source }}</p>{% endif %}
+  {% if source %}<p class="fa-st-source">{{ source }}</p>{% endif %}
 {% endmacro %}

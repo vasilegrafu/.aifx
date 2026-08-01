@@ -1,15 +1,15 @@
 {# purpose: the investment call: action, price target, upside, horizon and conviction #}
 {# data: facts[] {label:str, value:str}   tone: good|neutral|bad #}
 {% macro recommendation(action="", tone="neutral", facts=[], rationale="") %}
-  <aside class="investing-reco investing-reco-{{ tone }}">
-    <p class="investing-reco-action">{{ action }}</p>
+  <aside class="fa-reco fa-reco-{{ tone }}">
+    <p class="fa-reco-action">{{ action }}</p>
     {% if facts %}
-    <dl class="investing-reco-facts">
+    <dl class="fa-reco-facts">
       {% for f in facts %}
       <div><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></div>
       {% endfor %}
     </dl>
     {% endif %}
-    {% if rationale %}<p class="investing-reco-rationale">{{ rationale }}</p>{% endif %}
+    {% if rationale %}<p class="fa-reco-rationale">{{ rationale }}</p>{% endif %}
   </aside>
 {% endmacro %}

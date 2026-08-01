@@ -5,7 +5,7 @@
    (download SVG · copy source), and one debounced resize dispatch for the whole
    page. This file owns all of that and knows nothing about any engine.
 
-   An engine module (today only chart-apache-echarts.js; the pattern takes more)
+   An engine module (today only charts-apache-echarts.js; the pattern takes more)
    does exactly three things: parse its own spec, build a frame, and draw into
    `frame.canvas`.
 

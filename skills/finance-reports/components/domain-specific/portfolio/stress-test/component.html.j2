@@ -1,0 +1,22 @@
+{# purpose: portfolio or company impact under named stress scenarios #}
+{# data: rows[] {scenario:str, trigger:str, impact:str, magnitude:num, tone:str, response:str} — magnitude % for the bar #}
+{% macro stress_test(rows=[], caption="", note="") %}
+  <table class="fin portfolio-stress">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>Scenario</th><th>Trigger</th><th class="portfolio-stress-impact-head">Impact</th><th>Response</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <th scope="row">{{ r.scenario }}</th>
+        <td class="portfolio-stress-trigger">{{ r.trigger }}</td>
+        <td class="portfolio-stress-impact">
+          <span class="portfolio-stress-value tone-{{ r.tone }}">{{ r.impact }}</span>
+          <span class="portfolio-stress-track"><span class="portfolio-stress-fill portfolio-stress-fill-{{ r.tone }}" data-pct="{{ r.magnitude }}%"></span></span>
+        </td>
+        <td class="portfolio-stress-response">{{ r.response }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
+{% endmacro %}

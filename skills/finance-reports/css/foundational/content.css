@@ -102,3 +102,152 @@ table.comparison .mark-part { color: var(--warning); font-weight: 700; }
    it before 4.0.0 — the only genuine class collision in the system — and
    namespacing them resolved it by moving the one definition here. */
 .neg { color: var(--risk); }
+
+/* =======================================================================
+   Promoted from domain-specific in 6.0.0. These components encode a SHAPE,
+   not a discipline — a waterfall, a two-way grid, a labelled bar — so they
+   sit here, where any report may use them, and carry no prefix.
+   ======================================================================= */
+
+/* ---------- shared: numeric tables ---------- */
+/* ONE skin for every numeric table in the category. A table opts in with the
+   `fin` marker class plus its own component class:
+   <table class="fin multiples">. Labels left, numbers right, tabular figures,
+   uppercase micro-headers; components below add only what differs. */
+table.fin {
+  border-collapse: collapse;
+  width: 100%;
+  margin: var(--block-gap) 0;
+  font-size: .92rem;
+}
+table.fin th, table.fin td {
+  border: none; border-bottom: 1px solid var(--border);
+  padding: .4rem .8rem .4rem 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+table.fin th:first-child, table.fin td:first-child { text-align: left; }
+table.fin thead th {
+  font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--fg-soft);
+  border-bottom: 2px solid var(--border);
+}
+table.fin tbody th { font-weight: 500; }
+table.fin tfoot tr.total td, table.fin tfoot tr.total th {
+  font-weight: 700;
+  border-top: 3px double var(--fg);
+  border-bottom: none;
+}
+
+/* Sign tinting. `.neg` is applied by the macros from the leading minus and is
+   FOUNDATIONAL — see foundational/content.css; it is arithmetic, not a domain
+   concept, and both domains defined it before 4.0.0. `tone-*` is an explicit
+   author judgement, so it stays here and takes the namespace. */
+.tone-good    { color: var(--decision); font-weight: 600; }
+.tone-bad     { color: var(--risk);     font-weight: 600; }
+.tone-neutral { color: var(--fg-soft); }
+
+/* Direction glyph column, shared by metric-trend and macro-indicators. */
+.trend      { width: 2.5rem; text-align: center !important; font-size: .8rem; }
+.trend-head { width: 2.5rem; text-align: center !important; }
+.trend-up   { color: var(--decision); }
+.trend-down { color: var(--risk); }
+.trend-flat { color: var(--fg-soft); }
+
+/* ---------- expected-value ---------- */
+table.ev tbody th:first-child { font-weight: 500; }
+.ev-dot {
+  display: inline-block;
+  width: .55rem; height: .55rem;
+  margin-right: .45rem;
+  border-radius: 50%;
+  vertical-align: baseline;
+}
+.ev-good    { background: var(--decision); }
+.ev-neutral { background: var(--accent); }
+.ev-bad     { background: var(--risk); }
+table.ev td:last-child { font-weight: 650; }
+
+/* ---------- sensitivity-table: the two-way grid ---------- */
+table.sens {
+  border-collapse: separate; border-spacing: 2px;
+  width: 100%;
+  margin: var(--block-gap) 0;
+  font-size: .88rem;
+}
+table.sens th, table.sens td {
+  padding: .35rem .5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+table.sens thead th, table.sens tbody th {
+  font-size: .72rem; font-weight: 700;
+  color: var(--fg-soft);
+  background: var(--bg-soft);
+  border-radius: 3px;
+}
+/* Keep the label column narrow: the two-line corner would otherwise stretch it
+   and leave the row headers stranded far from the grid. */
+table.sens th:first-child { width: 8rem; }
+.sens-corner { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; font-size: .66rem; }
+.sens-row-label::after { content: " ↓"; }
+.sens-col-label { color: var(--accent); }
+.sens-col-label::after { content: " →"; }
+.sens-cell { background: var(--bg-soft); border-radius: 3px; }
+.sens-low  { background: var(--risk-bg);     color: var(--risk); }
+.sens-mid  { background: var(--warning-bg);  color: var(--warning); }
+.sens-high { background: var(--decision-bg); color: var(--decision); }
+.sens-base {
+  outline: 2px solid var(--fg);
+  outline-offset: -2px;
+  font-weight: 800;
+}
+
+/* ---------- roll-forward ---------- */
+table.rollfwd tr.rf-opening th, table.rollfwd tr.rf-opening td { font-weight: 650; }
+table.rollfwd tr.rf-movement th { padding-left: 1.1rem; font-weight: 400; color: var(--fg-soft); }
+table.rollfwd tr.rf-movement td { color: var(--fg-soft); }
+table.rollfwd tr.rf-closing th, table.rollfwd tr.rf-closing td {
+  font-weight: 700;
+  border-top: 3px double var(--fg);
+  border-bottom: none;
+}
+
+/* ---------- variance-analysis ---------- */
+.var-actual { font-weight: 700; }
+table.variance td:last-child { text-align: right; }
+
+/* ---------- cohort-table ---------- */
+table.cohorts {
+  border-collapse: separate; border-spacing: 2px;
+  width: 100%;
+  margin: var(--block-gap) 0;
+  font-size: .82rem;
+}
+table.cohorts th, table.cohorts td {
+  padding: .3rem .35rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+table.cohorts thead th, table.cohorts tbody th {
+  font-size: .7rem; font-weight: 700;
+  color: var(--fg-soft);
+  background: var(--bg-soft);
+  border-radius: 3px;
+}
+table.cohorts tbody th { text-align: left; padding-left: .5rem; }
+.cohort-size { color: var(--fg-soft); }
+.cohort-cell { border-radius: 3px; }
+.cohort-l0 { background: var(--bg-soft);  color: var(--fg-soft); }
+.cohort-l1 { background: var(--cohort-1-bg); color: var(--cohort-1-fg); font-weight: 700; }
+.cohort-l2 { background: var(--cohort-2-bg); color: var(--cohort-2-fg); }
+.cohort-l3 { background: var(--bg-soft); color: var(--fg); }
+.cohort-l4 { background: var(--cohort-4-bg); color: var(--cohort-4-fg); }
+.cohort-l5 { background: var(--cohort-5-bg); color: var(--cohort-5-fg); font-weight: 700; }
+.cohort-empty { background: transparent; }
+
+/* ---------- print ---------- */
+@media print {
+  table.fin, table.cohorts, table.sens { break-inside: auto; }
+}

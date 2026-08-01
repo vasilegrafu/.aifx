@@ -1,13 +1,13 @@
 {# purpose: multi-period cash flow statement with an explicit free-cash-flow derivation #}
 {# data: rows[] {label:str, cells:num[], kind:section|detail|subtotal|total, note?:str} — raw numbers #}
 {% macro cash_flow_statement(periods=[], rows=[], caption="", unit="", source="", fcf="", fmt="money") %}
-  <table class="investing-fin investing-statement st-cashflow">
-  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="investing-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin fa-statement st-cashflow">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
     <thead><tr><th>{{ "" }}</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}
-      <tr class="investing-st-{{ r.get('kind') or 'line' }}">
-        <th scope="row">{{ r.label }}{% if r.get('note') %} <a class="investing-st-note" href="#note-{{ r.note }}">{{ r.note }}</a>{% endif %}</th>
+      <tr class="fa-st-{{ r.get('kind') or 'line' }}">
+        <th scope="row">{{ r.label }}{% if r.get('note') %} <a class="fa-st-note" href="#note-{{ r.note }}">{{ r.note }}</a>{% endif %}</th>
         {% for v in r.cells %}<td{% if v is number and v < 0 %} class="neg"{% endif %}>{{ v | fmt(fmt) }}</td>{% endfor %}
         {% for _ in range(periods | length - r.cells | length) %}<td></td>{% endfor %}
       </tr>
@@ -15,7 +15,7 @@
     </tbody>
   </table>
   {% if fcf %}
-    <p class="investing-st-fcf"><span class="investing-st-fcf-tag">Free cash flow</span> {{ fcf }}</p>
+    <p class="fa-st-fcf"><span class="fa-st-fcf-tag">Free cash flow</span> {{ fcf }}</p>
   {% endif %}
-  {% if source %}<p class="investing-st-source">{{ source }}</p>{% endif %}
+  {% if source %}<p class="fa-st-source">{{ source }}</p>{% endif %}
 {% endmacro %}

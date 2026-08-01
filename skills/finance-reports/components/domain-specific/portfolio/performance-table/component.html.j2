@@ -1,0 +1,16 @@
+{# purpose: returns across periods for the portfolio, its benchmark and the excess #}
+{# data: rows[] {label:str, cells:str[], kind?:benchmark|excess} — pre-formatted % strings #}
+{% macro performance_table(periods=[], rows=[], caption="") %}
+  <table class="fin portfolio-perf">
+  {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead><tr><th>Series</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr{% if r.get('kind') %} class="{{ r.kind }}"{% endif %}>
+        <th scope="row">{{ r.label }}</th>
+        {% for v in r.cells %}<td{% if v is string and (v.startswith("-") or v.startswith("−")) %} class="neg"{% endif %}>{{ v }}</td>{% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

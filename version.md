@@ -19,6 +19,171 @@ Each release is the git tag `v<version>`; jsDelivr serves every skill from it at
 
 ---
 
+## 6.0.0 — 2026-08-01
+
+**Major.** Four renames and one naming rule. Every domain class in the system
+changed its name, so **no document upgrades to 6.0.0 by repointing its two head
+links** — it must be regenerated. Documents pinned to `@5.x` and earlier are
+unaffected and keep rendering from their own immutable tags.
+
+### The repository, the skill, and the reports are renamed
+
+`.aifx` → **`aifx-finance`**, and `skills/investing` → **`skills/finance-reports`**.
+The CDN base in `version.json` follows, so every page generated from here links
+`…/aifx-finance@6.0.0/skills/finance-reports/…`.
+
+Two consequences worth stating plainly. A project that junctioned or symlinked
+`skills/investing` loses that directory on the next pull. And every document
+published before today pins `cdn.jsdelivr.net/gh/vasilegrafu/.aifx@…`: GitHub
+redirects the old repository name and jsDelivr follows the redirect, so they
+keep rendering — but that redirect dies permanently if any account ever creates
+a repository called `.aifx`.
+
+`reports/` gained a taxonomy: a report is now filed under its **subject** —
+`company/`, `portfolio/`, `market/`, `economy/` — with `financial-profile` at
+`company/financial-profile`. Filed by subject rather than by method, because a
+report has exactly one subject and usually several methods; a method-shaped
+shelf makes every filing decision a judgement call. The domain is shelving for
+a reader, not part of the address: discovery is recursive, so a report is still
+run by name alone, and a name must be unique across every domain.
+
+### One naming rule, and the end of `investing-`
+
+> **A class is unprefixed ONLY in `foundational/`. Anywhere else it carries the
+> name of the directory it lives in.**
+
+`.fa-dcf-value`, `.portfolio-holdings-weight`, `.macro-indicator-row`,
+`.chart-figure`, `.diagram-canvas` — and a bare `.bridge-row`, because bridge is
+foundational. 460 occurrences of `investing-` are gone.
+
+`bundle.css` had defended that prefix as "the skill's name, not the
+discipline's, so a component can move between disciplines without a class
+rename." That was a rationalisation of a coincidence. 4.0.0 created the
+convention with **two** prefixes, `investing-` and `business-`, which were
+domains; 5.0.0 deleted `business`, and the survivor happened to share the
+skill's name. Then the skill was renamed and the prefix named nothing that
+existed — not the skill, not the directory, not the discipline. A prefix that
+names anything other than its own directory has no way to stay true.
+
+The rule is about **anchoring, not spelling**: `.diagram-tools .zoom-label` and
+`.diagram-canvas.grabbing` satisfy it, because the unprefixed part is a
+descendant or compound of a prefixed class and cannot be selected alone. Three
+exceptions are external or contractual — `.katex` belongs to KaTeX, and
+`.mermaid` / `.apache-echarts` are engine markup hooks a published document
+carries.
+
+### `domain-specific/` held one mislabeled bucket; it now holds three
+
+`fundamental-analysis` was the only discipline, and about half of what it
+contained was not fundamental analysis. Reading all 45 purpose headers: 23 were
+(statements, valuation, peers, solvency, thesis), **8 were portfolio
+analytics** (holdings, performance, attribution, exposure, risk, drawdown,
+stress, trades), **2 were macro**, and **12 knew no discipline at all**.
+
+The 12 are shapes, not subjects — a waterfall, a two-way grid, a labelled bar,
+a cohort table — and `foundational/`'s own entry rule is "nothing here knows a
+discipline." They were domain-specific only because they arrived from
+docs-html's investing category in 3.0.0. They move to `foundational/blocks`
+(bridge, funnel, heatmap, quadrant-map, scorecard, composite-score) and
+`foundational/content` (sensitivity-table, roll-forward, cohort-table,
+variance-analysis, metric-trend, expected-value), and lose their prefix, which
+is what promotion means.
+
+**Components 45 → 33 domain, 41 → 53 foundational. The total is unchanged at 109.**
+
+`fundamental-analysis.css` splits three ways to match. The three shared skins it
+opened with could not follow any one discipline — `table.fin` is opted into by
+all three plus six of the promoted components, the `.trend-*` glyph column is
+shared by `metric-trend` (now foundational) and `macro-indicators` (now macro),
+and the labelled-bar row grammar is shared by `bridge` and `funnel` (now
+foundational) with `debt-maturity` (still `fa`). Duplicating them three ways is
+the drift 4.2.0 and 5.0.0 were spent deleting, so they were promoted instead:
+`table.fin` with `.tone-*` and `.trend-*` to `foundational/content.css`, the bar
+row to `foundational/blocks.css`.
+
+The `investing` **layer** becomes `domain`, holding all three files. They are
+mutually exclusive by namespace, so there is nothing for them to fight over,
+and a fourth discipline costs one `@import` and no layer edit — the shape
+`charts/` and `diagrams/` already use. The layer is named for the SCOPE, which
+is what let the old name outlive the thing it was named after.
+
+### Three smaller repairs the rule exposed
+
+- **`.sep`**, the 1px divider between toolbar button groups, was defined
+  **byte-identically** in both `charts.css` and `diagrams.css`. It is now in
+  `foundational/base.css` beside `.doc-toolbar`, which was already there — one
+  rule for all three toolbars.
+- **`.mermaid-editor*`** → `.diagram-mermaid-editor*`, the only genuine
+  violation of the rule outside `domain-specific/`. Safe to rename: the editor
+  panel is built by `diagram-mermaid.js` at runtime, so no published document
+  contains those classes.
+- `charts.css` was reported as styling `.diagram-tools`. It does not — the
+  reference is in a comment. Nothing to fix, recorded so it is not re-found.
+
+### The engine modules take their directory's name, and stop borrowing a class
+
+`js/modules/diagram-mermaid.js` → **`diagrams-mermaid.js`** and
+`chart-apache-echarts.js` → **`charts-apache-echarts.js`**, so an engine module
+is named for the directory it sits in — the same rule the classes follow. The
+`MODULES` list in `bundle.js` and each module's own `register({name})` follow;
+a name that does not resolve to a file is a 404 at runtime and a silently dead
+feature, so the two are checked against each other.
+
+`chart-apache-echarts.css` had hung its containment rules off **`.chart-canvas`**,
+the class the SHARED frame owns. An engine file reaching into shared markup is
+the seam leaking: those rules are true of ECharts and false of the next engine.
+`charts-apache-echarts.js` now adds **`.charts-apache-echarts-canvas`** to the
+canvas before it draws, and the three rules hang off that. Safe to change — the
+canvas and its class are built at runtime, so no published document names them.
+
+### Credentials move out of the skill, and split dev from prod
+
+`credentials.local.json`, which sat beside `credentials.py`, is replaced by
+**`secrets.dev.json` / `secrets.prod.json` at the REPO ROOT**, selected by
+`AIFX_ENV` (default `dev`). The shape is `{"fmp": {"api_key": "…"}}`, and
+`FMP_API_KEY` still wins over both — it is the only option that works in CI,
+where there is no file.
+
+Out of the skill on purpose. A skill is meant to be copied or junctioned as
+`skills/finance-reports/` and nothing above it, so a credential kept inside
+that subtree travels with every copy; one kept above it cannot.
+
+Two environments because a dev key and a production key have different rate
+limits and different blast radii, and the way that goes wrong is someone
+burning a production quota on a test run. `AIFX_ENV` defaults to the safe end,
+and an unrecognised value is a hard error rather than a silent fallback to
+production. The placeholder the files ship with is detected by name and
+refused, instead of being sent to the API so the reader has to work backwards
+from a 401.
+
+**Migrating:** move your key out of `credentials.local.json` into
+`secrets.dev.json` and delete the old file. `.gitignore` now covers
+`secrets.*.json`.
+
+### Tooling: a declared environment and an output shelf
+
+`requirements.txt` names the two libraries the tree needs — Jinja renders every
+template, httpx is the only thing that touches the network — with `.venv/`
+gitignored. Nothing here builds the published CSS or JS; those are still served
+raw from the git tag, which is what keeps a published tag immutable without
+qualification.
+
+`output/` is the conventional destination for a generated report, gitignored
+except for its `.gitkeep`. **`--out` is still required and still has no
+default** — the page's local asset href is computed relative to where the file
+is written, so a report built without naming its destination would link its
+assets relative to a directory nobody chose. `output/` is a convention, not a
+default; see `reports/REFERENCE.md`.
+
+### Migrating
+
+Regenerate. There is no head-link edit that carries a 5.x document to 6.0.0,
+because the class names in its body changed. An existing document left pinned
+to `@5.0.0` keeps rendering exactly as it does today, which is what the pin has
+always been for.
+
+---
+
 ## 5.0.0 — 2026-08-01
 
 **Major.** The `docs-html` skill is removed. `investing` is the whole repo.

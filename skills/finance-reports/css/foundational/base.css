@@ -83,6 +83,18 @@ body:not(.wide) .doc-toolbar [data-w="page"],
 body.wide .doc-toolbar [data-w="wide"] { background: var(--accent-soft); color: var(--accent); }
 @media print { .doc-toolbar { display: none; } }
 
+/* The divider between button groups in ANY of the three toolbars — the page's
+   own .doc-toolbar above, .chart-tools, and .diagram-tools. All three are the
+   same chip of flat icon buttons with different hosts, and charts.css and
+   diagrams.css each carried a byte-identical copy of this rule until 6.0.0.
+   It is unprefixed because it lives here: a 1px separator knows no discipline
+   and no rendering subsystem. */
+.sep {
+  width: 1px; height: 1.1rem;
+  background: var(--border);
+  margin: 0 .15rem;
+}
+
 /* ---------- type scale ---------- */
 h1 {
   font-size: 2rem; font-weight: 800; line-height: 1.15;

@@ -1,23 +1,23 @@
 {# purpose: return on equity or capital decomposed into its multiplicative drivers across periods #}
 {# data: factors[] {name:str, cells:str[]}   result? {label:str, cells:str[]} — multiplicative drivers #}
 {% macro dupont(periods=[], factors=[], result=none, caption="", note="") %}
-  <table class="investing-fin dupont">
+  <table class="fin dupont">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead><tr><th>Driver</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for f in factors %}
       <tr>
-        <th scope="row"><span class="investing-dp-op">{{ "" if loop.first else "×" }}</span>{{ f.name }}</th>
+        <th scope="row"><span class="fa-dp-op">{{ "" if loop.first else "×" }}</span>{{ f.name }}</th>
         {% for v in f.cells %}<td>{{ v }}</td>{% endfor %}
       </tr>
     {% endfor %}
     </tbody>
     {% if result %}
-    <tfoot><tr class="investing-total">
-      <th scope="row"><span class="investing-dp-op">=</span>{{ result.label }}</th>
+    <tfoot><tr class="total">
+      <th scope="row"><span class="fa-dp-op">=</span>{{ result.label }}</th>
       {% for v in result.cells %}<td>{{ v }}</td>{% endfor %}
     </tr></tfoot>
     {% endif %}
   </table>
-  {% if note %}<p class="investing-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
 {% endmacro %}
