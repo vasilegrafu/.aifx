@@ -68,5 +68,62 @@ neither replaces the other:
 
 Reports need the network and a real key; there is no offline mode and nothing
 is cached. `--out` and `--peers` have **no defaults on purpose** — ask rather
-than choose. Output under `.claude_testing_scenarios/` is gitignored: it
-carries live market data and differs on every run.
+than choose. A built report carries live market data and differs on every run,
+so it is an artifact: never commit one, wherever it was written.
+
+Each report has a `report_test.py` **beside it** that builds it for real and
+then checks the file:
+
+```bash
+R=.claude/skills/finance-reports/reports/report_test_runner.py
+./.venv/Scripts/python.exe $R --list          # costs nothing
+./.venv/Scripts/python.exe $R financial-profile
+./.venv/Scripts/python.exe $R --all
+```
+
+**A bare run does nothing on purpose** — it lists what exists and totals the
+quota it would spend. Tests are found, not registered: a directory holding
+`report_test.py` has a test, and its `CALLS = <n>` is what the runner adds up
+without importing anything.
+
+**The page lands in `report_test_output/` beside the report** and stays there —
+open it, because a chart draws at view time and no check here can see one.
+
+That folder is **tracked but always empty**: a `.gitkeep`, plus one pair of
+rules in `.gitignore` covering every report present and future.
+
+```
+**/report_test_output/*
+!**/report_test_output/.gitkeep
+```
+
+The `**/` is load-bearing — without it the pattern anchors to the repo root and
+silently ignores nothing four levels down. **Verify with `git check-ignore`, not
+by eye**, whenever these lines are touched: a published page is a page that was
+committed, and this is the rule standing between the two. A copied skill needs
+the same lines in the consuming project.
+
+**Not temp**, which was tried: it is on `C:` while this repo is on `D:`, and
+with no relative path between drives `local_href` comes out empty — so the page
+links the CDN alone and renders unstyled against a tag that may not be pushed.
+
+**It spends ~13 live API calls every time** — there is nothing to cache and no
+fixture, so don't run it in a loop while iterating. Its ten checks answer two
+questions the build cannot:
+
+- **well-formed** — chart specs survive `JSON.parse`, both asset halves resolve,
+  the CDN half pins the *current* `version.json` (which is how the
+  bump-before-rebuild rule above gets enforced rather than remembered), in-page
+  links land on real ids, no half-rendered markup
+- **carries data** — no empty chart, no header-over-nothing table, no bare
+  section, every requested symbol present, no section mostly blank
+
+**Assertions passing does not mean data arrived.** An endpoint that returns a
+200 with an empty body yields zeros, and `0 + 0 == 0` satisfies `cost + gross ==
+revenue` — so the arithmetic holds, all 48 `READS` names exist, and the page
+renders flat and empty. That is what the second tier is for, and it measures
+per SECTION: one dead endpoint out of seven moves the whole page only to ~26%
+blank, which no page-level threshold can catch without failing good markup.
+
+It is the same story as the showcase audit: green means the page is valid, not
+that it is correct. **Open it.**

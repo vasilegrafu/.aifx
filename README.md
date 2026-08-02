@@ -175,12 +175,68 @@ deriving and asserting ...
 <path to the written file>
 ```
 
-Runnable scenarios live in `.claude_testing_scenarios/`, each stating its
-command, what must be true of the output, and what each failure mode points at.
-
 ```powershell
 python .claude/skills/finance-reports/reports/report_builder.py financial-profile --help
 ```
+
+### Testing a report
+
+Each report has a `report_test.py` **beside it** — it builds the report for real
+and then checks the file:
+
+```powershell
+python .claude/skills/finance-reports/reports/report_test_runner.py --list
+python .claude/skills/finance-reports/reports/report_test_runner.py financial-profile
+python .claude/skills/finance-reports/reports/report_test_runner.py --all
+```
+
+Tests are **found, not registered** — a directory holding `report.html.j2` is a
+report, and one that also holds `report_test.py` has a test — so adding one
+means adding a file. Because the test ships with the skill, a **linked** install
+can be tested in place, which is the quickest way to find out whether that
+project's `environment.json` and `secrets.<env>.json` resolve.
+
+**A bare run does nothing**: it prints what exists and totals what it would
+cost, because every test builds against the live API and nothing is cached. Ten
+reports is ~130 calls of real quota, so the selection has to be said out loud.
+The built page lands in **`report_test_output/` beside the report** and stays
+there — open it, since charts draw at view time and no check can judge one. That
+folder is tracked but always empty: a `.gitkeep`, and a `.gitignore` pair that
+covers every report, so nothing built is ever committed or published.
+
+It is written to disk rather than held in memory because the destination is part
+of what is tested — the page's local asset links are computed relative to it.
+Beside the report rather than the system temp directory for the same reason: on
+Windows temp is on another drive, no relative path exists between them, and the
+page would silently fall back to linking the CDN alone.
+
+If you **copy** the skill into your own project, add those two lines to that
+project's `.gitignore` yourself, exactly as you would for `secrets.*.json`.
+
+It exits 0 or 1 and needs no arguments: the symbol and the peer group are
+declared in the file, because a test whose inputs are typed each time is a test
+that was run differently the last time somebody ran it.
+
+The build already asserts its own arithmetic, so the test adds what only the
+finished page can show, in two tiers:
+
+- **is it well-formed** — every chart spec survives `JSON.parse`, both asset
+  halves resolve and the CDN half pins the *current* version, every in-page link
+  lands on a real section id, no half-rendered markup reached the file
+- **does it carry data** — no chart is an empty frame, no table is a header over
+  nothing, every declared section has content, every requested symbol appears,
+  and no section is mostly blanks
+
+The second tier exists because the first cannot fail on an empty page. If an
+endpoint returns a 200 with nothing in it, the derivation produces zeros — and
+its identities still hold, since `0 + 0 == 0` satisfies `cost + gross ==
+revenue`. Every structural check passes and the report renders beautifully with
+flat lines and no numbers.
+
+Tests live beside `.claude/` rather than inside it for the same reason the
+config does: they belong to this project, not to a skill copied out of it. A
+passing run still does not mean the page is right — charts draw at view time, so
+**open it**.
 
 ---
 

@@ -55,6 +55,8 @@ enough to be worth re-deriving each time.
 
 ```bash
 python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
+python reports/report_test_runner.py --list        # tests, and what they cost
+python reports/report_test_runner.py --all         # each builds for REAL
 python components/showcase_builder.py charts/bar
 python components/showcase_builder.py --all        # rebuild every showcase
 python components/showcase_builder.py --check      # verify each is current
@@ -218,9 +220,9 @@ with three answers is a layout question with two wrong ones.
 
 A directory containing `component.html.j2` **is** a component. A directory
 containing `report.html.j2` **is** a report. A component directory that also
-holds `showcase_controller.py` and `showcase.html.j2` **has** a showcase.
-Nothing is listed anywhere, so adding any of the three means adding files and
-nothing else.
+holds `showcase_controller.py` and `showcase.html.j2` **has** a showcase, and a
+report directory that also holds `report_test.py` **has** a test. Nothing is
+listed anywhere, so adding any of the four means adding files and nothing else.
 
 `ShowcaseBuilder.build("charts/bar")` therefore does no lookup: check the three
 files are present, path-load the controller, find the `ShowcaseController`
@@ -273,8 +275,9 @@ reports/
   _report_controller.py        ReportController; borrows env() AND the asset pair
   _report.master.html.j2       the shell every report view extends
   report_builder.py            ReportBuilder.build(name, argv, out) + the CLI
+  report_test_runner.py        finds report_test.py, totals the cost, runs them
   company/                     a domain, holding its reports
-    financial-profile/         one report
+    financial-profile/         one report — view, controller, usage, report_test
   portfolio/  market/  economy/
                                declared and empty — the taxonomy, stated
 
@@ -419,6 +422,15 @@ per-field — **`service_providers/REFERENCE.md`**. It is written down once.
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
 4. `python reports/report_builder.py <name> … --out DIR`
+5. `reports/<domain>/<name>/report_test.py` — declare `REPORT`, `ARGV` and
+   `CALLS`, then the checks only the finished PAGE can answer. The build asserts
+   its own arithmetic; what it cannot see is an empty one, since `0 + 0 == 0`
+   satisfies `cost + gross == revenue`. Copy the neighbour and change the three
+   constants. It writes to **`report_test_output/` beside itself**, so also add
+   that folder with a `.gitkeep` in it — `.gitignore` already covers the
+   contents of every one of them, and a new report therefore needs no new rule.
+   Not the system temp directory, which is on another drive on Windows: that
+   empties `local_href` and leaves the page linking the CDN alone.
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so

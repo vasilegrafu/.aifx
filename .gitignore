@@ -5,5 +5,6 @@ __pycache__/
 
 secrets.*.json
 
-.claude_testing_scenarios/**/*.html
+**/report_test_output/*
+!**/report_test_output/.gitkeep
 

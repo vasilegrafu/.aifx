@@ -114,10 +114,120 @@ an invented path fails silently in two ways at once, landing where nobody looks
 and computing its asset links against the wrong root.
 
 There is deliberately **no conventional destination either** — no `output/`
-shelf to fall into by habit. A test run names
-`.claude_testing_scenarios/<skill>/<domain>/<report>/`, which mirrors this tree
-so a scenario sits at the same address as the thing it tests; a real
-deliverable goes wherever the reader asked for it.
+shelf to fall into by habit. A real deliverable goes wherever the reader asked
+for it.
+
+The one place the question is already answered is a test — see below.
+
+## Testing a report
+
+```bash
+python reports/report_test_runner.py --list      # what exists, and the cost
+python reports/report_test_runner.py financial-profile
+python reports/report_test_runner.py --all
+```
+
+**The test sits beside the report**, as `report_test.py`. A directory holding
+`report.html.j2` **is** a report; one that also holds `report_test.py` **has** a
+test — the same rule a component follows with `showcase_controller.py`, and
+nothing is registered either way. The alternative was a mirrored tree of test
+directories, and a mirror is a second copy of the taxonomy free to drift from
+the first; this repository already deleted a hand-maintained catalogue for that
+reason.
+
+Being inside the skill means it travels with it: a skill **linked** into another
+project can be tested there, which is the fastest way to learn whether that
+project's `environment.json` and `secrets.<env>.json` resolve — the failure a
+fresh install actually has.
+
+**The page lands in `report_test_output/`, beside the report**, and stays there
+to be opened. Every report has one:
+
+```
+company/financial-profile/
+  report.html.j2  report_controller.py  report_test.py  usage.md
+  report_test_output/
+    .gitkeep                       tracked — the folder exists in a fresh clone
+    amd-financial-profile.html     ignored — never committed, never published
+```
+
+**Tracked as an empty directory.** `.gitignore` carries one pair of rules for
+all of them:
+
+```
+**/report_test_output/*
+!**/report_test_output/.gitkeep
+```
+
+The leading `**/` is load-bearing — a pattern containing a slash is anchored to
+the `.gitignore`'s own directory, so plain `report_test_output/*` matches only at
+the repo root and silently ignores nothing four levels down. With it, **a new
+report needs no new rule.**
+
+That is what makes writing inside a published tree safe: jsDelivr serves what is
+committed and `git.commit&push.bat` runs `git add .`, so a page that is never
+committed is never swept up and never served. A skill **copied** into another
+project needs the same two lines in that project's `.gitignore`, exactly as
+`secrets.*.json` does.
+
+**Written at all, rather than held in memory**, because the destination is part
+of what is under test. `build()` renders, writes and returns a path — that *is*
+its contract, and a test that rebuilt the four stages in-process to avoid the
+disk would have stopped testing the thing it is named after. Concretely,
+`local_href` is computed **from** the destination, so with no destination
+`assets_resolve` loses the half that catches a wrong `../` depth.
+
+**Not the system temp directory**, which was tried and is wrong on Windows: it
+is on `C:` while a project usually is not, and `local_href` is empty when no
+relative path exists between two drives — so the page would link the CDN alone,
+render unstyled against a tag that may not be pushed, and leave the local half
+of `assets_resolve` testing nothing. Beside the report is the same volume by
+construction.
+
+That destination is declared in the test rather than asked for, and it is not an
+exception being smuggled in: `--out` has no default because **a report is a
+deliverable somebody asked for**, and a scratch artifact nobody receives is not
+one.
+
+### What it checks, and why the build cannot
+
+`_build_context` asserts the arithmetic and `_validate_context` asserts the view
+contract, but **neither has seen the file**. Two tiers:
+
+- **is it well-formed** — every chart spec survives `JSON.parse`, both asset
+  halves resolve and the CDN half pins the *current* `version.json`, every
+  `href="#x"` finds an `id="x"`, no half-rendered markup, no pre-6.0.0 prefix
+- **does it carry data** — no chart is an empty frame, no `<tbody>` is a header
+  over nothing, every declared section has content, every requested symbol
+  appears, and no section is mostly blanks
+
+The second tier exists because the first cannot fail on an empty page. An
+endpoint returning 200 with an empty body yields zeros, and **`0 + 0 == 0`
+satisfies `cost + gross == revenue`** — the identities hold, all 48 `READS`
+names are present, every spec is valid JSON, and the report renders beautifully
+with flat lines and nothing in it.
+
+Blanks are measured **per section**. A real build is 19% blank against a limit
+that must sit above 50% to clear known-good markup, so one dead endpoint would
+move a seven-section page to ~26% and never fire; measured where the failure
+lands, that section reads 100% and the complaint names it.
+
+### Cost, and why `--all` is explicit
+
+Each test builds its report for real: ~13 calls, nothing cached, no offline
+mode. Ten reports is ~130 calls of live quota, so **a bare invocation runs
+nothing** — it lists what exists and totals what it would spend. Each test
+declares `CALLS = <n>`, which the runner reads out of the source with `ast`
+rather than by importing, since importing is where the expense begins.
+
+Each test runs as **its own process**: every one puts the skill on `sys.path`
+and path-loads controllers into `sys.modules` under aliases of its own, and the
+exit code is already the contract. Sharing an interpreter would trade that
+isolation for ~0.5s of cached Jinja environment against a test that spends ten
+seconds on the network.
+
+**A green run means the page is valid, not that it is right.** Charts draw at
+view time. Open it.
 
 ### The environment is DECLARED, not passed — and there is no flag
 
