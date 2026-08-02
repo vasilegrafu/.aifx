@@ -1,5 +1,9 @@
 {# purpose: returns across periods for the portfolio, its benchmark and the excess #}
-{# data: rows[] {label:str, cells:str[], kind?:benchmark|excess} — pre-formatted % strings #}
+{# data: rows[] {label:str, cells:str[], kind?:portfolio-benchmark|portfolio-excess} — pre-formatted % strings #}
+{# `kind` is emitted as the class VERBATIM, and portfolio.css styles
+   tr.portfolio-benchmark and tr.portfolio-excess — so the value carries the
+   prefix. Passing a bare "benchmark" is not an error: the row renders
+   unstyled and reads as another portfolio line. #}
 {% macro performance_table(periods=[], rows=[], caption="") %}
   <table class="fin portfolio-perf">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}

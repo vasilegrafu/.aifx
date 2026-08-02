@@ -46,8 +46,11 @@
                 caption=d.inc_caption) }}
     {# No profit columns: the product-segmentation feed publishes revenue only,
        and the macro renders a narrower table rather than a fabricated one. #}
+    {# seg_note is empty unless a segment appeared or vanished this year, and
+       the macro drops the line entirely when it is. #}
     {{ c.segment_reporting(rows=d.seg_rows, total_row=d.seg_total_row,
-                           caption=d.seg_caption, unit=d.unit) }}
+                           caption=d.seg_caption, unit=d.unit,
+                           source=d.seg_note) }}
   {% endcall %}
 
   {% call c.section("cash", "Where the money goes") %}

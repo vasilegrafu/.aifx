@@ -2,7 +2,7 @@
 
 The macro it feeds must match the {# data: ... #} header in component.html.j2:
 
-    rows[] {scenario:str, trigger:str, impact:str, magnitude:num, tone:str, response:str} -- magnitude % drives the bar
+    rows[] {scenario:str, trigger:str, impact:str, magnitude:num, tone:bad|warn, response:str} -- magnitude % drives the bar
 
 ONE `tone` FEEDS TWO CLASS FAMILIES WITH DIFFERENT VOCABULARIES. It
 is emitted as both tone-{{ tone }} on the figure and

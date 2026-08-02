@@ -2,14 +2,12 @@
 
 The macro it feeds must match the {# data: ... #} header in component.html.j2:
 
-    items[] {state:done|active|todo, when:str, title:str, detail:str}
+    items[] {state:done|current|todo, when:str, title:str, detail:str}
 
-THE HEADER SAYS `active`, BUT blocks.css STYLES `current`. There is
-a rule for li[data-state="done"] and one for li[data-state="current"], and none
-for "active" -- an item marked active renders with the plain marker, which is
-indistinguishable from a future milestone. The states used here are the ones
-the stylesheet honours; "todo" is deliberately unstyled and is the default
-appearance.
+STATES ARE done, current AND todo. blocks.css carries a rule for done and
+for current; "todo" is deliberately unstyled and is the default appearance, so
+a milestone that has not started looks like one. Anything else renders with the
+plain marker and is indistinguishable from a future milestone.
 """
 
 import sys
@@ -30,8 +28,8 @@ from components._showcase_controller import ShowcaseController     # noqa: E402
 class TimelineShowcaseController(ShowcaseController):
 
     def _build_context(self):
-        # "current", not "active": blocks.css has no rule for active, and an
-        # item marked that way is drawn as though it had not started.
+        # Exactly one item is current -- it is what answers "where are we
+        # now", and two of them answer nothing.
         items = [
             {"state": "done", "when": "2025-11-19",
              "title": "Coverage initiated",
@@ -61,7 +59,6 @@ class TimelineShowcaseController(ShowcaseController):
         assert_all_drawn("timeline", d, [("items", ())])
         assert_labels("timeline", "titles", [i["title"] for i in d["items"]])
         for it in d["items"]:
-            # NOT the header's "active" -- blocks.css has no rule for it.
             assert_enum("timeline", f"{it['title']!r}.state", it["state"],
                         {"done", "current", "todo"})
         dates = [i["when"] for i in d["items"]]

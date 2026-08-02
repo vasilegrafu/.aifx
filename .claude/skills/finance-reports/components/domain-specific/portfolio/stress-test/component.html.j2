@@ -1,5 +1,10 @@
 {# purpose: portfolio or company impact under named stress scenarios #}
-{# data: rows[] {scenario:str, trigger:str, impact:str, magnitude:num, tone:str, response:str} — magnitude % for the bar #}
+{# data: rows[] {scenario:str, trigger:str, impact:str, magnitude:num, tone:bad|warn, response:str} — magnitude % for the bar #}
+{# `tone` LANDS ON TWO ELEMENTS with different vocabularies: tone-{tone} on the
+   figure, which portfolio.css defines for good, bad and neutral, and
+   portfolio-stress-fill-{tone} on the bar, which it defines for bad and warn
+   only. USE bad OR warn. "warn" colours the bar and leaves the figure plain;
+   "good" and "neutral" do the reverse. Only "bad" styles both. #}
 {% macro stress_test(rows=[], caption="", note="") %}
   <table class="fin portfolio-stress">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}

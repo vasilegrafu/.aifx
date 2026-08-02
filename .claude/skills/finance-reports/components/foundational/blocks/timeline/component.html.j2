@@ -1,5 +1,10 @@
 {# purpose: dated milestone timeline with status #}
-{# data: items[] {state:done|active|todo, when:str, title:str, detail:str} #}
+{# data: items[] {state:done|current|todo, when:str, title:str, detail:str} #}
+{# `current`, NOT `active`. blocks.css styles li[data-state="done"] and
+   li[data-state="current"] and has no rule for anything else, so a milestone
+   marked active renders with the plain marker -- indistinguishable from one
+   that has not started. `todo` is deliberately unstyled and is the default
+   appearance. #}
 {% macro timeline(items=[]) %}
   <ol class="timeline">
   {% for it in items %}

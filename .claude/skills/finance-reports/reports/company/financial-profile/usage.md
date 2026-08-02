@@ -119,5 +119,14 @@ A build that violates either **stops**. It does not warn.
   `READS`, then the `c.<macro>(...)` call in `report.html.j2`.
 - **Assert anything you derive that must balance.** The cost of a missing
   assertion is a confident, wrong picture.
+- **A renamed segment is indistinguishable from a closed one**, and the report
+  says so rather than guessing. `revenue-product-segmentation` reports a
+  renamed line under both names, so a reorganisation appears as one segment at
+  **−100.0%** beside a new one at **0.0%** — the second has no prior year to
+  divide by. Both figures are correct and the pair reads as a collapse: INTU's
+  largest business, renamed for FY2025, prints in red. When a segment vanishes
+  or appears, `seg_note` states what was observed and lands under the table.
+  It is **a note, not an assertion** — a segment really can be closed, and
+  nothing in the data distinguishes the two.
 - Requires a live network and `FMP_API_KEY` — see Credentials in `SKILL.md`.
   There is no offline mode and no cached payloads.

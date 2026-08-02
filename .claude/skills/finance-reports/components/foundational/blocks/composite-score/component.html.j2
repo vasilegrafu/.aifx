@@ -1,6 +1,8 @@
 {# purpose: a formula-based composite score with its inputs, the result, and the band it falls in #}
 {# data: inputs[] {component:str, coefficient:num, value:num, contribution:num}
-         bands[]  {label:str, range:str, tone:good|neutral|bad} #}
+         bands[]  {label:str, range:str, tone:good|warn|bad} #}
+{# `warn`, not `neutral`: the outer band and the scale pills both read
+   composite-{tone}, and blocks.css defines good, warn and bad for each. #}
 {# SHOW THE INPUTS, NOT JUST THE NUMBER. A score whose workings are hidden is an
    opinion wearing a decimal point — and these scores are dominated by one term
    far more often than a reader expects. #}

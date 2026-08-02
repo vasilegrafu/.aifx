@@ -2,18 +2,16 @@
 
 The macro it feeds must match the {# data: ... #} header in component.html.j2:
 
-    inputs[] {component:str, coefficient:num, value:num, contribution:num}   bands[] {label:str, range:str, tone:good|neutral|bad}
+    inputs[] {component:str, coefficient:num, value:num, contribution:num}   bands[] {label:str, range:str, tone:good|warn|bad}
 
 SHOW THE INPUTS, NOT JUST THE NUMBER, as the component header says.
 This showcase makes the header's point with real arithmetic: of the 3.99 total,
 1.72 comes from one term -- 43% of an Altman Z-score that moves with the share
 price rather than with the business.
 
-NOTE ON TONES: the header documents bands[].tone as good|neutral|bad, but
-blocks.css styles .composite-good, .composite-bad and .composite-warn, and has
-no .composite-step-* rule at all -- so a band's own tone currently renders
-unstyled whatever it is set to. The values used here are the ones the
-stylesheet honours for the outer band.
+TONES ARE good|warn|bad, for the outer band AND for each pill on the scale.
+The two read the same three tokens, so a band cannot be styled one way in the
+summary and another in the scale beneath it.
 """
 
 import sys

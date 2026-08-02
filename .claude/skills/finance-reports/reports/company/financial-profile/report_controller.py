@@ -467,6 +467,46 @@ class FinancialProfileReportController(ReportController):
                          "cells": [f"{seg_totals[-1]:,}", "100.0%",
                                    f"{100 * (seg_totals[-1] / seg_totals[-2] - 1):.1f}%"]}
 
+        # A RENAMED SEGMENT READS AS A COLLAPSED ONE, and nothing in the data
+        # distinguishes them. The endpoint reports the old and new names as
+        # separate lines, so a reorganisation appears as a -100.0% row beside a
+        # brand-new one — and the new one shows 0.0% growth, because the branch
+        # above yields 0 when there is no prior-year figure to divide by. Both
+        # numbers are correct and the pair is badly misleading: INTU's largest
+        # business, renamed for FY2025, prints as -100.0% in red.
+        #
+        # This is a NOTE, not an assertion. A segment really can be closed, and
+        # the source cannot say which happened — so the report states what it
+        # observed and leaves the reading to the reader.
+        retired = [s["name"] for s in seg_series
+                   if s["points"][-1] == 0 and s["points"][-2] > 0]
+        introduced = [s["name"] for s in seg_series
+                      if s["points"][-1] > 0 and s["points"][-2] == 0]
+
+        def _listed(names):
+            return ", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 \
+                else names[0]
+
+        seg_note = ""
+        if retired and introduced:
+            seg_note = (
+                f"{_listed(retired)} fell to zero in {seg_years[-1]} while "
+                f"{_listed(introduced)} first appeared. The source reports "
+                f"renamed segments under both names, so a reorganisation looks "
+                f"like a segment ending at -100.0% beside a new one at 0.0% — "
+                f"the new line has no prior year to compare against. Read the "
+                f"two together before reading either alone.")
+        elif retired:
+            seg_note = (
+                f"{_listed(retired)} fell to zero in {seg_years[-1]}. The "
+                f"source does not distinguish a closed segment from a renamed "
+                f"one, and prints -100.0% for both.")
+        elif introduced:
+            seg_note = (
+                f"{_listed(introduced)} is first reported in {seg_years[-1]}, "
+                f"so its growth shows as 0.0% for want of a prior-year figure "
+                f"rather than because it did not grow.")
+
         seg_trend_rows = [
             {"label": s["name"], "cells": s["points"],
              "cagr": _cagr(s["points"][0], s["points"][-1], len(seg_raw) - 1),
@@ -613,6 +653,7 @@ class FinancialProfileReportController(ReportController):
             "seg_rows": seg_rows,
             "seg_total_row": seg_total_row,
             "seg_caption": f"Revenue by segment, {seg_years[-1]}",
+            "seg_note": seg_note,
             "seg_years": seg_years,
             # cash
             "cash_nodes": cash_nodes, "cash_links": cash_links,
@@ -665,7 +706,8 @@ class FinancialProfileReportController(ReportController):
         "cash_links", "cash_nodes", "company", "exchange", "header_facts",
         "inc_caption", "inc_links", "inc_nodes", "margin_rows", "peer_caption",
         "peer_formats", "peer_headers", "peer_rows", "periods", "pershare_rows",
-        "price_date", "roll_rows", "seg_caption", "seg_rows", "seg_series",
+        "price_date", "roll_rows", "seg_caption", "seg_note", "seg_rows",
+        "seg_series",
         "seg_total_row", "seg_trend_rows", "seg_years", "share_periods",
         "ticker", "unit", "z_band", "z_bands", "z_formula", "z_inputs",
         "z_name", "z_score", "z_tone",

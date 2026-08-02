@@ -2,17 +2,12 @@
 
 The macro it feeds must match the {# data: ... #} header in component.html.j2:
 
-    rows[] {label:str, cells:str[], kind?:benchmark|excess} -- pre-formatted % strings
+    rows[] {label:str, cells:str[], kind?:portfolio-benchmark|portfolio-excess} -- pre-formatted % strings
 
-THE HEADER AND THE STYLESHEET DISAGREE ABOUT `kind`. The macro emits
-class="{{ kind }}" verbatim, so kind="benchmark" produces class="benchmark" --
-but portfolio.css styles tr.portfolio-benchmark and tr.portfolio-excess. The
-documented values therefore render UNSTYLED, and the benchmark row is
-indistinguishable from the portfolio row.
-
-The values used here are the ones the stylesheet honours. That is a workaround
-for a mismatch, not the contract: either the header or the CSS is wrong and
-somebody has to decide which.
+`kind` CARRIES THE PREFIX -- portfolio-benchmark, portfolio-excess. It is
+emitted as the class verbatim and portfolio.css styles tr.portfolio-benchmark
+and tr.portfolio-excess, so a bare "benchmark" renders unstyled and the
+benchmark row reads as another portfolio line.
 
 EVERY CELL IS A STRING and nothing checks the excess row against the two above
 it. The validator does.
@@ -44,9 +39,9 @@ class PerformanceTableShowcaseController(ShowcaseController):
         def cells(values):
             return [f"{v:+.1f}%" for v in values]
 
-        # NOT the header's "benchmark"/"excess": portfolio.css styles
-        # tr.portfolio-benchmark and tr.portfolio-excess, and the macro emits
-        # the value verbatim, so the documented spellings render unstyled.
+        # The prefix is part of the value: the macro emits `kind` as the
+        # class verbatim, and portfolio.css styles tr.portfolio-benchmark
+        # and tr.portfolio-excess.
         rows = [
             {"label": "Strategy", "cells": cells(portfolio)},
             {"label": "MSCI World", "cells": cells(benchmark),
@@ -70,7 +65,6 @@ class PerformanceTableShowcaseController(ShowcaseController):
                 (f"performance-table: {r['label']!r} has {len(r['cells'])} "
                  f"cells against {len(d['periods'])} periods")
             if r.get("kind"):
-                # The spellings the STYLESHEET knows, not the header's.
                 assert_enum("performance-table", f"{r['label']!r}.kind",
                             r["kind"],
                             {"portfolio-benchmark", "portfolio-excess"})
