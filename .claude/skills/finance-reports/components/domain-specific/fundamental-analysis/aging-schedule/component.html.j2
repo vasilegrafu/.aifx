@@ -12,7 +12,7 @@
         {% for _ in range(buckets | length - r.cells | length) %}<td></td>{% endfor %}
         <td class="fa-aging-total">{{ r.total }}</td>
         <td class="fa-aging-share">
-          <span class="fa-aging-track"><span class="fa-aging-fill{% if r.tone %} fa-aging-fill-{{ r.tone }}{% endif %}" data-pct="{{ r.overdue_share }}%"></span></span>
+          <span class="fa-aging-track"><span class="fa-aging-fill{% if r.get('tone') %} fa-aging-fill-{{ r.tone }}{% endif %}" data-pct="{{ r.overdue_share }}%"></span></span>
           <span class="fa-aging-pct">{{ r.overdue_share }}%</span>
         </td>
       </tr>

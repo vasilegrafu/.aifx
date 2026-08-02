@@ -1,5 +1,12 @@
 {# purpose: valuation ranges by method with the current price marked — the football field #}
 {# data: rows[] {method:str, low:num, high:num, label:str} — offsets computed here; price marks the current level #}
+{# unit: a PREFIX SYMBOL — "$", "£". It is set directly against scale_min and
+   scale_max on the axis line, so a phrase like "USD per share" renders as
+   "USD per share0". Put the phrase in `caption` instead.
+
+   SET scale_min AND scale_max. They default to 0..100, and a row outside that
+   span computes an offset past 100% — the bar runs out of its track and off
+   the figure, which no assertion in the macro will tell you about. #}
 {% macro valuation_range(rows=[], scale_min=0, scale_max=100, price=none, price_label="", caption="", unit="") %}
   {% set span = (scale_max - scale_min) if (scale_max - scale_min) else 1 %}
   <figure class="fa-valrange">

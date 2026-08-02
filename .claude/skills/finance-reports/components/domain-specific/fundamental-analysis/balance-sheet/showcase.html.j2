@@ -1,0 +1,20 @@
+{# The `balance-sheet` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two periods, sections and a row note — the standard form</h3>
+      {{ c.balance_sheet(rows=d.rows, periods=d.periods,
+               caption="Balance sheet",
+               unit="USD millions",
+               check="79,642 = 15,180 + 64,462") }}
+    </section>
+    <hr>
+    <section>
+      <h3>without the check line — where the reader is left to add it up</h3>
+      {{ c.balance_sheet(rows=d.rows, periods=d.periods,
+               caption="Balance sheet",
+               unit="USD millions") }}
+    </section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{# The `peer-comparison` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five metrics on mixed units — one format per column</h3>
+      {{ c.peer_comparison(headers=d.headers, formats=d.formats, rows=d.rows,
+               caption="Peers — fiscal years ending on different dates") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a single metric — the smallest table this component still suits</h3>
+      {{ c.peer_comparison(headers=d.narrow_headers, formats=d.narrow_formats,
+               rows=d.narrow_rows,
+               caption="EV / EBITDA against peers") }}
+    </section>
+{% endblock %}

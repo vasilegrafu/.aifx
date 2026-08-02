@@ -1,0 +1,16 @@
+{# The `valuation-multiples` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>all three verdicts — cheap, fair and rich in one table</h3>
+      {{ c.valuation_multiples(rows=d.rows,
+               caption="Multiples against peers and against history") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a single multiple — a passing mention inside a longer argument</h3>
+      {{ c.valuation_multiples(rows=d.single, caption="EV / EBITDA") }}
+    </section>
+{% endblock %}

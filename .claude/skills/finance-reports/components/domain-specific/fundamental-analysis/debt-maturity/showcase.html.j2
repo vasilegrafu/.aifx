@@ -1,0 +1,21 @@
+{# The `debt-maturity` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a laddered stack — no year carries much more than the others</h3>
+      {{ c.debt_maturity(items=d.items,
+               caption="Debt maturity profile",
+               unit="principal outstanding",
+               summary="Well laddered: nothing above a third falls in any one year.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a maturity wall — 86% in a single year, at the highest coupon</h3>
+      {{ c.debt_maturity(items=d.wall,
+               caption="Debt maturity profile",
+               unit="principal outstanding",
+               summary="FY27 is the whole refinancing risk, and it carries the worst rate.") }}
+    </section>
+{% endblock %}

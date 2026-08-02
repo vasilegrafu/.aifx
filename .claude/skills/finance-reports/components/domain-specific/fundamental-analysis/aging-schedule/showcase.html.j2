@@ -1,0 +1,19 @@
+{# The `aging-schedule` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five buckets, tones on the outliers, and a total row</h3>
+      {{ c.aging_schedule(rows=d.rows, buckets=d.buckets, total_row=d.total_row,
+               caption="Receivables ageing",
+               unit="USD millions") }}
+    </section>
+    <hr>
+    <section>
+      <h3>without the total row — where the reader is not offered a sum</h3>
+      {{ c.aging_schedule(rows=d.rows, buckets=d.buckets,
+               caption="Receivables ageing by counterparty",
+               unit="USD millions") }}
+    </section>
+{% endblock %}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>showcase audit</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; }
+  h1 { font-size: 1.3rem; }
+  #probe { width: 1100px; height: 2400px; border: 0;
+            position: absolute; left: -20000px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+  th, td { text-align: left; padding: .35rem .6rem;
+            border-bottom: 1px solid #ddd; vertical-align: top; }
+  th { background: #f4f4f4; }
+  td.kind { white-space: nowrap; font-family: ui-monospace, monospace; }
+  td.detail { font-family: ui-monospace, monospace; font-size: 12px;
+               word-break: break-word; }
+  .ok { color: #0a7c2f; }
+  .bad { color: #b00020; }
+  #summary { font-size: 1.05rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<h1>showcase audit</h1>
+<p id="summary">running…</p>
+<table id="out"><thead><tr>
+  <th>component</th><th>check</th><th>detail</th>
+</tr></thead><tbody></tbody></table>
+<iframe id="probe"></iframe>
+<script>
+const PAGES = [
+"charts/apache-echarts",
+"charts/area",
+"charts/bar",
+"charts/bar-negative",
+"charts/correlation-matrix",
+"charts/drawdown-curve",
+"charts/funnel-chart",
+"charts/gauge",
+"charts/line",
+"charts/pie",
+"charts/price-history",
+"charts/radar",
+"charts/sankey",
+"charts/scatter",
+"charts/smoothed-line",
+"charts/stacked-area",
+"charts/stacked-column",
+"charts/stacked-horizontal-bar",
+"charts/stacked-line",
+"charts/stacked-normalized",
+"charts/waterfall",
+"domain-specific/fundamental-analysis/aging-schedule",
+"domain-specific/fundamental-analysis/balance-sheet",
+"domain-specific/fundamental-analysis/capital-allocation",
+"domain-specific/fundamental-analysis/cash-flow-statement",
+"domain-specific/fundamental-analysis/catalyst-timeline",
+"domain-specific/fundamental-analysis/covenant-table",
+"domain-specific/fundamental-analysis/dcf-summary",
+"domain-specific/fundamental-analysis/debt-maturity",
+"domain-specific/fundamental-analysis/dupont",
+"domain-specific/fundamental-analysis/earnings-surprise",
+"domain-specific/fundamental-analysis/five-forces",
+"domain-specific/fundamental-analysis/footnote-disclosures",
+"domain-specific/fundamental-analysis/income-statement",
+"domain-specific/fundamental-analysis/ownership-table",
+"domain-specific/fundamental-analysis/peer-comparison",
+"domain-specific/fundamental-analysis/recommendation",
+"domain-specific/fundamental-analysis/security-header",
+"domain-specific/fundamental-analysis/segment-reporting",
+"domain-specific/fundamental-analysis/thesis-pillars",
+"domain-specific/fundamental-analysis/unit-economics",
+"domain-specific/fundamental-analysis/valuation-multiples",
+"domain-specific/fundamental-analysis/valuation-range",
+"domain-specific/fundamental-analysis/working-capital"
+];
+const ALLOWED = ["bps", "pts", "pt", "bn", "mn", "tn", "kg", "km", "sqft", "yoy", "qoq", "mom", "cagr", "year", "yr", "day", "hr"];
+const PAGE = "showcase.html";
+const SETTLE_MS = 700;   // charts draw after load; canvas needs a beat
+
+// ---------------------------------------------------------------- the checks
+
+// Every check answers the same question: is something outside the box that was
+// drawn for it? That is the class of defect a build cannot see.
+function checks(doc, win) {
+  const out = [];
+  const de = doc.documentElement;
+
+  // Guard first. If the stylesheet did not arrive, nothing below means
+  // anything -- an unstyled page overflows everywhere and would bury the
+  // real findings under noise.
+  const styled = win.getComputedStyle(doc.body).maxWidth !== 'none'
+              || doc.styleSheets.length > 0;
+  if (!styled) {
+    out.push(['assets-missing', 'no stylesheet applied; other checks skipped']);
+    return out;
+  }
+
+  // 1. The page itself scrolls sideways. This is what valuation-range did.
+  if (de.scrollWidth > de.clientWidth + 1) {
+    out.push(['page-overflow',
+      `scrollWidth ${de.scrollWidth} > clientWidth ${de.clientWidth}`]);
+  }
+
+  // 2. A percentage driving a width is outside 0..100. The library sets bar
+  // geometry through data-* attributes, so this reads the actual instruction
+  // rather than the result -- it fires even when the overflow is clipped
+  // away and never reaches check 1.
+  for (const el of doc.querySelectorAll('*')) {
+    for (const attr of el.attributes) {
+      if (!attr.name.startsWith('data-')) continue;
+      const m = /^(-?[\d.]+)%$/.exec(attr.value.trim());
+      if (!m) continue;
+      const n = parseFloat(m[1]);
+      if (n < 0 || n > 100) {
+        out.push(['pct-out-of-track',
+          `<${el.tagName.toLowerCase()} class="${el.className}"> `
+          + `${attr.name}="${attr.value}"`]);
+      }
+    }
+  }
+
+  // 3. Text clipped by its own container.
+  for (const el of doc.querySelectorAll('*')) {
+    if (el.children.length || !el.textContent.trim()) continue;
+    const cs = win.getComputedStyle(el);
+    if (cs.overflowX === 'visible') continue;
+    if (el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1) {
+      out.push(['clipped',
+        `<${el.tagName.toLowerCase()} class="${el.className}"> `
+        + `"${el.textContent.trim().slice(0, 40)}"`]);
+    }
+  }
+
+  // 4. A word run welded to a number -- "USD per share0", "78.4percent".
+  // Both directions, because the unit can land on either side, and a run of
+  // three lets "Q1" and "FY25" through without an allowlist entry each.
+  const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  for (let node; (node = walk.nextNode()); ) {
+    const tag = node.parentElement && node.parentElement.tagName;
+    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+    const text = node.nodeValue;
+    for (const hit of text.matchAll(/[a-z]{3,}\d|\d[a-z]{3,}/g)) {
+      const run = hit[0].replace(/[\d.]/g, '').toLowerCase();
+      if (ALLOWED.includes(run)) continue;
+      out.push(['glued-text', `"${hit[0]}" in "${text.trim().slice(0, 60)}"`]);
+    }
+  }
+  return out;
+}
+
+// ----------------------------------------------------------------- the walk
+
+const frame = document.getElementById('probe');
+const body = document.querySelector('#out tbody');
+const results = [];
+
+function row(component, kind, detail) {
+  const tr = body.insertRow();
+  tr.insertCell().textContent = component;
+  const k = tr.insertCell(); k.textContent = kind; k.className = 'kind';
+  const d = tr.insertCell(); d.textContent = detail; d.className = 'detail';
+}
+
+function load(url) {
+  return new Promise(resolve => {
+    frame.onload = () => setTimeout(resolve, SETTLE_MS);
+    frame.src = url;
+  });
+}
+
+(async () => {
+  for (const component of PAGES) {
+    const url = component + '/' + PAGE;
+    let found;
+    try {
+      await load(url);
+      found = checks(frame.contentDocument, frame.contentWindow);
+    } catch (e) {
+      found = [['unreadable', String(e)]];
+    }
+    for (const [kind, detail] of found) {
+      results.push({component, kind, detail});
+      row(component, kind, detail);
+    }
+  }
+  const summary = document.getElementById('summary');
+  const n = new Set(results.map(r => r.component)).size;
+  summary.textContent =
+    `${PAGES.length} showcase(s) checked, ${results.length} `
+    + `flag(s) across ${n} component(s)`;
+  summary.className = results.length ? 'bad' : 'ok';
+  // The result any caller reads -- a browser tool evaluates this, so the
+  // findings do not have to be scraped back out of the table.
+  window.__AUDIT__ = {done: true, checked: PAGES.length, results};
+})();
+</script>
+</body>
+</html>

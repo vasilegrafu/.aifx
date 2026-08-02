@@ -65,6 +65,35 @@ def assert_labels(component, where, labels):
          f"whichever came first")
 
 
+def assert_enum(component, where, value, allowed):
+    """A field whose value carries MEANING the CSS reads.
+
+    `tone`, `kind`, `status`, `verdict` -- a typo does not raise, it renders
+    unstyled, which reads as "neutral" rather than as "broken"."""
+    assert value in allowed, \
+        (f"{component}: {where} is {value!r}; one of "
+         f"{', '.join(map(repr, sorted(allowed)))}. An unrecognised value is "
+         f"not an error at render -- it just loses its styling")
+
+
+def assert_rows(component, where, rows, required, minimum=1):
+    """Every row is a dict carrying `required`, and there is at least one.
+
+    The shape check that comes before any judgement about the values: a row
+    missing a key raises at render under StrictUndefined, but a row that is not
+    a dict at all fails somewhere less obvious."""
+    assert isinstance(rows, list) and len(rows) >= minimum, \
+        f"{component}: {where} needs at least {minimum} row(s)"
+    for i, row in enumerate(rows):
+        assert isinstance(row, dict), \
+            (f"{component}: {where}[{i}] is {type(row).__name__}, not a dict")
+        missing = [k for k in required if k not in row]
+        assert not missing, \
+            (f"{component}: {where}[{i}] is missing {', '.join(missing)}; the "
+             f"view reads them and StrictUndefined would stop the build here "
+             f"with the template named instead of the row")
+
+
 def assert_all_drawn(component, d, calls):
     """Nothing in the context goes undrawn.
 

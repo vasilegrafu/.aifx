@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>covenant-table — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>covenant-table</h1>
+  </header>
+
+    <section>
+      <h3>a pass, a tight test and a breach — the three states side by side</h3>
+        <table class="fin fa-covenants">
+<caption>Covenant compliance <span class="macro-macro-asof">tested at 30 June 2026</span></caption>    <thead><tr><th>Covenant</th><th>Test</th><th>Limit</th><th>Actual</th><th>Headroom</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr class="fa-cov-pass">
+        <th scope="row">Net leverage</th>
+        <td class="fa-cov-test">Net debt / EBITDA</td>
+        <td>≤ 3.50x</td>
+        <td class="fa-cov-actual">0.42x</td>
+        <td>3.08x</td>
+        <td><span class="badge badge-good">pass</span></td>
+      </tr>
+      <tr class="fa-cov-tight">
+        <th scope="row">Interest cover</th>
+        <td class="fa-cov-test">EBITDA / interest</td>
+        <td>≥ 3.00x</td>
+        <td class="fa-cov-actual">3.24x</td>
+        <td>0.24x</td>
+        <td><span class="badge badge-warn">tight</span></td>
+      </tr>
+      <tr class="fa-cov-pass">
+        <th scope="row">Minimum liquidity</th>
+        <td class="fa-cov-test">Cash + undrawn RCF</td>
+        <td>≥ $2,000m</td>
+        <td class="fa-cov-actual">$14,347m</td>
+        <td>$12,347m</td>
+        <td><span class="badge badge-good">pass</span></td>
+      </tr>
+      <tr class="fa-cov-breach">
+        <th scope="row">Capex limit</th>
+        <td class="fa-cov-test">Annual capex</td>
+        <td>≤ $1,250m</td>
+        <td class="fa-cov-actual">$1,420m</td>
+        <td>-$170m</td>
+        <td><span class="badge badge-bad">breach</span></td>
+      </tr>
+    </tbody>
+  </table>
+<p class="fa-st-source">The capex limit is waived through FY27 under the March amendment.</p>
+    </section>
+    <hr>
+    <section>
+      <h3>all clear — what the table looks like when nothing is wrong</h3>
+        <table class="fin fa-covenants">
+<caption>Covenant compliance</caption>    <thead><tr><th>Covenant</th><th>Test</th><th>Limit</th><th>Actual</th><th>Headroom</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr class="fa-cov-pass">
+        <th scope="row">Net leverage</th>
+        <td class="fa-cov-test">Net debt / EBITDA</td>
+        <td>≤ 3.50x</td>
+        <td class="fa-cov-actual">0.42x</td>
+        <td>3.08x</td>
+        <td><span class="badge badge-good">pass</span></td>
+      </tr>
+      <tr class="fa-cov-pass">
+        <th scope="row">Minimum liquidity</th>
+        <td class="fa-cov-test">Cash + undrawn RCF</td>
+        <td>≥ $2,000m</td>
+        <td class="fa-cov-actual">$14,347m</td>
+        <td>$12,347m</td>
+        <td><span class="badge badge-good">pass</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+    </section>
+  </main>
+</body>
+</html>

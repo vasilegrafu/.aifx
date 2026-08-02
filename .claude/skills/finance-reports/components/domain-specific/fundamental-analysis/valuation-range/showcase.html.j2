@@ -1,0 +1,23 @@
+{# The `valuation-range` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>four methods and the traded price — the standard form</h3>
+      {{ c.valuation_range(rows=d.rows, price=d.price,
+               scale_min=d.scale_min, scale_max=d.scale_max,
+               price_label="$118",
+               caption="Valuation range by method, USD per share",
+               unit="$") }}
+    </section>
+    <hr>
+    <section>
+      <h3>two methods that barely overlap — where the spread is the finding</h3>
+      {{ c.valuation_range(rows=d.disputed, price=d.price,
+               scale_min=d.scale_min, scale_max=d.scale_max,
+               price_label="$118",
+               caption="Going concern against liquidation, USD per share",
+               unit="$") }}
+    </section>
+{% endblock %}

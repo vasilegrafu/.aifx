@@ -1,0 +1,20 @@
+{# The `income-statement` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>sections, a row note, and negatives the macro colours itself</h3>
+      {{ c.income_statement(rows=d.rows, periods=d.periods,
+               caption="Income statement",
+               unit="USD millions",
+               source="Company filings") }}
+    </section>
+    <hr>
+    <section>
+      <h3>the short form — no groupings, no notes, same component</h3>
+      {{ c.income_statement(rows=d.summary, periods=d.periods,
+               caption="Income statement, summarised",
+               unit="USD millions") }}
+    </section>
+{% endblock %}

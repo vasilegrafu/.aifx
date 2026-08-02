@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ownership-table — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>ownership-table</h1>
+  </header>
+
+    <section>
+      <h3>a summary above the top five holders, tones on the active movers</h3>
+        <dl class="fa-own-summary">
+    <div><dt>Institutional</dt><dd>68.4%</dd></div>
+    <div><dt>Insiders</dt><dd>1.2%</dd></div>
+    <div><dt>Retail and other</dt><dd>30.4%</dd></div>
+    <div><dt>Holders of record</dt><dd>2,841</dd></div>
+  </dl>
+  <table class="fin ownership">
+<caption>Ownership <span class="macro-macro-asof">as of 30 June 2026</span></caption>    <thead><tr><th>Holder</th><th>Type</th><th>Shares</th><th class="fa-own-stake-head">Stake</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Vanguard Group</th>
+        <td class="fa-own-type">Index</td>
+        <td>148.2m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="9.1%"></span></span>
+          <span class="fa-own-pct">9.1%</span>
+        </td>
+        <td>+0.4%</td>
+      </tr>
+      <tr>
+        <th scope="row">BlackRock</th>
+        <td class="fa-own-type">Index</td>
+        <td>132.6m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="8.2%"></span></span>
+          <span class="fa-own-pct">8.2%</span>
+        </td>
+        <td>+0.2%</td>
+      </tr>
+      <tr>
+        <th scope="row">State Street</th>
+        <td class="fa-own-type">Index</td>
+        <td>71.4m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="4.4%"></span></span>
+          <span class="fa-own-pct">4.4%</span>
+        </td>
+        <td>0.0%</td>
+      </tr>
+      <tr>
+        <th scope="row">Fidelity</th>
+        <td class="fa-own-type">Active</td>
+        <td>54.9m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="3.4%"></span></span>
+          <span class="fa-own-pct">3.4%</span>
+        </td>
+        <td class="tone-good">+2.8%</td>
+      </tr>
+      <tr>
+        <th scope="row">Capital Group</th>
+        <td class="fa-own-type">Active</td>
+        <td>38.1m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="2.3%"></span></span>
+          <span class="fa-own-pct">2.3%</span>
+        </td>
+        <td class="tone-bad">-6.1%</td>
+      </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <hr>
+    <section>
+      <h3>the holders alone — without the summary, the concentration is unanchored</h3>
+        <table class="fin ownership">
+<caption>Top holders</caption>    <thead><tr><th>Holder</th><th>Type</th><th>Shares</th><th class="fa-own-stake-head">Stake</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Vanguard Group</th>
+        <td class="fa-own-type">Index</td>
+        <td>148.2m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="9.1%"></span></span>
+          <span class="fa-own-pct">9.1%</span>
+        </td>
+        <td>+0.4%</td>
+      </tr>
+      <tr>
+        <th scope="row">BlackRock</th>
+        <td class="fa-own-type">Index</td>
+        <td>132.6m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="8.2%"></span></span>
+          <span class="fa-own-pct">8.2%</span>
+        </td>
+        <td>+0.2%</td>
+      </tr>
+      <tr>
+        <th scope="row">State Street</th>
+        <td class="fa-own-type">Index</td>
+        <td>71.4m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="4.4%"></span></span>
+          <span class="fa-own-pct">4.4%</span>
+        </td>
+        <td>0.0%</td>
+      </tr>
+      <tr>
+        <th scope="row">Fidelity</th>
+        <td class="fa-own-type">Active</td>
+        <td>54.9m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="3.4%"></span></span>
+          <span class="fa-own-pct">3.4%</span>
+        </td>
+        <td class="tone-good">+2.8%</td>
+      </tr>
+      <tr>
+        <th scope="row">Capital Group</th>
+        <td class="fa-own-type">Active</td>
+        <td>38.1m</td>
+        <td class="fa-own-stake">
+          <span class="fa-own-track"><span class="fa-own-fill" data-pct="2.3%"></span></span>
+          <span class="fa-own-pct">2.3%</span>
+        </td>
+        <td class="tone-bad">-6.1%</td>
+      </tr>
+    </tbody>
+  </table>
+
+    </section>
+  </main>
+</body>
+</html>

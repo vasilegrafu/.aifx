@@ -1,0 +1,10 @@
+{# The `footnote-disclosures` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>four disclosures, two flagged for attention</h3>
+      {{ c.footnote_disclosures(items=d.items, caption="Notes to the accounts") }}
+    </section>
+{% endblock %}

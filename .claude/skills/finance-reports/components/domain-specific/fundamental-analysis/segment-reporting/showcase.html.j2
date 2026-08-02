@@ -1,0 +1,19 @@
+{# The `segment-reporting` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>revenue only, with a total row — the common case</h3>
+      {{ c.segment_reporting(rows=d.rows, total_row=d.total_row,
+               caption="Revenue by segment, FY25",
+               unit="USD millions") }}
+    </section>
+    <hr>
+    <section>
+      <h3>with profit and margin — where share of revenue and share of profit diverge</h3>
+      {{ c.segment_reporting(rows=d.with_profit,
+               caption="Segment revenue and profitability, FY25",
+               unit="USD millions") }}
+    </section>
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>working-capital — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>working-capital</h1>
+  </header>
+
+    <section>
+      <h3>three periods with a total row — the standard cycle table</h3>
+        <table class="fin fa-workcap">
+<caption>Working capital cycle</caption>    <thead><tr><th>Metric</th><th>FY23</th><th>FY24</th><th>FY25</th><th class="trend-head">Trend</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Days sales outstanding</th>
+<td>52</td><td>56</td><td>61</td>        <td class="trend trend-up">▲</td>
+      </tr>
+      <tr>
+        <th scope="row">Days inventory outstanding</th>
+<td>88</td><td>84</td><td>79</td>        <td class="trend trend-down">▼</td>
+      </tr>
+      <tr>
+        <th scope="row">Days payable outstanding</th>
+<td>41</td><td>44</td><td>44</td>        <td class="trend trend-flat">▬</td>
+      </tr>
+      <tr class="fa-wc-total">
+        <th scope="row">Cash conversion cycle</th>
+<td>99</td><td>96</td><td>96</td>        <td class="trend trend-flat">▬</td>
+      </tr>
+    </tbody>
+  </table>
+<p class="fa-st-source">Days, and the direction is a judgement: DPO rising is favourable.</p>
+    </section>
+    <hr>
+    <section>
+      <h3>no caption — the bare table under an existing heading</h3>
+        <table class="fin fa-workcap">
+    <thead><tr><th>Metric</th><th>FY23</th><th>FY24</th><th>FY25</th><th class="trend-head">Trend</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Days sales outstanding</th>
+<td>52</td><td>56</td><td>61</td>        <td class="trend trend-up">▲</td>
+      </tr>
+      <tr>
+        <th scope="row">Days inventory outstanding</th>
+<td>88</td><td>84</td><td>79</td>        <td class="trend trend-down">▼</td>
+      </tr>
+      <tr>
+        <th scope="row">Days payable outstanding</th>
+<td>41</td><td>44</td><td>44</td>        <td class="trend trend-flat">▬</td>
+      </tr>
+      <tr class="fa-wc-total">
+        <th scope="row">Cash conversion cycle</th>
+<td>99</td><td>96</td><td>96</td>        <td class="trend trend-flat">▬</td>
+      </tr>
+    </tbody>
+  </table>
+
+    </section>
+  </main>
+</body>
+</html>

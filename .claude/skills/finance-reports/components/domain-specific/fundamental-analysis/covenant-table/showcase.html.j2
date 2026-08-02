@@ -1,0 +1,17 @@
+{# The `covenant-table` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a pass, a tight test and a breach — the three states side by side</h3>
+      {{ c.covenant_table(rows=d.rows, asof="30 June 2026",
+               caption="Covenant compliance",
+               note="The capex limit is waived through FY27 under the March amendment.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>all clear — what the table looks like when nothing is wrong</h3>
+      {{ c.covenant_table(rows=d.clean, caption="Covenant compliance") }}
+    </section>
+{% endblock %}

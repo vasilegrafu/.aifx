@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aging-schedule — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>aging-schedule</h1>
+  </header>
+
+    <section>
+      <h3>five buckets, tones on the outliers, and a total row</h3>
+        <table class="fin aging">
+<caption>Receivables ageing <span class="fa-st-unit">USD millions</span></caption>    <thead><tr><th>Counterparty</th><th>Current</th><th>1 – 30</th><th>31 – 60</th><th>61 – 90</th><th>90+</th><th>Total</th><th class="fa-aging-share-head">Overdue</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Distributor A</th>
+<td>1,240</td><td>310</td><td>88</td><td>24</td><td>6</td>        <td class="fa-aging-total">1,668</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill" data-pct="25.7%"></span></span>
+          <span class="fa-aging-pct">25.7%</span>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">Distributor B</th>
+<td>880</td><td>142</td><td>36</td><td>0</td><td>0</td>        <td class="fa-aging-total">1,058</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill" data-pct="16.8%"></span></span>
+          <span class="fa-aging-pct">16.8%</span>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">OEM C</th>
+<td>610</td><td>204</td><td>155</td><td>92</td><td>71</td>        <td class="fa-aging-total">1,132</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill fa-aging-fill-bad" data-pct="46.1%"></span></span>
+          <span class="fa-aging-pct">46.1%</span>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">OEM D</th>
+<td>1,905</td><td>58</td><td>0</td><td>0</td><td>0</td>        <td class="fa-aging-total">1,963</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill fa-aging-fill-good" data-pct="3.0%"></span></span>
+          <span class="fa-aging-pct">3.0%</span>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot><tr class="total"><th scope="row">Total</th><td>4,635</td><td>714</td><td>279</td><td>116</td><td>77</td></tr></tfoot>
+  </table>
+
+    </section>
+    <hr>
+    <section>
+      <h3>without the total row — where the reader is not offered a sum</h3>
+        <table class="fin aging">
+<caption>Receivables ageing by counterparty <span class="fa-st-unit">USD millions</span></caption>    <thead><tr><th>Counterparty</th><th>Current</th><th>1 – 30</th><th>31 – 60</th><th>61 – 90</th><th>90+</th><th>Total</th><th class="fa-aging-share-head">Overdue</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Distributor A</th>
+<td>1,240</td><td>310</td><td>88</td><td>24</td><td>6</td>        <td class="fa-aging-total">1,668</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill" data-pct="25.7%"></span></span>
+          <span class="fa-aging-pct">25.7%</span>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">Distributor B</th>
+<td>880</td><td>142</td><td>36</td><td>0</td><td>0</td>        <td class="fa-aging-total">1,058</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill" data-pct="16.8%"></span></span>
+          <span class="fa-aging-pct">16.8%</span>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">OEM C</th>
+<td>610</td><td>204</td><td>155</td><td>92</td><td>71</td>        <td class="fa-aging-total">1,132</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill fa-aging-fill-bad" data-pct="46.1%"></span></span>
+          <span class="fa-aging-pct">46.1%</span>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">OEM D</th>
+<td>1,905</td><td>58</td><td>0</td><td>0</td><td>0</td>        <td class="fa-aging-total">1,963</td>
+        <td class="fa-aging-share">
+          <span class="fa-aging-track"><span class="fa-aging-fill fa-aging-fill-good" data-pct="3.0%"></span></span>
+          <span class="fa-aging-pct">3.0%</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+    </section>
+  </main>
+</body>
+</html>

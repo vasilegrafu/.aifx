@@ -1,0 +1,19 @@
+{# The `dcf-summary` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the projection with its assumptions beside it — the only honest form</h3>
+      {{ c.dcf_summary(rows=d.rows, periods=d.years, assumptions=d.assumptions,
+               caption="Discounted cash flow",
+               unit="USD millions") }}
+    </section>
+    <hr>
+    <section>
+      <h3>the projection alone — what a DCF looks like without its inputs</h3>
+      {{ c.dcf_summary(rows=d.rows, periods=d.years,
+               caption="Discounted cash flow, assumptions omitted",
+               unit="USD millions") }}
+    </section>
+{% endblock %}

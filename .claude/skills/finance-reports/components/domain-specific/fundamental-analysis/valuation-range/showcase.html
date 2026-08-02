@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>valuation-range — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.2.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>valuation-range</h1>
+  </header>
+
+    <section>
+      <h3>four methods and the traded price — the standard form</h3>
+        <figure class="fa-valrange">
+<figcaption>Valuation range by method, USD per share</figcaption>    <div class="fa-valrange-rows">
+      <div class="fa-valrange-row">
+        <span class="fa-valrange-method">DCF, 9% WACC</span>
+        <span class="fa-valrange-track">
+          <span class="fa-valrange-bar" data-lo="61.25%" data-span="21.25%"></span>
+<span class="fa-valrange-mark" data-at="74.0%"></span>        </span>
+        <span class="fa-valrange-value">$98 – $132</span>
+      </div>
+      <div class="fa-valrange-row">
+        <span class="fa-valrange-method">EV / EBITDA, peer median</span>
+        <span class="fa-valrange-track">
+          <span class="fa-valrange-bar" data-lo="46.25%" data-span="19.38%"></span>
+<span class="fa-valrange-mark" data-at="74.0%"></span>        </span>
+        <span class="fa-valrange-value">$74 – $105</span>
+      </div>
+      <div class="fa-valrange-row">
+        <span class="fa-valrange-method">P/E, 5-year average</span>
+        <span class="fa-valrange-track">
+          <span class="fa-valrange-bar" data-lo="55.0%" data-span="20.62%"></span>
+<span class="fa-valrange-mark" data-at="74.0%"></span>        </span>
+        <span class="fa-valrange-value">$88 – $121</span>
+      </div>
+      <div class="fa-valrange-row">
+        <span class="fa-valrange-method">Sum of the parts</span>
+        <span class="fa-valrange-track">
+          <span class="fa-valrange-bar" data-lo="68.75%" data-span="28.75%"></span>
+<span class="fa-valrange-mark" data-at="74.0%"></span>        </span>
+        <span class="fa-valrange-value">$110 – $156</span>
+      </div>
+    </div>
+    <p class="fa-valrange-axis"><span>$0</span><span class="fa-valrange-price">$118</span><span>$160</span></p>
+  </figure>
+
+    </section>
+    <hr>
+    <section>
+      <h3>two methods that barely overlap — where the spread is the finding</h3>
+        <figure class="fa-valrange">
+<figcaption>Going concern against liquidation, USD per share</figcaption>    <div class="fa-valrange-rows">
+      <div class="fa-valrange-row">
+        <span class="fa-valrange-method">DCF, 9% WACC</span>
+        <span class="fa-valrange-track">
+          <span class="fa-valrange-bar" data-lo="61.25%" data-span="21.25%"></span>
+<span class="fa-valrange-mark" data-at="74.0%"></span>        </span>
+        <span class="fa-valrange-value">$98 – $132</span>
+      </div>
+      <div class="fa-valrange-row">
+        <span class="fa-valrange-method">Liquidation value</span>
+        <span class="fa-valrange-track">
+          <span class="fa-valrange-bar" data-lo="25.62%" data-span="10.62%"></span>
+<span class="fa-valrange-mark" data-at="74.0%"></span>        </span>
+        <span class="fa-valrange-value">$41 – $58</span>
+      </div>
+    </div>
+    <p class="fa-valrange-axis"><span>$0</span><span class="fa-valrange-price">$118</span><span>$160</span></p>
+  </figure>
+
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{# The `security-header` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five facts with an as-of date — the report cover</h3>
+      {{ c.security_header(ticker="AMD", name="Advanced Micro Devices, Inc.",
+               exchange="NASDAQ", asof="02 August 2026", facts=d.facts) }}
+    </section>
+    <hr>
+    <section>
+      <h3>two facts, no exchange — a thinly covered name</h3>
+      {{ c.security_header(ticker="XYZ", name="Example Holdings plc",
+               asof="02 August 2026", facts=d.sparse) }}
+    </section>
+{% endblock %}

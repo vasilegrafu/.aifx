@@ -1,0 +1,17 @@
+{# The `ownership-table` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a summary above the top five holders, tones on the active movers</h3>
+      {{ c.ownership_table(summary=d.summary, rows=d.rows,
+               caption="Ownership",
+               asof="30 June 2026") }}
+    </section>
+    <hr>
+    <section>
+      <h3>the holders alone — without the summary, the concentration is unanchored</h3>
+      {{ c.ownership_table(rows=d.rows, caption="Top holders") }}
+    </section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{# The `working-capital` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three periods with a total row — the standard cycle table</h3>
+      {{ c.working_capital(rows=d.rows, periods=d.periods,
+               caption="Working capital cycle",
+               note="Days, and the direction is a judgement: DPO rising is favourable.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>no caption — the bare table under an existing heading</h3>
+      {{ c.working_capital(rows=d.rows, periods=d.periods) }}
+    </section>
+{% endblock %}

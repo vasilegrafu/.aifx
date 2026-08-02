@@ -1,0 +1,19 @@
+{# The `capital-allocation` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five uses against the cash that funded them</h3>
+      {{ c.capital_allocation(rows=d.rows, periods=d.periods, source_line=d.source_line,
+               caption="Capital allocation, three years",
+               unit="USD millions") }}
+    </section>
+    <hr>
+    <section>
+      <h3>the uses alone — without the source, the shares are unanchored</h3>
+      {{ c.capital_allocation(rows=d.rows, periods=d.periods,
+               caption="Capital deployed",
+               unit="USD millions") }}
+    </section>
+{% endblock %}
