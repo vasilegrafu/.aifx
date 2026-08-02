@@ -1,7 +1,12 @@
 # aifx-finance
 
-**A versioned toolbox for Claude Code — skills and agents in one public repo,
-dropped into any project.**
+**A versioned toolbox for Claude Code — skills in one public repo, dropped into
+any project.**
+
+Today that is one skill, `finance-reports`: a component library of 109
+components, each with a built showcase page, and the report engine that builds
+documents out of them. `.claude/agents/` exists and is empty — the shelf is
+declared, nothing is on it yet.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 

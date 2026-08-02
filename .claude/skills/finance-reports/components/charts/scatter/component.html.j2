@@ -32,14 +32,21 @@
 {%   set _ = x_axis.update({"name": x_name, "nameLocation": "middle",
                             "nameGap": 28}) %}
 {% endif %}
+{# Points are POSITIONAL [x, y], so the y magnitudes have to be pulled out
+   before the gap can be derived from them -- see `axis_gap` in
+   _showcase_controller.py. The x name needs no such treatment: it sits BELOW
+   its labels, where nothing is competing for the space. #}
+{% set _ys = [] %}
+{% for s in series %}{% for p in s.points %}{% set _ = _ys.append(p[1]) %}{% endfor %}{% endfor %}
+{% set _gap = _ys | axis_gap %}
 {% set y_axis = {"type": "value", "scale": true} %}
 {% if y_name %}
 {%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
-                            "nameGap": 46, "nameRotate": 90}) %}
+                            "nameGap": _gap, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {
      "tooltip": {"trigger": "item"},
-     "grid": {"left": (46 if y_name else 8), "right": 16,
+     "grid": {"left": (_gap if y_name else 8), "right": 16,
               "bottom": (34 if x_name else 8), "containLabel": true},
      "xAxis": x_axis,
      "yAxis": y_axis,

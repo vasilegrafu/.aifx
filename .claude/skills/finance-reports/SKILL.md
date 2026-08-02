@@ -59,7 +59,21 @@ python components/showcase_builder.py charts/bar
 python components/showcase_builder.py --all        # rebuild every showcase
 python components/showcase_builder.py --check      # verify each is current
 python components/showcase_builder.py --missing    # components with none yet
+python components/showcase_audit.py                # the page that checks them
 ```
+
+**`showcase_audit.py` generates a page, it does not print a verdict.** Serve the
+repo and open it: it walks every showcase in an iframe and reports what a build
+cannot see — page-level horizontal overflow, a percentage driving a width
+outside 0..100, text clipped by its container, and a word run welded to a
+number. All four are LAYOUT facts that exist only once a browser has applied
+the CSS, which is how three of them shipped past a clean build.
+
+It is a **review prompt, not a gate**. Some flags are fine, and it cannot see a
+chart that is merely wrong — only one that has left its box. The collision it
+specifically cannot see is an axis NAME drawn over its own tick labels, because
+both are SVG text inside the chart and nothing overflows anything; that one is
+handled by `axis_gap` instead.
 
 There is **no top-level dispatcher**. Each directory owns the engine that
 builds what lives in it, and neither knows the other exists as a command.
@@ -304,7 +318,7 @@ and since Jinja runs only at build time the failure costs nothing and reaches
 no reader.
 
 **Assertions live in the controller** because that is the only place with the
-arithmetic. `financial-profile` carries 14: cost + gross == revenue,
+arithmetic. `financial-profile` carries 13: cost + gross == revenue,
 liabilities + equity == assets, each sankey summing to its own table, the
 segment bridge reaching its endpoint. They exist because **a diagram that does
 not conserve draws perfectly and lies** — a sankey scales each node's ribbons
@@ -319,27 +333,24 @@ The two are not the same job. `_build_context` asserts the **arithmetic** —
 that a sankey conserves, that a bridge reaches its endpoint — and lives with
 the derivation that produces it. `_validate_context` asserts the **contract
 with the view**, which the arithmetic knows nothing about. `financial-profile`
-carries both: 13 identities in the derivation, and a `READS` tuple of the 47
+carries both: 13 identities in the derivation, and a `READS` tuple of the 48
 `d.*` names its recipe touches.
 
-The checks worth writing are about agreement between values, not presence:
-
-- **length** — a series pairs to categories BY INDEX, and ECharts complains
-  about neither a short list nor a long one. The chart draws; the difference is
-  simply not there to see.
-- **finiteness** — `NaN` and the infinities are `float` instances, so they pass
-  every type check and reach `| tojson`, which writes them into the `<pre>`
-  unquoted. That is not JSON, so the browser's `JSON.parse` throws and the page
-  shows **no chart at all**.
-- **collisions** — a repeated category is two ticks a reader cannot tell apart;
-  two series sharing a name collapse into one legend key. Names must be unique
-  *within one call*, not globally: `bar` legitimately draws two different
-  single-series charts both named `FY24`.
-- **drift** — anything in the context that no section draws is data left behind
-  by a view that changed.
+**The checks worth writing are about agreement between values, not presence** —
+length against its own categories, finiteness, name collisions, and data no
+section draws. All four are implemented once in `components/_contracts.py` and
+the failure each one prevents is written up in `components/REFERENCE.md`; a
+component writes only the checks that are its own.
 
 `showcase` is the only thing that renders without an API key, and it covers
 components, not reports.
+
+**A CLEAN BUILD IS NOT A CORRECT PAGE.** Everything above runs before the
+browser does, and three defects have shipped past all of it — bars running out
+of their track, a unit welded to a number, clipped axis labels. Those are
+LAYOUT facts that exist only once the CSS has been applied.
+`components/showcase_audit.py` is the pass that looks for them, and even it
+cannot see a chart that is merely wrong.
 
 ## Credentials
 

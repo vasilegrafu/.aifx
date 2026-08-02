@@ -30,4 +30,14 @@
                height=320,
                note="Naming sixteen points would bury the one thing visible here: the slope.") }}
     </section>
+    <hr>
+    <section>
+      <h3>wide values — the y gap is derived from the pairs, not from a flat list</h3>
+      {{ c.scatter(series=[d.by_size],
+               caption="Revenue against R&D intensity",
+               x_name="R&D / revenue (%)",
+               y_name="Revenue (USD m)",
+               height=320,
+               note="Same six companies as the first chart, with revenue on y instead of ROIC. The ticks now read 60,000 rather than 62.9, and the axis name moves out to clear them.") }}
+    </section>
 {% endblock %}

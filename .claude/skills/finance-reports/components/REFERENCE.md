@@ -191,6 +191,44 @@ matter are relative:
   `bar` legitimately draws two single-series charts both named `FY24`.
 - **drift** — anything in the context no section draws is data left behind.
 
+### `_contracts.py` — the checks, written once
+
+Those four are the same relation whatever component is asking, and ten of the
+charts share one contract exactly:
+
+```
+series[] {name:str, points:num[]}   categories: str[]
+```
+
+Copied into ten files that would be ten claims about one contract, free to
+disagree the moment one of them learned something. `_contracts.py` holds them
+instead — `assert_series_categories`, `assert_numbers`, `assert_labels`,
+`assert_enum`, `assert_rows`, `assert_all_drawn` — so a lesson is learned once.
+
+Two that are not obvious from their names:
+
+- `assert_numbers` rejects `bool` as well as non-finite values. `bool` is an
+  `int` in Python, so `True` would draw as 1; and an integer past
+  `Number.MAX_SAFE_INTEGER` arrives rounded, because the page parses its data
+  with `JSON.parse` where every number is a float64.
+- `assert_all_drawn` runs BACKWARDS, from the context to the calls. Every other
+  check runs from the calls to the context, which is why this is the one that
+  notices a section the view renamed or data orphaned by one it deleted.
+
+A component still writes the checks only IT can make — `area` capping
+overlapping fills at two, `sankey` conserving flow, `bridge` reaching its own
+endpoint — beside a call to these.
+
+### What none of them can see
+
+All of the above runs before a browser does. A page whose markup is valid and
+whose numbers agree can still be **wrong on screen**: bars past their track, a
+unit welded to a number, clipped labels, an axis name over its own ticks.
+`showcase_audit.py` generates a page that walks every showcase in an iframe and
+checks the first three. The fourth is not detectable that way — both texts are
+SVG inside the chart and nothing overflows anything — so it is handled at
+render time by the `axis_gap` filter instead.
+
 ## The catalogue
 
 ```bash

@@ -31,6 +31,12 @@ class ChartBarShowcaseController(ShowcaseController):
         by_segment = {"name": "FY24", "points": [22.1, 14.7, 3.2, 5.4]}
         margin_by_segment = {"name": "FY24", "points": [31.2, 88.4, 9.1, 24.7]}
 
+        # THE SAME SEGMENTS IN $m RATHER THAN $bn. Nothing about the chart
+        # changes except the width of its tick labels -- which is exactly the
+        # state a fixed nameGap got wrong: 46px is right for "22.1" and draws
+        # straight through "22,100".
+        in_millions = {"name": "FY24", "points": [22100, 14700, 3200, 5400]}
+
         return {
             "quarters": quarters,
             "segments": segments,
@@ -39,6 +45,7 @@ class ChartBarShowcaseController(ShowcaseController):
             "fy23": fy23,
             "by_segment": by_segment,
             "margin_by_segment": margin_by_segment,
+            "in_millions": in_millions,
         }
 
     def _validate_context(self, d):
@@ -47,7 +54,7 @@ class ChartBarShowcaseController(ShowcaseController):
 
             series[] {name:str, points:num[]}   categories: str[]
 
-        CALLS is the four <section>s of showcase.html.j2, one entry each, read
+        CALLS is the five <section>s of showcase.html.j2, one entry each, read
         as categories -> the series drawn against them. PER SECTION rather
         than grouped by axis, because the two checks that matter are both
         relative: points against ITS categories, and names against the OTHER
@@ -58,6 +65,7 @@ class ChartBarShowcaseController(ShowcaseController):
             ("quarters", ("fy24", "fy23")),
             ("segments", ("by_segment",)),
             ("segments", ("margin_by_segment",)),
+            ("segments", ("in_millions",)),
         ))
 
 

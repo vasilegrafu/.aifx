@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>stacked-column — showcase</title>
   <link rel="stylesheet" href="../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.4.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.5.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.4.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.5.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -168,6 +168,92 @@
 }
   </pre>
   <p class="chart-note">NVDA is one segment wearing a company; INTC is the opposite.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>wide values — the gap follows the column total, not the tallest segment</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 66,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        16600,
+        47500,
+        15500,
+        6400,
+        28200
+      ],
+      "name": "Data centre",
+      "stack": "total",
+      "type": "bar"
+    },
+    {
+      "data": [
+        14600,
+        3100,
+        30100,
+        24700,
+        4900
+      ],
+      "name": "Client",
+      "stack": "total",
+      "type": "bar"
+    },
+    {
+      "data": [
+        3500,
+        1400,
+        8200,
+        5100,
+        12600
+      ],
+      "name": "Embedded",
+      "stack": "total",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD, millions",
+    "text": "Revenue by segment, in millions"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "AMD",
+      "NVDA",
+      "INTC",
+      "QCOM",
+      "AVGO"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "Revenue (USD m)",
+    "nameGap": 66,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Identical mix to the chart above, in millions. NVDA's tallest segment is 47,500 but its column reaches 52,000 — the ticks spell out the total, so that is what the gap is derived from.</p>
 
 
     </section>

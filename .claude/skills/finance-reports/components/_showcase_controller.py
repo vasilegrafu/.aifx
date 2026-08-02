@@ -138,10 +138,65 @@ def f_fmt(value, spec="num", *a, **kw):
     return FORMATS[spec](value, *a, **kw)
 
 
+#: Pixels per tick-label character, and the smallest gap worth reserving.
+#: Measured against the chart font rather than calculated: the axis font is
+#: ~11px and its digits are tabular, so 7px a character is close and errs wide.
+_AXIS_CHAR_PX = 7
+_AXIS_GAP_FLOOR = 46
+
+
+def f_axis_gap(values, stacked=False, floor=_AXIS_GAP_FLOOR):
+    """Left margin for a ROTATED Y-AXIS NAME, in pixels.
+
+    THE BUG THIS EXISTS FOR. ECharts' `containLabel` reserves room for tick
+    LABELS but not for the axis NAME, which sits at a fixed `nameGap` from the
+    axis. A hardcoded 46 is right for "12.1" and draws straight through
+    "60,000" — the chart renders, nothing raises, and the two texts simply
+    overlap. `waterfall` hit it first; ten other charts carried the same
+    constant against data that had not yet grown wide enough.
+
+    It is a FUNCTION rather than ten copies of the arithmetic because the
+    Jinja to express it is fiddly (a stacked axis reaches the column TOTAL,
+    not the largest point) and ten copies of fiddly arithmetic is ten chances
+    to get it subtly different.
+
+    `values` is either a flat list of numbers or the `series` list itself —
+    [{"name": …, "points": [...]}, …]. With `stacked=True` the magnitude is
+    the per-category sum, because that is where the axis actually reaches.
+    Mixed signs sum as absolutes, which OVER-estimates: erring wide costs a
+    few pixels of margin, erring narrow costs a collision.
+    """
+    rows = [row["points"] if isinstance(row, dict) else row for row in values]
+    if not rows:
+        return floor
+
+    def numbers(row):
+        return [v for v in row if isinstance(v, (int, float))
+                and not isinstance(v, bool)]
+
+    if not isinstance(rows[0], (list, tuple)):
+        magnitudes = [abs(v) for v in numbers(rows)]
+    elif stacked:
+        width = max(len(row) for row in rows)
+        magnitudes = [sum(abs(v) for row in rows
+                          for v in numbers(row[i:i + 1]))
+                      for i in range(width)]
+    else:
+        magnitudes = [abs(v) for row in rows for v in numbers(row)]
+
+    if not magnitudes:
+        return floor
+    # The widest tick as it is PRINTED: its digits, plus one character for
+    # each thousands separator the formatter will insert.
+    digits = len(str(int(max(magnitudes)))) or 1
+    characters = digits + (digits - 1) // 3
+    return max(floor, 24 + characters * _AXIS_CHAR_PX)
+
+
 #: What the env exposes. Derived from FORMATS rather than restated, so the two
 #: cannot drift — `fmt` dispatches over exactly the names available directly.
 #: `raw` comes along as the identity filter, which is what it already meant.
-FILTERS = {**FORMATS, "fmt": f_fmt}
+FILTERS = {**FORMATS, "fmt": f_fmt, "axis_gap": f_axis_gap}
 
 
 @cache

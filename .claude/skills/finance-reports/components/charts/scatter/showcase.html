@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>scatter — showcase</title>
   <link rel="stylesheet" href="../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.4.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.5.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.4.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.5.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -466,6 +466,131 @@
 }
   </pre>
   <p class="chart-note">Naming sixteen points would bury the one thing visible here: the slope.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>wide values — the y gap is derived from the pairs, not from a flat list</h3>
+        <pre class="chart apache-echarts" hidden data-height="320">
+{
+  "grid": {
+    "bottom": 34,
+    "containLabel": true,
+    "left": 66,
+    "right": 16,
+    "top": 52
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AMD",
+          "value": [
+            23.4,
+            22680
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "NVDA",
+          "value": [
+            8.6,
+            60922
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "INTC",
+          "value": [
+            26.1,
+            54228
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "QCOM",
+          "value": [
+            19.8,
+            35820
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AVGO",
+          "value": [
+            12.2,
+            35819
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "TXN",
+          "value": [
+            15.4,
+            17519
+          ]
+        }
+      ],
+      "name": "Semiconductors",
+      "type": "scatter"
+    }
+  ],
+  "title": {
+    "text": "Revenue against R\u0026D intensity"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "xAxis": {
+    "name": "R\u0026D / revenue (%)",
+    "nameGap": 28,
+    "nameLocation": "middle",
+    "scale": true,
+    "type": "value"
+  },
+  "yAxis": {
+    "name": "Revenue (USD m)",
+    "nameGap": 66,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "scale": true,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Same six companies as the first chart, with revenue on y instead of ROIC. The ticks now read 60,000 rather than 62.9, and the axis name moves out to clear them.</p>
 
 
     </section>

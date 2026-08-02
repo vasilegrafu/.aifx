@@ -43,11 +43,20 @@ class ChartScatterShowcaseController(ShowcaseController):
             [24.6, 33.8], [27.2, 30.1], [29.8, 38.4], [7.3, 6.2],
             [12.6, 12.9], [18.1, 17.4], [23.7, 22.8]]}
 
-        return {"semis": semis, "software": software, "unlabelled": unlabelled}
+        # Y IN ABSOLUTE DOLLARS rather than a ratio. Points here are
+        # POSITIONAL [x, y], so the y magnitudes have to be pulled out of the
+        # pairs before the axis gap can be derived from them -- the one call
+        # site where the shape of the data is not a plain list of numbers.
+        by_size = {"name": "Semiconductors", "points": [
+            [23.4, 22680, "AMD"], [8.6, 60922, "NVDA"], [26.1, 54228, "INTC"],
+            [19.8, 35820, "QCOM"], [12.2, 35819, "AVGO"], [15.4, 17519, "TXN"]]}
+
+        return {"semis": semis, "software": software,
+                "unlabelled": unlabelled, "by_size": by_size}
 
     def _validate_context(self, d):
         """Points are POSITIONAL, so the checks are about length and order."""
-        for key in ("semis", "software", "unlabelled"):
+        for key in ("semis", "software", "unlabelled", "by_size"):
             s = d[key]
             assert isinstance(s.get("name"), str) and s["name"], \
                 f"scatter: {key!r} needs a non-empty name; it labels the legend"

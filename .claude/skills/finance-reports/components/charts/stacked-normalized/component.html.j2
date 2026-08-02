@@ -49,6 +49,10 @@
 {% endfor %}
 {# `max: 100` pins the axis. Without it ECharts fits the axis to the data, and
    a column that rounds to 99.99 quietly rescales the whole chart. #}
+{# 46 STAYS HARDCODED HERE, and that is deliberate: `max: 100` pins the axis,
+   so the widest tick this chart can ever print is "100" -- three characters,
+   comfortably inside the floor. Deriving a constant would only hide that the
+   constant is safe. #}
 {% set y_axis = {"type": "value", "max": 100} %}
 {% if y_name %}
 {%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",

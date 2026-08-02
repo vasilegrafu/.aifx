@@ -13,14 +13,19 @@
 {%   set _ = built.append({"type": "bar", "name": s.name, "stack": "total",
                            "data": s.points}) %}
 {% endfor %}
+{# The axis NAME sits at a fixed offset and `containLabel` does NOT
+   reserve room for it, so a hardcoded gap collides with the tick labels the
+   moment the values get wide. Derived from the widest tick instead --
+   `axis_gap` in _showcase_controller.py has the reasoning. #}
+{% set _gap = series | axis_gap(stacked=true) %}
 {% set y_axis = {"type": "value"} %}
 {% if y_name %}
 {%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
-                            "nameGap": 46, "nameRotate": 90}) %}
+                            "nameGap": _gap, "nameRotate": 90}) %}
 {% endif %}
 {% set option = {
      "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-     "grid": {"left": (46 if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
+     "grid": {"left": (_gap if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
      "xAxis": {"type": "category", "data": categories},
      "yAxis": y_axis,
      "series": built,

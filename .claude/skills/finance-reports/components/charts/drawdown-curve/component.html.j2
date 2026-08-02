@@ -21,6 +21,9 @@
    name sits mid-axis because ECharts puts it at the end — into the title.
    The markPoint pin must hold the full signed value ("-18.75"); at the default
    size it truncates, and a marker showing a wrong number is worse than none. #}
+{# 46 STAYS HARDCODED HERE: `max: 0` and a drawdown floor of -100 bound the
+   axis, so the widest tick is "-100". Nothing this chart can be given makes
+   it collide. #}
 {% set option = {
      "tooltip": {"trigger": "axis"},
      "grid": {"left": 42, "right": 16,

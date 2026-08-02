@@ -36,4 +36,13 @@
                y_name="Operating margin (%)",
                note="License carries the business; hardware dilutes it.") }}
     </section>
+    <hr>
+    <section>
+      <h3>wide values — the axis name gap widens to clear the ticks</h3>
+      {{ c.bar(series=[d.in_millions], categories=d.segments,
+               caption="Segment revenue, in millions",
+               unit="USD, millions",
+               y_name="USD (millions)",
+               note="The same four segments as above. Only the tick width changed, and the gap between the axis name and the ticks is derived from it.") }}
+    </section>
 {% endblock %}

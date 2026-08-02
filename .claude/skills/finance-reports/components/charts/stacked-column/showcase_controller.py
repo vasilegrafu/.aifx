@@ -35,8 +35,18 @@ class ChartStackedColumnShowcaseController(ShowcaseController):
         embedded = {"name": "Embedded",
                     "points": [3.5, 1.4, 8.2, 5.1, 12.6]}
 
+        # THE SAME MIX IN $m. A stacked axis reaches the COLUMN TOTAL, not the
+        # tallest segment -- NVDA's largest segment is 47,500 but its column
+        # is 52,000, and it is the column the ticks have to spell out.
+        dc_m = {"name": "Data centre", "points": [16600, 47500, 15500, 6400, 28200]}
+        client_m = {"name": "Client", "points": [14600, 3100, 30100, 24700, 4900]}
+        embedded_m = {"name": "Embedded", "points": [3500, 1400, 8200, 5100, 12600]}
+
         return {
             "peers": peers,
+            "dc_m": dc_m,
+            "client_m": client_m,
+            "embedded_m": embedded_m,
             "data_center": data_center,
             "client": client,
             "embedded": embedded,
@@ -50,6 +60,7 @@ class ChartStackedColumnShowcaseController(ShowcaseController):
         assert_series_categories("stacked-column", d, (
             ("peers", ("data_center", "client")),
             ("peers", ("data_center", "client", "embedded")),
+            ("peers", ("dc_m", "client_m", "embedded_m")),
         ))
 
 
