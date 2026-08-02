@@ -2,8 +2,8 @@
 
     ReportBuilder().build("financial-profile", ["INTC", "--peers", "none"], out)
 
-    python reports/report_builder.py financial-profile INTC --peers none --out DIR
-    python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
+    python .claude/skills/finance-reports/reports/report_builder.py financial-profile INTC \n        --peers none --out DIR
+    python .claude/skills/finance-reports/reports/report_builder.py financial-profile INTC \n        --peers AMD,NVDA --out DIR
 
 A NAME, not a path: a report sits under its SUBJECT (`company/…`), and the
 domain is a taxonomy for readers, so nobody running one should have to know
@@ -163,8 +163,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="report_builder.py",
         description="build a report from live data",
-        epilog="example: python reports/report_builder.py financial-profile "
-               "INTC --peers AMD,NVDA --out DIR")
+        epilog=f"example: python .claude/skills/finance-reports/reports/report_builder.py "
+               f"financial-profile INTC --peers AMD,NVDA --out DIR")
     parser.add_argument("report", help="report name, e.g. financial-profile")
     parser.add_argument("--out", required=True,
                         help="output directory. Required and with no default: "

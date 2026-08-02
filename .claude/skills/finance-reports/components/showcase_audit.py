@@ -1,6 +1,6 @@
 """Generate the audit page — every showcase checked in one browser load.
 
-    python components/showcase_audit.py        ->  Path to showcase_audit.html
+    python .claude/skills/finance-reports/components/showcase_audit.py  ->  showcase_audit.html
 
 Then serve the repo and open it. The page walks every showcase in an iframe
 and reports what a build cannot see.

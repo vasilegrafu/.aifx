@@ -122,9 +122,11 @@ The one place the question is already answered is a test — see below.
 ## Testing a report
 
 ```bash
-python reports/report_test_runner.py --list      # what exists, and the cost
-python reports/report_test_runner.py financial-profile
-python reports/report_test_runner.py --all
+S=.claude/skills/finance-reports        # from the PROJECT ROOT — see ../SKILL.md
+
+python $S/reports/report_test_runner.py --list      # what exists, and the cost
+python $S/reports/report_test_runner.py financial-profile
+python $S/reports/report_test_runner.py --all
 ```
 
 **The test sits beside the report**, as `report_test.py`. A directory holding
@@ -299,9 +301,9 @@ never restated in code.
 ## The engine
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --out DIR
-python reports/report_builder.py financial-profile MU --peers INTC,WDC --out DIR
-python reports/report_builder.py financial-profile --help    # the REPORT's args
+python $S/reports/report_builder.py financial-profile MU --peers none --out DIR
+python $S/reports/report_builder.py financial-profile MU --peers INTC,WDC --out DIR
+python $S/reports/report_builder.py financial-profile --help    # the REPORT's args
 ```
 
 Addressed by **name**, not path — and the two no longer coincide, since a
@@ -374,7 +376,7 @@ never wrote raises at render.
 ## The catalogue
 
 ```bash
-python reports/catalog_builder.py       # -> reports/CATALOG.md
+python $S/reports/catalog_builder.py    # -> reports/CATALOG.md
 ```
 
 `usage.md` answers *"should I run THIS one?"* once you have a candidate. The
@@ -405,8 +407,8 @@ with one report and expensive to backfill across a dozen.
    `c.<macro>(...)` calls carrying `d.*`. No arithmetic, no I/O. **The
    `{# purpose: … #}` header is required** — the build checks it.
 3. `reports/<domain>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
-4. **`python reports/catalog_builder.py`** — nothing calls it for you.
-5. `python reports/report_builder.py <name> … --out DIR`
+4. **`python $S/reports/catalog_builder.py`** — nothing calls it for you.
+5. `python $S/reports/report_builder.py <name> … --out DIR`
 
 Nothing to register. Building requires the network and `FMP_API_KEY` — see
 `../service_providers/REFERENCE.md` for the client and the credential order.
@@ -416,5 +418,5 @@ here, so a report added without step 4 leaves `CATALOG.md` short by one.
 `--check` makes that loud:
 
 ```bash
-python reports/catalog_builder.py --check      # exit 1 if stale, writes nothing
+python $S/reports/catalog_builder.py --check   # exit 1 if stale, writes nothing
 ```

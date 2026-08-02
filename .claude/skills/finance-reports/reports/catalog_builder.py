@@ -2,7 +2,7 @@
 
     CatalogBuilder().build()  ->  Path to reports/CATALOG.md
 
-    python reports/catalog_builder.py
+    python .claude/skills/finance-reports/reports/catalog_builder.py
 
 The twin of components/catalog_builder.py, one level up: usage.md tells you
 whether to run THIS report; nothing told you which to consider. Choosing wrong
@@ -31,7 +31,14 @@ SKILL_DIR = REPORTS_DIR.parent
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
+from _paths import CDN_SUFFIX                                   # noqa: E402
 from reports.report_builder import ReportBuilder                # noqa: E402
+
+#: How to invoke these from the PROJECT ROOT, where a session starts. Derived
+#: from where the skill actually sits, so a copy under another name still
+#: prints commands that run.
+COMMAND = f"python {CDN_SUFFIX}/reports/catalog_builder.py"
+BUILD_COMMAND = f"python {CDN_SUFFIX}/reports/report_builder.py"
 
 PAGE = "CATALOG.md"
 USAGE = "usage.md"
@@ -55,8 +62,7 @@ class CatalogBuilder:
         if check:
             current = output.read_text(encoding="utf-8") if output.exists() else ""
             if current != content:
-                raise SystemExit(f"{PAGE} is out of date. Run: python "
-                                 f"reports/catalog_builder.py")
+                raise SystemExit(f"{PAGE} is out of date. Run: {COMMAND}")
             return output
         output.write_text(content, encoding="utf-8")
         return output
@@ -73,14 +79,14 @@ class CatalogBuilder:
             "",
             "_Every report, by what it argues. **Generated** from each report's "
             "own_",
-            "_declarations — do not edit; run `python reports/catalog_builder.py`._",
+            f"_declarations — do not edit; run `{COMMAND}`._",
             "",
             f"{len(found)} report{'' if len(found) == 1 else 's'}. Narrow to a "
             "candidate here, then read its `usage.md` for what",
             "it fetches, what that costs, and what its assertions guarantee.",
             "",
             "```bash",
-            "python reports/report_builder.py <report> <args...> --out DIR",
+            f"{BUILD_COMMAND} <report> <args...> --out DIR",
             "```",
             "",
             "| report | title | what it argues | arguments | docs |",
@@ -134,7 +140,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="catalog_builder.py",
         description="regenerate reports/CATALOG.md from what each report declares",
-        epilog="example: python reports/catalog_builder.py")
+        epilog=f"example: {COMMAND}")
     parser.add_argument("--check", action="store_true",
                         help="do not write; exit 1 if CATALOG.md is out of date")
     args = parser.parse_args(argv)

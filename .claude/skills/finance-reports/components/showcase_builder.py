@@ -2,7 +2,7 @@
 
     ShowcaseBuilder().build("charts/bar")  ->  Path to showcase.html
 
-    python components/showcase_builder.py charts/bar
+    python .claude/skills/finance-reports/components/showcase_builder.py charts/bar
 
 A path rather than a name, because that is the whole address: it says where
 the controller is, where the view is, and where the page goes. Nothing here
@@ -35,10 +35,16 @@ SKILL_DIR = COMPONENTS_DIR.parent
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
+from _paths import CDN_SUFFIX                          # noqa: E402
 from components._showcase_controller import (          # noqa: E402
     MARKUP, PAGE, VIEW, ShowcaseController)
 
 CONTROLLER = "showcase_controller.py"
+
+#: How to invoke this from the PROJECT ROOT, where a session starts. Derived
+#: from where the skill actually sits, so a copy under another name still
+#: prints a command that runs.
+COMMAND = f"python {CDN_SUFFIX}/components/showcase_builder.py"
 
 
 class ShowcaseBuilder:
@@ -92,7 +98,7 @@ class ShowcaseBuilder:
             raise SystemExit(
                 f"{len(stale)} showcase page(s) out of date:\n" +
                 "\n".join(f"  {p}" for p in stale) +
-                f"\nRun: python components/showcase_builder.py --all")
+                f"\nRun: {COMMAND} --all")
         return built
 
     def _render(self, path: str) -> str:
@@ -166,7 +172,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="showcase_builder.py",
         description="render a component's showcase.html from its controller "
                     "and view",
-        epilog="example: python components/showcase_builder.py charts/bar")
+        epilog=f"example: {COMMAND} charts/bar")
     # Plain hyphens in anything PRINTED: stdout is cp1252 on Windows, where an
     # em dash encodes to 0x97 and the console shows a replacement character.
     # Docstrings keep theirs — those are read in an editor, which is UTF-8.

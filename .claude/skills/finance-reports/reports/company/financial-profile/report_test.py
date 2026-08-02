@@ -1,7 +1,8 @@
 """Test - `financial-profile` for AMD, with NVDA and INTC as peers.
 
-    python reports/report_test_runner.py financial-profile
-    python reports/company/financial-profile/report_test.py   # or run it alone
+    python .claude/skills/finance-reports/reports/report_test_runner.py financial-profile
+    python .claude/skills/finance-reports/reports/company/financial-profile/report_test.py
+        # ... or run it alone
 
 Exercises the skill END TO END: environment resolution, the FMP client, the
 arithmetic assertions in `_build_context`, the view's `READS` contract,

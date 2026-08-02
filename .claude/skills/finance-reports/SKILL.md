@@ -23,19 +23,19 @@ output would be editing a build artifact.
 
 ## Documentation map
 
-| where | what |
+| where | read it when |
 |---|---|
-| **this file** | the shape, the contracts, how to add things |
-| `components/CATALOG.md` | **all of them by what they are for** — start here to choose one, generated |
-| `components/REFERENCE.md` | the library and its showcase engine: `env()`, the `c` namespace, filters, path-loading |
-| `reports/CATALOG.md` | **every report by what it argues** — start here to choose one, generated |
-| `reports/REFERENCE.md` | the report engine: the four stages, the controller contract, where the guarantees come from |
-| `css/REFERENCE.md` | the stylesheet: `@layer` order, module map, theming |
-| `js/REFERENCE.md` | the runtime: modules, chart frame, the failure states |
-| `service_providers/REFERENCE.md` | the only code doing I/O: the client, credentials, why it raises and never caches |
-| `service_providers/fmp/endpoints.md` | which FMP endpoints exist, and which the plan allows |
-| `components/<cat>/<name>/usage.md` | one per component: when to use it, and the rules |
-| `reports/<domain>/<name>/usage.md` | one per report: what it argues, what it fetches, what it guarantees |
+| **this file** | always — the shape, the contracts, how to add things |
+| `components/CATALOG.md` | **choosing a component** — all of them by what they are for, generated |
+| `reports/CATALOG.md` | **choosing a report** — every one by what it argues, generated |
+| `components/<cat>/<name>/usage.md` | **before using or changing that component** — its rules |
+| `reports/<domain>/<name>/usage.md` | **before running that report** — what it argues, fetches and costs |
+| `components/REFERENCE.md` | writing a showcase, or a macro/filter/`c`-namespace question |
+| `reports/REFERENCE.md` | writing a report controller, or asking where a guarantee comes from |
+| `css/REFERENCE.md` | before touching any `.css` — the `@layer` order decides what wins |
+| `js/REFERENCE.md` | a chart renders blank, a page has no JS, or a module needs adding |
+| `service_providers/REFERENCE.md` | credentials will not resolve, or a fetch is behaving oddly |
+| `service_providers/fmp/endpoints.md` | you need an endpoint no report uses yet — check the plan allows it |
 
 **Every directory that owns an engine owns a `REFERENCE.md`**, so it can be
 read on its own — the documentation form of the rule the code already follows.
@@ -51,31 +51,50 @@ build costs (~13 calls, no cache), and which of its numbers are asserted rather
 than merely computed. None of that is inferable from the controller quickly
 enough to be worth re-deriving each time.
 
-## CLI
+## Requirements
+
+Python 3.11+ and two libraries: Jinja renders every template, httpx is the only
+thing that touches the network. Nothing here builds the published CSS or JS —
+those are served raw from the git tag.
 
 ```bash
-python reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
-python reports/report_test_runner.py --list        # tests, and what they cost
-python reports/report_test_runner.py --all         # each builds for REAL
-python components/showcase_builder.py charts/bar
-python components/showcase_builder.py --all        # rebuild every showcase
-python components/showcase_builder.py --check      # verify each is current
-python components/showcase_builder.py --missing    # components with none yet
-python components/showcase_audit.py                # the page that checks them
+python -m venv .venv
+.venv/Scripts/pip install "jinja2>=3.1.4" "httpx>=0.27.0"   # .venv/bin/pip elsewhere
 ```
 
-**`showcase_audit.py` generates a page, it does not print a verdict.** Serve the
-repo and open it: it walks every showcase in an iframe and reports what a build
-cannot see — page-level horizontal overflow, a percentage driving a width
-outside 0..100, text clipped by its container, and a word run welded to a
-number. All four are LAYOUT facts that exist only once a browser has applied
-the CSS, which is how three of them shipped past a clean build.
+A **linked** skill reads its configuration from the clone it was linked from. A
+**copied** one is a real file tree in someone else's project: it needs those two
+libraries installed there, and the four root files listed under **Credentials**
+below created there, because nothing above `.claude/skills/<name>/` travels
+with a copy.
 
-It is a **review prompt, not a gate**. Some flags are fine, and it cannot see a
-chart that is merely wrong — only one that has left its box. The collision it
-specifically cannot see is an axis NAME drawn over its own tick labels, because
-both are SVG text inside the chart and nothing overflows anything; that one is
-handled by `axis_gap` instead.
+## CLI
+
+**Every command below is written from the PROJECT ROOT** — the directory holding
+`.claude/`, which is where a session starts. `python` means the project venv's
+interpreter (`.venv/Scripts/python.exe` on Windows, `.venv/bin/python`
+elsewhere); a system interpreter has no Jinja and fails on the first import.
+
+```bash
+S=.claude/skills/finance-reports
+
+python $S/reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
+python $S/reports/report_test_runner.py --list        # tests, and what they cost
+python $S/reports/report_test_runner.py --all         # each builds for REAL
+python $S/components/showcase_builder.py charts/bar
+python $S/components/showcase_builder.py --all        # rebuild every showcase
+python $S/components/showcase_builder.py --check      # verify each is current
+python $S/components/showcase_builder.py --missing    # components with none yet
+python $S/components/showcase_audit.py                # the page that checks them
+```
+
+**Only the script path is relative to where you stand.** Everything inside the
+tools derives from `__file__` — which component, which report, where the output
+goes — so no argument and no result depends on the working directory.
+
+**`showcase_audit.py` generates a page, it does not print a verdict.** Serve the
+repo and open it; what it can and cannot see is under **What guards the output**
+below, and in full in `components/REFERENCE.md`.
 
 There is **no top-level dispatcher**. Each directory owns the engine that
 builds what lives in it, and neither knows the other exists as a command.
@@ -86,14 +105,11 @@ every page in the tree at once. `--check` writes nothing and names every stale
 page, so the answer to "did I regenerate them?" is an exit code rather than a
 memory.
 
-A showcase is addressed by its **directory path**, a report by its **name**,
-since components nest two to four levels. A report sits under its subject
-(`company/financial-profile`), but that domain is shelving for a reader rather
-than part of the address — discovery is recursive, so the name alone still
-finds it, and a name must therefore be unique across every domain. Neither is a
-registry lookup: the address IS where the controller, the view and the output
-live. Every path derives from `__file__`, so both commands work from any
-working directory.
+A showcase is addressed by its **directory path** (components nest two to four
+levels), a report by its **name** alone — its domain is shelving for a reader,
+not part of the address, so a name must be unique across every domain. Neither
+is a registry lookup: the address IS where the controller, the view and the
+output live.
 
 `--out` is required and has no default. The page's local asset href is computed
 relative to it, so a report built without naming its destination would link its
@@ -133,7 +149,7 @@ the shape of an unset flag.**
 Each engine prints the arguments its own reports declare:
 
 ```bash
-python reports/report_builder.py financial-profile --help   # symbol, --peers
+python $S/reports/report_builder.py financial-profile --help   # symbol, --peers
 ```
 
 ## The shape — both sides are the same three files
@@ -191,8 +207,8 @@ Both outputs are **build artifacts** and both are overwritten without asking.
 The controller and the view are the source; a report regenerated from the same
 symbol is the same report with newer numbers.
 
-`_fetch` and `_build_context` never touch each other. One place does I/O; the
-derivation is a pure `payloads -> dict`, which is what lets its 13 identity
+`_fetch` and `_build_context` never touch each other — one place does I/O, and
+the derivation is a pure `payloads -> dict`, which is what lets its identity
 assertions be read on their own with no request in the middle.
 
 ### Which way the arrow points
@@ -203,11 +219,8 @@ filters they format with, and the asset pair every page links. `reports/`
 **borrows** them — `env()` is module-level and `@cache`d, because it belongs to
 the library rather than to whoever is rendering. So a macro that draws on a
 showcase page draws identically in a report: it is the same env, not two
-configurations that happen to match.
-
-Building that env parses every component template in the tree. Cached once it
-costs ~0.5s on the first call and nothing after; built per controller it would
-cost that once per component.
+configurations that happen to match. What that caching costs and why it is
+module-level is in `components/REFERENCE.md`.
 
 **Reports depend on components, never the reverse.** That is why `components/`
 builds its own showcases without knowing reports exist. It imports exactly one
@@ -230,27 +243,16 @@ subclass in it, call `build()`. It **raises** rather than returning a code,
 because a showcase asked for by name and not built is a mistake worth stopping
 for.
 
-**It finds the class rather than deriving its name.** `charts/bar` holding
-`ChartBarShowcaseController` is a convention worth keeping, but computing one
-from the other would make the convention load-bearing — and a category that
-pluralizes (`charts` → `Chart`) already shows how that goes wrong. A subclass
-of `ShowcaseController` in the module is unambiguous.
+**It finds the class rather than deriving its name**, and it **path-loads**
+rather than importing — the first so a naming convention never becomes
+load-bearing, the second because an `import` statement cannot name a folder
+with a hyphen and most of this tree has one. `components/REFERENCE.md` has both
+in full.
 
-**Path-loading is what removed the old hyphen constraint.** An `import`
-statement cannot name a folder with a hyphen, which once disqualified
-most components — `domain-specific/fundamental-analysis/*` is blocked twice
-before you reach the component at all. Loading by path has no such rule, so
-every component is reachable by the same one notation.
-
-Two things the loader must get right, both verified:
-
-- the module is registered in `sys.modules` before it executes. Plain
-  `importlib` path-loading skips this, and then a class cannot be resolved back
-  to its file.
-- the base is imported **package-qualified** — `from components._showcase_controller
-  import …` — by the builder and by every leaf. Reached under two names it
-  would be two module objects: `issubclass` would fail against the wrong one,
-  and each copy would build its own env.
+Two things the loader must get right — register the module in `sys.modules`
+*before* executing it, and import the base **package-qualified** — and both are
+load-bearing enough that `components/REFERENCE.md` writes up the failure each
+one produces. Copy the preamble below rather than reconstructing them.
 
 ## Layout
 
@@ -287,9 +289,8 @@ service_providers/fmp/            the client — the ONLY thing doing I/O
 ```
 
 `_showcase_controller.py` is one file because each part of it has exactly one
-consumer inside the others: a filter nothing hangs on a template is
-unreachable, and the asset hrefs exist only to be passed to a render. It has no
-imports outside the standard library and Jinja.
+consumer inside the others — a filter nothing hangs on a template is
+unreachable. It imports nothing outside the standard library and Jinja.
 
 ## Assets — local first, CDN second
 
@@ -315,10 +316,8 @@ API key, so `_build_context`'s assertions and `StrictUndefined` fire during a re
 build and nowhere else.
 
 **`StrictUndefined` is the point.** A view reading a key its controller never
-produced would, by default, render an empty string — a tidy blank cell in an
-otherwise perfect table, which nobody notices. It raises at build time instead,
-and since Jinja runs only at build time the failure costs nothing and reaches
-no reader.
+produced would otherwise render an empty string — a tidy blank cell in an
+otherwise perfect table, which nobody notices. It raises at build time instead.
 
 **Assertions live in the controller** because that is the only place with the
 arithmetic. `financial-profile` carries 13: cost + gross == revenue,
@@ -332,18 +331,16 @@ template and no reader can catch.
 called by `build()` between the controller and the render, and it catches what
 `StrictUndefined` cannot: a key that is present and **wrong**.
 
-The two are not the same job. `_build_context` asserts the **arithmetic** —
-that a sankey conserves, that a bridge reaches its endpoint — and lives with
-the derivation that produces it. `_validate_context` asserts the **contract
-with the view**, which the arithmetic knows nothing about. `financial-profile`
-carries both: 13 identities in the derivation, and a `READS` tuple of the 48
-`d.*` names its recipe touches.
+The two are not the same job. `_build_context` asserts the **arithmetic** — a
+sankey conserving, a bridge reaching its endpoint — beside the derivation that
+produces it. `_validate_context` asserts the **contract with the view**, which
+the arithmetic knows nothing about. `financial-profile` carries both: 13
+identities, and a `READS` tuple of the 48 `d.*` names its recipe touches.
 
 **The checks worth writing are about agreement between values, not presence** —
 length against its own categories, finiteness, name collisions, and data no
-section draws. All four are implemented once in `components/_contracts.py` and
-the failure each one prevents is written up in `components/REFERENCE.md`; a
-component writes only the checks that are its own.
+section draws. All four live once in `components/_contracts.py`, which
+`components/REFERENCE.md` documents; a component writes only its own.
 
 `showcase` is the only thing that renders without an API key, and it covers
 components, not reports.
@@ -355,23 +352,49 @@ LAYOUT facts that exist only once the CSS has been applied.
 `components/showcase_audit.py` is the pass that looks for them, and even it
 cannot see a chart that is merely wrong.
 
+### When a build fails, and what NOT to do about it
+
+Every one of these has a wrong response that looks like progress. A build spends
+~13 live calls with nothing cached, so a retry is a decision, not a reflex.
+
+- **Credentials unresolved** — say which two places were checked, by the full
+  paths the error prints, and stop. Never write a key into a file, never pass
+  one on a command line, never retry with a guess.
+- **A ticker returns nothing** — say so and ask. Substituting a similar symbol
+  produces a report about a company nobody asked about, and it looks fine.
+- **An endpoint 200s with an empty body** — the build SUCCEEDS. Zeros satisfy
+  every identity, so the page renders flat and empty; `report_test_runner.py
+  <name>` and its per-section blank check are the only things that see it.
+  Re-running the build cannot clear it and costs another ~13 calls.
+- **Anything raised mid-`_fetch`** — the calls already spent are gone. Report
+  how many before retrying.
+- **`StrictUndefined` or an assertion** — the report is wrong, not the engine.
+  Fix the controller or the view; never loosen the check that caught it.
+
 ## Credentials
 
 This repository is **public**, and jsDelivr's `/gh/` path publishes it — a key
 committed anywhere under this directory is fetchable at a URL by anyone who
 guesses the path.
 
-**Three files beside `.claude/`, never inside it.** A skill is copied or linked
+**Four files beside `.claude/`, never inside it.** A skill is copied or linked
 as `.claude/skills/<name>/` and nothing above it, so a credential kept outside
-that subtree cannot travel with a copy of the skill:
+that subtree cannot travel with a copy of the skill — and neither can the other
+three, which is why a **copied** skill needs all four created in the consuming
+project before anything builds:
 
 ```
 <project>/
+  version.json         TRACKED     {"version": …, "cdn": …} — the pin every page carries
   environment.json     TRACKED     {"environment": "dev"} — which env this is
   config.<env>.json    TRACKED     api_url, and anything else not secret
   secrets.<env>.json   GITIGNORED  api_key, and nothing else
   .claude/skills/<name>/
 ```
+
+`version.json` is on that list because **every generated page links its assets
+to it** — `cdn_href()` reads it on every build, so a project without one cannot
+render a single showcase, let alone a report.
 
 **Two resolutions, both first-hit-wins, both with NO default:**
 
@@ -382,19 +405,16 @@ env:  $ENVIRONMENT   ->  environment.json     ->  hard error
 
 One declaration selects both `config.<env>.json` and `secrets.<env>.json`, so a
 run cannot read dev settings against a prod key. There is **no `--env` flag**
-and no third place either looks. Every build says what it resolved and from
-where, in full paths, before the ~13 calls:
+and no third place either looks. Every build prints what it resolved and from
+where, in full paths, before the ~13 calls.
 
-```
-environment: dev (from D:\...\environment.json)   config.dev.json, key from ...
-```
-
-**There is no template for `secrets.<env>.json`** — write it by hand from
-`README.md`. `.gitignore` matches `secrets.*.json` with **no exception**, so
-nothing by that name is trackable; a shipped template would need a negation,
-and `git.commit&push.bat` runs `git add .` against a public, CDN-served repo.
-For the same reason the environment file is **not** called `.env`: that name is
-where every tutorial tells you to put an API key, and it is tracked.
+**There is no template for `secrets.<env>.json`** — write the two lines by hand,
+`{ "fmp": { "api_key": "<your-fmp-api-key>" } }`. `.gitignore` matches
+`secrets.*.json` with **no exception**, so nothing by that name is trackable; a
+shipped template would need a negation, and `git.commit&push.bat` runs `git add
+.` against a public, CDN-served repo. For the same reason the environment file
+is **not** called `.env`: that is where every tutorial says to put a key, and it
+is tracked.
 
 Why declared rather than passed, why two environments, why per-FILE rather than
 per-field — **`service_providers/REFERENCE.md`**. It is written down once.
@@ -421,16 +441,14 @@ per-field — **`service_providers/REFERENCE.md`**. It is written down once.
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
-4. `python reports/report_builder.py <name> … --out DIR`
-5. `reports/<domain>/<name>/report_test.py` — declare `REPORT`, `ARGV` and
-   `CALLS`, then the checks only the finished PAGE can answer. The build asserts
-   its own arithmetic; what it cannot see is an empty one, since `0 + 0 == 0`
-   satisfies `cost + gross == revenue`. Copy the neighbour and change the three
-   constants. It writes to **`report_test_output/` beside itself**, so also add
-   that folder with a `.gitkeep` in it — `.gitignore` already covers the
-   contents of every one of them, and a new report therefore needs no new rule.
-   Not the system temp directory, which is on another drive on Windows: that
-   empties `local_href` and leaves the page linking the CDN alone.
+4. `python $S/reports/report_builder.py <name> … --out DIR`
+5. `reports/<domain>/<name>/report_test.py` — **copy the neighbour and change
+   `REPORT`, `ARGV` and `CALLS`**, then write the checks only the finished PAGE
+   can answer. The build asserts its own arithmetic; what it cannot see is an
+   empty page, since `0 + 0 == 0` satisfies `cost + gross == revenue`. Add a
+   `report_test_output/` folder beside it holding a `.gitkeep` — that is where
+   it writes, `.gitignore` already covers the contents of every one of them, and
+   the destination is not free to move (`reports/REFERENCE.md` says why).
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so
@@ -445,7 +463,10 @@ reading one meant regex-parsing the template you were about to render.
    `{% extends "_showcase.master.html.j2" %}`, one `<section>` per state worth
    seeing: the default, and the ones where the component has to make a decision
    (a legend appears past one series, an axis name widens the margin).
-3. `python components/showcase_builder.py <cat>/<name>`
+3. `python $S/components/showcase_builder.py <cat>/<name>`
+
+**Follow the skeleton in `components/REFERENCE.md`** — there is one showcase per
+component, and 109 written freehand is 109 dialects.
 
 There is no step registering it. `showcase.html` is a build artifact — the
 controller and the view are the source — but it is **tracked**, so a showcase
@@ -453,18 +474,10 @@ is viewable straight from the CDN without cloning anything. Regenerate it
 whenever you change the component or its controller, or the committed page
 describes a version of the component that no longer exists.
 
-Copy the preamble from `charts/bar/showcase_controller.py` — every leaf needs
-it, and it is the same in all of them, reports included:
-
-```python
-_SKILL_DIR = next(p for p in Path(__file__).resolve().parents
-                  if (p / "_paths.py").exists())
-```
-
-It locates the skill root by the **marker `_paths.py`**, never by counting
-parents: leaves sit two to four folders deep and a count is wrong at the next
-depth. The base is then imported package-qualified — reached under a second
-name it would be a second module object with its own cached `env()`.
+Copy the four-line `sys.path` preamble from `charts/bar/showcase_controller.py`.
+Every leaf needs it, reports included; it finds the skill root by the **marker
+`_paths.py`** rather than counting parents, because leaves sit two to four
+folders deep and a count is wrong at the next depth.
 
 ## The shape of a usage.md
 
@@ -481,12 +494,15 @@ _One italic line: what this is, and that this file is authoring guidance._
 What it is in two or three sentences. **Use when** … — and, where it earns its
 place, **not** for … .
 
-## Markup            (a component: the macro call and its parameters)
-## Build it          (a report: the command, the arguments, what they cost)
+### Markup          (a component: the macro call and its parameters)
+### Build it        (a report: the command, the arguments, what they cost)
 
-## Rules
+### Rules
 - The things a reader cannot infer from the code, each with its reason.
 ```
+
+*(Those are `##` in the real file — shown a level down here so they do not read
+as sections of THIS document.)*
 
 The heading names may vary where the item genuinely differs — a report has no
 markup and a component has no fetch — but **`## Rules` is not optional**. It is
@@ -494,47 +510,6 @@ the section that carries what the code cannot say: that a bar's axis starts at
 zero because length IS the value, that a peer group is chosen rather than
 screened. A `usage.md` without it is a description, and the code was already
 that.
-
-## The shape of a showcase
-
-A showcase is two files and they divide the same way a report does: the
-controller holds data and calls no macro, the view calls macros and holds no
-data. **Follow this skeleton** — there will be one per component, and 109 of
-them written freehand is 109 dialects.
-
-```python
-# showcase_controller.py — NAMED DATA, never per-state bundles.
-class ChartBarShowcaseController(ShowcaseController):
-    def _build_context(self) -> dict:
-        return {"quarters": [...], "revenue": {...}, "by_segment": {...}}
-```
-
-```jinja
-{# showcase.html.j2 — one <section> per state, <hr> between. #}
-{% extends "_showcase.master.html.j2" %}
-{% block content %}
-    <section>
-      <h3>two series — a legend appears, colour is never the only cue</h3>
-      {{ c.bar(series=[d.fy24, d.fy23], categories=d.quarters, ...) }}
-    </section>
-{% endblock %}
-```
-
-Three rules carry the weight:
-
-- **Show the states where the component DECIDES something** — a legend appears
-  past one series, an axis name widens the margin, a negative flips the tone,
-  an empty list has to say so. A second state that exercises no decision is a
-  second copy of the first.
-- **The `<h3>` names the decision, not the data.** "two series — a legend
-  appears" tells a reader what to look at; "another example" does not.
-- **Context keys read as what the data IS**, not which section uses it —
-  `by_segment`, not `example_3`. The view is then free to recombine them, and
-  a new state costs no controller change.
-
-Demo data is chosen, not invented: it should be the kind of thing the component
-exists for, at a plausible magnitude. A `bar` of `[1, 2, 3]` proves the macro
-runs and nothing else.
 
 ## House rules for components
 

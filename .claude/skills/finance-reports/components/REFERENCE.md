@@ -14,8 +14,8 @@ components/
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
   CATALOG.md                all 109 by purpose — generated, do not edit
   charts/            21     engine-backed charts (Apache ECharts)
-  domain-specific/   45     one analysis discipline owns it
-  foundational/      41     any document may use these
+  domain-specific/   33     one analysis discipline owns it
+  foundational/      53     any document may use these
   diagrams/  math/    2     the two other rendering subsystems
 ```
 
@@ -112,10 +112,15 @@ time the failure costs nothing and reaches no reader.
 ## The showcase engine
 
 ```bash
-python components/showcase_builder.py charts/bar
-python -m components.showcase_builder charts/bar
-python components/charts/bar/showcase_controller.py   # a leaf runs alone
+S=.claude/skills/finance-reports        # from the PROJECT ROOT — see ../SKILL.md
+
+python $S/components/showcase_builder.py charts/bar
+python $S/components/charts/bar/showcase_controller.py   # a leaf runs alone
+(cd $S && python -m components.showcase_builder charts/bar)
 ```
+
+The `-m` form is the only one that needs a working directory: it names a
+*package*, so it must run from the skill root. The other two name a file.
 
 Addressed by **directory path**, because components nest two to four levels and
 the path is the whole address: where the controller is, where the view is, where
@@ -167,6 +172,47 @@ Not `__file__` — that names the base module and would put every showcase in
 path-loaded controller. A code object carries its filename with it and needs no
 lookup, so a controller reached by import, by path, or run directly all land in
 the same place.
+
+## The shape of a showcase
+
+A showcase is two files and they divide the same way a report does: the
+controller holds data and calls no macro, the view calls macros and holds no
+data. **Follow this skeleton** — there is one per component, and 109 of them
+written freehand is 109 dialects.
+
+```python
+# showcase_controller.py — NAMED DATA, never per-state bundles.
+class ChartBarShowcaseController(ShowcaseController):
+    def _build_context(self) -> dict:
+        return {"quarters": [...], "revenue": {...}, "by_segment": {...}}
+```
+
+```jinja
+{# showcase.html.j2 — one <section> per state, <hr> between. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two series — a legend appears, colour is never the only cue</h3>
+      {{ c.bar(series=[d.fy24, d.fy23], categories=d.quarters, ...) }}
+    </section>
+{% endblock %}
+```
+
+Three rules carry the weight:
+
+- **Show the states where the component DECIDES something** — a legend appears
+  past one series, an axis name widens the margin, a negative flips the tone,
+  an empty list has to say so. A second state that exercises no decision is a
+  second copy of the first.
+- **The `<h3>` names the decision, not the data.** "two series — a legend
+  appears" tells a reader what to look at; "another example" does not.
+- **Context keys read as what the data IS**, not which section uses it —
+  `by_segment`, not `example_3`. The view is then free to recombine them, and
+  a new state costs no controller change.
+
+Demo data is chosen, not invented: it should be the kind of thing the component
+exists for, at a plausible magnitude. A `bar` of `[1, 2, 3]` proves the macro
+runs and nothing else.
 
 ## Validating a context
 
@@ -232,7 +278,7 @@ render time by the `axis_gap` filter instead.
 ## The catalogue
 
 ```bash
-python components/catalog_builder.py       # -> components/CATALOG.md
+python $S/components/catalog_builder.py    # -> components/CATALOG.md
 ```
 
 `usage.md` answers *"should I use THIS?"* once you have a candidate. Nothing
@@ -260,7 +306,7 @@ undocumented is the state the catalogue exists to make visible.
 3. Style it in the matching `css/` directory. **No `style=`, no `<style>`, no
    component sets its own colour.**
 4. Optionally add `showcase_controller.py` + `showcase.html.j2`.
-5. **`python components/catalog_builder.py`** — nothing calls it for you.
+5. **`python $S/components/catalog_builder.py`** — nothing calls it for you.
 
 Nothing to *register*, in any step. Step 5 is not registration: the catalogue
 is derived from what you already wrote, and regenerating it only publishes what
@@ -272,7 +318,7 @@ quietly short by one — the exact way the previous catalogue died. `--check`
 exists to make that loud:
 
 ```bash
-python components/catalog_builder.py --check   # exit 1 if stale, writes nothing
+python $S/components/catalog_builder.py --check   # exit 1 if stale, writes nothing
 ```
 
 Wire it into a pre-commit hook if you want it enforced rather than remembered.

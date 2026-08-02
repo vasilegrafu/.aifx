@@ -1,13 +1,13 @@
 # Reports — catalogue
 
 _Every report, by what it argues. **Generated** from each report's own_
-_declarations — do not edit; run `python reports/catalog_builder.py`._
+_declarations — do not edit; run `python .claude/skills/finance-reports/reports/catalog_builder.py`._
 
 1 report. Narrow to a candidate here, then read its `usage.md` for what
 it fetches, what that costs, and what its assertions guarantee.
 
 ```bash
-python reports/report_builder.py <report> <args...> --out DIR
+python .claude/skills/finance-reports/reports/report_builder.py <report> <args...> --out DIR
 ```
 
 | report | title | what it argues | arguments | docs |

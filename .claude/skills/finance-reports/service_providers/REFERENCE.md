@@ -193,8 +193,12 @@ name is trackable under any circumstance. A shipped `secrets.example.json`
 would need a negation to stay tracked, and the failure mode is not hypothetical
 here: `git.commit&push.bat` runs `git add .` against a repository that is
 public *and* served by jsDelivr. One mis-ordered line in `.gitignore` and a key
-is fetchable at a URL. Four lines of JSON written by hand from `README.md` are
-cheaper than that.
+is fetchable at a URL. Writing it by hand is cheaper than that, and it is two
+lines:
+
+```json
+{ "fmp": { "api_key": "<your-fmp-api-key>" } }
+```
 
 A placeholder of the form `<...>` is still detected and rejected by name at
 build time, rather than being sent to the API so the reader has to work

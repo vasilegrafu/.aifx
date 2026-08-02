@@ -58,6 +58,15 @@ def cdn_href() -> str:
     THE OBLIGATION THIS CREATES: change anything under css/ or js/ and the
     version has to be bumped and tagged, or pages falling back to the CDN keep
     getting the previous behaviour while local ones move on."""
+    # A COPIED skill lands in a project that has none of the four root files,
+    # and this is the first one any build touches -- so it is where an install
+    # that skipped them gets caught. Unhandled, it is a FileNotFoundError
+    # naming a path the reader has never heard of.
+    if not VERSION_FILE.exists():
+        sys.exit(f'{VERSION_FILE} not found -- every generated page pins its '
+                 f'assets to it. Create it beside .claude/:\n'
+                 f'  {{"version": "1.0.0", "cdn": '
+                 f'"https://cdn.jsdelivr.net/gh/<owner>/<repo>@{{version}}"}}')
     info = json.loads(VERSION_FILE.read_text(encoding="utf-8"))
     cdn, version = info.get("cdn"), info["version"]
     if not cdn:

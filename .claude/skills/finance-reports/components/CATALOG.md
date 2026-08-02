@@ -1,7 +1,7 @@
 # Components — catalogue
 
 _Every component, by what it is for. **Generated** from the `{# purpose: … #}`_
-_header of each `component.html.j2` — do not edit; run `python components/catalog_builder.py`._
+_header of each `component.html.j2` — do not edit; run `python .claude/skills/finance-reports/components/catalog_builder.py`._
 
 109 components in 5 categories. Narrow to a candidate here, then read its `usage.md`
 for the rules and its parameters. The macro name is the folder name with hyphens

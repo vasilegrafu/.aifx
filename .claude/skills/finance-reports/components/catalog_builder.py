@@ -2,7 +2,7 @@
 
     CatalogBuilder().build()  ->  Path to components/CATALOG.md
 
-    python components/catalog_builder.py
+    python .claude/skills/finance-reports/components/catalog_builder.py
 
 WHY THIS IS GENERATED. An index of a hundred-odd items maintained by hand is an
 index that is wrong. Every component already declares what it is in the
@@ -32,7 +32,13 @@ SKILL_DIR = COMPONENTS_DIR.parent
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
+from _paths import CDN_SUFFIX                                          # noqa: E402
 from components._showcase_controller import MARKUP, VIEW, macro_name   # noqa: E402
+
+#: How to invoke this from the PROJECT ROOT, where a session starts. Derived
+#: from where the skill actually sits, so a copy under another name still
+#: prints a command that runs.
+COMMAND = f"python {CDN_SUFFIX}/components/catalog_builder.py"
 
 PAGE = "CATALOG.md"
 USAGE = "usage.md"
@@ -71,9 +77,7 @@ class CatalogBuilder:
         if check:
             current = output.read_text(encoding="utf-8") if output.exists() else ""
             if current != content:
-                raise SystemExit(
-                    f"{PAGE} is out of date. Run: python "
-                    f"components/catalog_builder.py")
+                raise SystemExit(f"{PAGE} is out of date. Run: {COMMAND}")
             return output
         output.write_text(content, encoding="utf-8")
         return output
@@ -90,8 +94,8 @@ class CatalogBuilder:
             "",
             "_Every component, by what it is for. **Generated** from the "
             "`{# purpose: … #}`_",
-            "_header of each `component.html.j2` — do not edit; run "
-            "`python components/catalog_builder.py`._",
+            f"_header of each `component.html.j2` — do not edit; run "
+            f"`{COMMAND}`._",
             "",
             f"{total} components in {len(found)} categories. Narrow to a "
             "candidate here, then read its `usage.md`",
@@ -178,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="catalog_builder.py",
         description="regenerate components/CATALOG.md from the purpose headers",
-        epilog="example: python components/catalog_builder.py")
+        epilog=f"example: {COMMAND}")
     parser.add_argument("--check", action="store_true",
                         help="do not write; exit 1 if CATALOG.md is out of date")
     args = parser.parse_args(argv)

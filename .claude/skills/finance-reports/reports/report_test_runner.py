@@ -1,8 +1,8 @@
 """Run the reports' tests, discovered rather than listed.
 
-    python reports/report_test_runner.py --list     what exists, and the cost
-    python reports/report_test_runner.py financial-profile
-    python reports/report_test_runner.py --all
+    python .claude/skills/finance-reports/reports/report_test_runner.py --list   what exists, and cost
+    python .claude/skills/finance-reports/reports/report_test_runner.py financial-profile
+    python .claude/skills/finance-reports/reports/report_test_runner.py --all
 
 NOTHING IS REGISTERED, and it is the same rule twice over. A directory holding
 `report.html.j2` IS a report; one that also holds `report_test.py` HAS a test -

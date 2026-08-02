@@ -16,9 +16,11 @@ this report describes, it does not argue a position.
 ## Build it
 
 ```bash
-python reports/report_builder.py financial-profile MU --peers none --out DIR
-python reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --out DIR
-python reports/report_builder.py financial-profile --help
+S=.claude/skills/finance-reports        # from the PROJECT ROOT — see ../../../SKILL.md
+
+python $S/reports/report_builder.py financial-profile MU --peers none --out DIR
+python $S/reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --out DIR
+python $S/reports/report_builder.py financial-profile --help
 ```
 
 | argument | required | notes |
