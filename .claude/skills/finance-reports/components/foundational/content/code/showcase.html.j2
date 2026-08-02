@@ -1,0 +1,26 @@
+{# The `code` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a Python sample</h3>
+      {% call c.code(lang=d.langs[0]) %}{% raw %}def shape(rows):
+    """Opening + movements must reach closing."""
+    opening = rows[0]["cells"]
+    closing = rows[-1]["cells"]
+    for i, (o, c) in enumerate(zip(opening, closing)):
+        moved = sum(r["cells"][i] for r in rows[1:-1])
+        assert abs(o + moved - c) < 0.01, f"column {i} does not close"
+{% endraw %}{% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>a template sample — the case that needs raw-wrapping</h3>
+      {% call c.code(lang=d.langs[1]) %}{% raw %}{% for r in rows %}
+  &lt;tr&gt;&lt;th&gt;{{ r.label }}&lt;/th&gt;
+    {% for v in r.cells %}&lt;td&gt;{{ v | fmt("money") }}&lt;/td&gt;{% endfor %}
+  &lt;/tr&gt;
+{% endfor %}{% endraw %}{% endcall %}
+    </section>
+{% endblock %}

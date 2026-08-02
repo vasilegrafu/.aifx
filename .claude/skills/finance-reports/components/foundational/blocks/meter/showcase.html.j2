@@ -1,0 +1,19 @@
+{# The `meter` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three meters against their targets</h3>
+      {% for m in d.meters %}{{ c.meter(label=m.label, value=m.value,
+               max=m.max, display=m.display) }}
+      {% endfor %}
+    </section>
+    <hr>
+    <section>
+      <h3>both ends of the scale — empty and full</h3>
+      {% for m in d.edges %}{{ c.meter(label=m.label, value=m.value,
+               max=m.max, display=m.display) }}
+      {% endfor %}
+    </section>
+{% endblock %}

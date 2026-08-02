@@ -50,6 +50,7 @@ const PAGES = [
 "charts/stacked-line",
 "charts/stacked-normalized",
 "charts/waterfall",
+"diagrams/mermaid",
 "domain-specific/fundamental-analysis/aging-schedule",
 "domain-specific/fundamental-analysis/balance-sheet",
 "domain-specific/fundamental-analysis/capital-allocation",
@@ -72,9 +73,73 @@ const PAGES = [
 "domain-specific/fundamental-analysis/unit-economics",
 "domain-specific/fundamental-analysis/valuation-multiples",
 "domain-specific/fundamental-analysis/valuation-range",
-"domain-specific/fundamental-analysis/working-capital"
+"domain-specific/fundamental-analysis/working-capital",
+"domain-specific/macro/cycle-position",
+"domain-specific/macro/macro-indicators",
+"domain-specific/portfolio/attribution",
+"domain-specific/portfolio/drawdown-table",
+"domain-specific/portfolio/exposure-bars",
+"domain-specific/portfolio/holdings-table",
+"domain-specific/portfolio/performance-table",
+"domain-specific/portfolio/risk-metrics",
+"domain-specific/portfolio/stress-test",
+"domain-specific/portfolio/trade-log",
+"foundational/blocks/acceptance-criteria",
+"foundational/blocks/approval-block",
+"foundational/blocks/badge",
+"foundational/blocks/bridge",
+"foundational/blocks/change-history",
+"foundational/blocks/composite-score",
+"foundational/blocks/funnel",
+"foundational/blocks/glossary",
+"foundational/blocks/heatmap",
+"foundational/blocks/kpi-tiles",
+"foundational/blocks/meter",
+"foundational/blocks/quadrant-map",
+"foundational/blocks/requirement",
+"foundational/blocks/revision-note",
+"foundational/blocks/risk-matrix",
+"foundational/blocks/scorecard",
+"foundational/blocks/timeline",
+"foundational/callouts/callout",
+"foundational/callouts/todo-marker",
+"foundational/content/code",
+"foundational/content/code-block",
+"foundational/content/cohort-table",
+"foundational/content/collapsible",
+"foundational/content/comparison-table",
+"foundational/content/expected-value",
+"foundational/content/figure",
+"foundational/content/metric-trend",
+"foundational/content/quote",
+"foundational/content/roll-forward",
+"foundational/content/sensitivity-table",
+"foundational/content/table",
+"foundational/content/variance-analysis",
+"foundational/front-back-matter/appendices",
+"foundational/front-back-matter/appendix",
+"foundational/front-back-matter/footnotes",
+"foundational/front-back-matter/references",
+"foundational/layout/card",
+"foundational/layout/column",
+"foundational/layout/columns",
+"foundational/layout/grid",
+"foundational/layout/width",
+"foundational/lists/bullets",
+"foundational/lists/checklist",
+"foundational/lists/facts",
+"foundational/lists/numbered",
+"foundational/lists/steps",
+"foundational/lists/trace-id",
+"foundational/structure/lead",
+"foundational/structure/metadata-header",
+"foundational/structure/prose",
+"foundational/structure/section",
+"foundational/structure/subsection",
+"foundational/structure/toc",
+"math/formula"
 ];
-const ALLOWED = ["bps", "pts", "pt", "bn", "mn", "tn", "kg", "km", "sqft", "yoy", "qoq", "mom", "cagr", "year", "yr", "day", "hr"];
+const ALLOWED = ["bps", "pts", "pt", "bn", "mn", "tn", "kg", "km", "sqft", "yoy", "qoq", "mom", "cagr", "year", "yr", "day", "hr", "rem", "em", "px", "vw", "vh", "ch", "fr"];
 const PAGE = "showcase.html";
 const SETTLE_MS = 700;   // charts draw after load; canvas needs a beat
 
@@ -137,8 +202,12 @@ function checks(doc, win) {
   // three lets "Q1" and "FY25" through without an allowlist entry each.
   const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
   for (let node; (node = walk.nextNode()); ) {
-    const tag = node.parentElement && node.parentElement.tagName;
-    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+    // Lowercased, because tagName preserves case inside SVG -- a <style>
+    // that Mermaid injects into its own diagram is "style", not "STYLE",
+    // and it reads as a page full of CSS colour codes glued to digits.
+    const tag = (node.parentElement && node.parentElement.tagName || '')
+                  .toLowerCase();
+    if (tag === 'script' || tag === 'style') continue;
     const text = node.nodeValue;
     for (const hit of text.matchAll(/[a-z]{3,}\d|\d[a-z]{3,}/g)) {
       const run = hit[0].replace(/[\d.]/g, '').toLowerCase();

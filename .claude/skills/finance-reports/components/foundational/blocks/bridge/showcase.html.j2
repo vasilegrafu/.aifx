@@ -1,0 +1,19 @@
+{# The `bridge` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>revenue, FY24 to FY25 — five movements landing on the endpoint</h3>
+      {{ c.bridge(steps=d.revenue, scale_min=0, scale_max=d.revenue_max,
+               caption="FY24 to FY25 revenue, $m",
+               note="Organic growth of $5,260m is offset by $2,091m of churn and FX.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a subtotal step, which resets the running total rather than adding to it</h3>
+      {{ c.bridge(steps=d.gross, scale_min=0, scale_max=d.gross_max,
+               caption="FY24 to FY25 gross profit, $m",
+               note="Gross profit rose $1,481m while margin fell 2.0pt — the mix, not the rate.") }}
+    </section>
+{% endblock %}

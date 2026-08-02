@@ -1,0 +1,12 @@
+{# The `drawdown-table` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the four worst drawdowns, deepest first</h3>
+      {{ c.drawdown_table(rows=d.rows,
+               caption="Worst drawdowns since inception",
+               note="Recovery is the first close back at the prior peak. The 2022 episode took 15.3 months to fall and 39.5 to recover.") }}
+    </section>
+{% endblock %}

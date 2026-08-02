@@ -1,0 +1,18 @@
+{# The `todo-marker` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>inline in a sentence, as a block</h3>
+      <p>Operating income rose 0.8% against budget, though
+      {% call c.todo_marker() %}the bridge to the restated FY24 base is
+      still missing{% endcall %} and the comparison is provisional.</p>
+    </section>
+    <hr>
+    <section>
+      <h3>as an argument — the form a loop over unresolved items produces</h3>
+      <p>Outstanding before publication:
+      {% for g in d.gaps %}{{ c.todo_marker(text=g) }} {% endfor %}</p>
+    </section>
+{% endblock %}

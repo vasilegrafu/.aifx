@@ -1,0 +1,16 @@
+{# The `expected-value` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three scenarios weighted to one number</h3>
+      {{ c.expected_value(rows=d.rows, total=d.total,
+               caption="Probability-weighted return against $118.40") }}
+    </section>
+    <hr>
+    <section>
+      <h3>the same rows with no total — the tfoot is dropped entirely</h3>
+      {{ c.expected_value(rows=d.rows) }}
+    </section>
+{% endblock %}

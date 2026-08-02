@@ -1,0 +1,24 @@
+{# The `callout` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the four styled types</h3>
+      {% call c.callout(type="note") %}Segment figures for FY24 have been
+      restated onto the new reporting lines.{% endcall %}
+      {% call c.callout(type="warning") %}FY26 guidance was withdrawn on
+      28 January. Forward figures here are the analyst's own.{% endcall %}
+      {% call c.callout(type="decision") %}Rating cut to Hold. Price target
+      reduced from $132 to $118.{% endcall %}
+      {% call c.callout(type="risk") %}A further 12% fall in EBITDA would
+      breach the leverage covenant at the FY26 Q2 test.{% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>an unrecognised type — no error, just an unstyled aside</h3>
+      {% call c.callout(type="caution") %}"caution" has no rule in
+      callouts.css, so this renders as plain body text inside an aside.
+      Nothing fails; the emphasis simply never arrives.{% endcall %}
+    </section>
+{% endblock %}

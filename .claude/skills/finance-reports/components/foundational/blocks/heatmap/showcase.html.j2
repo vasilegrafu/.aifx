@@ -1,0 +1,18 @@
+{# The `heatmap` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three full years of monthly returns</h3>
+      {{ c.heatmap(cols=d.cols, rows=d.rows, corner="Year",
+               caption="Monthly total return, per cent",
+               legend="Six colour steps, banded at ±0.5, ±2.0 and ±4.0 per cent.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a part-finished year — the macro pads, rather than reading as zeros</h3>
+      {{ c.heatmap(cols=d.cols, rows=d.partial, corner="Year",
+               caption="A year still in progress") }}
+    </section>
+{% endblock %}

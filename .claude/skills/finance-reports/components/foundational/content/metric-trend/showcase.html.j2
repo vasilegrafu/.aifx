@@ -1,0 +1,12 @@
+{# The `metric-trend` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>four metrics over five years, three quantities and one rate</h3>
+      {{ c.metric_trend(periods=d.periods, rows=d.rows,
+               caption="Group performance, FY21 to FY25", unit="$m",
+               fmt="money", cagr_fmt="pct") }}
+    </section>
+{% endblock %}

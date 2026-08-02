@@ -1,0 +1,11 @@
+{# The `macro-indicators` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>six readings, with the surprise and the direction measured separately</h3>
+      {{ c.macro_indicators(rows=d.rows,
+               caption="US indicators", asof="31 July 2026") }}
+    </section>
+{% endblock %}

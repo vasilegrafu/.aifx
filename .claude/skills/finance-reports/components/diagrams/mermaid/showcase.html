@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mermaid — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>mermaid</h1>
+  </header>
+
+    <section>
+      <h3>a flowchart, passed as an argument</h3>
+        <pre class="mermaid">
+flowchart LR
+  A[Filing] --> B[Controller]
+  B --> C{Assertions pass?}
+  C -->|no| D[Build stops]
+  C -->|yes| E[View]
+  E --> F[Report]
+  </pre>
+
+    </section>
+  </main>
+</body>
+</html>

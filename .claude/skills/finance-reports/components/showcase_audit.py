@@ -42,8 +42,11 @@ AUDIT_PAGE = "showcase_audit.html"
 
 #: Letter runs that legitimately touch a digit, so the glued-text check does
 #: not report every "100bps". Compared lowercased against the run alone.
+#: CSS lengths are here because a showcase for a layout component talks about
+#: its own measurements -- "min 12rem" is the subject, not a defect.
 ALLOWED_RUNS = ["bps", "pts", "pt", "bn", "mn", "tn", "kg", "km", "sqft",
-                "yoy", "qoq", "mom", "cagr", "year", "yr", "day", "hr"]
+                "yoy", "qoq", "mom", "cagr", "year", "yr", "day", "hr",
+                "rem", "em", "px", "vw", "vh", "ch", "fr"]
 
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -139,8 +142,12 @@ function checks(doc, win) {{
   // three lets "Q1" and "FY25" through without an allowlist entry each.
   const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
   for (let node; (node = walk.nextNode()); ) {{
-    const tag = node.parentElement && node.parentElement.tagName;
-    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+    // Lowercased, because tagName preserves case inside SVG -- a <style>
+    // that Mermaid injects into its own diagram is "style", not "STYLE",
+    // and it reads as a page full of CSS colour codes glued to digits.
+    const tag = (node.parentElement && node.parentElement.tagName || '')
+                  .toLowerCase();
+    if (tag === 'script' || tag === 'style') continue;
     const text = node.nodeValue;
     for (const hit of text.matchAll(/[a-z]{{3,}}\\d|\\d[a-z]{{3,}}/g)) {{
       const run = hit[0].replace(/[\\d.]/g, '').toLowerCase();

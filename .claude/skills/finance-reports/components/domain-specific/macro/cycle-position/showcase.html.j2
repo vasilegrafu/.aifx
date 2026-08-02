@@ -1,0 +1,12 @@
+{# The `cycle-position` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>four phases with the third marked current</h3>
+      {{ c.cycle_position(phases=d.phases, at=d.at,
+               asof="July 2026",
+               note="Wage growth of 4.6% against 2.1% productivity puts the cycle late rather than mid.") }}
+    </section>
+{% endblock %}

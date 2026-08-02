@@ -1,0 +1,18 @@
+{# The `funnel` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>market sizing — each width measured against the top, not the step above</h3>
+      {{ c.funnel(stages=d.market,
+               caption="Market sizing, FY25",
+               note="Revenue is 9.3% of the total addressable market and 74% of the obtainable one.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a conversion funnel, where the same rule is easiest to get wrong</h3>
+      {{ c.funnel(stages=d.conversion,
+               caption="Trial to paid conversion, FY25") }}
+    </section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{# The `holdings-table` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>nine positions with weight bars, tinted on the last column</h3>
+      {{ c.holdings_table(headers=d.headers, rows=d.rows,
+               total_row=d.total_row,
+               caption="Portfolio holdings, $2,450m") }}
+    </section>
+{% endblock %}

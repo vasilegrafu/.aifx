@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>requirement — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>requirement</h1>
+  </header>
+
+    <section>
+      <h3>three requirements — a must, a should, and an explicit won't</h3>
+  <article class="requirement" id="REQ-014">
+    <header>
+      <span class="req-id">REQ-014</span>
+      <h3>A report is regenerated, never edited</h3>
+      <span class="req-priority priority-must">Must</span>
+    </header>
+    <dl>
+      <dt>Description</dt><dd>The controller rebuilds the whole page from source data on every run. No published page is patched in place.</dd>
+      <dt>Fit criterion</dt><dd>Rebuilding an unchanged report twice produces two byte-identical files.</dd>
+    </dl>
+  </article>
+
+  <article class="requirement" id="REQ-021">
+    <header>
+      <span class="req-id">REQ-021</span>
+      <h3>Every figure names the filing it came from</h3>
+      <span class="req-priority priority-should">Should</span>
+    </header>
+    <dl>
+      <dt>Description</dt><dd>Each statement block carries the period and the form type behind its numbers.</dd>
+      <dt>Fit criterion</dt><dd>A reader can trace any printed figure to a filing in one step, without leaving the page.</dd>
+    </dl>
+  </article>
+
+  <article class="requirement" id="REQ-033">
+    <header>
+      <span class="req-id">REQ-033</span>
+      <h3>Intraday price updates</h3>
+      <span class="req-priority priority-wont">Won't</span>
+    </header>
+    <dl>
+      <dt>Description</dt><dd>Reports are built against filings and close prices. Live quotes are out of scope for this release.</dd>
+      <dt>Fit criterion</dt><dd>No component reads a quote endpoint at render time.</dd>
+    </dl>
+  </article>
+
+    </section>
+  </main>
+</body>
+</html>

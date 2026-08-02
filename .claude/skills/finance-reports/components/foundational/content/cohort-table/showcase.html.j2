@@ -1,0 +1,13 @@
+{# The `cohort-table` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>six cohorts, each observed for a different length of time</h3>
+      {{ c.cohort_table(periods=d.periods, rows=d.rows,
+               size_label="Signups",
+               caption="Logo retention by signup cohort, per cent",
+               note="Blank cells are periods not yet observed, not zero retention.") }}
+    </section>
+{% endblock %}

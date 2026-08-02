@@ -1,0 +1,12 @@
+{# The `width` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the same block at each alignment</h3>
+      {% for a in d.aligns %}{% call c.width(w=d.w, align=a) %}
+        {% call c.card(title=a) %}{{ c.prose(text=d.body) }}{% endcall %}
+      {% endcall %}{% endfor %}
+    </section>
+{% endblock %}

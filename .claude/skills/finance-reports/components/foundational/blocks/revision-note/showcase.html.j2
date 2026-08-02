@@ -1,0 +1,19 @@
+{# The `revision-note` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a note about a restatement</h3>
+      {% call c.revision_note(rev=d.minor) %}Segment revenue for FY24 has
+      been restated onto the new reporting lines. Prior-year figures in
+      this report are not comparable with version 3.0.{% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>a note about a change of view</h3>
+      {% call c.revision_note(rev=d.major) %}Rating cut to Hold and the
+      price target reduced from $132 to $118, following the guidance
+      withdrawal on 28 January.{% endcall %}
+    </section>
+{% endblock %}

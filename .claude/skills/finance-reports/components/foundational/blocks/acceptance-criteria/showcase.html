@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>acceptance-criteria — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>acceptance-criteria</h1>
+  </header>
+
+    <section>
+      <h3>the happy path — state, act, observable result</h3>
+        <div class="acceptance" id="AC-14">
+    <div class="ac-head">
+      <span class="ac-id">AC-14</span>
+<span class="ac-title">A new filing regenerates the report</span>    </div>
+    <dl class="gwt">
+      <dt class="kw-given">Given</dt><dd>a published report built against the FY25 Q2 10-Q</dd>
+      <dt class="kw-given">and</dt><dd>a newer 10-Q available from the provider</dd>
+      <dt class="kw-when">When</dt><dd>the report controller runs against the same ticker</dd>
+      <dt class="kw-then">Then</dt><dd>the page is rebuilt from the newer filing</dd>
+      <dt class="kw-then">and</dt><dd>every figure on the page carries the new period label</dd>
+      <dt class="kw-then">and</dt><dd>the asset version pin is unchanged</dd>
+    </dl>
+  </div>
+
+    </section>
+    <hr>
+    <section>
+      <h3>a criterion about refusing to act — the half that goes unwritten</h3>
+        <div class="acceptance" id="AC-15">
+    <div class="ac-head">
+      <span class="ac-id">AC-15</span>
+<span class="ac-title">A partial filing is refused, not rendered</span>    </div>
+    <dl class="gwt">
+      <dt class="kw-given">Given</dt><dd>a 10-Q missing the cash flow statement</dd>
+      <dt class="kw-when">When</dt><dd>the report controller runs</dd>
+      <dt class="kw-then">Then</dt><dd>the build stops with the missing statement named</dd>
+      <dt class="kw-then">and</dt><dd>no page is written</dd>
+      <dt class="kw-then">and</dt><dd>the previously published page is left in place</dd>
+    </dl>
+  </div>
+
+    </section>
+  </main>
+</body>
+</html>

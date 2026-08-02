@@ -1,0 +1,29 @@
+{# The `column` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>span 2 beside span 1 — two thirds and one third</h3>
+      {% call c.columns() %}
+      {% call c.column(span=d.wide) %}
+        {% call c.card(title="Commentary") %}{{ c.prose(text=d.commentary) }}{% endcall %}
+      {% endcall %}
+      {% call c.column(span=d.narrow) %}
+        {% call c.card(title="Figures") %}{{ c.prose(text=d.figures) }}{% endcall %}
+      {% endcall %}
+      {% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>the same two cells at equal span — halves</h3>
+      {% call c.columns() %}
+      {% call c.column() %}
+        {% call c.card(title="Commentary") %}{{ c.prose(text=d.commentary) }}{% endcall %}
+      {% endcall %}
+      {% call c.column() %}
+        {% call c.card(title="Figures") %}{{ c.prose(text=d.figures) }}{% endcall %}
+      {% endcall %}
+      {% endcall %}
+    </section>
+{% endblock %}

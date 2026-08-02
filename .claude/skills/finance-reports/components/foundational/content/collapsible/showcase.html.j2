@@ -1,0 +1,20 @@
+{# The `collapsible` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>working shown on request — length, not inconvenience</h3>
+      {% call c.collapsible(summary=d.method) %}<p>Risk-free rate 4.1% on the
+      10-year; equity risk premium 5.0%; levered beta 1.08 against the
+      peer set. Cost of equity 9.5%. After-tax cost of debt 3.4% at a
+      24% target debt weighting gives 9.0%.</p>{% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>a second block, closed by default like the first</h3>
+      {% call c.collapsible(summary=d.restated) %}<p>Segment revenue only.
+      The FY24 split was restated onto the reporting lines introduced in
+      FY25 Q1; group totals are unchanged.</p>{% endcall %}
+    </section>
+{% endblock %}

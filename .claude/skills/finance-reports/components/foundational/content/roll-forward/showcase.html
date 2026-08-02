@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>roll-forward — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>roll-forward</h1>
+  </header>
+
+    <section>
+      <h3>net debt, opening to closing, in two columns that both close</h3>
+        <table class="fin rollfwd">
+<caption>Net debt roll-forward <span class="fa-st-unit">$m</span></caption>    <thead><tr><th></th><th>FY24</th><th>FY25</th></tr></thead>
+    <tbody>
+      <tr class="rf-opening">
+        <th scope="row">Opening net debt</th>
+<td>8,420</td><td>7,905</td>      </tr>
+      <tr class="rf-movement">
+        <th scope="row">Free cash flow</th>
+<td class="neg">-2,140</td><td class="neg">-2,530</td>      </tr>
+      <tr class="rf-movement">
+        <th scope="row">Acquisitions</th>
+<td>1,180</td><td>1,640</td>      </tr>
+      <tr class="rf-movement">
+        <th scope="row">Buybacks and dividends</th>
+<td>900</td><td>1,050</td>      </tr>
+      <tr class="rf-movement">
+        <th scope="row">FX translation</th>
+<td class="neg">-455</td><td>120</td>      </tr>
+      <tr class="rf-closing">
+        <th scope="row">Closing net debt</th>
+<td>7,905</td><td>8,185</td>      </tr>
+    </tbody>
+  </table>
+<p class="fa-st-source">Free cash flow reduces net debt and is shown negative. FY24 closes where FY25 opens.</p>
+    </section>
+  </main>
+</body>
+</html>

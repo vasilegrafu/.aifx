@@ -1,0 +1,15 @@
+{# The `card` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a titled card</h3>
+      {% call c.card(title=d.titles[0]) %}{{ c.prose(text=d.bodies[0]) }}{% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>no title — the title line is dropped, not left blank</h3>
+      {% call c.card() %}{{ c.prose(text=d.bodies[1]) }}{% endcall %}
+    </section>
+{% endblock %}

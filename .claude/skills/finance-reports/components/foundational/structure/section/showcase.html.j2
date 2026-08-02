@@ -1,0 +1,12 @@
+{# The `section` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two anchored sections, from the same list a TOC would use</h3>
+      {% for s in d.sections %}{% call c.section(s.id, s.label) %}
+        {{ c.prose(text="Body of " + s.label + ", anchored at #" + s.id + ".") }}
+      {% endcall %}{% endfor %}
+    </section>
+{% endblock %}

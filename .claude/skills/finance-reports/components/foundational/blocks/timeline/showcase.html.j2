@@ -1,0 +1,10 @@
+{# The `timeline` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five milestones — two done, one current, two ahead</h3>
+      {{ c.timeline(items=d.items) }}
+    </section>
+{% endblock %}

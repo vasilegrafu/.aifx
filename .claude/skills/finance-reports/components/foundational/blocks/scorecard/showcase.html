@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>scorecard — showcase</title>
+  <link rel="stylesheet" href="../../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@8.3.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>scorecard</h1>
+  </header>
+
+    <section>
+      <h3>five weighted criteria, with the total the rows actually produce</h3>
+        <table class="fin scorecard">
+<caption>Investment scorecard, FY25</caption>    <thead><tr><th>Criterion</th><th>Weight</th><th>Score</th><th>Rating</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Balance sheet</td>
+        <td>30%</td>
+        <td>4 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="80.0%"></span></span></td>
+        <td>Net debt/EBITDA 1.24x; no maturity before FY28</td>
+      </tr>
+      <tr>
+        <td>Revenue quality</td>
+        <td>25%</td>
+        <td>3 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="60.0%"></span></span></td>
+        <td>68% recurring, but net retention fell to 104%</td>
+      </tr>
+      <tr>
+        <td>Competitive position</td>
+        <td>20%</td>
+        <td>5 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="100.0%"></span></span></td>
+        <td>Share gains in all four regions for six quarters</td>
+      </tr>
+      <tr>
+        <td>Capital allocation</td>
+        <td>15%</td>
+        <td>2 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="40.0%"></span></span></td>
+        <td>Two write-downs on acquisitions since FY23</td>
+      </tr>
+      <tr>
+        <td>Governance</td>
+        <td>10%</td>
+        <td>4 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="80.0%"></span></span></td>
+        <td>Independent chair; no related-party transactions</td>
+      </tr>
+    </tbody>
+    <tfoot><tr class="total"><td>Weighted total</td><td></td><td>3.65 / 5</td><td></td><td></td></tr></tfoot>
+  </table>
+
+    </section>
+    <hr>
+    <section>
+      <h3>the same rows without a total — the tfoot is dropped entirely</h3>
+        <table class="fin scorecard">
+    <thead><tr><th>Criterion</th><th>Weight</th><th>Score</th><th>Rating</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Balance sheet</td>
+        <td>30%</td>
+        <td>4 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="80.0%"></span></span></td>
+        <td>Net debt/EBITDA 1.24x; no maturity before FY28</td>
+      </tr>
+      <tr>
+        <td>Revenue quality</td>
+        <td>25%</td>
+        <td>3 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="60.0%"></span></span></td>
+        <td>68% recurring, but net retention fell to 104%</td>
+      </tr>
+      <tr>
+        <td>Competitive position</td>
+        <td>20%</td>
+        <td>5 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="100.0%"></span></span></td>
+        <td>Share gains in all four regions for six quarters</td>
+      </tr>
+      <tr>
+        <td>Capital allocation</td>
+        <td>15%</td>
+        <td>2 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="40.0%"></span></span></td>
+        <td>Two write-downs on acquisitions since FY23</td>
+      </tr>
+      <tr>
+        <td>Governance</td>
+        <td>10%</td>
+        <td>4 / 5</td>
+        <td><span class="score-track"><span class="score-fill" data-pct="80.0%"></span></span></td>
+        <td>Independent chair; no related-party transactions</td>
+      </tr>
+    </tbody>
+  </table>
+
+    </section>
+  </main>
+</body>
+</html>

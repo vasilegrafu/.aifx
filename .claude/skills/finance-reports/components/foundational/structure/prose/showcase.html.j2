@@ -1,0 +1,17 @@
+{# The `prose` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the text= form, which is what a loop over strings produces</h3>
+      {% for p in d.paragraphs %}{{ c.prose(text=p) }}{% endfor %}
+    </section>
+    <hr>
+    <section>
+      <h3>the block form, for a paragraph containing other components</h3>
+      {% call c.prose() %}The covenant is tested quarterly at
+      {{ c.badge(label="1.13x", variant="good") }} against a 2.5x limit,
+      which leaves room for EBITDA to fall by 55% before it binds.{% endcall %}
+    </section>
+{% endblock %}

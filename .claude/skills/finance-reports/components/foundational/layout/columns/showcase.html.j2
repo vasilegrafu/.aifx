@@ -1,0 +1,14 @@
+{# The `columns` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three equal columns, each holding a card</h3>
+      {% call c.columns() %}
+      {% for x in d.cells %}{% call c.column() %}
+        {% call c.card(title=x.title) %}{{ c.prose(text=x.body) }}{% endcall %}
+      {% endcall %}{% endfor %}
+      {% endcall %}
+    </section>
+{% endblock %}

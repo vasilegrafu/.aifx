@@ -1,0 +1,13 @@
+{# The `quadrant-map` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five competitors placed by share and growth</h3>
+      {{ c.quadrant_map(items=d.items, quadrants=d.quadrants,
+               x_label="Market share →", y_label="Revenue growth →",
+               caption="Competitive position, FY25",
+               note="Vertex grows fastest from the smallest base; Halcyon holds the most share and the least growth.") }}
+    </section>
+{% endblock %}

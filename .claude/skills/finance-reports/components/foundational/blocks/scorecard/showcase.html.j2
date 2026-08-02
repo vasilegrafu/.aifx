@@ -1,0 +1,16 @@
+{# The `scorecard` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>five weighted criteria, with the total the rows actually produce</h3>
+      {{ c.scorecard(rows=d.rows, scale=d.scale, total=d.total,
+               caption="Investment scorecard, FY25") }}
+    </section>
+    <hr>
+    <section>
+      <h3>the same rows without a total — the tfoot is dropped entirely</h3>
+      {{ c.scorecard(rows=d.rows, scale=d.scale) }}
+    </section>
+{% endblock %}

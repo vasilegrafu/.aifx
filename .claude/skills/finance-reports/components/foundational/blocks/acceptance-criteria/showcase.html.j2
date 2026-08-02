@@ -1,0 +1,19 @@
+{# The `acceptance-criteria` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the happy path — state, act, observable result</h3>
+      {{ c.acceptance_criteria(id=d.regenerate.id, title=d.regenerate.title,
+               given=d.regenerate.given, when=d.regenerate.when,
+               then=d.regenerate.then) }}
+    </section>
+    <hr>
+    <section>
+      <h3>a criterion about refusing to act — the half that goes unwritten</h3>
+      {{ c.acceptance_criteria(id=d.refuse.id, title=d.refuse.title,
+               given=d.refuse.given, when=d.refuse.when,
+               then=d.refuse.then) }}
+    </section>
+{% endblock %}

@@ -1,0 +1,13 @@
+{# The `sensitivity-table` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>value per share across discount rate and terminal growth</h3>
+      {{ c.sensitivity_table(cols=d.cols, rows=d.rows,
+               row_label="WACC", col_label="Terminal growth",
+               caption="DCF value per share, USD",
+               note="The outlined cell is the base case at 9.0% and 2.5%. A half-point on either assumption moves the value by roughly $9.") }}
+    </section>
+{% endblock %}

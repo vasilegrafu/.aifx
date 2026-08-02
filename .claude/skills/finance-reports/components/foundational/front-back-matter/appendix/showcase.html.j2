@@ -1,0 +1,12 @@
+{# The `appendix` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>a lettered appendix, called on its own</h3>
+      {% call c.appendix(d["items"][0].id, d["items"][0].heading) %}
+      {{ c.prose(text="Twelve listed companies with revenue between $8bn and $60bn, at least 40% of revenue from the same end market, and four years of continuous filings.") }}
+      {% endcall %}
+    </section>
+{% endblock %}

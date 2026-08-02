@@ -1,0 +1,19 @@
+{# The `grid` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>min 12rem — more tiles per row</h3>
+      {% call c.grid(min=d.tight) %}
+      {% for t in d.tiles %}{% call c.card(title=t.title) %}{{ c.prose(text=t.body) }}{% endcall %}{% endfor %}
+      {% endcall %}
+    </section>
+    <hr>
+    <section>
+      <h3>min 22rem — the same six tiles, fewer per row</h3>
+      {% call c.grid(min=d.loose) %}
+      {% for t in d.tiles %}{% call c.card(title=t.title) %}{{ c.prose(text=t.body) }}{% endcall %}{% endfor %}
+      {% endcall %}
+    </section>
+{% endblock %}

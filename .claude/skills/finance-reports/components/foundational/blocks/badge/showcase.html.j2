@@ -1,0 +1,17 @@
+{# The `badge` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>the four styled variants</h3>
+      <p>{% for b in d.variants %}{{ c.badge(label=b.label, variant=b.variant) }}
+      {% endfor %}</p>
+    </section>
+    <hr>
+    <section>
+      <h3>no variant — the plain pill, and what a typo looks like</h3>
+      <p>{{ c.badge(label="Under review") }}
+      {{ c.badge(label="Typo here", variant="gooed") }}</p>
+    </section>
+{% endblock %}

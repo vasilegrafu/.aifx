@@ -1,0 +1,10 @@
+{# The `numbered` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>four steps of one argument, where the order is the point</h3>
+      {{ c.numbered(d['items']) }}
+    </section>
+{% endblock %}

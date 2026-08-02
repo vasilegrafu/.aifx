@@ -1,0 +1,13 @@
+{# The `requirement` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three requirements — a must, a should, and an explicit won't</h3>
+      {% for r in d.cards %}{{ c.requirement(id=r.id, title=r.title,
+               priority=r.priority, label=r.label,
+               description=r.description, fit=r.fit) }}
+      {% endfor %}
+    </section>
+{% endblock %}

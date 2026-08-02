@@ -1,0 +1,12 @@
+{# The `variance-analysis` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>budget against actual, where the sign and the verdict come apart</h3>
+      {{ c.variance_analysis(rows=d.rows, total_row=d.total_row,
+               caption="Budget variance", unit="$m", period="FY25",
+               note="Cost of sales and operating expenses are adverse at a positive variance: over budget on a cost line is not good news.") }}
+    </section>
+{% endblock %}
