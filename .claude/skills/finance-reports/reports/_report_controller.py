@@ -49,6 +49,7 @@ if str(SKILL_DIR) not in sys.path:
 from _paths import owning_directory                          # noqa: E402
 from components._showcase_controller import (                # noqa: E402
     cdn_href, env, local_href)
+from reports._report_validation import NOT_YET, validate     # noqa: E402
 
 VIEW = "report.html.j2"
 
@@ -78,7 +79,31 @@ class ReportController:
     #: What a reader sees as the document type, above the title.
     TITLE = ""
 
+    #: The sections this report's view declares, in its order. Written out here
+    #: rather than read back from the view: a check that derives its expectation
+    #: from the thing it is checking agrees with it by construction, including
+    #: when both are wrong. A deleted section should show up on the page and be
+    #: deliberately removed from this tuple. Empty means no promise was made and
+    #: the two section checks are skipped rather than invented.
+    SECTIONS: tuple[str, ...] = ()
+
+    #: The domain class prefix this report's components carry - `fa-` for a
+    #: company report, `portfolio-` for a book. Empty skips the check. Zero
+    #: occurrences of it in a finished page means that family did not render.
+    PREFIX = ""
+
     # ------------------------------------------------------------- subclass
+    def _expected_text(self, **args) -> list[str]:
+        """Strings the request named that MUST appear in the finished page.
+
+        OPTIONAL. Called with the same arguments as `_fetch`, because only this
+        report knows its own argument shape - `financial-profile` reads a symbol
+        and a comma-separated `--peers`, and the next report need not take
+        either. A peer whose payload came back empty still gets its column,
+        labelled and blank, so the table looks complete while comparing the
+        subject against nothing; this is what notices."""
+        return []
+
     def _add_args(self, parser) -> None:
         """Declare this report's CLI arguments on a parser the builder owns.
 
@@ -126,7 +151,13 @@ class ReportController:
 
         Raises rather than returning a code: a report asked for by name and
         not built is a mistake worth stopping for, and the caller owns the
-        reporting."""
+        reporting.
+
+        VALIDATION DOES NOT RAISE, and that is deliberate. By the time the page
+        is checked it has already cost ~13 live calls, so throwing it away over
+        a finding would charge for the diagnosis twice. The page is written
+        whatever was found, the findings are rendered into the top of it, and
+        the caller gets the file back."""
         directory = self.directory
         try:
             view = (directory / VIEW).relative_to(SKILL_DIR).as_posix()
@@ -151,20 +182,51 @@ class ReportController:
         self._validate_context(d)
 
         report_name = self.TITLE or self.name
-        try:
-            html = env().get_template(view).render(
-                d=SimpleNamespace(**d),
-                title=d.get("title", report_name),
-                report_name=report_name,
-                local_href=local_href(out),
-                cdn_href=cdn_href())
-        except Exception as e:      # noqa: BLE001 — name the template, re-raise
-            raise SystemExit(f"{self.name}: render failed{blame(e)}: "
-                             f"{type(e).__name__}: {e}") from None
+        template = env().get_template(view)
+
+        def render(validation):
+            try:
+                return template.render(
+                    d=SimpleNamespace(**d),
+                    title=d.get("title", report_name),
+                    report_name=report_name,
+                    local_href=local_href(out),
+                    cdn_href=cdn_href(),
+                    validation=validation)
+            except Exception as e:  # noqa: BLE001 — name the template, re-raise
+                raise SystemExit(f"{self.name}: render failed{blame(e)}: "
+                                 f"{type(e).__name__}: {e}") from None
+
+        html = render(NOT_YET)
+
+        # CHECKED BEFORE THE BANNER EXISTS, which is the whole ordering. What
+        # these checks measure is the document; re-rendering with the findings
+        # would have them measuring the notice about the document as well.
+        print("validating the render ...", flush=True)
+        found = validate(html, out,
+                         sections=self.SECTIONS, prefix=self.PREFIX,
+                         expected=self._expected_text(**args))
+
+        # ALWAYS re-rendered, including when nothing was found. Skipping this
+        # for a clean page was tried and is wrong: the page then keeps the
+        # placeholder's counts and its all-clear reads "0 check(s)", which is
+        # precisely the "did validation even run?" ambiguity the comment exists
+        # to remove. A second render costs milliseconds against a cached
+        # environment and no network at all.
+        html = render(found)
 
         # Overwritten without asking: the output is a build artifact, and the
         # controller and the view are the source.
         out.mkdir(parents=True, exist_ok=True)
         target = out / self._filename(d)
         target.write_text(html, encoding="utf-8")
+
+        # Said on the way out as well as shown on the page. The page is where a
+        # reader meets it; a caller building ten reports wants the count without
+        # opening ten files. NOT raised: the page cost ~13 live calls and is
+        # written either way, and a broken page you can open beats an exception.
+        for problem in found.errors:
+            print(f"  ERROR    {problem.check}: {problem.message}", flush=True)
+        for problem in found.warnings:
+            print(f"  warning  {problem.check}: {problem.message}", flush=True)
         return target

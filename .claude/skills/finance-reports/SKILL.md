@@ -85,8 +85,6 @@ elsewhere); a system interpreter has no Jinja and fails on the first import.
 S=.claude/skills/finance-reports
 
 python $S/reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
-python $S/reports/report_test_runner.py --list        # tests, and what they cost
-python $S/reports/report_test_runner.py --all         # each builds for REAL
 python $S/reports/catalog_builder.py                  # -> reports/CATALOG.md
 python $S/components/showcase_builder.py charts/bar
 python $S/components/showcase_builder.py --all        # rebuild every showcase
@@ -255,9 +253,9 @@ with three answers is a layout question with two wrong ones.
 
 A directory containing `component.html.j2` **is** a component. A directory
 containing `report.html.j2` **is** a report. A component directory that also
-holds `showcase_controller.py` and `showcase.html.j2` **has** a showcase, and a
-report directory that also holds `report_test.py` **has** a test. Nothing is
-listed anywhere, so adding any of the four means adding files and nothing else.
+holds `showcase_controller.py` and `showcase.html.j2` **has** a showcase.
+Nothing is listed anywhere, so adding any of the three means adding files and
+nothing else.
 
 `ShowcaseBuilder.build("charts/bar")` therefore does no lookup: check the three
 files are present, path-load the controller, find the `ShowcaseController`
@@ -303,8 +301,8 @@ at one depth and silently wrong at the next — and wrong here means the base ge
 imported under a second name, which is failure (2) above.
 
 The last line is what differs per side: a showcase imports
-`ShowcaseController`, a report imports `ReportController` from
-`reports._report_controller`, and a report test imports `_report_checks`. The
+`ShowcaseController`, and a report imports `ReportController` from
+`reports._report_controller`. The
 `# noqa: E402` is required on each — the import is deliberately below the
 `sys.path` edit that makes it resolvable, and every linter reads that as a
 mistake.
@@ -330,11 +328,11 @@ components/                    the library: macros, filters, env, assets, showca
 
 reports/
   _report_controller.py        ReportController; borrows env() AND the asset pair
+  _report_validation.py        what build() checks the rendered page for
   _report.master.html.j2       the shell every report view extends
   report_builder.py            ReportBuilder.build(name, argv, out) + the CLI
-  report_test_runner.py        finds report_test.py, totals the cost, runs them
   company/                     a domain, holding its reports
-    financial-profile/         one report — view, controller, usage, report_test
+    financial-profile/         one report — view, controller, usage
   portfolio/  market/  economy/
                                declared and empty — the taxonomy, stated
 
@@ -406,6 +404,40 @@ of their track, a unit welded to a number, clipped axis labels. Those are
 LAYOUT facts that exist only once the CSS has been applied, so **nothing in
 this skill can see them**. Open the page.
 
+### Report validation — the page says what is wrong with it
+
+`build()` checks the report it just rendered and **renders the findings into the
+top of the document**, above the cover. The checks are in
+`reports/_report_validation.py`, one home for every report.
+
+**On the page rather than on stdout**, because a chart draws at view time and
+the page has to be opened anyway — so the findings arrive where the eye already
+is, instead of in output nobody is obliged to read. A report that leaves this
+tree then carries its own warning, which is the case that matters most: a reader
+cannot otherwise tell a healthy page from one whose endpoint returned nothing.
+
+| | means | fails the build? |
+|---|---|---|
+| **error** | the page is broken — a spec that will not parse, an asset half that does not resolve, a dangling in-page link, unrendered template syntax, a declared section that never rendered, the pre-6.0.0 `investing-` prefix | no |
+| **warning** | it rendered and its content is thin — an empty chart, a table with no rows, a section mostly blank, a requested symbol appearing nowhere | no |
+
+The split exists because the second kind depends on **what was asked for**.
+Against a fixed input, a mostly-blank section meant the code broke; against
+whatever symbol you named today it usually means that company has little data.
+Failing on it would fail a legitimately sparse company's own report.
+
+**Nothing raises and nothing is withheld.** By the time validation runs the page
+has cost ~13 live calls, so it is written whatever was found — a page you can
+open beats an exception. The findings also print on the way out.
+
+**A clean build leaves an HTML comment**, not an empty box: an absent banner
+cannot distinguish *"validated and clean"* from *"validation never ran"*.
+
+**What it checks is the document, never the banner.** The page is rendered, that
+string is validated, and only then is it rendered again carrying the findings —
+including when there are none, so the all-clear can state how many checks
+actually ran.
+
 ### When a build fails, and what NOT to do about it
 
 Every one of these has a wrong response that looks like progress. A build spends
@@ -417,9 +449,9 @@ Every one of these has a wrong response that looks like progress. A build spends
 - **A ticker returns nothing** — say so and ask. Substituting a similar symbol
   produces a report about a company nobody asked about, and it looks fine.
 - **An endpoint 200s with an empty body** — the build SUCCEEDS. Zeros satisfy
-  every identity, so the page renders flat and empty; `report_test_runner.py
-  <name>` and its per-section blank check are the only things that see it.
-  Re-running the build cannot clear it and costs another ~13 calls.
+  every identity, so the page renders flat and empty; the per-section blank
+  warning at the top of the page is the only thing that sees it. Re-running the
+  build cannot clear it and costs another ~13 calls.
 - **Anything raised mid-`_fetch`** — the calls already spent are gone. Report
   how many before retrying.
 - **`StrictUndefined` or an assertion** — the report is wrong, not the engine.
@@ -517,23 +549,21 @@ per-field — **`service_providers/REFERENCE.md`**. It is written down once.
    tree already says. Skip it and `reports/CATALOG.md` is short by one, which
    means the next session choosing a report cannot see yours.
 5. `python $S/reports/report_builder.py <name> … --out DIR`
-6. `reports/<domain>/<name>/report_test.py` — **four declarations and a `CHECKS`
-   tuple**, not a copied test. `REPORT`, `ARGV`, `CALLS` and `OUT`, then
-   `checks.UNIVERSAL` from `reports/_report_checks.py` plus the three that take
-   this report's own answer — its `SECTIONS`, its symbols, its domain prefix —
-   and any check only THIS finished page can answer. The build asserts its own
-   arithmetic; what it cannot see is an empty page, since `0 + 0 == 0` satisfies
-   `cost + gross == revenue`. Add a `report_test_output/` folder beside it
-   holding a `.gitkeep` — that is where it writes, `.gitignore` already covers
-   the contents of every one of them, and the destination is not free to move
-   (`reports/REFERENCE.md` says why).
+6. **Declare what the page must contain**, on the controller beside `TITLE` —
+   `SECTIONS` (what the view lays out, written by hand so a section that stops
+   rendering is a finding rather than an expectation quietly agreeing with it),
+   `PREFIX` (the domain class family: `fa-`, `portfolio-`, `macro-`), and
+   `_expected_text(**args)` if the request names things that must appear, such
+   as a symbol and its peers. Each is optional; declaring nothing skips that
+   check rather than inventing an expectation.
 
-   **Never copy a check body into a leaf.** Ten reports carrying their own
-   reading of the blank-cell threshold are ten claims about one number, free to
-   disagree the moment one of them learns something — the argument
-   `components/_contracts.py` already settled for components. A check that
-   applies to any generated page belongs in `_report_checks.py`, where adding it
-   reaches every report on its next run.
+   **There is no test to write.** `build()` validates the page it rendered and
+   puts what it found at the top of the document — see **Report validation**
+   below. A check that applies to any generated page belongs in
+   `reports/_report_validation.py`, never copied into a report: ten reports
+   carrying their own reading of the blank-cell threshold are ten claims about
+   one number, free to disagree the moment one of them learns something. That is
+   the argument `components/_contracts.py` already settled.
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so

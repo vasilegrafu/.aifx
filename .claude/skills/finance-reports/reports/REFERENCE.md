@@ -9,7 +9,7 @@ argues and costs lives in its own `usage.md`. This is the on-demand detail.
 reports/
   _report_controller.py     ReportController + its own copy of the asset pair
   _report.master.html.j2    the shell every report view extends
-  _report_checks.py         the checks every report test makes + run()
+  _report_validation.py     what build() checks the rendered page for
   report_builder.py         ReportBuilder.build(name, argv, out) + the CLI
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
   CATALOG.md                every report by what it argues — generated
@@ -118,143 +118,118 @@ There is deliberately **no conventional destination either** — no `output/`
 shelf to fall into by habit. A real deliverable goes wherever the reader asked
 for it.
 
-The one place the question is already answered is a test — see below.
+Nothing in the engine answers it for you, and there is no longer a test that
+did: the page is validated wherever you chose to write it.
 
-## Testing a report
+## Report validation — the page carries its own findings
 
-```bash
-S=.claude/skills/finance-reports        # from the PROJECT ROOT — see ../SKILL.md
+There is **no report test and no test runner.** `build()` checks the page it
+just rendered and puts what it found at the top of the document, above the
+cover. The checks live once, in `_report_validation.py`.
 
-python $S/reports/report_test_runner.py --list      # what exists, and the cost
-python $S/reports/report_test_runner.py financial-profile
-python $S/reports/report_test_runner.py --all
+**Why not a test.** The test this replaced built a report OF ITS OWN — a fixed
+symbol, ~13 live calls — and checked that one. So confidence in a report you
+actually wanted cost twenty-six calls and validated the wrong page: the one the
+test built, never the one you were about to send. Validating the render costs
+nothing, happens on every build, and checks the page you are holding.
+
+**Why on the page rather than on stdout.** Charts draw at view time, so a human
+has to open the page regardless; putting the findings there means they arrive
+where the eye already is instead of in output nobody is obliged to read. It also
+means a report that left this tree carries its own warning — which matters more
+than the developer case, because a reader cannot otherwise tell a healthy page
+from one whose endpoint returned nothing.
+
+### Two severities
+
+| | means | fails the build |
+|---|---|---|
+| **error** | the page is broken | no |
+| **warning** | it rendered; the content is thin | no |
+
+- **errors** — a chart spec that will not survive `JSON.parse`, an asset half
+  that does not resolve, an `href="#x"` with no `id="x"`, a duplicate id,
+  unrendered Jinja delimiters or a visible `None`, a declared section that never
+  rendered, the pre-6.0.0 `investing-` prefix, or a missing domain prefix.
+- **warnings** — a chart that is an empty frame or all zeros, a `<tbody>` that
+  is a header over nothing, a declared section rendered as a heading with
+  nothing beneath, a requested symbol appearing nowhere, a section that is
+  mostly blank cells.
+
+The line between them is **what the finding depends on**. An error is a defect
+in the render path for any input. A warning usually means the subject has little
+data — which is a fact about the world, not a fault. Against the fixed input of
+a test the second kind meant "the code broke"; against whatever was asked for
+today it does not, and failing on it would fail a legitimately sparse company's
+own report.
+
+**Neither raises.** By the time validation runs the page has cost ~13 live
+calls, so it is written whatever was found: a broken page you can open beats an
+exception. Both lists also print on the way out, so a caller building several
+does not have to open each one.
+
+**A clean build leaves an HTML comment**, not an empty box:
+
+```html
+<!-- validated: 9 check(s), 0 error(s), 0 warning(s) at 2026-08-03T04:11:07 -->
 ```
 
-**The test sits beside the report**, as `report_test.py` — four declarations and
-a `CHECKS` tuple. A directory holding `report.html.j2` **is** a report; one that
-also holds `report_test.py` **has** a test — the same rule a component follows
-with `showcase_controller.py`, and nothing is registered either way.
+An absent banner cannot distinguish "validated and clean" from "validation never
+ran" — the same false green as a page that scrolls past its own empty audit.
 
-**The checks themselves live once, in `_report_checks.py`.** Seven are universal
-— they are generic over "a page this skill generated" and a leaf takes them
-whole as `checks.UNIVERSAL`, so a check added there reaches every report on its
-next run. Three have universal logic and a per-report *expectation*, so they are
-factories called with the report's own answer:
+### What each report declares about itself
+
+Universal checks need nothing. Three are universal in LOGIC and per-report in
+EXPECTATION, so the controller declares the expectation beside `TITLE`:
 
 ```python
-CHECKS = checks.UNIVERSAL + (
-    checks.sections_are_populated(SECTIONS),        # the sections it declares
-    checks.symbols_present([ARGV[0], *ARGV[-1].split(",")]),
-    checks.markup_is_current("fa-"),                # `portfolio-` for a book
-)
+class FinancialProfileReportController(ReportController):
+    TITLE = "Financial Profile"
+    SECTIONS = ("snapshot", "income", "cash", "position", …)   # what the view lays out
+    PREFIX = "fa-"                                             # `portfolio-` for a book
+
+    def _expected_text(self, symbol, peers):                   # what the request named
+        ...
 ```
 
-`run(REPORT, ARGV, OUT, CHECKS)` builds for real, echoes the resolved
-credentials before spending a call, runs every check, and owns the exit code.
+Each is optional, and declaring nothing **skips** that check rather than
+inventing an expectation for it. `SECTIONS` is written by hand rather than read
+back from the view: a check that derives its expectation from the thing it is
+checking agrees with it by construction, including when both are wrong.
 
-**A check body is never copied into a leaf.** Ten reports carrying their own
+**A check body is never copied into a report.** Ten reports carrying their own
 reading of `BLANK_LIMIT` are ten claims about one measured number, free to
-disagree the moment one of them learns something — which is the argument
-`components/_contracts.py` already settled one level down, and the same reason
-this directory refuses a mirrored tree of test folders below. The alternative was a mirrored tree of test
-directories, and a mirror is a second copy of the taxonomy free to drift from
-the first; this repository already deleted a hand-maintained catalogue for that
-reason.
-
-Being inside the skill means it travels with it: a skill **linked** into another
-project can be tested there, which is the fastest way to learn whether that
-project's `environment.json` and `secrets.<env>.json` resolve — the failure a
-fresh install actually has.
-
-**The page lands in `report_test_output/`, beside the report**, and stays there
-to be opened. Every report has one:
-
-```
-company/financial-profile/
-  report.html.j2  report_controller.py  report_test.py  usage.md
-  report_test_output/
-    .gitkeep                       tracked — the folder exists in a fresh clone
-    amd-financial-profile.html     ignored — never committed, never published
-```
-
-**Tracked as an empty directory.** `.gitignore` carries one pair of rules for
-all of them:
-
-```
-**/report_test_output/*
-!**/report_test_output/.gitkeep
-```
-
-The leading `**/` is load-bearing — a pattern containing a slash is anchored to
-the `.gitignore`'s own directory, so plain `report_test_output/*` matches only at
-the repo root and silently ignores nothing four levels down. With it, **a new
-report needs no new rule.**
-
-That is what makes writing inside a published tree safe: jsDelivr serves what is
-committed, and this repo is committed with a blanket `git add .` — so the
-`.gitignore` rule is the only thing standing between a built page and a public
-URL, and a page that is never committed is never swept up and never served. A skill **copied** into another
-project needs the same two lines in that project's `.gitignore`, exactly as
-`secrets.*.json` does.
-
-**Written at all, rather than held in memory**, because the destination is part
-of what is under test. `build()` renders, writes and returns a path — that *is*
-its contract, and a test that rebuilt the four stages in-process to avoid the
-disk would have stopped testing the thing it is named after. Concretely,
-`local_href` is computed **from** the destination, so with no destination
-`assets_resolve` loses the half that catches a wrong `../` depth.
-
-**Not the system temp directory**, which was tried and is wrong on Windows: it
-is on `C:` while a project usually is not, and `local_href` is empty when no
-relative path exists between two drives — so the page would link the CDN alone,
-render unstyled against a tag that may not be pushed, and leave the local half
-of `assets_resolve` testing nothing. Beside the report is the same volume by
-construction.
-
-That destination is declared in the test rather than asked for, and it is not an
-exception being smuggled in: `--out` has no default because **a report is a
-deliverable somebody asked for**, and a scratch artifact nobody receives is not
-one.
+disagree the moment one of them learns something — the argument
+`components/_contracts.py` already settled one level down.
 
 ### What it checks, and why the build cannot
 
 `_build_context` asserts the arithmetic and `_validate_context` asserts the view
-contract, but **neither has seen the file**. Two tiers:
+contract, but **neither has seen the file**.
 
-- **is it well-formed** — every chart spec survives `JSON.parse`, both asset
-  halves resolve and the CDN half pins the *current* `version.json`, every
-  `href="#x"` finds an `id="x"`, no half-rendered markup, no pre-6.0.0 prefix
-- **does it carry data** — no chart is an empty frame, no `<tbody>` is a header
-  over nothing, every declared section has content, every requested symbol
-  appears, and no section is mostly blanks
-
-The second tier exists because the first cannot fail on an empty page. An
-endpoint returning 200 with an empty body yields zeros, and **`0 + 0 == 0`
-satisfies `cost + gross == revenue`** — the identities hold, all 48 `READS`
-names are present, every spec is valid JSON, and the report renders beautifully
-with flat lines and nothing in it.
+The warnings exist because the errors cannot fire on an empty page. An endpoint
+returning 200 with an empty body yields zeros, and **`0 + 0 == 0` satisfies
+`cost + gross == revenue`** — the identities hold, all 48 `READS` names are
+present, every spec is valid JSON, and the report renders beautifully with flat
+lines and nothing in it.
 
 Blanks are measured **per section**. A real build is 19% blank against a limit
 that must sit above 50% to clear known-good markup, so one dead endpoint would
 move a seven-section page to ~26% and never fire; measured where the failure
-lands, that section reads 100% and the complaint names it.
+lands, that section reads ~100% and the complaint names it.
 
-### Cost, and why `--all` is explicit
+**The banner is never itself validated.** The page is rendered, that string is
+what gets checked, and only then is it rendered again carrying the findings —
+so the checks measure the document and never the notice about the document.
 
-Each test builds its report for real: ~13 calls, nothing cached, no offline
-mode. Ten reports is ~130 calls of live quota, so **a bare invocation runs
-nothing** — it lists what exists and totals what it would spend. Each test
-declares `CALLS = <n>`, which the runner reads out of the source with `ast`
-rather than by importing, since importing is where the expense begins.
+The second render happens **even when nothing was found**. Skipping it for a
+clean page was tried and is wrong: the page keeps the placeholder's counts and
+its all-clear reads `0 check(s)`, which is exactly the "did validation run?"
+ambiguity the comment exists to remove. A render costs milliseconds against a
+cached environment and touches no network.
 
-Each test runs as **its own process**: every one puts the skill on `sys.path`
-and path-loads controllers into `sys.modules` under aliases of its own, and the
-exit code is already the contract. Sharing an interpreter would trade that
-isolation for ~0.5s of cached Jinja environment against a test that spends ten
-seconds on the network.
-
-**A green run means the page is valid, not that it is right.** Charts draw at
-view time. Open it.
+**A clean page is valid, not right.** Charts draw at view time and nothing here
+has seen one. Open it.
 
 ### The environment is DECLARED, not passed — and there is no flag
 

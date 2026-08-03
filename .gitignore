@@ -5,6 +5,3 @@ __pycache__/
 
 secrets.*.json
 
-**/report_test_output/*
-!**/report_test_output/.gitkeep
-

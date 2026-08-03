@@ -180,36 +180,33 @@ deriving and asserting ...
 python .claude/skills/finance-reports/reports/report_builder.py financial-profile --help
 ```
 
-### Testing a report
+### Every report validates itself
 
-Each report has a `report_test.py` **beside it** — it builds the report for real
-and then checks the file:
+There is no separate test to remember to run. `build()` checks the page it just
+rendered and **writes what it found into the top of the document**, above the
+cover — so the findings arrive where you already have to look, since charts draw
+at view time and the page has to be opened anyway.
 
-```powershell
-python .claude/skills/finance-reports/reports/report_test_runner.py --list
-python .claude/skills/finance-reports/reports/report_test_runner.py financial-profile
-python .claude/skills/finance-reports/reports/report_test_runner.py --all
-```
+A report that left this tree therefore carries its own warning. That matters
+more than the developer case: a reader cannot otherwise tell a healthy page from
+one whose endpoint returned nothing, because `0 + 0 == 0` satisfies every
+identity the controller asserts.
 
-Tests are **found, not registered** — a directory holding `report.html.j2` is a
-report, and one that also holds `report_test.py` has a test — so adding one
-means adding a file. Because the test ships with the skill, a **linked** install
-can be tested in place, which is the quickest way to find out whether that
-project's `environment.json` and `secrets.<env>.json` resolve.
+- **errors** — the page is broken: a chart spec that will not parse, an asset
+  half that does not resolve, a link to an id nothing carries, unrendered
+  template syntax. Independent of which company was asked for.
+- **warnings** — the page rendered and its content is thin: an empty chart, a
+  table with no rows, a section mostly blank, a requested symbol appearing
+  nowhere. Usually a sparse subject, so they are shown and fail nothing.
 
-**A bare run does nothing**: it prints what exists and totals what it would
-cost, because every test builds against the live API and nothing is cached. Ten
-reports is ~130 calls of real quota, so the selection has to be said out loud.
-The built page lands in **`report_test_output/` beside the report** and stays
-there — open it, since charts draw at view time and no check can judge one. That
-folder is tracked but always empty: a `.gitkeep`, and a `.gitignore` pair that
-covers every report, so nothing built is ever committed or published.
+Neither raises. The page has already cost ~13 live calls and is written either
+way — a page you can open beats an exception. A clean build carries the
+all-clear as an HTML comment rather than a box, so *"validated and clean"* is
+never confused with *"validation never ran"*.
 
-It is written to disk rather than held in memory because the destination is part
-of what is tested — the page's local asset links are computed relative to it.
-Beside the report rather than the system temp directory for the same reason: on
-Windows temp is on another drive, no relative path exists between them, and the
-page would silently fall back to linking the CDN alone.
+The checks live in `reports/_report_validation.py`, one home for all reports.
+What each report expects of itself — its sections, its domain class prefix, the
+symbols the request named — is declared on its controller beside `TITLE`.
 
 If you **copy** the skill into your own project, add those two lines to that
 project's `.gitignore` yourself, exactly as you would for `secrets.*.json`.

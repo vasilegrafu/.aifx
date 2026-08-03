@@ -15,6 +15,37 @@
   </div>
 
   <main>
+{# What the build found in THIS page, above everything, because a finding a
+   reader has to go looking for is a finding nobody reads. Errors mean the page
+   is broken; warnings mean it rendered and its content is thin. A clean build
+   leaves the comment alone -- an absent banner cannot tell "validated and
+   clean" apart from "validation never ran". #}
+{% block validation %}
+<!-- validated: {{ validation.checked }} check(s), {{ validation.errors | length }} error(s), {{ validation.warnings | length }} warning(s){% if validation.at %} at {{ validation.at }}{% endif %} -->
+{% if validation.errors %}
+{% call c.callout("risk") %}
+      <p><strong>This page is broken in {{ validation.errors | length }} way(s).</strong>
+      Found when it was built; it is a defect in the report, not in the data.</p>
+      <ul>
+{% for problem in validation.errors %}
+        <li><code>{{ problem.check }}</code> — {{ problem.message }}</li>
+{% endfor %}
+      </ul>
+{% endcall %}
+{% endif %}
+{% if validation.warnings %}
+{% call c.callout("warning") %}
+      <p><strong>{{ validation.warnings | length }} thin or empty area(s).</strong>
+      The page rendered, but this much of it carries no data — usually a sparse
+      subject, sometimes an endpoint that returned nothing.</p>
+      <ul>
+{% for problem in validation.warnings %}
+        <li><code>{{ problem.check }}</code> — {{ problem.message }}</li>
+{% endfor %}
+      </ul>
+{% endcall %}
+{% endif %}
+{% endblock %}
 {% block cover %}
 {{ c.metadata_header(report_name, title) }}
 {% endblock %}

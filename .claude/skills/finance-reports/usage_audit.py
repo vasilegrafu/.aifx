@@ -35,7 +35,7 @@ not break it: a dispatcher routes work to the engine that owns it, and this
 builds nothing, writes nothing and owns nothing. The convention itself is
 documented ONCE, in one section of SKILL.md, as a statement about all 110 files
 on both sides -- so the check that enforces it is one file for the same reason
-`_report_checks.py` is one file. Two copies of these three assertions would be
+`_report_validation.py` is one file. Two copies of these three assertions would be
 two claims about one skeleton, free to disagree the moment either side learned
 something.
 

@@ -152,6 +152,28 @@ class FinancialProfileReportController(ReportController):
 
     TITLE = "Financial Profile"
 
+    #: The sections report.html.j2 declares, in its order. Written out rather
+    #: than read back from the view, so a section that silently stops rendering
+    #: is a finding on the page instead of an expectation quietly agreeing with
+    #: whatever happened.
+    SECTIONS = ("snapshot", "income", "cash", "position", "per-share",
+                "evolution", "peers")
+
+    #: A company report, so its exhibits are the fundamental-analysis family. A
+    #: portfolio report would name `portfolio-` here.
+    PREFIX = "fa-"
+
+    def _expected_text(self, symbol, peers):
+        """The subject and every peer must appear in the finished page.
+
+        Takes the same arguments as `_fetch`, and reads them the same way:
+        `--peers none` is the explicit no-peer-group, so it contributes nothing
+        to look for rather than a literal "none"."""
+        wanted = [symbol]
+        if peers and peers.lower() != "none":
+            wanted += [p.strip() for p in peers.split(",") if p.strip()]
+        return wanted
+
     def _filename(self, d):
         """<symbol>-financial-profile.html. The report is ABOUT a company, so
         the company belongs in the name; two builds for two symbols must not

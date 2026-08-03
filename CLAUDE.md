@@ -71,59 +71,45 @@ is cached. `--out` and `--peers` have **no defaults on purpose** — ask rather
 than choose. A built report carries live market data and differs on every run,
 so it is an artifact: never commit one, wherever it was written.
 
-Each report has a `report_test.py` **beside it** that builds it for real and
-then checks the file:
+## Every report validates itself, and says so on its own first screen
 
-```bash
-R=.claude/skills/finance-reports/reports/report_test_runner.py
-./.venv/Scripts/python.exe $R --list          # costs nothing
-./.venv/Scripts/python.exe $R financial-profile
-./.venv/Scripts/python.exe $R --all
-```
+There is **no report test and no test runner**. `build()` checks the page it
+just rendered, in `reports/_report_validation.py`, and renders what it found
+into the top of the document — above the cover, before anything else.
 
-**A bare run does nothing on purpose** — it lists what exists and totals the
-quota it would spend. Tests are found, not registered: a directory holding
-`report_test.py` has a test, and its `CALLS = <n>` is what the runner adds up
-without importing anything.
+That costs nothing. The test this replaced built a report *of its own* to check,
+so confidence in a report you wanted cost twice the quota and validated the
+wrong page. Now the page that gets checked is the page you are holding, every
+time, for every symbol.
 
-**The page lands in `report_test_output/` beside the report** and stays there —
-open it, because a chart draws at view time and no check here can see one.
+**Two severities, and the line matters:**
 
-That folder is **tracked but always empty**: a `.gitkeep`, plus one pair of
-rules in `.gitignore` covering every report present and future.
+- **error** — the page is BROKEN: a spec that will not `JSON.parse`, an asset
+  half that does not resolve, a link to an id nothing carries, a Jinja
+  delimiter that reached the file, a declared section that never rendered, the
+  pre-6.0.0 `investing-` prefix. None of these depend on the company asked for.
+- **warning** — the page rendered and its CONTENT is thin: an empty chart, a
+  table with no rows, a section mostly blank, a requested symbol that appears
+  nowhere. Against arbitrary input these usually mean the data is sparse, so
+  they are said loudly and fail nothing.
 
-```
-**/report_test_output/*
-!**/report_test_output/.gitkeep
-```
+Without that split a legitimately sparse company would fail its own report.
 
-The `**/` is load-bearing — without it the pattern anchors to the repo root and
-silently ignores nothing four levels down. **Verify with `git check-ignore`, not
-by eye**, whenever these lines are touched: a published page is a page that was
-committed, and this is the rule standing between the two. A copied skill needs
-the same lines in the consuming project.
+**Validation never raises and never withholds the page.** By the time it runs,
+the file has cost ~13 live calls; it is written whatever was found. Errors and
+warnings also print on the way out, so a caller building several does not have
+to open each one.
 
-**Not temp**, which was tried: it is on `C:` while this repo is on `D:`, and
-with no relative path between drives `local_href` comes out empty — so the page
-links the CDN alone and renders unstyled against a tag that may not be pushed.
+**A clean build leaves an HTML comment, not a box** — `<!-- validated: N
+check(s), 0 error(s) … -->`. An absent banner cannot tell *"validated and
+clean"* from *"validation never ran"*.
 
-**It spends ~13 live API calls every time** — there is nothing to cache and no
-fixture, so don't run it in a loop while iterating. Its ten checks answer two
-questions the build cannot:
+**Assertions passing does not mean data arrived.** An endpoint returning a 200
+with an empty body yields zeros, and `0 + 0 == 0` satisfies `cost + gross ==
+revenue` — the arithmetic holds, all 48 `READS` names exist, and the page
+renders flat and empty. That is what the warnings measure, and they measure per
+SECTION: one dead endpoint out of seven moves the whole page only to ~26% blank,
+which no page-level threshold catches without failing good markup.
 
-- **well-formed** — chart specs survive `JSON.parse`, both asset halves resolve,
-  the CDN half pins the *current* `version.json` (which is how the
-  bump-before-rebuild rule above gets enforced rather than remembered), in-page
-  links land on real ids, no half-rendered markup
-- **carries data** — no empty chart, no header-over-nothing table, no bare
-  section, every requested symbol present, no section mostly blank
-
-**Assertions passing does not mean data arrived.** An endpoint that returns a
-200 with an empty body yields zeros, and `0 + 0 == 0` satisfies `cost + gross ==
-revenue` — so the arithmetic holds, all 48 `READS` names exist, and the page
-renders flat and empty. That is what the second tier is for, and it measures
-per SECTION: one dead endpoint out of seven moves the whole page only to ~26%
-blank, which no page-level threshold can catch without failing good markup.
-
-It is the same story as the showcase audit: green means the page is valid, not
-that it is correct. **Open it.**
+Green still means the page is valid, not that it is correct. Charts draw at view
+time and nothing here has seen one. **Open it.**

@@ -1,54 +1,73 @@
-"""The checks every report test makes, and the run that makes them.
+"""What a built report is checked for, and how the page says so on its face.
 
-WHAT A `report_test.py` IS, once this file exists: four declarations and the
-checks only THAT report's finished page can answer. Everything here is generic
-over "a page this skill generated" - it names no report, no endpoint and no
-company - so a second report inherits ten checks instead of copying four
-hundred lines of them.
+    validate(html, out, sections=…, prefix=…, expected=…)  ->  Validation
 
-THE ARGUMENT IS `components/_contracts.py`, one level up. Ten charts share one
-series/categories contract there, and copying it into ten files would have been
-ten claims about one contract, free to disagree the moment one of them learned
-something. The same is true of `no_blank_epidemic`'s threshold, of the two
-halves of `assets_resolve`, and of what counts as a blank cell: each is one
-fact, and a fact wants one home. `reports/REFERENCE.md` refuses a mirrored tree
-of test directories for this reason - a mirror is a second copy free to drift -
-and check bodies copied per report are that mirror at a smaller scale.
+RUN AT BUILD TIME, NOT BY A TEST, and the difference is quota. The test this
+replaced built a report OF ITS OWN - a fixed AMD/NVDA/INTC, ~13 live calls - and
+checked that. So confidence in a report you actually wanted cost twenty-six
+calls and validated the wrong page: the one the test built, never the one you
+were about to send. Checking the render in `build()` costs nothing, happens
+every time, and the page that gets checked is the page you are holding.
 
-WHAT STAYS IN THE LEAF. Three of the ten cannot be universal, because their
-EXPECTATION is the report's own: which sections it declares, which symbols it
-was asked for, which domain prefix its components carry. Those are factories
-here - called with the report's answer, returning a check of the usual shape -
-so the leaf declares a fact rather than reimplementing a loop.
+THE RESULT IS RENDERED INTO THE DOCUMENT, at the top, before the cover. Printing
+to stdout was the other option and it repeats the mistake this repository keeps
+finding: a signal nobody is obliged to read. Charts draw at view time, so a
+human has to open the page anyway - putting the findings there means the
+feedback arrives where the eye already is. It also means a report that left this
+tree carries its own warning, which matters more than the developer case: a
+reader cannot tell a healthy page from one whose endpoint returned nothing,
+because `0 + 0 == 0` satisfies every identity a controller asserts.
 
-EVERY CHECK IS `(html, out) -> list[str]`, returning complaints rather than
-asserting, so one run reports EVERY fault it found: a test that stops at the
-first tells you nothing about the second, and the second is the one that was
-going to cost you a rebuild. `out` is the directory the page was written to and
-only `assets_resolve` uses it - uniform anyway, because the alternative is a
-runner that has to know which checks want which arguments, and that knowledge
-would live nowhere the checks themselves can see.
+TWO SEVERITIES, and the line between them is what the finding depends on.
 
-A GREEN RUN MEANS THE PAGE IS VALID, NOT THAT IT IS RIGHT. Charts draw at view
-time. Nothing in this file has seen one. Open the page.
+    ERROR    the page is BROKEN. A spec that will not parse, an asset half that
+             does not resolve, a link to an id nothing carries, a Jinja
+             delimiter that reached the file. None of these depend on which
+             company was asked for - they are defects in the render path, and
+             they are defects for every input.
+
+    WARNING  the page renders, and its CONTENT is thin. An empty chart, a table
+             with no rows, a section that is mostly blank. Against the fixed
+             input of a test these meant "the code broke". Against arbitrary
+             input they usually mean "this symbol has little data", which is a
+             fact about the world and not a fault - so they are said loudly and
+             they do not fail the build.
+
+Without that split a legitimately sparse company would fail its own report.
+
+THE BANNER IS NOT ITSELF VALIDATED. `build()` renders, validates that string,
+and only then renders again carrying the findings - so what these checks measure
+is the document, never the notice about the document. The second render happens
+even on a clean page, so the all-clear can say how many checks actually ran: an
+ABSENT banner cannot distinguish "validated and clean" from "validation never
+ran", and neither can one claiming zero checks.
 """
 
 import json
 import re
 import sys
+from collections import namedtuple
+from datetime import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 
-# Skill root on sys.path by MARKER, so the base imports PACKAGE-QUALIFIED -
-# character for character what a leaf does, and for the same reason. Not a
-# parent count: leaves sit two to four folders deep and a count is wrong at the
-# next depth.
+# Skill root on sys.path by MARKER, so the base imports PACKAGE-QUALIFIED.
+# Why a marker and not a parent count: SKILL.md, "The preamble every leaf
+# starts with".
 SKILL = next(p for p in [HERE, *HERE.parents] if (p / "_paths.py").exists())
 if str(SKILL) not in sys.path:
     sys.path.insert(0, str(SKILL))
 
 from _paths import VERSION_FILE                                    # noqa: E402
+
+#: One finding. `check` is what the reader recognises, `message` is where to
+#: look - both reach the page, because "something is wrong" is not actionable.
+Problem = namedtuple("Problem", "check message")
+
+#: What `build()` hands the template. `ok` is a convenience for the common case;
+#: `checked` exists so the all-clear comment can say how much was actually run.
+Validation = namedtuple("Validation", "errors warnings checked at ok")
 
 #: The engine's own selector, from js/modules/charts-apache-echarts.js. Any
 #: attribute may follow the class - `hidden` always does, `data-height`
@@ -57,16 +76,12 @@ CHART = re.compile(r'<pre class="chart apache-echarts"[^>]*>(.*?)</pre>', re.S)
 
 #: How much of a section may be blank before it stops being a section.
 #:
-#: MEASURED, not guessed. Swept across the 36 built showcase pages that carry a
+#: MEASURED, not guessed. Swept across the built showcase pages that carry a
 #: real table, the legitimate high-water marks are `approval-block` at 50% and
 #: `cohort-table` at 36% - both correct pages that are simply sparse. So 25%
 #: would have failed known-good markup, and the number has to sit above the
 #: densest honest page rather than wherever it feels strict. A section whose
 #: endpoint returned nothing goes to ~100%, so there is room for both.
-#:
-#: ONE NUMBER FOR EVERY REPORT, which is the point of it living here: it was
-#: measured once against the library, not against `financial-profile`, and a
-#: per-report copy would be a second reading of the same sweep.
 BLANK_LIMIT = 0.55
 
 #: What a cell holds when it holds nothing. `n/m` is deliberate - `_convert_to_str`
@@ -80,7 +95,7 @@ def _reject_constant(name):
 
     Python accepts bare `NaN`, `Infinity` and `-Infinity` - JSON does not, and
     `JSON.parse` throws on them. `| tojson` writes them unquoted from any float
-    that got there, so without this hook a test would cheerfully parse a page
+    that got there, so without this hook validation would cheerfully pass a page
     on which NOT ONE CHART RENDERS."""
     raise ValueError(f"{name} is not valid JSON")
 
@@ -88,11 +103,11 @@ def _reject_constant(name):
 def _numbers(node):
     """Every numeric leaf under an ECharts `data`/`links` value, whatever its shape.
 
-    Twenty-one chart types put their numbers in six different places - a bare
-    list for the axis charts, `[x, y]` pairs for scatter, `[o, c, l, h]` for
-    candlestick, `{name, value}` for pie and funnel, `{value}` for gauge, and a
-    separate `links[].value` for sankey. Walking for numbers costs one function
-    and works for the twenty-second."""
+    Chart types put their numbers in six different places - a bare list for the
+    axis charts, `[x, y]` pairs for scatter, `[o, c, l, h]` for candlestick,
+    `{name, value}` for pie and funnel, `{value}` for gauge, and a separate
+    `links[].value` for sankey. Walking for numbers costs one function and works
+    for the next one."""
     if isinstance(node, bool):
         return                          # a bool is an int in Python; not data
     if isinstance(node, (int, float)):
@@ -115,18 +130,22 @@ def _sections(html):
     return dict(zip(spans[1::2], spans[2::2]))
 
 
-# ------------------------------------------------- universal - is it well-formed
-def charts_parse(html, out):
-    """Every chart spec must survive `JSON.parse`.
+# --------------------------------------------------------------- ERROR checks
+# Broken regardless of what was asked for. Every one of these is a defect in the
+# render path, so none of them can be explained away by a thin data set.
 
-    This is the failure the documentation calls invisible: the markup is valid,
-    the build exits 0, and the browser shows a page of error cards because one
-    number was non-finite. It is invisible to a READER of the HTML, not to a
-    parser of it."""
-    specs = CHART.findall(html)
-    if not specs:
-        return ["no chart specs in the page at all"]
+def charts_parse(html, out):
+    """Every chart spec that EXISTS must survive `JSON.parse`.
+
+    The failure this catches is the one the documentation calls invisible: the
+    markup is valid, the build exits 0, and the browser shows a page of error
+    cards because one number was non-finite. It is invisible to a READER of the
+    HTML, not to a parser of it.
+
+    Absence is not an error here - a report with no chart is a warning, below,
+    because whether it should have had one is a question about its data."""
     problems = []
+    specs = CHART.findall(html)
     for i, spec in enumerate(specs, 1):
         try:
             json.loads(spec, parse_constant=_reject_constant)
@@ -143,19 +162,12 @@ def assets_resolve(html, out):
     filesystem rather than pattern-matched, because a path with the right SHAPE
     and the wrong depth looks identical.
 
-    CDN is pinned at BUILD time, so a page built before `version.json` was
-    bumped pins the previous tag and serves the previous behaviour to everyone
-    who opens it outside this tree. That is the ordering trap in CLAUDE.md,
-    caught here as a string comparison.
-
     THE CDN PATTERN COMES FROM `version.json`, not from a repository name
     written into this file. A copied skill points its `cdn` at whoever will
     publish its pages, and a check that hard-coded the original owner would
     quietly stop testing the CDN half in every project but this one - passing,
     because the half it could not find was never required."""
     info = json.loads(VERSION_FILE.read_text(encoding="utf-8"))
-    # {version} is the one variable part; everything else is escaped, so the
-    # pattern is whatever this project actually publishes to.
     pinned = re.escape(info["cdn"]).replace(
         re.escape("{version}"), r"([0-9][0-9.]*)")
 
@@ -163,8 +175,7 @@ def assets_resolve(html, out):
     for kind, bundle in (("css", "css/bundle.css"), ("js", "js/bundle.js")):
         # `[^":]*` so a URL can never match: the local href is a RELATIVE path,
         # and without excluding the colon this matched the CDN fallback and
-        # then reported it as a local file that does not exist. A page with no
-        # local half at all looked identical to a page with a broken one.
+        # then reported it as a local file that does not exist.
         local = re.search(rf'(?:href|src)="([^":]*?/{re.escape(bundle)})"', html)
         if not local:
             problems.append(f"{kind}: no local link to {bundle} - the page "
@@ -173,14 +184,9 @@ def assets_resolve(html, out):
         elif not (out / local.group(1)).resolve().is_file():
             problems.append(f"{kind}: local href does not resolve to a file - "
                             f"{local.group(1)!r} from {out}")
-        cdn = re.search(rf"{pinned}/[^'\"]*?{re.escape(bundle)}", html)
-        if not cdn:
+        if not re.search(rf"{pinned}/[^'\"]*?{re.escape(bundle)}", html):
             problems.append(f"{kind}: no CDN fallback for {bundle} matching "
                             f"{info['cdn']!r} from {VERSION_FILE}")
-        elif cdn.group(1) != info["version"]:
-            problems.append(f"{kind}: CDN pins {cdn.group(1)}, version.json says "
-                            f"{info['version']} - the page was built before "
-                            f"the bump, or not rebuilt after it")
     return problems
 
 
@@ -190,7 +196,7 @@ def toc_resolves(html, out):
     `toc/component.html.j2` claims the contents and the document "cannot
     disagree" because the recipe passes the same list it renders from. It writes
     the two lists SEPARATELY, so today they can - this is what turns that claim
-    into an exit code."""
+    into a finding on the page."""
     ids = re.findall(r'\sid="([^"]+)"', html)
     problems = [f"duplicate id: {i!r}" for i in sorted(set(ids))
                 if ids.count(i) > 1]
@@ -217,7 +223,51 @@ def no_residue(html, out):
     return problems
 
 
-# ------------------------------------------------- universal - does it carry data
+def sections_present(sections):
+    """Every section the report DECLARES actually rendered.
+
+    Missing entirely is structural: the view names a section the render did not
+    produce, which is a fault in the page whatever the data was. Present but
+    empty is a different question and is a warning.
+
+    `sections` is declared on the controller rather than read back from the
+    view: a check that derives its expectation from the thing it is checking
+    agrees with it by construction, including when both are wrong."""
+    def check(html, out):
+        found = _sections(html)
+        return [f"section {s!r} is missing entirely" for s in sections
+                if s not in found]
+    return check
+
+
+def markup_is_current(prefix):
+    """No pre-6.0.0 prefix, and this report's own domain prefix present.
+
+    `investing-` was the domain prefix before 6.0.0: an occurrence anywhere
+    means something in the render path still emits old markup against new CSS,
+    which degrades SILENTLY - the page loads and simply loses that component's
+    styling.
+
+    The positive half matters as much: zero `fa-` in a company report means the
+    fundamental-analysis components did not render at all. Neither half depends
+    on the data, which is why both are errors."""
+    def check(html, out):
+        problems = []
+        if (stale := html.count("investing-")):
+            problems.append(f"{stale} occurrence(s) of the pre-6.0.0 "
+                            f"`investing-` prefix")
+        if not re.search(rf'class="[^"]*\b{re.escape(prefix)}', html):
+            problems.append(f"no `{prefix}` class anywhere - no component from "
+                            f"that family rendered")
+        return problems
+    return check
+
+
+# ------------------------------------------------------------- WARNING checks
+# The page renders; what is in it is thin. Against a fixed test input these
+# meant the code broke. Against whatever was asked for today they usually mean
+# the data is sparse - so they are said loudly and they do not fail anything.
+
 def charts_have_data(html, out):
     """A chart may be perfectly valid and perfectly EMPTY.
 
@@ -226,11 +276,12 @@ def charts_have_data(html, out):
     still hold, because `0 + 0 == 0` satisfies `cost + gross == revenue`. Every
     `READS` name is present, `StrictUndefined` is satisfied, every spec is valid
     JSON containing `[0, 0, 0, 0]`, and the page renders beautifully with flat
-    lines and nothing in it.
-
-    Free to run: `charts_parse` has already parsed these. This only looks."""
+    lines and nothing in it."""
+    specs = CHART.findall(html)
+    if not specs:
+        return ["no chart specs in the page at all"]
     problems = []
-    for i, spec in enumerate(CHART.findall(html), 1):
+    for i, spec in enumerate(specs, 1):
         try:
             option = json.loads(spec, parse_constant=_reject_constant)
         except ValueError:
@@ -255,16 +306,12 @@ def charts_have_data(html, out):
 
 
 def tables_have_rows(html, out):
-    """A `<tbody>` with no `<tr>` is a header over an empty page.
-
-    Checked on every table rather than on the ones a given report happens to
-    draw: `peer_comparison`, `balance_sheet`, `roll_forward` and
-    `segment_reporting` all emit the same shape, and so will the fifth."""
+    """A `<tbody>` with no `<tr>` is a header over an empty page."""
     bodies = re.findall(r"<tbody>(.*?)</tbody>", html, re.S)
     if not bodies:
         return ["no <tbody> in the page - no table rendered"]
-    empty = [i for i, body in enumerate(bodies, 1) if "<tr" not in body]
-    return [f"table {i} of {len(bodies)}: <tbody> has no rows" for i in empty]
+    return [f"table {i} of {len(bodies)}: <tbody> has no rows"
+            for i, body in enumerate(bodies, 1) if "<tr" not in body]
 
 
 def no_blank_epidemic(html, out):
@@ -279,8 +326,7 @@ def no_blank_epidemic(html, out):
     above 50% to clear known-good markup - so one dead endpoint, taking its
     section to ~100%, would move a seven-section page to about 33% and never
     fire. Measured where the failure actually lands, that same section trips on
-    its own, and the complaint names which one - which is also the difference
-    between "something is wrong" and a place to look."""
+    its own, and the complaint names which one."""
     problems = []
     for name, body in _sections(html).items():
         cells = re.findall(r"<td[^>]*>(.*?)</td>", body, re.S)
@@ -300,44 +346,20 @@ def no_blank_epidemic(html, out):
     return problems
 
 
-#: The seven that need nothing from the report to be useful. A leaf adds them
-#: whole rather than naming them one at a time, so a check added here reaches
-#: every report on its next run - which is the entire reason this file exists.
-UNIVERSAL = (
-    # is it well-formed?
-    charts_parse, assets_resolve, toc_resolves, no_residue,
-    # does it carry data?
-    charts_have_data, tables_have_rows, no_blank_epidemic,
-)
-
-
-# ----------------------------------------------------- configured by the report
-# Three checks whose LOGIC is universal and whose EXPECTATION is the report's
-# own. Factories, so what the leaf writes is the fact and not the loop, and so
-# the thing it appends to CHECKS has the same (html, out) shape as everything
-# else.
-
 def sections_are_populated(sections):
-    """Every declared section present, and carrying something.
+    """A declared section that rendered as a heading over nothing.
 
-    A section that renders as a heading with nothing under it is what a macro
-    handed an empty list looks like: no error, no gap in the contents, just a
-    title and white space that a reader scrolls straight past.
+    What a macro handed an empty list looks like: no error, no gap in the
+    contents, just a title and white space a reader scrolls straight past.
 
     "Carrying something" means a table, a chart, or visible prose - not a byte
-    count, which a wrapper div would satisfy on its own.
-
-    `sections` is written out in the leaf rather than read from the view: a test
-    that derives its expectation from the thing it is testing agrees with it by
-    construction, including when both are wrong. A deleted section should fail
-    here and be deliberately removed from that list."""
+    count, which a wrapper div would satisfy on its own."""
     def check(html, out):
         problems = []
         found = _sections(html)
         for wanted in sections:
             if wanted not in found:
-                problems.append(f"section {wanted!r} is missing entirely")
-                continue
+                continue                # sections_present owns that complaint
             body = found[wanted]
             text = re.sub(r"<[^>]+>", " ",
                           re.sub(r"<h2>.*?</h2>", "", body, flags=re.S))
@@ -349,92 +371,59 @@ def sections_are_populated(sections):
     return check
 
 
-def symbols_present(symbols):
-    """The subject and every peer must actually appear in the page.
+def text_present(expected):
+    """Everything the request named must actually appear in the page.
 
     The single strongest signal that the fetch worked. A peer whose payload came
     back empty still gets its column - labelled, present, and blank - so the
     table looks complete while comparing the subject against nothing.
 
-    The leaf passes the list because only the leaf knows its report's argument
+    The controller supplies the list, because only it knows its own argument
     shape: `financial-profile` reads a symbol and a comma-separated `--peers`,
     and the next report need not take either."""
     def check(html, out):
         return [f"{s!r} was requested but appears nowhere in the page"
-                for s in symbols if s not in html]
+                for s in expected if s not in html]
     return check
 
 
-def markup_is_current(prefix):
-    """No pre-6.0.0 prefix, and this report's own domain prefix present.
+# ---------------------------------------------------------------- the run
+def validate(html, out, sections=(), prefix="", expected=()) -> Validation:
+    """Check a rendered report. Never raises, never writes, returns findings.
 
-    `investing-` was the domain prefix before 6.0.0 and is universal: an
-    occurrence anywhere means something in the render path still emits old
-    markup against new CSS, which degrades SILENTLY - the page loads and simply
-    loses that component's styling.
+    The three configured checks are skipped rather than failed when the
+    controller declares nothing for them: a report with no `SECTIONS` is a
+    report that has not made that promise, and inventing an expectation for it
+    would be a check agreeing with itself."""
+    errors_run = [charts_parse, assets_resolve, toc_resolves, no_residue]
+    warnings_run = [charts_have_data, tables_have_rows, no_blank_epidemic]
 
-    The positive half is the report's, and matters as much: zero `fa-` in a
-    company report means the fundamental-analysis components did not render at
-    all. A portfolio report asks the same question of `portfolio-`, which is why
-    the prefix is an argument and not a constant."""
-    def check(html, out):
-        problems = []
-        if (stale := html.count("investing-")):
-            problems.append(f"{stale} occurrence(s) of the pre-6.0.0 "
-                            f"`investing-` prefix")
-        if not re.search(rf'class="[^"]*\b{re.escape(prefix)}', html):
-            problems.append(f"no `{prefix}` class anywhere - no component from "
-                            f"that family rendered")
-        return problems
-    return check
+    if prefix:
+        errors_run.append(markup_is_current(prefix))
+    if sections:
+        errors_run.append(sections_present(sections))
+        warnings_run.append(sections_are_populated(sections))
+    if expected:
+        warnings_run.append(text_present(expected))
+
+    def gather(checks):
+        found = []
+        for check in checks:
+            # A factory's closure is named `check`; the factory is what the
+            # reader recognises, so name it from the qualified name.
+            label = getattr(check, "__qualname__", check.__name__).split(".")[0]
+            found.extend(Problem(label, m) for m in check(html, out))
+        return found
+
+    errors, warnings = gather(errors_run), gather(warnings_run)
+    return Validation(
+        errors=errors, warnings=warnings,
+        checked=len(errors_run) + len(warnings_run),
+        at=datetime.now().isoformat(timespec="seconds"),
+        ok=not (errors or warnings))
 
 
-# ----------------------------------------------------------------------- the run
-def run(report, argv, out, checks) -> int:
-    """Build the report for REAL, then check the file. 0 or 1.
-
-    The build is the expensive half and the point of the exercise: ~13 live
-    calls, nothing cached, no fixture and no offline mode. What comes back is a
-    page on disk, which is the half no amount of build-time validation reaches.
-
-    Plain hyphens in anything printed: stdout is cp1252 on Windows."""
-    from reports.report_builder import ReportBuilder
-    from service_providers.config import config_file
-    from service_providers.fmp.credentials import describe, resolve
-
-    # Said out loud BEFORE the calls, exactly as report_builder.main does.
-    # Worth reading rather than skipping past: `from $ENVIRONMENT` means a shell
-    # variable is overriding environment.json, and `key from $FMP_API_KEY` means
-    # a stale one is overriding secrets.dev.json. Both are legal, neither is
-    # usually intended, and the only other record of which key paid is a quota.
-    name, source = resolve()
-    print(f"environment: {name} (from {source})   "
-          f"{config_file().name}, {describe()}", flush=True)
-    print(f"building {report} {' '.join(argv)} -> {out}", flush=True)
-
-    # No try/except. A build that raises has already said which stage failed and
-    # named the template or the identity; catching it here would replace a
-    # useful traceback with the word "failed".
-    page = ReportBuilder().build(report, argv, out)
-    html = page.read_text(encoding="utf-8")
-    print(f"{page}  ({len(html):,} bytes)\n", flush=True)
-
-    failures = 0
-    for check in checks:
-        problems = check(html, out)
-        failures += len(problems)
-        # A factory's closure is named `check`; the factory is what the reader
-        # recognises, so name it from the qualified name rather than __name__.
-        label = getattr(check, "__qualname__", check.__name__).split(".")[0]
-        print(f"{'FAIL' if problems else 'ok  '}  {label}")
-        for problem in problems:
-            print(f"        {problem}")
-
-    print()
-    if failures:
-        print(f"FAILED - {failures} problem(s). The page was still written; "
-              f"open it and see.")
-        return 1
-    print("PASSED - and a passing run does not mean the page is RIGHT. "
-          "Charts draw at view time; open it.")
-    return 0
+#: What the FIRST render is handed, before anything has been checked. The
+#: environment runs with `StrictUndefined`, so the name has to exist even on the
+#: pass whose whole purpose is to produce the string that gets validated.
+NOT_YET = Validation(errors=(), warnings=(), checked=0, at="", ok=True)
