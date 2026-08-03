@@ -95,27 +95,17 @@
   {% endcall %}
 
   {% call c.section("reconciliation", "Does it tie?") %}
-    {# THE AUDIT OF EVERY EXHIBIT ABOVE. Each row is one identity the statement
-       claims about itself, and the cells are what it LEAVES OVER in each
-       period. A row of zeros is the filing agreeing with itself.
+    {# THE AUDIT OF EVERY EXHIBIT ABOVE. Each block is one identity the statement
+       claims about itself, and it lands on what that identity LEAVES OVER in
+       each period. Zero is the filing agreeing with itself.
 
-       This exists because the answer is routinely no. A reader who is shown a
-       clean-looking ladder and a clean-looking diagram has no way to know that
-       the source's own components missed its own subtotal by most of pre-tax
-       income — so it is stated here, per period, as a number. #}
-    {# A MARK WHERE IT TIES, THE GAP WHERE IT DOES NOT. Printing the residual in
-       every cell was the first draft, and a healthy statement rendered forty
-       zeros — the validator called it an 88% blank section and was right to.
-       Zero is the answer here rather than missing data, but a wall of zeros is
-       ceremony, not detail. A tick says the same thing and leaves the eye free
-       to land on the one cell that is a number. #}
-    {# NO WARNING BELOW THE TABLE ANY MORE. It existed to explain a residual the
-       ladder printed, and the ladder no longer prints it: the statement now
-       decomposes the subtotal the filing actually carries, so every identity
-       here is a genuine check rather than an apology. What remains to be said
-       about the source is one line in the basis, at the top, where a fact about
-       the DATA belongs rather than at the foot of an exhibit about the
-       COMPANY. #}
-    {{ c.comparison_table(headers=d.recon_headers, rows=d.recon_rows) }}
+       THE TERMS, NOT A VERDICT. A tick asserts that an identity holds and asks
+       to be believed; the terms themselves are what the tick was asserting, and
+       a reader can follow them in the quarter they care about. Same component
+       as the ladder above, so the audit reads in the language of the thing it
+       audits. #}
+    {{ c.income_statement(periods=d.periods, rows=d.recon_rows, unit=d.unit,
+                          caption="Every identity worked out, per period",
+                          source="Each block stacks its terms and lands on what they leave over. Zero is the statement agreeing with itself.") }}
   {% endcall %}
 {% endblock %}

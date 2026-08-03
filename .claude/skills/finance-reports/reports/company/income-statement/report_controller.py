@@ -586,86 +586,74 @@ class IncomeStatementReportController(ReportController):
         ]
 
         # ---------------------------------------------------- the reconciliation
-        # One row per identity, cells being WHAT IT LEAVES OVER in each period.
-        # A column of zeros is the statement agreeing with itself. This is the
-        # exhibit that makes the residual a stated finding rather than a number
-        # buried in a footnote -- and it is per period, because a source that
-        # reconciles in four years out of five is a different fact from one that
-        # never does.
-        # A TICK WHERE IT TIES, THE GAP WHERE IT DOES NOT -- not a grid of
-        # residuals. The first draft printed the residual in every cell, which
-        # meant a healthy statement rendered forty zeros: the validator called
-        # it an 88% blank section, and it was right to. Zero is the answer here,
-        # not missing data, but a wall of zeros is ceremony rather than
-        # detail. A mark carries the same finding and leaves the eye free to
-        # land on the one number that is not a mark.
-        def residual(label, fn):
-            return [label] + [
-                "yes" if not fn(k) else f"{fn(k):,}" for k in range(n)]
-
-        recon_rows = [
-            residual("Cost of revenue + gross profit − revenue",
-                     lambda k: cogs[k] + gross[k] - rev[k]),
-            residual("R&D + SG&A + other − operating expenses",
-                     lambda k: rd[k] + sga[k] + other_ex[k] - opex[k]),
-            residual("Gross profit − operating expenses − operating income",
-                     lambda k: op_resid[k]),
-            residual("Interest income − interest expense − net interest",
-                     lambda k: int_inc[k] - int_exp[k] - net_int[k]),
-            # The row that measured `nonOperatingIncomeExcludingInterest`
-            # against the subtotal is gone with the field itself. It would now
-            # tie by construction in every period, and an identity that cannot
-            # fail is not an audit -- it is decoration that makes the exhibit
-            # look more thorough than it is. The interest identity above stays:
-            # it reads three INDEPENDENT fields and it genuinely fails, in
-            # GOOGL Q4 FY2025, where the feed scrambles both interest signs.
-            residual("Operating income + total other − pre-tax income",
-                     lambda k: opinc[k] + other_net[k] - pretax[k]),
-            residual("Pre-tax income − tax − continuing operations",
-                     lambda k: pretax[k] - tax[k] - cont[k]),
-            residual("EBITDA − D&A − EBIT",
-                     lambda k: ebitda[k] - dna[k] - ebit[k]),
-        ]
-
-        # THE FINDING MOVED OFF THE PAGE AND INTO THE BASIS, because the
-        # statement no longer prints the field it was about. The ladder shows
-        # what the filing shows -- one non-operating subtotal -- decomposed into
-        # interest, which the notes disclose and the feed gets right, and a
-        # derived remainder. Everything ties, so there is no gap to warn about
-        # and the warning callout is gone.
+        # EVERY IDENTITY WORKED OUT, PER PERIOD. Each block stacks the terms
+        # vertically and lands on what they leave over, so a reader can follow
+        # the arithmetic in the quarter they care about instead of taking a tick
+        # on trust.
         #
-        # What survives is DISCLOSURE, one line in the basis: which row is
-        # derived, and why the published alternative was not used. A reader who
-        # pulls this company from FMP themselves will meet the broken field, and
-        # a report that silently routed around it would leave them to rediscover
-        # it. Stating it once, quietly, is the right weight -- it is a fact
-        # about the data source, not a finding about the company.
-        ties = other_net[-1] - net_int[-1]
-        # WHETHER the published field is provably reversed, and how often. One
-        # period landing exactly could be coincidence; four of five is a bug.
-        agree = sum(1 for k in range(n)
-                    if nonop[k] and other_net[k] + nonop[k] + int_exp[k] == 0)
-        if agree:
-            derived_why = (
-                f"total other income less net interest — {other_net[-1]:,} less "
-                f"{net_int[-1]:,} = {ties:+,} for {periods[-1]}. The feed also "
-                f"publishes nonOperatingIncomeExcludingInterest, which is not "
-                f"used: it reads {nonop[-1]:,}, and negating it and subtracting "
-                f"interest expense reproduces the subtotal exactly in {agree} of "
-                f"the {n} periods shown, so its sign is reversed")
-        elif any(nonop_resid):
-            derived_why = (
-                f"total other income less net interest — {other_net[-1]:,} less "
-                f"{net_int[-1]:,} = {ties:+,} for {periods[-1]}. The feed also "
-                f"publishes nonOperatingIncomeExcludingInterest, which is not "
-                f"used: it misses the statement's own subtotal by "
-                f"{nonop_resid[-1]:,} and the payload does not say why")
-        else:
-            derived_why = (
-                f"total other income less net interest — {other_net[-1]:,} less "
-                f"{net_int[-1]:,} = {ties:+,} for {periods[-1]}. It is derived "
-                f"rather than read so that the row always sums into the subtotal "
-                f"above it")
+        # THIS IS THE THIRD SHAPE. The first printed one residual per identity
+        # per period and rendered forty zeros, which the validator called an 88%
+        # blank section; the second replaced them with ticks, which fixed the
+        # blankness by removing every number -- thirty-five ticks and not one
+        # figure, so nothing could be checked and nothing could be learnt. The
+        # terms themselves are the answer: they are what a tick was asserting.
+        #
+        # It restates numbers the ladder already shows, deliberately. A
+        # reconciliation a reader has to cross-reference is one they will not
+        # perform, and the whole exhibit exists to be performed.
+        #
+        # Reuses the income_statement component rather than a table, because its
+        # section / detail / subtotal kinds map exactly onto identity name /
+        # term / leftover, and the exhibit then reads in the same visual
+        # language as the statement it audits.
+        def recon_block(title, parts):
+            """One identity: a heading, its signed terms, and the remainder.
+
+            Terms arrive ALREADY SIGNED, so the leftover is a plain sum and the
+            label carries the operator the reader sees. Deriving the sign from
+            the label instead would put the arithmetic in two places."""
+            rows = [{"label": title, "cells": [], "kind": "section"}]
+            rows += [{"label": label, "cells": vals, "kind": "detail"}
+                     for label, vals in parts]
+            rows.append({"label": "= leftover", "kind": "subtotal",
+                         "cells": [sum(vals[k] for _, vals in parts)
+                                   for k in range(n)]})
+            return rows
+
+        def neg(values):
+            return [-v for v in values]
+
+        recon_rows = (
+            recon_block("Revenue", [
+                ("Cost of revenue", cogs),
+                ("+ Gross profit", gross),
+                ("− Revenue", neg(rev))])
+            + recon_block("Operating expenses", [
+                ("Research and development", rd),
+                ("+ Selling, general and administrative", sga),
+                ("+ Other operating expenses", other_ex),
+                ("− Total operating expenses", neg(opex))])
+            + recon_block("Operating income", [
+                ("Gross profit", gross),
+                ("− Total operating expenses", neg(opex)),
+                ("− Operating income", neg(opinc))])
+            + recon_block("Net interest", [
+                ("Interest income", int_inc),
+                ("− Interest expense", neg(int_exp)),
+                ("− Net interest income", neg(net_int))])
+            + recon_block("Income before tax", [
+                ("Operating income", opinc),
+                ("+ Total other income and expenses", other_net),
+                ("− Income before tax", neg(pretax))])
+            + recon_block("Continuing operations", [
+                ("Income before tax", pretax),
+                ("− Income tax expense", neg(tax)),
+                ("− Net income from continuing operations", neg(cont))])
+            + recon_block("EBIT", [
+                ("EBITDA", ebitda),
+                ("− Depreciation and amortisation", neg(dna)),
+                ("− EBIT", neg(ebit))])
+        )
 
         # ----------------------------------------------------------- the basis
         period_end = datetime.strptime(latest["date"], "%Y-%m-%d").date()
@@ -706,34 +694,6 @@ class IncomeStatementReportController(ReportController):
                 {"term": "Currency and unit",
                  "value": f"{latest.get('reportedCurrency', 'USD')}, {unit} unless "
                           f"stated. Per-share figures are as reported"},
-                {"term": "Segment detail",
-                 "value": ("selling and marketing is reported separately from "
-                           "general and administrative"
-                           if sga_split else
-                           "the filing reports selling, general and administrative "
-                           "as one line and publishes zero for both halves, so it "
-                           "is shown combined rather than split into two zero rows")},
-                {"term": "Depreciation",
-                 "value": "sits inside cost of revenue and operating expenses. It "
-                          "is a memo line in the ladder and appears nowhere in the "
-                          "diagram, where it would be counted twice"},
-                # THE ONE DERIVED ROW, named out loud. This used to read "every
-                # line is as published and none is derived", and that promise is
-                # what made printing a broken published field feel obligatory.
-                # The promise was worth less than the accuracy it cost.
-                {"term": "Other non-operating",
-                 "value": f"the one derived row on the page. It is {derived_why}"},
-                {"term": "How the diagram is built",
-                 "value": "from the subtotals that tie — operating income plus "
-                          "total other income equals pre-tax income in every "
-                          "period, and the ladder decomposes that same subtotal, "
-                          "so the picture and the statement agree line for line"},
-                {"term": "Source",
-                 "value": "company filings via Financial Modeling Prep. Every line "
-                          "is as published except the one named above, and the "
-                          "condensed statement carries a single non-operating "
-                          "subtotal, which is what Total other income and "
-                          "expenses reproduces"},
             ],
             # ladder
             "ladder_rows": ladder,
@@ -748,7 +708,6 @@ class IncomeStatementReportController(ReportController):
             "margin_rows": margin_rows,
             "pershare_rows": pershare_rows,
             "share_rows": share_rows,
-            "recon_headers": ["Identity"] + periods,
             "recon_rows": recon_rows,
         }
         return d
@@ -760,7 +719,7 @@ class IncomeStatementReportController(ReportController):
         "basis_facts", "company", "exchange", "flow_caption", "flow_links",
         "flow_nodes", "flow_note", "header_facts", "ladder_caption", "ladder_rows",
         "margin_rows", "period", "periods", "pershare_rows", "price_date",
-        "recon_headers", "recon_rows", "share_rows", "ticker",
+        "recon_rows", "share_rows", "ticker",
         "unit",
     )
 

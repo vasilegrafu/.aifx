@@ -123,9 +123,24 @@ not — but only if the page says which is which.
 
 **An identity that cannot fail is not an audit.** The reconciliation row that
 measured the removed field went with it, because it would now tie by
-construction in every period. The interest identity stays: it reads three
-independent fields and it genuinely fails, in GOOGL Q4 FY2025, where the feed
-scrambles both interest signs.
+construction in every period.
+
+**The exhibit shows its terms, not a verdict.** Three shapes were tried. One
+residual per identity per period rendered forty zeros and the validator called
+it an 88% blank section. Ticks fixed the blankness by removing every number —
+thirty-five ticks and not one figure, so nothing could be checked and nothing
+could be learnt. Now each identity stacks its terms vertically and lands on the
+remainder, per period, which is what a tick was asserting all along.
+
+It restates numbers the ladder already carries, deliberately: a reconciliation
+a reader must cross-reference is one they will not perform, and the exhibit
+exists to be performed.
+
+**Every identity ties for GOOGL, including the interest one.** Q4 FY2025 prints
+interest income of -3,127 and interest expense of +438, which look scrambled —
+but they are scrambled consistently, and -3,127 - (-438) - (-2,689) is 0. Odd
+signs are not the same finding as a broken identity, and the exhibit now shows
+the terms, so a reader can see which of the two they are looking at.
 
 **D&A and EBITDA are memo lines, never ribbons.** Depreciation sits inside cost
 of revenue and inside operating expenses. Drawing it as its own flow counts it
