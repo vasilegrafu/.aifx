@@ -20,6 +20,7 @@ S=.claude/skills/finance-reports        # from the PROJECT ROOT — see ../../..
 
 python $S/reports/report_builder.py financial-profile MU --peers none --out DIR
 python $S/reports/report_builder.py financial-profile MU --peers INTC,WDC,STX --out DIR
+python $S/reports/report_builder.py financial-profile MU --peers none --out DIR --asset-bundles local
 python $S/reports/report_builder.py financial-profile --help
 ```
 
@@ -28,6 +29,7 @@ python $S/reports/report_builder.py financial-profile --help
 | `symbol` | yes | ticker, upper-cased for you |
 | `--peers` | **yes** | tickers, or `none`. No default: choosing nobody is still choosing. One extra call each |
 | `--out` | yes | no default. **Ask if you were not told it** — see below |
+| `--asset-bundles` | no | `cdn` unless you say otherwise, so the page renders anywhere. `local` links this tree relative to `--out` and breaks once the file moves |
 
 The file lands at `<symbol-lower>-financial-profile.html` and **overwrites**
 without asking. Two symbols never collide; the same symbol twice is the same

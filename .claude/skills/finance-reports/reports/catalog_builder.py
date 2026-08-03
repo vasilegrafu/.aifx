@@ -86,7 +86,8 @@ class CatalogBuilder:
             "it fetches, what that costs, and what its assertions guarantee.",
             "",
             "```bash",
-            f"{BUILD_COMMAND} <report> <args...> --out DIR",
+            f"{BUILD_COMMAND} <report> <args...> --out DIR "
+            f"[--asset-bundles local]",
             "```",
             "",
             "| report | title | what it argues | arguments | docs |",

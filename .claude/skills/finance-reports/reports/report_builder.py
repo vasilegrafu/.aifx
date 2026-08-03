@@ -1,9 +1,9 @@
 """Build a report from live data, addressed by NAME.
 
-    ReportBuilder().build("financial-profile", ["INTC", "--peers", "none"], out)
+    ReportBuilder().build("financial-profile", ["INTC", "--peers", "none"], out, "cdn")
 
     python .claude/skills/finance-reports/reports/report_builder.py financial-profile INTC \n        --peers none --out DIR
-    python .claude/skills/finance-reports/reports/report_builder.py financial-profile INTC \n        --peers AMD,NVDA --out DIR
+    python .claude/skills/finance-reports/reports/report_builder.py financial-profile INTC \n        --peers AMD,NVDA --out DIR --asset-bundles local
 
 A NAME, not a path: a report sits under its SUBJECT (`company/…`), and the
 domain is a taxonomy for readers, so nobody running one should have to know
@@ -38,6 +38,7 @@ SKILL_DIR = REPORTS_DIR.parent
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
+from components._showcase_controller import ASSET_BUNDLES          # noqa: E402
 from reports._report_controller import VIEW, ReportController      # noqa: E402
 from service_providers.config import config_file                   # noqa: E402
 from service_providers.fmp.credentials import describe, resolve    # noqa: E402
@@ -86,17 +87,19 @@ class ReportBuilder:
         controller._add_args(parser)
         return controller, parser
 
-    def build(self, name: str, argv: list[str], out_dir) -> Path:
+    def build(self, name: str, argv: list[str], out_dir, asset_bundles) -> Path:
         """Build report `name` with `argv` as its own arguments.
 
         `argv` is whatever the CLI did not claim: the report declares what it
-        accepts through _add_args, so the engine never knows what a symbol is."""
+        accepts through _add_args, so the engine never knows what a symbol is.
+        `out_dir` and `asset_bundles` are the two the ENGINE claims, and they
+        are passed separately for that reason — a report never sees either."""
         controller, parser = self.parser_for(name)
         # Before the arguments are parsed and long before ~13 network calls: a
         # malformed report should cost nothing to discover.
         self.purpose(self.all()[name])
         args = parser.parse_args(argv)
-        return controller.build(out_dir, **vars(args))
+        return controller.build(out_dir, asset_bundles, **vars(args))
 
     @staticmethod
     def purpose(directory: Path) -> str:
@@ -168,7 +171,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("report", help="report name, e.g. financial-profile")
     parser.add_argument("--out", required=True,
                         help="output directory. Required and with no default: "
-                             "the page's local asset links are relative to it")
+                             "a report is a deliverable and where it lands is "
+                             "the reader's decision, not one to invent")
+    # DEFAULTS TO CDN, unlike --out and --peers, because the two choices are not
+    # symmetric: a CDN page renders everywhere INCLUDING where it was written,
+    # while a local page renders in exactly one directory. So the default is the
+    # one that cannot be silently wrong -- at worst it costs the edit-reload
+    # loop, which is visible immediately. `local` is the opt-in.
+    parser.add_argument("--asset-bundles", default="cdn",
+                        choices=ASSET_BUNDLES,
+                        help="where the page links css/bundle.css and "
+                             "js/bundle.js: 'cdn' at the pinned version, which "
+                             "renders anywhere (default); 'local' relative to "
+                             "--out, live against this tree but broken as soon "
+                             "as the page is moved")
     # `report_builder.py <report> --help` has to reach the REPORT's parser.
     # The arguments after the name belong to it, and argparse fires this
     # parser's own -h during parse_known_args, so the report's would never be
@@ -191,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"environment: {name} (from {source})   "
           f"{config_file().name}, {describe()}", flush=True)
 
-    print(ReportBuilder().build(args.report, rest, args.out))
+    print(ReportBuilder().build(args.report, rest, args.out, args.asset_bundles))
     return 0
 
 

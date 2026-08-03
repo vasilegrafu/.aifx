@@ -150,8 +150,10 @@ and neither announces itself:
 - **The file is somewhere nobody looks.** It is not an error; it is a report
   that quietly does not exist where it was wanted.
 - **The asset href is computed from that directory**, so a report written to
-  the wrong place links its CSS and JS along a relative path that may not
-  resolve — and it still renders from the CDN fallback, looking almost right.
+  the wrong place under `--asset-bundles local` links its CSS and JS along a
+  relative path that does not resolve. Since 12.0.0 there is no CDN fallback to
+  cover for it: the page renders unstyled, which is at least a symptom you can
+  see rather than one that looks almost right.
 
 Ask once, plainly: *"Where should the report be written?"* One question costs a
 sentence; a report in the wrong place costs ~13 API calls and a file the reader
@@ -341,14 +343,14 @@ reports/
   _report_controller.py        ReportController; borrows env() AND the asset pair
   _report_validation.py        what build() checks the rendered page for
   _report.master.html.j2       the shell every report view extends
-  report_builder.py            ReportBuilder.build(name, argv, out) + the CLI
+  report_builder.py            ReportBuilder.build(name, argv, out, bundles) + the CLI
   company/                     a domain, holding its reports
     financial-profile/         one report — view, controller, usage
   portfolio/  market/  economy/
                                declared and empty — the taxonomy, stated
 
-css/  css.loader.html.j2       the <link>   + its CDN fallback
-js/   js.loader.html.j2        the <script> + its CDN fallback
+css/  css.loader.html.j2       the <link>,   local or CDN as asked
+js/   js.loader.html.j2        the <script>, local or CDN as asked
 service_providers/fmp/            the client — the ONLY thing doing I/O
 ```
 
@@ -356,22 +358,37 @@ service_providers/fmp/            the client — the ONLY thing doing I/O
 consumer inside the others — a filter nothing hangs on a template is
 unreachable. It imports nothing outside the standard library and Jinja.
 
-## Assets — local first, CDN second
+## Assets — one bundle, chosen at build time
 
-Every generated page links the bundle **twice over**: the local copy, relative
-to wherever the file was written, and the version-pinned CDN as an `onerror`
-fallback. Local first, so a page previews the current tree the moment it is
-generated. CDN second, so the same file still renders once it leaves the tree —
-copied elsewhere, emailed, opened from a download folder.
+Every generated page links the bundle **once**, and the caller says which:
 
-The two halves fail differently, which is why they are two files. A `<link>`
-retargets its own `href`. A `<script>` **cannot** — once it has failed the
-browser will not re-fetch on a new `src`, so the handler appends a fresh
-element. Getting that wrong looks like it works; the page simply has no
-JavaScript.
+- `--asset-bundles cdn` — **the default.** The version-pinned tag. Renders
+  anywhere: copied, emailed, opened from a download folder, and also in the
+  directory it was written to.
+- `--asset-bundles local` — relative to `--out`. Live against the current tree,
+  so a stylesheet edit shows on the next reload with no publish and no bump.
+  Breaks the moment the file is moved. This is what showcases always get; they
+  are committed beside their component, and because jsDelivr publishes the whole
+  repo their `../../..` resolves over the CDN too.
 
-**Editing a bundle means bumping `version.json`.** Until you do, anything
-falling back to the CDN serves the previous behaviour from the pinned tag.
+**The default is the portable half on purpose.** The two are not symmetric —
+`cdn` works everywhere `local` does and more — so defaulting to it cannot be
+silently wrong. It costs the edit-reload loop, and losing that is obvious on the
+next reload. Defaulting the other way would ship pages that break only after
+they are moved, which is the one place nobody is looking.
+
+Until 12.0.0 a page linked local-first with the CDN armed on `onerror`, so it
+did not have to know. That cost a 404 on every page that had left the tree —
+and a stylesheet that 404s counts as *resolved*, so the browser painted the
+document unstyled before the fallback was even armed. The flash was the
+fallback. It also forced the two halves apart, because a `<link>` can retarget
+its own `href` and a `<script>` cannot: once a script has failed the browser
+will not re-fetch on a new `src`, so that handler had to append a fresh element,
+and getting it wrong looked like it worked. Choosing at build time deleted all
+of it.
+
+**Editing a bundle means bumping `version.json`.** Until you do, every page
+built with `cdn` serves the previous behaviour from the pinned tag.
 
 ## What guards the output
 
@@ -633,11 +650,16 @@ short by one, which is exactly how the previous hand-maintained one died.
    `css/` or `js/` changed, so no showcase is invalidated and there is nothing
    to rebuild; the bump is what publishes the report at a tag someone can pin.
 7. `python $S/status.py --check` — the four exit codes in one command.
-8. **Run it**, and ask for both arguments rather than choosing either:
+8. **Run it**, and ask for `--out` and `--peers` rather than choosing either:
 
 ```bash
-python $S/reports/report_builder.py <name> … --peers … --out DIR
+python $S/reports/report_builder.py <name> … --peers … --out DIR [--asset-bundles local]
 ```
+
+   `--asset-bundles` is the one argument here that DOES have a default, and it
+   is `cdn`: the page links the pinned version and renders anywhere. Pass
+   `local` only when you want the page live against the current tree — it links
+   relative to `--out` and breaks the moment the file is moved.
 
 9. **Open the page.** It costs ~13 live calls and validates itself, but a clean
    validation means the markup is valid, not that the page is right — charts

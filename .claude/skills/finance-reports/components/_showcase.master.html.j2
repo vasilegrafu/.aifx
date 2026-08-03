@@ -2,8 +2,9 @@
    reports/_report.master.html.j2, and it does the same job: doctype, head, the
    asset pair, the cover block, and one {% block content %} for the view to
    fill. It exists so those are written ONCE rather than in every component's
-   view; the asset pair especially, which is local-first with a CDN fallback
-   and is not something to restate 110 times.
+   view; the asset pair especially, which branches on `asset_bundles` and is
+   not something to restate 110 times. A showcase always passes "local" — see
+   _showcase_controller.render().
 
    It calls no macro but metadata_header, and holds no case-specific markup —
    what a component shows is its view's business. #}

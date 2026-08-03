@@ -7,7 +7,7 @@ _declarations — do not edit; run `python .claude/skills/finance-reports/report
 it fetches, what that costs, and what its assertions guarantee.
 
 ```bash
-python .claude/skills/finance-reports/reports/report_builder.py <report> <args...> --out DIR
+python .claude/skills/finance-reports/reports/report_builder.py <report> <args...> --out DIR [--asset-bundles local]
 ```
 
 | report | title | what it argues | arguments | docs |

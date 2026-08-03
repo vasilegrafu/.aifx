@@ -1,6 +1,6 @@
 """What a built report is checked for, and how the page says so on its face.
 
-    validate(html, out, sections=…, prefix=…, expected=…)  ->  Validation
+    validate(html, out, asset_bundles, sections=…, prefix=…, expected=…)  ->  Validation
 
 RUN AT BUILD TIME, NOT BY A TEST, and the difference is quota. The test this
 replaced built a report OF ITS OWN - a fixed AMD/NVDA/INTC, ~13 live calls - and
@@ -20,7 +20,7 @@ because `0 + 0 == 0` satisfies every identity a controller asserts.
 
 TWO SEVERITIES, and the line between them is what the finding depends on.
 
-    ERROR    the page is BROKEN. A spec that will not parse, an asset half that
+    ERROR    the page is BROKEN. A spec that will not parse, an asset link that
              does not resolve, a link to an id nothing carries, a Jinja
              delimiter that reached the file. None of these depend on which
              company was asked for - they are defects in the render path, and
@@ -154,40 +154,63 @@ def charts_parse(html, out):
     return problems
 
 
-def assets_resolve(html, out):
-    """Both halves of the asset pair, and both ways they break.
+def assets_resolve(asset_bundles):
+    """The one asset link the build ASKED for, and the ways it breaks.
+
+    A factory, because what counts as correct depends on the choice made at
+    `--asset-bundles`. Until 12.0.0 every page carried both halves and this
+    check required both; a page now carries exactly one, so requiring the other
+    would fail every build of the kind it was not.
 
     LOCAL is computed relative to wherever the file was written, so it is
     exactly what moving the destination breaks - resolved against the real
     filesystem rather than pattern-matched, because a path with the right SHAPE
-    and the wrong depth looks identical.
+    and the wrong depth looks identical. The check is therefore only as good as
+    the page staying put, which is the whole meaning of asking for local.
 
-    THE CDN PATTERN COMES FROM `version.json`, not from a repository name
-    written into this file. A copied skill points its `cdn` at whoever will
-    publish its pages, and a check that hard-coded the original owner would
-    quietly stop testing the CDN half in every project but this one - passing,
-    because the half it could not find was never required."""
+    CDN is matched against the pattern in `version.json`, not against a
+    repository name written into this file. A copied skill points its `cdn` at
+    whoever will publish its pages, and a check that hard-coded the original
+    owner would quietly stop testing anything in every project but this one -
+    passing, because what it could not find was never required.
+
+    EITHER WAY THE OTHER MUST BE ABSENT. A local page that also carries a CDN
+    href is a page still paying for the fallback this release removed, and a
+    CDN page carrying a relative href is one that will 404 the moment it is
+    opened from anywhere else."""
     info = json.loads(VERSION_FILE.read_text(encoding="utf-8"))
     pinned = re.escape(info["cdn"]).replace(
         re.escape("{version}"), r"([0-9][0-9.]*)")
 
-    problems = []
-    for kind, bundle in (("css", "css/bundle.css"), ("js", "js/bundle.js")):
-        # `[^":]*` so a URL can never match: the local href is a RELATIVE path,
-        # and without excluding the colon this matched the CDN fallback and
-        # then reported it as a local file that does not exist.
-        local = re.search(rf'(?:href|src)="([^":]*?/{re.escape(bundle)})"', html)
-        if not local:
-            problems.append(f"{kind}: no local link to {bundle} - the page "
-                            f"links the CDN alone and renders unstyled until "
-                            f"that tag is pushed")
-        elif not (out / local.group(1)).resolve().is_file():
-            problems.append(f"{kind}: local href does not resolve to a file - "
-                            f"{local.group(1)!r} from {out}")
-        if not re.search(rf"{pinned}/[^'\"]*?{re.escape(bundle)}", html):
-            problems.append(f"{kind}: no CDN fallback for {bundle} matching "
-                            f"{info['cdn']!r} from {VERSION_FILE}")
-    return problems
+    def check(html, out):
+        problems = []
+        for kind, bundle in (("css", "css/bundle.css"), ("js", "js/bundle.js")):
+            # `[^":]*` so a URL can never match: a local href is a RELATIVE
+            # path, and without excluding the colon this matched a CDN link and
+            # then reported it as a local file that does not exist.
+            local = re.search(rf'(?:href|src)="([^":]*?/{re.escape(bundle)})"', html)
+            remote = re.search(rf"{pinned}/[^'\"]*?{re.escape(bundle)}", html)
+
+            if asset_bundles == "local":
+                if not local:
+                    problems.append(f"{kind}: no local link to {bundle}, but "
+                                    f"the build asked for local assets")
+                elif not (out / local.group(1)).resolve().is_file():
+                    problems.append(f"{kind}: local href does not resolve to a "
+                                    f"file - {local.group(1)!r} from {out}")
+                if remote:
+                    problems.append(f"{kind}: local build also links the CDN "
+                                    f"for {bundle} - one page, one bundle")
+            else:
+                if not remote:
+                    problems.append(f"{kind}: no CDN link for {bundle} matching "
+                                    f"{info['cdn']!r} from {VERSION_FILE}")
+                if local:
+                    problems.append(f"{kind}: cdn build also carries a relative "
+                                    f"href for {bundle} - {local.group(1)!r} - "
+                                    f"which 404s wherever the page is opened")
+        return problems
+    return check
 
 
 def toc_resolves(html, out):
@@ -388,14 +411,16 @@ def text_present(expected):
 
 
 # ---------------------------------------------------------------- the run
-def validate(html, out, sections=(), prefix="", expected=()) -> Validation:
+def validate(html, out, asset_bundles, sections=(), prefix="",
+             expected=()) -> Validation:
     """Check a rendered report. Never raises, never writes, returns findings.
 
     The three configured checks are skipped rather than failed when the
     controller declares nothing for them: a report with no `SECTIONS` is a
     report that has not made that promise, and inventing an expectation for it
     would be a check agreeing with itself."""
-    errors_run = [charts_parse, assets_resolve, toc_resolves, no_residue]
+    errors_run = [charts_parse, assets_resolve(asset_bundles),
+                  toc_resolves, no_residue]
     warnings_run = [charts_have_data, tables_have_rows, no_blank_epidemic]
 
     if prefix:

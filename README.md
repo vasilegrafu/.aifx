@@ -200,6 +200,13 @@ python .claude/skills/finance-reports/reports/report_builder.py `
 `--out` is required and has no default: the page's local asset links are
 computed relative to wherever it is written, so the destination is a decision.
 
+`--asset-bundles` says which bundle the page links, and **defaults to `cdn`** —
+the pinned version, so the page renders anywhere: copied, mailed, opened from a
+download folder. Pass `local` to point it at this tree relative to `--out`
+instead, which is live against whatever you have just edited and broken the
+moment the file is moved. The default goes to the portable one because `cdn`
+works everywhere `local` does and more, so it cannot be silently wrong.
+
 **The environment is declared, not passed.** `environment.json` sits at the
 repo root and is tracked, so a fresh clone starts somewhere:
 

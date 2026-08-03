@@ -48,7 +48,7 @@ if str(SKILL_DIR) not in sys.path:
 # links on a showcase, and two copies of the pair would be free to disagree.
 from _paths import owning_directory                          # noqa: E402
 from components._showcase_controller import (                # noqa: E402
-    cdn_href, env, local_href)
+    cdn_href, check_asset_bundles, env, local_href)
 from reports._report_validation import NOT_YET, validate     # noqa: E402
 
 VIEW = "report.html.j2"
@@ -146,8 +146,12 @@ class ReportController:
         return self.directory.name
 
     # ---------------------------------------------------------------- build
-    def build(self, out_dir, **args) -> Path:
+    def build(self, out_dir, asset_bundles, **args) -> Path:
         """fetch -> derive -> validate -> render -> write. Returns the file.
+
+        `asset_bundles` is "local" or "cdn" and is NAMED, not folded into
+        `**args`: those belong to the report and reach `_fetch()`, and this one
+        is the engine's. A report must never see it.
 
         Raises rather than returning a code: a report asked for by name and
         not built is a mistake worth stopping for, and the caller owns the
@@ -169,7 +173,10 @@ class ReportController:
 
         # Resolved BEFORE the fetch, so a bad destination costs no network
         # calls, and before the render, because the asset href depends on it.
+        # The asset choice is checked against it here for the same reason: a
+        # combination that cannot produce a working link should cost nothing.
         out = Path(out_dir).resolve()
+        check_asset_bundles(asset_bundles, out)
 
         print("fetching ...", flush=True)
         payloads = self._fetch(**args)
@@ -190,6 +197,7 @@ class ReportController:
                     d=SimpleNamespace(**d),
                     title=d.get("title", report_name),
                     report_name=report_name,
+                    asset_bundles=asset_bundles,
                     local_href=local_href(out),
                     cdn_href=cdn_href(),
                     validation=validation)
@@ -203,7 +211,7 @@ class ReportController:
         # these checks measure is the document; re-rendering with the findings
         # would have them measuring the notice about the document as well.
         print("validating the render ...", flush=True)
-        found = validate(html, out,
+        found = validate(html, out, asset_bundles,
                          sections=self.SECTIONS, prefix=self.PREFIX,
                          expected=self._expected_text(**args))
 

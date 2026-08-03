@@ -48,12 +48,18 @@ PAGE = "showcase.html"              # the build artifact
 # assets — where a generated page's CSS and JS come from
 # --------------------------------------------------------------------------
 #
-# Two hrefs, read by css/css.loader.html.j2 and js/js.loader.html.j2 at the
-# skill root. Every page links the bundle LOCAL-FIRST with the pinned CDN as an
-# onerror fallback. THIS IS THE ONLY COPY — reports/ imports both.
+# Two hrefs and the choice between them, read by css/css.loader.html.j2 and
+# js/js.loader.html.j2 at the skill root. Every page links ONE bundle, and the
+# CALLER says which: a report takes it from `--asset-bundles`, a showcase is
+# always local. THIS IS THE ONLY COPY — reports/ imports all three.
+#
+# It used to be local-first with the CDN on `onerror`, which meant every page
+# that had left the tree paid a 404 to discover where it was — and a stylesheet
+# that 404s counts as resolved, so the document painted unstyled first. Nothing
+# infers it now, because only the caller knows whether the file stays put.
 
 def cdn_href() -> str:
-    """CDN prefix (version-pinned) — the FALLBACK half of the asset pair.
+    """CDN prefix (version-pinned) — what a page written OUTSIDE the tree links.
 
     THE OBLIGATION THIS CREATES: change anything under css/ or js/ and the
     version has to be bumped and tagged, or pages falling back to the CDN keep
@@ -81,19 +87,48 @@ def cdn_href() -> str:
 
 
 def local_href(out_dir: Path) -> str:
-    """Path back to the skill FROM WHERE THE PAGE IS WRITTEN — the local half
-    of the asset pair.
+    """Path back to the skill FROM WHERE THE PAGE IS WRITTEN — what a page
+    links when it was built with "local".
 
     A showcase lands beside its component, three or four folders deep, and the
     page cannot know how deep that is. Whoever is about to write it does, which
     is why a report's --out is required and has no default.
 
-    Empty when no relative path exists — a different Windows drive — and the
-    loaders then link the CDN alone rather than an href that cannot resolve."""
+    Empty when no relative path exists — a different Windows drive. That is not
+    a silent downgrade to the CDN any more: it is the one thing that makes
+    "local" impossible, and check_asset_bundles() says so before the build."""
     try:
         return Path(os.path.relpath(SKILL_DIR, Path(out_dir).resolve())).as_posix()
     except ValueError:
         return ""
+
+
+#: Where a generated page's assets come from. Unlike `--out` and `--peers` this
+#: one DOES take a default, because the two values are not symmetric: "cdn"
+#: renders everywhere including the directory it was written to, while "local"
+#: renders in that directory and nowhere else. Defaulting to the portable half
+#: cannot be silently wrong — it costs the edit-reload loop, and losing that is
+#: obvious the moment you reload. Defaulting the other way would ship pages that
+#: break only after they are moved, which is where nobody is looking.
+ASSET_BUNDLES = ("local", "cdn")
+
+
+def check_asset_bundles(choice: str, out_dir) -> None:
+    """Refuse a choice this destination cannot honour. Raises, or returns None.
+
+    Only "local" can fail, and only one way: it needs a relative path from the
+    page back to the skill, and a destination on another Windows drive has
+    none. Said HERE — before the fetch, at the same point `--out` is resolved —
+    because the alternative is an href that looks right in the file and 404s in
+    somebody's browser days later."""
+    if choice not in ASSET_BUNDLES:
+        raise SystemExit(f"--asset-bundles: {choice!r} is not one of "
+                         f"{', '.join(ASSET_BUNDLES)}")
+    if choice == "local" and not local_href(out_dir):
+        raise SystemExit(
+            f"--asset-bundles local: no relative path from {out_dir} back to "
+            f"{SKILL_DIR}.\nThey are on different drives, so a local link "
+            f"cannot be written at all. Use --asset-bundles cdn.")
 
 
 # --------------------------------------------------------------------------
@@ -353,6 +388,11 @@ class ShowcaseController:
             d=SimpleNamespace(**d),
             title=f"{self.name} — showcase",
             component_name=self.name,
+            # A showcase has no choice to be told. It is committed beside the
+            # component it shows and it moves only with the tree — and because
+            # jsDelivr publishes the whole repo, its `../../..` resolves over
+            # the CDN as well as on disk. Local is right in both places.
+            asset_bundles="local",
             local_href=local_href(directory),
             cdn_href=cdn_href())
 

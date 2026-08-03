@@ -7,10 +7,10 @@ argues and costs lives in its own `usage.md`. This is the on-demand detail.
 
 ```
 reports/
-  _report_controller.py     ReportController + its own copy of the asset pair
+  _report_controller.py     ReportController; borrows env() AND the asset helpers
   _report.master.html.j2    the shell every report view extends
   _report_validation.py     what build() checks the rendered page for
-  report_builder.py         ReportBuilder.build(name, argv, out) + the CLI
+  report_builder.py         ReportBuilder.build(name, argv, out, bundles) + the CLI
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
   CATALOG.md                every report by what it argues — generated
   company/                  a domain, holding its reports
@@ -287,11 +287,12 @@ reverse, and one env means a macro drawn on a showcase page draws identically in
 a report — it is the same environment, not two configurations that happen to
 match.
 
-It carries **its own copy** of `cdn_href` / `local_href` so this directory stays
-readable on its own. That is a deliberate duplication: the asset pair is 45
-lines with no dependencies, while `env()` has behaviour that must not be
-duplicated (two `@cache`d copies would parse the whole component tree twice and
-could disagree about what a thousands separator looks like).
+It **borrows** `cdn_href` / `local_href` / `check_asset_bundles` from there too,
+rather than keeping a copy: a macro drawn on a report must link the same assets
+it links on a showcase, and two copies would be free to disagree about which.
+`env()` is borrowed for a stronger reason still — two `@cache`d copies would
+parse the whole component tree twice and could disagree about what a thousands
+separator looks like.
 
 The view is named to the env as `reports/<domain>/<name>/report.html.j2` —
 relative to the **skill root**, the loader's second search path. It is computed
@@ -303,6 +304,7 @@ never restated in code.
 ```bash
 python $S/reports/report_builder.py financial-profile MU --peers none --out DIR
 python $S/reports/report_builder.py financial-profile MU --peers INTC,WDC --out DIR
+python $S/reports/report_builder.py financial-profile MU --peers none --out DIR --asset-bundles local
 python $S/reports/report_builder.py financial-profile --help    # the REPORT's args
 ```
 
