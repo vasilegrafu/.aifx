@@ -41,8 +41,8 @@ every single-company exhibit; it is not what this file runs.
 WHAT IT CANNOT SEE, stated so nobody trusts a green run further than it goes. A
 chart whose spec is valid JSON and draws perfectly can still be WRONG - bars
 past their track, a clipped label, an axis name over its own ticks, a number
-that is simply not the number. `components/showcase_audit.py` catches the first
-three for showcases and nothing catches them here yet. **Open the page.**
+that is simply not the number. Every one of those is a fact about the RENDERED
+page, and nothing in this skill renders one. **Open the page.**
 
 COST: ~13 network calls and roughly ten seconds, against the dev key, every
 time. Nothing is cached on purpose - a report's claim is that it describes the

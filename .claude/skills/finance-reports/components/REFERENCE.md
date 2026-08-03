@@ -281,10 +281,11 @@ endpoint — beside a call to these.
 All of the above runs before a browser does. A page whose markup is valid and
 whose numbers agree can still be **wrong on screen**: bars past their track, a
 unit welded to a number, clipped labels, an axis name over its own ticks.
-`showcase_audit.py` generates a page that walks every showcase in an iframe and
-checks the first three. The fourth is not detectable that way — both texts are
-SVG inside the chart and nothing overflows anything — so it is handled at
-render time by the `axis_gap` filter instead.
+**Nothing in this skill looks for any of them** — they are layout facts that
+exist only once the CSS has been applied, so serving the page and opening it is
+the only pass that sees them. The last of the four is not detectable from the
+DOM at all — both texts are SVG inside the chart and nothing overflows
+anything — so it is handled at render time by the `axis_gap` filter instead.
 
 ## The catalogue
 

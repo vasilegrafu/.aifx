@@ -41,7 +41,7 @@ Every generated page pins its asset version **at build time**. So the order is:
 # 1. edit version.json
 ./.venv/Scripts/python.exe .claude/skills/finance-reports/components/showcase_builder.py --all
 ./.venv/Scripts/python.exe .claude/skills/finance-reports/components/catalog_builder.py
-./.venv/Scripts/python.exe .claude/skills/finance-reports/components/showcase_audit.py
+./.venv/Scripts/python.exe .claude/skills/finance-reports/components/showcase_builder.py --check
 ```
 
 Rebuild first and the pages pin the old version. **Any edit under `css/` or
@@ -54,14 +54,12 @@ stops working**, whether the thing is a page, a link, or a line someone typed.
 ## Before saying a page is fine
 
 A clean build proves the markup is valid. It does not prove the page is right —
-three defects have shipped past one. Two checks catch different things and
-neither replaces the other:
+three defects have shipped past one, and **nothing here renders a page**, so
+overflow, out-of-track bars, clipping and glued text are found only by looking:
 
-- **`showcase_audit.py`** — generates a page; serve the repo **root** over
-  `http://` and open it (`python -m http.server 8000`, then the URL the script
-  prints). It checks each showcase in an iframe, so `file://` yields an empty
-  audit that reads as a pass. Finds overflow, out-of-track percentages,
-  clipping, glued text. Cannot see a chart that is merely wrong.
+- **Serve it over `http://`** — `python -m http.server 8000`, then open the
+  page. Not `file://`: a showcase links its assets relatively and a report
+  links them relative to where it was written.
 - **Look at it.** Charts draw at view time, so a malformed spec is invisible in
   the HTML. ECharts here uses the **SVG renderer** — counting `<canvas>`
   elements proves nothing.

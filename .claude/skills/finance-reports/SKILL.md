@@ -92,7 +92,6 @@ python $S/components/showcase_builder.py charts/bar
 python $S/components/showcase_builder.py --all        # rebuild every showcase
 python $S/components/showcase_builder.py --check      # verify each is current
 python $S/components/showcase_builder.py --missing    # components with none yet
-python $S/components/showcase_audit.py                # the page that checks them
 python $S/components/catalog_builder.py               # -> components/CATALOG.md
 python $S/usage_audit.py                              # every usage.md vs the skeleton
 ```
@@ -101,19 +100,15 @@ python $S/usage_audit.py                              # every usage.md vs the sk
 tools derives from `__file__` — which component, which report, where the output
 goes — so no argument and no result depends on the working directory.
 
-**`showcase_audit.py` generates a page, it does not print a verdict.** Serve the
-repo **root** and open it — the script prints both lines when it runs:
+**No tool here renders a page.** Everything above reads markup, so what a
+browser does with it — layout, overflow, whether a chart actually draws — is
+checked by opening the page and looking. Serve the repo **root** over `http://`
+rather than opening the file, since a showcase links its assets relatively:
 
 ```bash
 python -m http.server 8000
-# http://localhost:8000/.claude/skills/finance-reports/components/showcase_audit.html
+# http://localhost:8000/.claude/skills/finance-reports/components/charts/bar/showcase.html
 ```
-
-**It has to be `http://`, not the file.** The page checks each showcase in an
-iframe, and a browser blocks cross-document access over `file://` — so opening
-it by double-clicking shows an empty audit that reads as a pass. What it can and
-cannot see is under **What guards the output** below, and in full in
-`components/REFERENCE.md`.
 
 There is **no top-level dispatcher**. Each directory owns the engine that
 builds what lives in it, and neither knows the other exists as a command.
@@ -408,9 +403,8 @@ components, not reports.
 **A CLEAN BUILD IS NOT A CORRECT PAGE.** Everything above runs before the
 browser does, and three defects have shipped past all of it — bars running out
 of their track, a unit welded to a number, clipped axis labels. Those are
-LAYOUT facts that exist only once the CSS has been applied.
-`components/showcase_audit.py` is the pass that looks for them, and even it
-cannot see a chart that is merely wrong.
+LAYOUT facts that exist only once the CSS has been applied, so **nothing in
+this skill can see them**. Open the page.
 
 ### When a build fails, and what NOT to do about it
 
