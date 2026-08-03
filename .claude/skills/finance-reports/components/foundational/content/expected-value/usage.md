@@ -9,6 +9,8 @@ between "here is what could happen" and "therefore this is worth owning at
 this size". Where `scenarios` (business category) describes the states of the
 world in prose, this component prices them.
 
+## Markup
+
 ```jinja
 {{ c.expected_value(
     caption="Apple — 12-month probability-weighted return from $232",
@@ -20,10 +22,14 @@ world in prose, this component prices them.
     ]) }}
 ```
 
-Rules: probabilities sum to exactly 100% and the footer says so — a table that
-sums to 90% is an error, not a rounding. Weighted = probability × return,
-computed by hand and stated; the document never computes at view time. Three
-to five scenarios, each tied to a named driver, not to a mood. If the expected
-value is positive only because the bull case is generous, that is the finding
-— say it under the table. Pair with `recommendation`: a positive expected
-value with a thin margin of safety still sizes small.
+## Rules
+
+- **Probabilities sum to exactly 100% and the footer says so.** A table that
+  sums to 90% is an error, not a rounding.
+- **Weighted = probability × return, computed by hand and stated.** The
+  document never computes at view time.
+- **Three to five scenarios, each tied to a named driver**, not to a mood.
+- **If the expected value is positive only because the bull case is generous,
+  that is the finding** — say it under the table.
+- Pair with `recommendation`: a positive expected value with a thin margin of
+  safety still sizes small.

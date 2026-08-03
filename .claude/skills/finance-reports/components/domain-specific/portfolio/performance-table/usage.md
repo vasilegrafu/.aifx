@@ -9,6 +9,8 @@ the excess between them. Three-row minimum: without the benchmark row a return
 number means nothing, and without the excess row the reader has to subtract.
 Negative cells are tinted automatically from the leading minus sign.
 
+## Markup
+
 ```jinja
 {{ c.performance_table(
     caption="Total return, net of costs, to 30 Jun 2026",
@@ -20,9 +22,13 @@ Negative cells are tinted automatically from the leading minus sign.
     ]) }}
 ```
 
-Rules: state net-or-gross and the currency in the caption — the two most
-common ways a performance table misleads. Periods over one year are annualised
-and labelled `p.a.`; never show a cumulative three-year number beside annual
-ones. Excess is in percentage points (pp), not percent. The benchmark is the
-one named in the investment policy statement, chosen before the period, not
-after. Pair with `risk_metrics` — return without volatility is half the story.
+## Rules
+
+- **State net-or-gross and the currency in the caption** — the two most common
+  ways a performance table misleads.
+- **Periods over one year are annualised and labelled `p.a.`** Never show a
+  cumulative three-year number beside annual ones.
+- **Excess is in percentage points (pp), not percent.**
+- **The benchmark is the one named in the investment policy statement**, chosen
+  before the period, not after.
+- Pair with `risk_metrics` — return without volatility is half the story.

@@ -191,7 +191,7 @@ act on.
 `.gitignore` matches `secrets.*.json` with **no exception**, so nothing by that
 name is trackable under any circumstance. A shipped `secrets.example.json`
 would need a negation to stay tracked, and the failure mode is not hypothetical
-here: `git.commit&push.bat` runs `git add .` against a repository that is
+here: this repository is committed with a blanket `git add .`, and it is
 public *and* served by jsDelivr. One mis-ordered line in `.gitignore` and a key
 is fetchable at a URL. Writing it by hand is cheaper than that, and it is two
 lines:

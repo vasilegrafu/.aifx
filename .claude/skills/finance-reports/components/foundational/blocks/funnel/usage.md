@@ -9,6 +9,8 @@ market sizing (total addressable market down to what this company can realistica
 serve) and conversion (visitors down to paying customers). The value of the
 form is that each step forces you to state a rate and defend it.
 
+## Markup
+
 ```jinja
 {{ c.funnel(
     caption="Market sizing — enterprise workflow software",
@@ -26,10 +28,13 @@ Bar widths come from a `data-pct` attribute read by CSS `attr()` in
 Chromium/Edge and applied by `attr-fallback.js` everywhere else; every stage
 also prints its value.
 
-Rules: each stage states WHY it is smaller than the one above — an unexplained
-narrowing is where market sizing turns into wishful arithmetic. Widths are
-relative to the first stage, so the final bar stays visible even when tiny
-(a floor keeps it legible); if the last stage is under about 3% of the top, say
-the ratio in `note` because the picture cannot show it honestly. Four to six
-stages. Never present a top-down TAM without also stating the implied share, as
-above — the share number is the claim, and the TAM is just context.
+## Rules
+
+- **Each stage states WHY it is smaller than the one above.** An unexplained
+  narrowing is where market sizing turns into wishful arithmetic.
+- **Widths are relative to the first stage**, so the final bar stays visible
+  even when tiny (a floor keeps it legible). If the last stage is under about
+  3% of the top, say the ratio in `note` — the picture cannot show it honestly.
+- **Four to six stages.**
+- **Never present a top-down TAM without also stating the implied share.** The
+  share number is the claim; the TAM is just context.

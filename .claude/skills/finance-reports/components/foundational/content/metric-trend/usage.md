@@ -9,6 +9,8 @@ column, then the compound growth rate and a direction glyph. Use it for the
 five-year picture that precedes any valuation work — revenue, margins,
 returns on capital, cash conversion, share count.
 
+## Markup
+
 ```jinja
 {{ c.metric_trend(
     caption="Apple — five-year operating record ($B unless noted)",
@@ -21,9 +23,14 @@ returns on capital, cash conversion, share count.
     ]) }}
 ```
 
-Rules: label the unit once in the caption, never per cell. Periods run oldest
-to newest, left to right — never reversed. `dir` describes the METRIC, not
-whether it is good news: a falling share count is `down` and that is fine;
-the reader judges. CAGR states its own basis (%, or pp for margins). Restated
-figures carry the restatement in a footnote, not a silent overwrite. For more
-than about seven periods use `apache_echarts` — a table stops being readable.
+## Rules
+
+- **Label the unit once in the caption**, never per cell.
+- **Periods run oldest to newest, left to right** — never reversed.
+- **`dir` describes the METRIC, not whether it is good news.** A falling share
+  count is `down` and that is fine; the reader judges.
+- **CAGR states its own basis** — % for values, pp for margins.
+- **Restated figures carry the restatement in a footnote**, not a silent
+  overwrite.
+- For more than about seven periods use `apache_echarts` — a table stops being
+  readable.

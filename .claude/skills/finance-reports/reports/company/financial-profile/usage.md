@@ -104,7 +104,7 @@ Liabilities + equity == assets. Each sankey sums to its own table. The segment
 bridge reaches its endpoint. None of that is visible in the output and none of
 it can be checked by a template.
 
-**`_validate_context` checks the contract with the view**: the 47 `d.*` names
+**`_validate_context` checks the contract with the view**: the 48 `d.*` names
 the recipe reads are all present, and no `NaN` or infinity survives anywhere in
 the nested structure — those pass every type check, reach `| tojson` unquoted,
 and make the browser's `JSON.parse` throw, so the exhibit renders as nothing.

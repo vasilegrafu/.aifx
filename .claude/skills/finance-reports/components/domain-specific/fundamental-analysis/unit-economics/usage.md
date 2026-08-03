@@ -10,6 +10,8 @@ decides whether growth creates value or destroys it — a company can grow
 revenue at 60% a year and be worth less each year if the payback period is
 longer than the customer's life.
 
+## Markup
+
 ```jinja
 {{ c.unit_economics(
     caption="Unit economics — FY2025 cohort",
@@ -28,12 +30,17 @@ longer than the customer's life.
     ]) }}
 ```
 
-Rules: compute LTV on GROSS PROFIT, never on revenue — the revenue version
-overstates value by the whole cost base and is the most common abuse of this
-table. CAC is fully loaded (all sales and marketing, not just paid
-acquisition). Cap customer life at a defensible horizon rather than using
-1/churn, which produces absurd lives at low churn rates; say that you capped it.
-State whether LTV is discounted. Payback period matters more than the LTV/CAC
-ratio for a cash-constrained business, so lead with it in `headline`. Where the
-figures are your estimates rather than disclosure, mark them — most companies do
-not publish CAC, and a reconstructed number needs its method in `note`.
+## Rules
+
+- **Compute LTV on GROSS PROFIT, never on revenue.** The revenue version
+  overstates value by the whole cost base and is the most common abuse of this
+  table.
+- **CAC is fully loaded** — all sales and marketing, not just paid acquisition.
+- **Cap customer life at a defensible horizon rather than using 1/churn**,
+  which produces absurd lives at low churn rates. Say that you capped it.
+- **State whether LTV is discounted.**
+- **Payback period matters more than the LTV/CAC ratio for a cash-constrained
+  business**, so lead with it in `headline`.
+- **Where the figures are your estimates rather than disclosure, mark them.**
+  Most companies do not publish CAC, and a reconstructed number needs its
+  method in `note`.

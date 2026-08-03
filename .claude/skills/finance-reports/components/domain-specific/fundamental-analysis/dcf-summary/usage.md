@@ -11,6 +11,8 @@ equity value per share. Uses the same line grammar as the statements
 assumption strip — because a DCF without its assumptions on the same page is
 an unfalsifiable number.
 
+## Markup
+
 ```jinja
 {{ c.dcf_summary(
     caption="Discounted cash flow — value per share", unit="$M except per share",
@@ -33,12 +35,17 @@ an unfalsifiable number.
     ]) }}
 ```
 
-Rules: state the terminal value as a PERCENTAGE of enterprise value — above
-about 70% the exercise is a terminal-value estimate wearing a forecast, and the
-reader must be told. Every assumption that moves the answer lives in
-`assumptions`, including the valuation date. Net debt is added or subtracted
-explicitly with its own line and note; a silent enterprise-to-equity step is
-where most errors hide. Always pair with `sensitivity_table` — a single DCF
-number published without its grid is false precision. If the output is far from
-the market price, the interesting question is what the market is assuming, and
-that belongs in the text below.
+## Rules
+
+- **State the terminal value as a PERCENTAGE of enterprise value.** Above about
+  70% the exercise is a terminal-value estimate wearing a forecast, and the
+  reader must be told.
+- **Every assumption that moves the answer lives in `assumptions`**, including
+  the valuation date.
+- **Net debt is added or subtracted explicitly, with its own line and note.** A
+  silent enterprise-to-equity step is where most errors hide.
+- **Always pair with `sensitivity_table`.** A single DCF number published
+  without its grid is false precision.
+- **If the output is far from the market price, the interesting question is
+  what the market is assuming** — and that belongs in the text below, not in
+  the table.

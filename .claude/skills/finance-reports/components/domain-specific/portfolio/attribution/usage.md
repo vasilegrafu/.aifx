@@ -11,6 +11,8 @@ in the right places (allocation) versus owning the right names within them
 
 This is a wide table — pair it with the full-width view or a short segment list.
 
+## Markup
+
 ```jinja
 {{ c.attribution(
     caption="Brinson attribution vs MSCI World", period="YTD to 30 Jun 2026",
@@ -25,12 +27,17 @@ This is a wide table — pair it with the full-width view or a short segment lis
     total_row=("Total", ["100.0%", "100.0%", "+9.6%", "+8.2%", "-0.06pp", "+1.08pp", "+1.40pp"])) }}
 ```
 
-Rules: allocation plus selection must reconcile to total excess return — if
-your model produces an interaction term, give it its own column rather than
-folding it silently into selection. Name the benchmark and confirm it is the one
-in the investment policy statement, chosen before the period. Cash is a segment
-and usually an allocation drag in a rising market; hiding it overstates skill.
-Effects are in percentage points, weights are averages over the period, not
-period-end. One period per table. A quarter of attribution is noise — the
-conclusion belongs to multi-year tables, and saying so in `note` is more
-credible than not.
+## Rules
+
+- **Allocation plus selection must reconcile to total excess return.** If your
+  model produces an interaction term, give it its own column rather than
+  folding it silently into selection.
+- **Name the benchmark and confirm it is the one in the investment policy
+  statement**, chosen before the period.
+- **Cash is a segment** and usually an allocation drag in a rising market;
+  hiding it overstates skill.
+- **Effects are in percentage points; weights are averages over the period, not
+  period-end.**
+- **One period per table.** A quarter of attribution is noise — the conclusion
+  belongs to multi-year tables, and saying so in `note` is more credible than
+  not.

@@ -9,6 +9,8 @@ what instrument. Solvency is a timing question before it is a leverage
 question — a company at 3x net debt to EBITDA with nothing due for six years is
 in a different position from the same company facing a refinancing next spring.
 
+## Markup
+
 ```jinja
 {{ c.debt_maturity(
     caption="Term debt maturity profile", unit="$M",
@@ -26,10 +28,15 @@ Bar widths come from a `data-pct` attribute read by CSS `attr()` in
 Chromium/Edge and applied by `attr-fallback.js` everywhere else; every row also
 prints its amount.
 
-Rules: shares are percentages of TOTAL debt and sum to 100%; group everything
-beyond five years into a single bucket rather than drawing a twenty-year tail.
-State the refinancing cost in `summary` — the wall only matters in relation to
-today's curve, and the incremental interest is the number a reader wants.
-Include undrawn revolver capacity and cash in `summary` too, since they decide
-whether a wall is a problem. Operating leases and pension obligations are not
-term debt; if they matter, give them their own table rather than blending them.
+## Rules
+
+- **Shares are percentages of TOTAL debt and sum to 100%.** Group everything
+  beyond five years into a single bucket rather than drawing a twenty-year
+  tail.
+- **State the refinancing cost in `summary`.** The wall only matters in
+  relation to today's curve, and the incremental interest is the number a
+  reader wants.
+- **Include undrawn revolver capacity and cash in `summary`** — they decide
+  whether a wall is a problem at all.
+- **Operating leases and pension obligations are not term debt.** If they
+  matter, give them their own table rather than blending them in.

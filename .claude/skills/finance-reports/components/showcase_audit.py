@@ -2,8 +2,14 @@
 
     python .claude/skills/finance-reports/components/showcase_audit.py  ->  showcase_audit.html
 
-Then serve the repo and open it. The page walks every showcase in an iframe
-and reports what a build cannot see.
+Then serve the repo ROOT and open it — the command is printed when it runs:
+
+    python -m http.server 8000
+    http://localhost:8000/.claude/skills/finance-reports/components/showcase_audit.html
+
+It must come off an http:// origin. The page walks every showcase in an IFRAME,
+and a browser blocks cross-document access over file://, so double-clicking the
+file shows an empty audit that reads as a pass.
 
 WHY THIS EXISTS. `showcase_builder.py --check` proves a page is CURRENT; it
 cannot prove the page is RIGHT. Three defects have shipped past a clean build
@@ -35,6 +41,7 @@ SKILL_DIR = COMPONENTS_DIR.parent
 if str(SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(SKILL_DIR))
 
+from _paths import CDN_SUFFIX                             # noqa: E402
 from components._showcase_controller import PAGE          # noqa: E402
 from components.showcase_builder import ShowcaseBuilder   # noqa: E402
 
@@ -234,8 +241,17 @@ def main(argv: list[str] | None = None) -> int:
     print(page)
     print(f"{len(ShowcaseBuilder().all())} showcase(s) listed")
     # Plain hyphens: stdout is cp1252 on Windows.
-    print("serve the repo root, then open "
-          ".claude/skills/finance-reports/components/" + AUDIT_PAGE)
+    #
+    # Print the command, not the instruction. The page walks every showcase in
+    # an IFRAME, and a browser refuses cross-document access over file:// -- so
+    # opening the page by double-clicking it shows an empty audit that looks
+    # like a pass. It has to come off an http:// origin.
+    print()
+    print("  Serve the repo ROOT (not this folder) and open the page:")
+    print()
+    print("      python -m http.server 8000")
+    print(f"      http://localhost:8000/{CDN_SUFFIX}/components/{AUDIT_PAGE}")
+    print()
     return 0
 
 

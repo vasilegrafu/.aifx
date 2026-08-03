@@ -9,6 +9,8 @@ verdict. The verdict column exists because the sign of a variance does not tell
 you its direction: spending less than budget is favourable on cost and adverse
 on a marketing line that was supposed to buy growth.
 
+## Markup
+
 ```jinja
 {{ c.variance_analysis(
     caption="Operating budget", period="H1 FY2026", unit="$000",
@@ -24,11 +26,15 @@ on a marketing line that was supposed to buy growth.
     total_row=("Operating profit", ["1,980", "2,410", "430", "+21.7%", ""])) }}
 ```
 
-Rules: the verdict is a JUDGEMENT and must sometimes contradict the sign — the
-marketing underspend above is adverse because it bought the profit beat by
-cutting future revenue, and a table that marked it favourable would be
-misleading. Percentages are of budget, not of actual. Every adverse variance
-above your materiality threshold gets an explanation in `note` or in the text;
-an unexplained variance is an open question, not a finding. Distinguish timing
-from permanent differences explicitly. Use the same sign convention as the
-underlying statements — costs in parentheses throughout.
+## Rules
+
+- **The verdict is a JUDGEMENT and must sometimes contradict the sign.** The
+  marketing underspend above is adverse because it bought the profit beat by
+  cutting future revenue; a table that marked it favourable would mislead.
+- **Percentages are of budget, not of actual.**
+- **Every adverse variance above your materiality threshold gets an
+  explanation** in `note` or in the text. An unexplained variance is an open
+  question, not a finding.
+- **Distinguish timing from permanent differences explicitly.**
+- **Use the same sign convention as the underlying statements** — costs in
+  parentheses throughout.

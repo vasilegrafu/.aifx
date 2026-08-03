@@ -10,6 +10,8 @@ string is the component's reason to exist — every reader computes it, so the
 document should state which definition it used rather than leave five plausible
 answers open.
 
+## Markup
+
 ```jinja
 {{ c.cash_flow_statement(
     caption="Consolidated statements of cash flows", unit="$M",
@@ -34,13 +36,18 @@ answers open.
     ]) }}
 ```
 
-Rules: the `fcf` line states its DEFINITION, not just its result — operating
-cash less capital expenditure is the default, and any other treatment (leases,
-acquisitions, capitalised software) is named explicitly. Express free cash flow
-against something: percent of revenue, percent of net income, or per share.
-Share-based compensation is a real cost added back in operating cash — show the
-line and cite its note rather than letting it disappear into "adjustments".
-Cash outflows are negative and in parentheses everywhere, including buybacks
-and dividends. Where operating cash and net income diverge for more than one
-period, that divergence is the finding — say so under the table, not in a
-caption.
+## Rules
+
+- **The `fcf` line states its DEFINITION, not just its result.** Operating cash
+  less capital expenditure is the default; any other treatment (leases,
+  acquisitions, capitalised software) is named explicitly. Five plausible
+  definitions are in circulation and the reader cannot tell which you used.
+- **Express free cash flow against something** — percent of revenue, percent of
+  net income, or per share. An absolute figure alone is not yet a finding.
+- **Share-based compensation is a real cost added back in operating cash.**
+  Show the line and cite its note rather than letting it disappear into
+  "adjustments".
+- **Cash outflows are negative and in parentheses everywhere**, including
+  buybacks and dividends.
+- **Where operating cash and net income diverge for more than one period, that
+  divergence IS the finding** — say so under the table, not in a caption.

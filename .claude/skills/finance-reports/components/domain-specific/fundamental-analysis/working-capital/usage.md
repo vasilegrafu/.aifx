@@ -9,6 +9,8 @@ cycle they produce. A negative cycle means suppliers fund the business, which is
 a structural advantage worth more than a point of margin; a deteriorating cycle
 is the earliest visible sign that reported earnings are running ahead of cash.
 
+## Markup
+
 ```jinja
 {{ c.working_capital(
     caption="Working capital efficiency (days)",
@@ -22,12 +24,15 @@ is the earliest visible sign that reported earnings are running ahead of cash.
     ]) }}
 ```
 
-Rules: state the formula in `note` — there are several conventions for each
-ratio and the reader cannot check you without knowing which one you used. Say
-whether the denominators are period-end or average balances; period-end
-overstates efficiency for a company whose sales are seasonal. `dir` describes
-the METRIC, not whether it is good news: rising DPO is `up` and is usually
-favourable, and the interpretation belongs in `note`. Three periods minimum —
-one year of working capital tells you about the quarter it ended in, not the
-business. Where a change comes from a one-off (a supplier finance programme, a
-factoring facility), that is the finding and it must be named.
+## Rules
+
+- **State the formula in `note`.** There are several conventions for each ratio
+  and the reader cannot check you without knowing which one you used.
+- **Say whether the denominators are period-end or average balances.**
+  Period-end overstates efficiency for a company whose sales are seasonal.
+- **`dir` describes the METRIC, not whether it is good news.** Rising DPO is
+  `up` and is usually favourable; the interpretation belongs in `note`.
+- **Three periods minimum.** One year of working capital tells you about the
+  quarter it ended in, not the business.
+- **Where a change comes from a one-off** — a supplier finance programme, a
+  factoring facility — **that is the finding and it must be named.**

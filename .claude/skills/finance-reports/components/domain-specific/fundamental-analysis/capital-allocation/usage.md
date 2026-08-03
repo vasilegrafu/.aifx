@@ -10,6 +10,8 @@ evidence about management. A company that has spent 70% of a decade's operating
 cash on buybacks at rising multiples has told you what it thinks about its own
 reinvestment opportunities.
 
+## Markup
+
 ```jinja
 {{ c.capital_allocation(
     caption="Uses of operating cash, FY2021–FY2025", unit="$M",
@@ -25,11 +27,15 @@ reinvestment opportunities.
     ]) }}
 ```
 
-Rules: five years minimum — capital allocation is a decade-scale question and a
-two-year window shows nothing. The `source_line` is the denominator and must be
-stated; percentages that sum past 100% mean the company funded uses with debt or
-cash reserves, which is itself the finding, so do not scale them to fit. Use the
-company's cash flow statement figures unadjusted. For buybacks, state the average
-multiple paid in `note` — buying back stock is an investment decision and is
-judged like one. Where a use is lumpy (one large acquisition), call it out rather
-than letting the average hide it.
+## Rules
+
+- **Five years minimum.** Capital allocation is a decade-scale question and a
+  two-year window shows nothing.
+- **The `source_line` is the denominator and must be stated.** Percentages that
+  sum past 100% mean the company funded uses with debt or cash reserves, which
+  is itself the finding — do not scale them to fit.
+- **Use the company's cash flow statement figures unadjusted.**
+- **For buybacks, state the average multiple paid in `note`.** Buying back
+  stock is an investment decision and is judged like one.
+- **Where a use is lumpy — one large acquisition — call it out** rather than
+  letting the average hide it.

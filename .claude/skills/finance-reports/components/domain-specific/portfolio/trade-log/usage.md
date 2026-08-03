@@ -9,6 +9,8 @@ of the trade. The rationale row is the component's reason to exist: a log of
 fills is a broker statement, while a log of fills plus the reason you gave
 before the outcome was known is the only honest record of process.
 
+## Markup
+
 ```jinja
 {{ c.trade_log(caption="Trades — Q2 2026", rows=[
     ("2026-04-14", "AAPL", "Buy", "250 sh", "$218.40", "open",
@@ -20,10 +22,14 @@ before the outcome was known is the only honest record of process.
 ]) }}
 ```
 
-Rules: the rationale is written BEFORE the outcome is known and never edited
-afterwards — corrections go in a later row, not over an earlier one. Say what
-the trade did to portfolio weight, not just the share count. Name the trigger
-and the pillar it serves, so a review can tell process from luck. Record the
-mistakes with the same detail as the wins; a journal with no bad trades in it
-is not being kept honestly. Open positions show `open` rather than an
-unrealised number that changes daily.
+## Rules
+
+- **The rationale is written BEFORE the outcome is known and never edited
+  afterwards.** Corrections go in a later row, not over an earlier one.
+- **Say what the trade did to portfolio weight**, not just the share count.
+- **Name the trigger and the pillar it serves**, so a review can tell process
+  from luck.
+- **Record the mistakes with the same detail as the wins.** A journal with no
+  bad trades in it is not being kept honestly.
+- **Open positions show `open`** rather than an unrealised number that changes
+  daily.

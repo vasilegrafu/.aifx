@@ -10,6 +10,8 @@ share across discount rate and terminal growth — and equally the right shape f
 earnings across price and volume, or LBO returns across entry and exit multiple.
 It is the honest form: it shows the answer is a range governed by two numbers.
 
+## Markup
+
 ```jinja
 {{ c.sensitivity_table(
     caption="Value per share ($) — DCF sensitivity",
@@ -25,12 +27,16 @@ It is the honest form: it shows the answer is a range governed by two numbers.
     ]) }}
 ```
 
-Rules: exactly ONE cell carries `base=True` — the assumption set you actually
-believe, so the reader can see how much of your conclusion survives moving one
-step in either direction. Tones are assigned against a stated reference (here,
-spot price): `low` below it, `mid` near it, `high` comfortably above. Say what
-the reference is in `note` — an unexplained colour gradient is decoration.
-Five by five is the readable maximum. Step the assumptions evenly. If the sign
-of your conclusion flips inside the grid, that IS the finding and belongs in the
-text, not just in a colour. Never tune the grid bounds until the base case sits
-in a comfortable colour.
+## Rules
+
+- **Exactly ONE cell carries `base=True`** — the assumption set you actually
+  believe, so the reader can see how much of your conclusion survives moving
+  one step in either direction.
+- **Tones are assigned against a stated reference** (here, spot price): `low`
+  below it, `mid` near it, `high` comfortably above. **Say what the reference
+  is in `note`** — an unexplained colour gradient is decoration.
+- **Five by five is the readable maximum**, and the assumptions step evenly.
+- **If the sign of your conclusion flips inside the grid, that IS the finding**
+  and belongs in the text, not just in a colour.
+- **Never tune the grid bounds until the base case sits in a comfortable
+  colour.**

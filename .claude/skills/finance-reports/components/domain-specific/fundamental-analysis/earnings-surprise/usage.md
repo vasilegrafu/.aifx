@@ -8,6 +8,8 @@ Reported against consensus for one earnings print, line by line, with the
 surprise colored by whether it helps or hurts the thesis. The opening block of
 every note on an earnings release: what was expected, what arrived, by how much.
 
+## Markup
+
 ```jinja
 {{ c.earnings_surprise(
     caption="Apple", period="FQ4 2025 (quarter ended 27 Sep 2025)",
@@ -21,10 +23,14 @@ every note on an earnings release: what was expected, what arrived, by how much.
     ]) }}
 ```
 
-Rules: cite the consensus source and its date in a footnote — "consensus" with
-no provenance is a number you chose. Tone reflects the effect on the thesis,
-not the sign: a revenue beat driven by one-off channel fill can be `neutral`.
-Include guidance as a row when guidance moved the stock more than the print
-did, which is most of the time. Margins are surprised in basis points, not
-percent of percent. Follow this block with what CHANGED in the thesis — a
-surprise table with no interpretation is data, not a note.
+## Rules
+
+- **Cite the consensus source and its date in a footnote.** "Consensus" with no
+  provenance is a number you chose.
+- **Tone reflects the effect on the thesis, not the sign.** A revenue beat
+  driven by one-off channel fill can be `neutral`.
+- **Include guidance as a row when guidance moved the stock more than the print
+  did** — which is most of the time.
+- **Margins are surprised in basis points**, not percent of percent.
+- **Follow this block with what CHANGED in the thesis.** A surprise table with
+  no interpretation is data, not a note.

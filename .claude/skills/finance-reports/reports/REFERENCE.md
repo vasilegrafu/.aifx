@@ -9,6 +9,7 @@ argues and costs lives in its own `usage.md`. This is the on-demand detail.
 reports/
   _report_controller.py     ReportController + its own copy of the asset pair
   _report.master.html.j2    the shell every report view extends
+  _report_checks.py         the checks every report test makes + run()
   report_builder.py         ReportBuilder.build(name, argv, out) + the CLI
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
   CATALOG.md                every report by what it argues — generated
@@ -129,10 +130,33 @@ python $S/reports/report_test_runner.py financial-profile
 python $S/reports/report_test_runner.py --all
 ```
 
-**The test sits beside the report**, as `report_test.py`. A directory holding
-`report.html.j2` **is** a report; one that also holds `report_test.py` **has** a
-test — the same rule a component follows with `showcase_controller.py`, and
-nothing is registered either way. The alternative was a mirrored tree of test
+**The test sits beside the report**, as `report_test.py` — four declarations and
+a `CHECKS` tuple. A directory holding `report.html.j2` **is** a report; one that
+also holds `report_test.py` **has** a test — the same rule a component follows
+with `showcase_controller.py`, and nothing is registered either way.
+
+**The checks themselves live once, in `_report_checks.py`.** Seven are universal
+— they are generic over "a page this skill generated" and a leaf takes them
+whole as `checks.UNIVERSAL`, so a check added there reaches every report on its
+next run. Three have universal logic and a per-report *expectation*, so they are
+factories called with the report's own answer:
+
+```python
+CHECKS = checks.UNIVERSAL + (
+    checks.sections_are_populated(SECTIONS),        # the sections it declares
+    checks.symbols_present([ARGV[0], *ARGV[-1].split(",")]),
+    checks.markup_is_current("fa-"),                # `portfolio-` for a book
+)
+```
+
+`run(REPORT, ARGV, OUT, CHECKS)` builds for real, echoes the resolved
+credentials before spending a call, runs every check, and owns the exit code.
+
+**A check body is never copied into a leaf.** Ten reports carrying their own
+reading of `BLANK_LIMIT` are ten claims about one measured number, free to
+disagree the moment one of them learns something — which is the argument
+`components/_contracts.py` already settled one level down, and the same reason
+this directory refuses a mirrored tree of test folders below. The alternative was a mirrored tree of test
 directories, and a mirror is a second copy of the taxonomy free to drift from
 the first; this repository already deleted a hand-maintained catalogue for that
 reason.
@@ -167,8 +191,9 @@ the repo root and silently ignores nothing four levels down. With it, **a new
 report needs no new rule.**
 
 That is what makes writing inside a published tree safe: jsDelivr serves what is
-committed and `git.commit&push.bat` runs `git add .`, so a page that is never
-committed is never swept up and never served. A skill **copied** into another
+committed, and this repo is committed with a blanket `git add .` — so the
+`.gitignore` rule is the only thing standing between a built page and a public
+URL, and a page that is never committed is never swept up and never served. A skill **copied** into another
 project needs the same two lines in that project's `.gitignore`, exactly as
 `secrets.*.json` does.
 
@@ -290,7 +315,7 @@ match.
 It carries **its own copy** of `cdn_href` / `local_href` so this directory stays
 readable on its own. That is a deliberate duplication: the asset pair is 45
 lines with no dependencies, while `env()` has behaviour that must not be
-duplicated (two `@cache`d copies would parse the 109-template tree twice and
+duplicated (two `@cache`d copies would parse the whole component tree twice and
 could disagree about what a thousands separator looks like).
 
 The view is named to the env as `reports/<domain>/<name>/report.html.j2` —
@@ -361,7 +386,7 @@ scales each node's ribbons independently, so an unbalanced one is a confident,
 wrong picture that no template and no reader can catch.
 
 **`_validate_context` asserts the contract with the view**, which the arithmetic
-knows nothing about. `financial-profile` carries 2: every one of the 47 `d.*`
+knows nothing about. `financial-profile` carries 2: every one of the 48 `d.*`
 names its recipe reads is present, and no `NaN` or infinity survives anywhere in
 the nested structure. Non-finite numbers pass every type check, reach
 `| tojson` unquoted, and make the browser's `JSON.parse` throw — the exhibit

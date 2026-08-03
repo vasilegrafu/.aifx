@@ -9,6 +9,8 @@ overdue share drawn as a bar. Ageing is where revenue quality shows up first:
 sales booked to customers who are not paying appear here a year before they
 appear in a write-off.
 
+## Markup
+
 ```jinja
 {{ c.aging_schedule(
     caption="Trade receivables ageing at 30 Jun 2026", unit="$000",
@@ -23,12 +25,15 @@ appear in a write-off.
     total_row=("Total", ["13,730", "1,770", "610", "280", "1,170", "17,560", ""])) }}
 ```
 
-Rules: buckets are calendar bands from the DUE date, not the invoice date —
-ageing from invoice date flatters every schedule with long payment terms. State
-the provision and what share of the 90+ bucket it covers, in `note`: an ageing
-schedule without provision coverage is half a disclosure. Concentration matters
-more than the total, so name counterparties above your materiality threshold
-individually and group the tail. Where a balance is disputed rather than simply
-late, say so — the two have different recovery odds. The same structure serves
-payables, where a lengthening profile is a liquidity signal rather than a credit
-one.
+## Rules
+
+- **Buckets are calendar bands from the DUE date, not the invoice date.**
+  Ageing from invoice date flatters every schedule with long payment terms.
+- **State the provision and what share of the 90+ bucket it covers**, in
+  `note`. An ageing schedule without provision coverage is half a disclosure.
+- **Concentration matters more than the total.** Name counterparties above your
+  materiality threshold individually and group the tail.
+- **Where a balance is disputed rather than simply late, say so** — the two
+  have different recovery odds.
+- The same structure serves payables, where a lengthening profile is a
+  liquidity signal rather than a credit one.

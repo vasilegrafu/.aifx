@@ -9,6 +9,13 @@ the component for any judgement that has to be repeatable across names:
 moat, business quality, management, capital allocation, ESG, counterparty.
 Weights force you to say what matters before you look at the answer.
 
+Standard rubrics worth reusing: moat (intangibles, switching costs, network
+effect, cost advantage, efficient scale), management (capital allocation,
+incentives, candour, succession), business quality (pricing power,
+reinvestment runway, cyclicality, balance sheet).
+
+## Markup
+
 ```jinja
 {{ c.scorecard(caption="Moat assessment", scale=5, total="3.9 / 5 — wide", rows=[
     ("Intangible assets", "30%", 5, "Brand carries a 20%+ price premium at like-for-like specification."),
@@ -24,13 +31,13 @@ time (the authoring contract forbids `style=`), consumed by CSS `attr()` in
 Chromium/Edge and applied by `attr-fallback.js` everywhere else, so the bar
 matches the numeric score in every browser.
 
-Rules: weights sum to 100% and are set BEFORE scoring, not tuned until the
-total agrees with a conclusion you already had. Every score carries evidence
-in the same row — an unsupported score is `<mark class="todo">`, not a number.
-Keep the scale consistent across every document in a project (5 is the
-default) so scores compare. The total is stated in the document, not computed
-at view time; recompute it by hand when a score changes.
+## Rules
 
-Standard rubrics worth reusing: moat (the five sources above), management
-(capital allocation, incentives, candour, succession), business quality
-(pricing power, reinvestment runway, cyclicality, balance sheet).
+- **Weights sum to 100% and are set BEFORE scoring** — not tuned until the
+  total agrees with a conclusion you already had.
+- **Every score carries evidence in the same row.** An unsupported score is
+  `<mark class="todo">`, not a number.
+- **Keep the scale consistent across every document in a project** (5 is the
+  default) so scores compare.
+- **The total is stated in the document, not computed at view time.** Recompute
+  it by hand when a score changes.

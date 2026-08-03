@@ -26,7 +26,8 @@ from datetime import date, datetime
 from pathlib import Path
 
 # Skill root on sys.path by marker, so the base imports PACKAGE-QUALIFIED.
-# Why a marker and not a parent count: SKILL.md, "Adding a component showcase".
+# Why a marker and not a parent count: SKILL.md, "The preamble every leaf
+# starts with" -- the same four lines a showcase controller opens with.
 _SKILL_DIR = next(p for p in Path(__file__).resolve().parents
                   if (p / "_paths.py").exists())
 if str(_SKILL_DIR) not in sys.path:

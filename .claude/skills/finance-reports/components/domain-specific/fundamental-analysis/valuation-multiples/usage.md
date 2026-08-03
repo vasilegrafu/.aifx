@@ -9,6 +9,8 @@ this company itself has traded at. The premium column is the only number most
 readers keep. The verdict pill (`cheap` / `fair` / `rich`) reuses the `badge`
 component so verdicts look the same everywhere in the document set.
 
+## Markup
+
 ```jinja
 {{ c.valuation_multiples(
     caption="Apple vs mega-cap hardware and platform peers",
@@ -21,11 +23,14 @@ component so verdicts look the same everywhere in the document set.
     ]) }}
 ```
 
-Rules: state the basis in the caption — trailing, next-twelve-months, or
-fiscal year — and use ONE basis for the whole table. Name the peer set in the
-caption or a footnote; an unnamed "peer median" is unfalsifiable. A premium is
-not a sell and a discount is not a buy: the verdict column is your read, and
-the reasoning belongs in `thesis_pillars`. Every multiple in the table must be
-one you would actually act on — drop the ones you are only quoting for
-completeness. Pair with `valuation_range` when the conclusion is a price, not
-a rating.
+## Rules
+
+- **State the basis in the caption** — trailing, next-twelve-months, or fiscal
+  year — **and use ONE basis for the whole table.**
+- **Name the peer set in the caption or a footnote.** An unnamed "peer median"
+  is unfalsifiable.
+- **A premium is not a sell and a discount is not a buy.** The verdict column
+  is your read, and the reasoning belongs in `thesis_pillars`.
+- **Every multiple in the table must be one you would actually act on.** Drop
+  the ones you are only quoting for completeness.
+- Pair with `valuation_range` when the conclusion is a price, not a rating.

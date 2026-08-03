@@ -10,6 +10,8 @@ matrices, and performance grids of sector against region. The author assigns
 each cell a level from −3 to +3 — the component never computes buckets, so the
 thresholds are yours, stated, and consistent across documents.
 
+## Markup
+
 ```jinja
 {{ c.heatmap(
     caption="Monthly total return (%)", corner="Year",
@@ -22,11 +24,15 @@ thresholds are yours, stated, and consistent across documents.
     ]) }}
 ```
 
-Rules: state the level thresholds in `legend` — an unexplained gradient is
-decoration, and the same number must get the same colour in every document in a
-project. Level 0 is genuinely neutral, not "small positive". Rows shorter than
-the column list pad with blanks, which is how a part-year row or the empty half
-of a correlation matrix renders. Keep cell text to four characters or fewer;
-this is a shape to scan, and the exact figures belong in a `table` if they
-matter individually. For a correlation matrix, show one triangle only — a
-mirrored matrix doubles the ink for no information.
+## Rules
+
+- **State the level thresholds in `legend`.** An unexplained gradient is
+  decoration, and the same number must get the same colour in every document in
+  a project.
+- **Level 0 is genuinely neutral**, not "small positive".
+- **Rows shorter than the column list pad with blanks** — which is how a
+  part-year row, or the empty half of a correlation matrix, renders.
+- **Keep cell text to four characters or fewer.** This is a shape to scan; the
+  exact figures belong in a `table` if they matter individually.
+- **For a correlation matrix, show one triangle only.** A mirrored matrix
+  doubles the ink for no information.

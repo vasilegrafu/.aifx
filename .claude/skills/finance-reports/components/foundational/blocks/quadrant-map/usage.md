@@ -12,6 +12,8 @@ groups — provided both axes are defined, which is where most 2×2s fail.
 `quadrants` labels the four zones in reading order: top-left, top-right,
 bottom-left, bottom-right.
 
+## Markup
+
 ```jinja
 {{ c.quadrant_map(
     caption="Watchlist — quality against valuation",
@@ -31,12 +33,15 @@ bottom-left, bottom-right.
 
 Item positions come from `data-x` / `data-y` attributes computed at compose time
 (the contract forbids `style=`), read by CSS `attr()` in Chromium/Edge and
-applied by `attr-fallback.js` everywhere else. State the conclusion in `note`
-regardless — a scatter of labels is an argument only once someone names it.
+applied by `attr-fallback.js` everywhere else.
 
-Rules: both axes must be DEFINED and measurable, with the definition in `note` —
-"quality" and "attractiveness" as bare labels make the chart unfalsifiable.
-Scores are 0–100 so placements are comparable across documents. Eight items is
-the readable maximum before labels collide. Name the quadrants with what they
-MEAN for action, not with cute names. Say which quadrant you are buying from,
-and if it is empty, say that too — an empty buy zone is a finding.
+## Rules
+
+- **Both axes must be DEFINED and measurable, with the definition in `note`.**
+  "Quality" and "attractiveness" as bare labels make the chart unfalsifiable.
+- **Scores are 0–100** so placements are comparable across documents.
+- **Eight items is the readable maximum** before labels collide.
+- **Name the quadrants with what they MEAN for action**, not with cute names.
+- **State the conclusion in `note` regardless** — a scatter of labels is an
+  argument only once someone names it. Say which quadrant you are buying from,
+  and if it is empty, say that too: an empty buy zone is a finding.

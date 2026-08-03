@@ -238,9 +238,27 @@ def env() -> Environment:
     # {{ c.bar(...) }} with no import of its own. The WHOLE tree, not just the
     # component being shown: _showcase.master.html.j2 reaches for
     # c.metadata_header, which lives in foundational/structure/.
+    #
+    # ONE FLAT NAMESPACE, so the tree's category folders buy no room: two
+    # components anywhere in it whose folder names reach the same macro would
+    # land on the same attribute, and the second would silently replace the
+    # first in every view that calls it. That failure renders — valid markup,
+    # wrong exhibit — which is the one kind this library cannot afford, so the
+    # collision is refused here rather than resolved by sort order. Keyed on the
+    # MACRO rather than the folder because the mapping is not injective:
+    # `cash-flow` and `cash_flow` are two directories and one attribute.
     c = SimpleNamespace()
+    source: dict[str, Path] = {}
     for markup in sorted(COMPONENTS_DIR.rglob(MARKUP)):
         macro = macro_name(markup.parent.name)
+        if macro in source:
+            raise SystemExit(
+                f"duplicate component name: {macro!r} is claimed by both "
+                f"{source[macro]} and {markup.parent}.\n"
+                f"A component's folder name IS its macro on the shared `c` "
+                f"namespace, so two cannot coexist under any categories. "
+                f"Rename one for what it is, not for where it lives.")
+        source[macro] = markup.parent
         module = environment.get_template(
             markup.relative_to(COMPONENTS_DIR).as_posix()).module
         if hasattr(module, macro):

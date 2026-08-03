@@ -8,16 +8,21 @@ A display formula: LaTeX source as plain text, rendered in the browser by
 KaTeX (loaded lazily from CDN by `bundle.js`). Inline math inside prose is
 hand-written: `<span class="math">E = mc^2</span>`.
 
+## Markup
+
 ```jinja
 {% call c.formula() %}{% raw %}d_1 = \frac{\ln(S/K) + (r + \sigma^2/2)\,t}{\sigma\sqrt{t}}{% endraw %}{% endcall %}
 ```
 
-Rules:
-- The document holds LaTeX TEXT — never images of equations (same principle
-  as diagrams). If the CDN is unreachable the source stays visible in mono.
-- Escape HTML specials in the TeX when hand-editing: `<` → `&lt;`, `>` →
-  `&gt;`, `&` → `&amp;` (rare in math, but real).
-- In Jinja templates wrap the TeX in `{% raw %}…{% endraw %}` so braces are
+## Rules
+
+- **The document holds LaTeX TEXT — never images of equations** (the same
+  principle as diagrams). If the CDN is unreachable the source stays visible in
+  mono, which is degraded but still readable.
+- **In Jinja templates wrap the TeX in `{% raw %}…{% endraw %}`** so braces are
   never parsed as template syntax.
-- Invalid TeX renders as red text (KaTeX throwOnError:false) — fix it, don't
+- **Escape HTML specials in the TeX when hand-editing**: `<` → `&lt;`, `>` →
+  `&gt;`, `&` → `&amp;`. Rare in math, but real.
+- **Invalid TeX renders as red text** (KaTeX runs with `throwOnError: false`),
+  so a broken formula fails visibly rather than at build time — fix it, don't
   ship it.

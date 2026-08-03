@@ -10,6 +10,8 @@ explicit balance check. The `check` string states the identity in words and the
 component marks it as balancing or not — a balance sheet published without that
 arithmetic done is a balance sheet nobody checked.
 
+## Markup
+
 ```jinja
 {{ c.balance_sheet(
     caption="Consolidated balance sheets", unit="$M",
@@ -33,12 +35,18 @@ arithmetic done is a balance sheet nobody checked.
     ]) }}
 ```
 
-Rules: the check is written out and verified by hand — set `balanced=false` and
-say why in the text if the figures you have do not tie, rather than quietly
-adjusting a number. Order is assets, then liabilities, then equity; current
-before non-current within each. Contra-equity lines (accumulated deficit,
-treasury stock, accumulated other comprehensive loss) stay negative in
-parentheses — never flip their sign to make the section read tidily. Cite the
-note on debt, leases, pensions and anything with an off-balance-sheet
-component. Same periods, in the same order, as the `income_statement` and
-`cash_flow_statement` in the same document.
+## Rules
+
+- **The check is written out and verified by hand.** If the figures you have do
+  not tie, set `balanced=false` and say why in the text — never quietly adjust
+  a number to make it close.
+- **Order is assets, then liabilities, then equity**; current before
+  non-current within each.
+- **Contra-equity lines stay negative in parentheses** — accumulated deficit,
+  treasury stock, accumulated other comprehensive loss. Never flip their sign
+  to make the section read tidily.
+- **Cite the note on debt, leases, pensions**, and anything with an
+  off-balance-sheet component.
+- **Same periods, in the same order, as the `income_statement` and
+  `cash_flow_statement` in the same document.** Three exhibits on three
+  different period sets cannot be read against each other.

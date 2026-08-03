@@ -9,6 +9,8 @@ what was expected, the surprise, and the direction of travel. The opening
 block of a market outlook or economic analysis — it establishes the state of
 the world before any argument about what to do with it.
 
+## Markup
+
 ```jinja
 {{ c.macro_indicators(caption="United States", asof="2026-07-17", rows=[
     ("CPI y/y",                   "2.6%",  "2.8%",  "2.7%",  "-0.1pp", "down"),
@@ -21,11 +23,16 @@ the world before any argument about what to do with it.
 ]) }}
 ```
 
-Rules: one economy per table — a mixed US/EU/China dashboard hides the
-divergence that is usually the finding. Every row states its unit and basis in
-the indicator name (`y/y`, `3m avg`, `ann.`), never in a footnote. Surprises
-are in the indicator's own unit (pp, k, index points). `dir` is the direction
-of the SERIES, not whether it is good news — falling payrolls are `down`, and
-whether that helps the position is the analyst's job to say underneath. Print
-dates matter: an indicator released before the `asof` date is stale and the
-caption must say so. Pair with `cycle_position` for the synthesis.
+## Rules
+
+- **One economy per table.** A mixed US/EU/China dashboard hides the divergence
+  that is usually the finding.
+- **Every row states its unit and basis in the indicator name** — `y/y`,
+  `3m avg`, `ann.` — never in a footnote.
+- **Surprises are in the indicator's own unit** (pp, k, index points).
+- **`dir` is the direction of the SERIES, not whether it is good news.**
+  Falling payrolls are `down`, and whether that helps the position is the
+  analyst's job to say underneath.
+- **Print dates matter.** An indicator released before the `asof` date is stale
+  and the caption must say so.
+- Pair with `cycle_position` for the synthesis.

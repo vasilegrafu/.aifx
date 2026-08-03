@@ -24,8 +24,8 @@ is fetchable by anyone who guesses the path.
 - `config.<env>.json` is **tracked** and must never hold an `api_key`.
 - The environment file is deliberately **not** `.env`, because that is where
   every tutorial says to put a key and this one is tracked.
-- `git.commit&push.bat` runs `git add .`, so no file holding a key may ever be
-  trackable — not even briefly.
+- This repo is committed with a blanket `git add .`, so no file holding a key
+  may ever be trackable — not even briefly.
 
 ## Ask before committing, and again before pushing
 
@@ -45,7 +45,7 @@ Every generated page pins its asset version **at build time**. So the order is:
 ```
 
 Rebuild first and the pages pin the old version. **Any edit under `css/` or
-`js/` invalidates every one of the 109 pages at once** — `--check` is what turns
+`js/` invalidates every showcase page at once** — `--check` is what turns
 "did I remember?" into an exit code.
 
 The semver rule is in `README.md`: a release is MAJOR if **a thing that worked
@@ -57,9 +57,11 @@ A clean build proves the markup is valid. It does not prove the page is right �
 three defects have shipped past one. Two checks catch different things and
 neither replaces the other:
 
-- **`showcase_audit.py`** — generates a page; serve the repo and open it. Finds
-  overflow, out-of-track percentages, clipping, glued text. Cannot see a chart
-  that is merely wrong.
+- **`showcase_audit.py`** — generates a page; serve the repo **root** over
+  `http://` and open it (`python -m http.server 8000`, then the URL the script
+  prints). It checks each showcase in an iframe, so `file://` yields an empty
+  audit that reads as a pass. Finds overflow, out-of-track percentages,
+  clipping, glued text. Cannot see a chart that is merely wrong.
 - **Look at it.** Charts draw at view time, so a malformed spec is invisible in
   the HTML. ECharts here uses the **SVG renderer** — counting `<canvas>`
   elements proves nothing.

@@ -10,6 +10,8 @@ revenue, loan loss reserves, share count, shareholders' equity — and the faste
 way to see whether a balance moved because of trading or because of an
 accounting choice.
 
+## Markup
+
 ```jinja
 {{ c.roll_forward(
     caption="Share count roll-forward (millions of diluted shares)",
@@ -23,11 +25,15 @@ accounting choice.
     ]) }}
 ```
 
-Rules: opening plus movements must equal closing in every column — verify each
-column by hand, because a roll-forward that does not foot is the single most
-embarrassing error in a financial document. Each movement is a CAUSE, not a
-category: "shares repurchased" not "other changes"; a movement line called
-"other" that exceeds about 5% of the opening balance must be broken out. Signs
-follow the balance's own direction, in accounting parentheses. Use the same
-periods and order as the statements in the same document. One balance per
-table — a combined roll-forward of three different balances cannot be checked.
+## Rules
+
+- **Opening plus movements must equal closing in every column.** Verify each
+  column by hand — a roll-forward that does not foot is the single most
+  embarrassing error in a financial document.
+- **Each movement is a CAUSE, not a category** — "shares repurchased", not
+  "other changes". A movement line called "other" that exceeds about 5% of the
+  opening balance must be broken out.
+- **Signs follow the balance's own direction**, in accounting parentheses.
+- **Use the same periods and order as the statements in the same document.**
+- **One balance per table.** A combined roll-forward of three different
+  balances cannot be checked.

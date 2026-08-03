@@ -9,6 +9,8 @@ questions no financial statement does: who can force a change, how much stock
 must clear the market if sentiment turns, and whether the people running the
 business are buying it.
 
+## Markup
+
 ```jinja
 {{ c.ownership_table(
     caption="Largest holders", asof="2026-06-30",
@@ -25,12 +27,16 @@ business are buying it.
     ]) }}
 ```
 
-Rules: date the table and say where the data came from — 13F filings are 45
-days stale by rule and a reader who does not know that will misread a change
-column. Separate index holders from active and strategic ones: a Vanguard stake
-carries no information about the business, and treating it as conviction is the
-most common misreading of this table. `tone` marks whether a change matters to
-the thesis, not its sign. Include short interest and days to cover in `summary`
-where they are material. Insider buying is far more informative than insider
-selling, which has many innocent explanations — say which kind you are looking
-at.
+## Rules
+
+- **Date the table and say where the data came from.** 13F filings are 45 days
+  stale by rule, and a reader who does not know that will misread a change
+  column.
+- **Separate index holders from active and strategic ones.** A Vanguard stake
+  carries no information about the business, and treating it as conviction is
+  the most common misreading of this table.
+- **`tone` marks whether a change matters to the thesis, not its sign.**
+- **Include short interest and days to cover in `summary`** where they are
+  material.
+- **Insider buying is far more informative than insider selling**, which has
+  many innocent explanations — say which kind you are looking at.

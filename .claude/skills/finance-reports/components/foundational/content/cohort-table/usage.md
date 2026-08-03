@@ -10,6 +10,8 @@ are shorter. The definitive shape for subscription retention, net revenue
 retention, and loan loss curves by vintage. It separates a business that is
 growing from one that is churning and replacing.
 
+## Markup
+
 ```jinja
 {{ c.cohort_table(
     caption="Net revenue retention by signup cohort (%)",
@@ -25,12 +27,16 @@ growing from one that is churning and replacing.
     ]) }}
 ```
 
-Rules: state the level thresholds in `note` — the colours are your buckets and
-mean nothing without them. Every cohort starts at 100 in M0 (or at its own
-starting count); a table where cohorts start at different bases cannot be
-compared down a column. Read DOWN the columns, not across the rows: comparing
-M12 across cohorts is the test of whether the business is getting better or
-worse, and that comparison is the reason for the shape. Short rows are correct
-for young cohorts — never extrapolate to fill the triangle. Say what changed
-when a column deteriorates, since the cause (mix, pricing, product) determines
-whether it recovers.
+## Rules
+
+- **State the level thresholds in `note`.** The colours are your buckets and
+  mean nothing without them.
+- **Every cohort starts at 100 in M0** (or at its own starting count). A table
+  where cohorts start at different bases cannot be compared down a column.
+- **Read DOWN the columns, not across the rows.** Comparing M12 across cohorts
+  is the test of whether the business is getting better or worse, and that
+  comparison is the reason for the shape.
+- **Short rows are correct for young cohorts** — never extrapolate to fill the
+  triangle.
+- **Say what changed when a column deteriorates**, since the cause — mix,
+  pricing, product — determines whether it recovers.

@@ -9,6 +9,8 @@ share of profit — because the gap between them is usually the whole analysis.
 A segment at 26% of revenue and 41% of profit is a different company from the
 one the headline revenue split describes, and no single-bar chart shows it.
 
+## Markup
+
 ```jinja
 {{ c.segment_reporting(
     caption="Revenue and gross profit by category, FY2025", unit="$M",
@@ -24,13 +26,18 @@ one the headline revenue split describes, and no single-bar chart shows it.
     total_row=("Total", ["416,200", "100.0%", "196,600", "100.0%", "47.2%", "+6.4%"])) }}
 ```
 
-Rules: use the company's OWN reported segments — a re-cut of the disclosure is
-your estimate and must be labelled as one. Both share columns sum to 100%;
-if the company does not disclose profit by segment, say so in the caption and
-leave the profit columns empty rather than allocating costs yourself. Name the
-profit measure exactly (`gross profit`, `operating income`, `segment adjusted
-EBITDA`) — "profit" alone is not a defined term. Corporate and unallocated
-costs get their own row; hiding them inflates every segment's margin. Segments
-sort by revenue descending. When a segment's share of profit exceeds its share
-of revenue by more than about ten points, that segment IS the thesis — link it
-to a pillar in `thesis_pillars`.
+## Rules
+
+- **Use the company's OWN reported segments.** A re-cut of the disclosure is
+  your estimate and must be labelled as one.
+- **Both share columns sum to 100%.** If the company does not disclose profit
+  by segment, say so in the caption and leave the profit columns empty rather
+  than allocating costs yourself.
+- **Name the profit measure exactly** — `gross profit`, `operating income`,
+  `segment adjusted EBITDA`. "Profit" alone is not a defined term.
+- **Corporate and unallocated costs get their own row.** Hiding them inflates
+  every segment's margin.
+- **Segments sort by revenue descending.**
+- **When a segment's share of profit exceeds its share of revenue by more than
+  about ten points, that segment IS the thesis** — link it to a pillar in
+  `thesis_pillars`.

@@ -9,6 +9,8 @@ class, currency, factor, or liquidity. Use it wherever the question is "how
 much of the book is in X", and the answer has to be compared against a target
 or a limit.
 
+## Markup
+
 ```jinja
 {{ c.exposure_bars(caption="Sector exposure vs policy limits", items=[
     ("Information technology", 42.3, "limit 40% — over"),
@@ -25,10 +27,14 @@ Bar widths come from a `data-pct` attribute (the contract forbids `style=`),
 consumed by CSS `attr()` in Chromium/Edge and applied by `attr-fallback.js`
 everywhere else; the percentage is also printed as text.
 
-Rules: one dimension per figure — a chart mixing sectors and geographies
-answers neither question. Percentages sum to 100% including cash and "Other".
-Sort descending, except where a fixed order carries meaning (credit ratings,
-maturity buckets). The `value` slot is where the LIMIT goes: an exposure with
-no stated limit cannot be breached, which is how concentration accumulates.
-Use `apache_echarts` with a donut instead when the composition itself is the
-finding and there are fewer than six slices.
+## Rules
+
+- **One dimension per figure.** A chart mixing sectors and geographies answers
+  neither question.
+- **Percentages sum to 100%, including cash and "Other".**
+- **Sort descending**, except where a fixed order carries meaning — credit
+  ratings, maturity buckets.
+- **The `value` slot is where the LIMIT goes.** An exposure with no stated
+  limit cannot be breached, which is how concentration accumulates.
+- Use `apache_echarts` with a donut instead when the composition itself is the
+  finding and there are fewer than six slices.

@@ -11,6 +11,11 @@ reconciliations, and price-target bridges are all this one shape. Anchors
 (`start`, `subtotal`, `end`) are measured from the axis floor; `up` and `down`
 steps float from the running total, which the component tracks at compose time.
 
+Prefer this over a Mermaid `xychart-beta` or an ECharts waterfall whenever the
+decomposition itself is the finding, which is nearly always.
+
+## Markup
+
 ```jinja
 {{ c.bridge(
     caption="FY2024 → FY2025 revenue bridge ($M)",
@@ -31,14 +36,18 @@ Bar offset and width are computed at compose time and carried as `data-lo` /
 Chromium/Edge and applied by `attr-fallback.js` everywhere else, so the bars are
 proportional in every browser. Every row also prints its own value.
 
-Rules: the steps must actually reconcile — start plus every delta equals end, and
-you check that by hand before publishing. `scale_min` is the axis floor, NOT
-zero: a bridge from 391,035 to 416,200 drawn from zero shows nothing, and one
-drawn from 380,000 shows the whole argument. Deltas are signed numbers; `display`
-carries the formatted text with its sign. Five to eight steps — a bridge with
-fifteen rows is a table. Name the driver, never the accounting line: "Services
-growth" beats "increase in revenue". Where a step is an estimate rather than a
-disclosed figure, say so in `note`.
+## Rules
 
-Prefer this over a Mermaid `xychart-beta` or an ECharts waterfall whenever the
-decomposition itself is the finding, which is nearly always.
+- **The steps must actually reconcile** — start plus every delta equals end,
+  and you check that by hand before publishing. Nothing in the component
+  verifies it.
+- **`scale_min` is the axis floor, NOT zero.** A bridge from 391,035 to 416,200
+  drawn from zero shows nothing; one drawn from 380,000 shows the whole
+  argument.
+- **Name the driver, never the accounting line.** "Services growth" beats
+  "increase in revenue" — the decomposition is the finding, so each row has to
+  say what happened.
+- **Five to eight steps.** A bridge with fifteen rows is a table.
+- **Deltas are signed numbers**; `display` carries the formatted text with its
+  sign.
+- Where a step is an estimate rather than a disclosed figure, say so in `note`.

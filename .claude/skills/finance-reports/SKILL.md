@@ -3,9 +3,15 @@ name: finance-reports
 description: Generate data-driven investing reports as standalone HTML, built
   from live market and fundamentals data rather than hand-filled templates. A
   report is a program - a controller fetches and asserts, a view chooses which
-  components appear - and the output is regenerated, never edited. Use when the
-  user asks to build, extend, or audit a company or portfolio report, add a
-  report type, or work on the component library behind them.
+  components appear - and the output is regenerated, never edited. Use when
+  asked to build, extend, or audit a company, portfolio, market or economy
+  report, or to add a report type; when working on the component library behind
+  them - adding or restyling a component, writing its usage.md, or building a
+  showcase page; and when a generated page comes out wrong - a chart draws
+  blank or misshapen, CSS and JS fail to load, a showcase looks stale, or
+  version.json was bumped and every page needs rebuilding against it. Not for
+  hand-editing a generated report, which is a build artifact to be regenerated,
+  and not for charts outside this component library.
 ---
 
 # finance-reports — reports as programs, not documents
@@ -81,11 +87,14 @@ S=.claude/skills/finance-reports
 python $S/reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 python $S/reports/report_test_runner.py --list        # tests, and what they cost
 python $S/reports/report_test_runner.py --all         # each builds for REAL
+python $S/reports/catalog_builder.py                  # -> reports/CATALOG.md
 python $S/components/showcase_builder.py charts/bar
 python $S/components/showcase_builder.py --all        # rebuild every showcase
 python $S/components/showcase_builder.py --check      # verify each is current
 python $S/components/showcase_builder.py --missing    # components with none yet
 python $S/components/showcase_audit.py                # the page that checks them
+python $S/components/catalog_builder.py               # -> components/CATALOG.md
+python $S/usage_audit.py                              # every usage.md vs the skeleton
 ```
 
 **Only the script path is relative to where you stand.** Everything inside the
@@ -93,8 +102,18 @@ tools derives from `__file__` — which component, which report, where the outpu
 goes — so no argument and no result depends on the working directory.
 
 **`showcase_audit.py` generates a page, it does not print a verdict.** Serve the
-repo and open it; what it can and cannot see is under **What guards the output**
-below, and in full in `components/REFERENCE.md`.
+repo **root** and open it — the script prints both lines when it runs:
+
+```bash
+python -m http.server 8000
+# http://localhost:8000/.claude/skills/finance-reports/components/showcase_audit.html
+```
+
+**It has to be `http://`, not the file.** The page checks each showcase in an
+iframe, and a browser blocks cross-document access over `file://` — so opening
+it by double-clicking shows an empty audit that reads as a pass. What it can and
+cannot see is under **What guards the output** below, and in full in
+`components/REFERENCE.md`.
 
 There is **no top-level dispatcher**. Each directory owns the engine that
 builds what lives in it, and neither knows the other exists as a command.
@@ -104,6 +123,14 @@ version it was built against, so one edit under `css/` or `js/` invalidates
 every page in the tree at once. `--check` writes nothing and names every stale
 page, so the answer to "did I regenerate them?" is an exit code rather than a
 memory.
+
+**Nothing regenerates a catalogue for you either.** Both `CATALOG.md` files are
+derived — from the `{# purpose: … #}` headers, and for reports also from `TITLE`
+and the parser the controller declares — but there is no CI and no git hook in
+this repository, so anything added without its `catalog_builder.py` run leaves
+the catalogue quietly short by one. That is exactly how the previous
+hand-maintained index died. Both builders take `--check`: exit 1 if stale,
+writes nothing.
 
 A showcase is addressed by its **directory path** (components nest two to four
 levels), a report by its **name** alone — its domain is shelving for a reader,
@@ -252,7 +279,40 @@ in full.
 Two things the loader must get right — register the module in `sys.modules`
 *before* executing it, and import the base **package-qualified** — and both are
 load-bearing enough that `components/REFERENCE.md` writes up the failure each
-one produces. Copy the preamble below rather than reconstructing them.
+one produces.
+
+### The preamble every leaf starts with
+
+Copy this rather than reconstructing it. It is the same four lines in a showcase
+controller and in a report controller — `charts/bar/showcase_controller.py` and
+`company/financial-profile/report_controller.py` carry it character for
+character, and a new leaf on either side is a copy of those four lines and
+nothing else:
+
+```python
+import sys
+from pathlib import Path
+
+# Skill root on sys.path by marker, so the base imports PACKAGE-QUALIFIED.
+_SKILL_DIR = next(p for p in Path(__file__).resolve().parents
+                  if (p / "_paths.py").exists())
+if str(_SKILL_DIR) not in sys.path:
+    sys.path.insert(0, str(_SKILL_DIR))
+
+from components._showcase_controller import ShowcaseController    # noqa: E402
+```
+
+**The marker is `_paths.py`, and the search is an ascent, not a count.** Leaves
+sit two to four folders deep, so any fixed number of `.parent` calls is correct
+at one depth and silently wrong at the next — and wrong here means the base gets
+imported under a second name, which is failure (2) above.
+
+The last line is what differs per side: a showcase imports
+`ShowcaseController`, a report imports `ReportController` from
+`reports._report_controller`, and a report test imports `_report_checks`. The
+`# noqa: E402` is required on each — the import is deliberately below the
+`sys.path` edit that makes it resolvable, and every linter reads that as a
+mistake.
 
 ## Layout
 
@@ -265,13 +325,13 @@ components/                    the library: macros, filters, env, assets, showca
   _showcase_controller.py      ShowcaseController + env() + FILTERS + the asset pair
   _showcase.master.html.j2     the shell every showcase view extends
   showcase_builder.py          ShowcaseBuilder.build(path) + the CLI
-  charts/            21        engine-backed charts (Apache ECharts)
-  domain-specific/   33        one discipline owns each; prefixed after it
-    fundamental-analysis/ 23     `fa-`         the company under the lens
-    portfolio/             8     `portfolio-`  a book you hold
-    macro/                 2     `macro-`      the economy, no security in view
-  foundational/      53        any document may use these; NO prefix
-  diagrams/  math/    2        the two other rendering subsystems
+  charts/                      engine-backed charts (Apache ECharts)
+  domain-specific/             one discipline owns each; prefixed after it
+    fundamental-analysis/        `fa-`         the company under the lens
+    portfolio/                   `portfolio-`  a book you hold
+    macro/                       `macro-`      the economy, no security in view
+  foundational/                any document may use these; NO prefix
+  diagrams/  math/             the two other rendering subsystems
 
 reports/
   _report_controller.py        ReportController; borrows env() AND the asset pair
@@ -396,6 +456,22 @@ project before anything builds:
 to it** — `cdn_href()` reads it on every build, so a project without one cannot
 render a single showcase, let alone a report.
 
+**A copied skill must REPOINT `cdn`, not just copy the file.** Left at
+`…/gh/vasilegrafu/aifx-finance@{version}`, every page the consuming project
+builds will fall back to *this* repository's CSS and JS, pinned to a version
+number that means something else there — and it will look like it works, because
+those assets exist and resolve. What it actually means is that another project's
+tag now controls your documents' appearance, and a version you never published
+is what they name.
+
+**Nothing catches this.** The `assets_resolve` check in a report test builds its
+expectation *from* the local `version.json`, so a copy that kept the original
+value agrees with itself and passes. The check catches a stale *version*, never
+a wrong *repository*. Set `cdn` to wherever the copy is actually published, at
+the same time you create the file — a **linked** skill has no such problem,
+since `resolve()` walks the junction back to this clone and reads this
+`version.json`.
+
 **Two resolutions, both first-hit-wins, both with NO default:**
 
 ```
@@ -411,8 +487,8 @@ where, in full paths, before the ~13 calls.
 **There is no template for `secrets.<env>.json`** — write the two lines by hand,
 `{ "fmp": { "api_key": "<your-fmp-api-key>" } }`. `.gitignore` matches
 `secrets.*.json` with **no exception**, so nothing by that name is trackable; a
-shipped template would need a negation, and `git.commit&push.bat` runs `git add
-.` against a public, CDN-served repo. For the same reason the environment file
+shipped template would need a negation, and this repo is committed with a
+blanket `git add .` against a public, CDN-served tree. For the same reason the environment file
 is **not** called `.env`: that is where every tutorial says to put a key, and it
 is tracked.
 
@@ -441,14 +517,29 @@ per-field — **`service_providers/REFERENCE.md`**. It is written down once.
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
-4. `python $S/reports/report_builder.py <name> … --out DIR`
-5. `reports/<domain>/<name>/report_test.py` — **copy the neighbour and change
-   `REPORT`, `ARGV` and `CALLS`**, then write the checks only the finished PAGE
-   can answer. The build asserts its own arithmetic; what it cannot see is an
-   empty page, since `0 + 0 == 0` satisfies `cost + gross == revenue`. Add a
-   `report_test_output/` folder beside it holding a `.gitkeep` — that is where
-   it writes, `.gitignore` already covers the contents of every one of them, and
-   the destination is not free to move (`reports/REFERENCE.md` says why).
+4. **`python $S/reports/catalog_builder.py`** — nothing calls it for you. This
+   is not registration: the catalogue is derived from the header, the `TITLE`
+   and the parser you already wrote, and regenerating it only publishes what the
+   tree already says. Skip it and `reports/CATALOG.md` is short by one, which
+   means the next session choosing a report cannot see yours.
+5. `python $S/reports/report_builder.py <name> … --out DIR`
+6. `reports/<domain>/<name>/report_test.py` — **four declarations and a `CHECKS`
+   tuple**, not a copied test. `REPORT`, `ARGV`, `CALLS` and `OUT`, then
+   `checks.UNIVERSAL` from `reports/_report_checks.py` plus the three that take
+   this report's own answer — its `SECTIONS`, its symbols, its domain prefix —
+   and any check only THIS finished page can answer. The build asserts its own
+   arithmetic; what it cannot see is an empty page, since `0 + 0 == 0` satisfies
+   `cost + gross == revenue`. Add a `report_test_output/` folder beside it
+   holding a `.gitkeep` — that is where it writes, `.gitignore` already covers
+   the contents of every one of them, and the destination is not free to move
+   (`reports/REFERENCE.md` says why).
+
+   **Never copy a check body into a leaf.** Ten reports carrying their own
+   reading of the blank-cell threshold are ten claims about one number, free to
+   disagree the moment one of them learns something — the argument
+   `components/_contracts.py` already settled for components. A check that
+   applies to any generated page belongs in `_report_checks.py`, where adding it
+   reaches every report on its next run.
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so
@@ -464,25 +555,33 @@ reading one meant regex-parsing the template you were about to render.
    seeing: the default, and the ones where the component has to make a decision
    (a legend appears past one series, an axis name widens the margin).
 3. `python $S/components/showcase_builder.py <cat>/<name>`
+4. **`python $S/components/catalog_builder.py`** — nothing calls it for you. A
+   showcase is a **column in the catalogue**, not just a page: the row for a
+   component with both `showcase_controller.py` and `showcase.html.j2` carries a
+   `[showcase]` link and the row for one without carries nothing. So this step
+   is needed when you give an EXISTING component its first showcase, not only
+   when you add a component.
 
 **Follow the skeleton in `components/REFERENCE.md`** — there is one showcase per
-component, and 109 written freehand is 109 dialects.
+component, and a hundred-odd written freehand is a hundred-odd dialects.
 
-There is no step registering it. `showcase.html` is a build artifact — the
+There is no step registering it — step 4 included, which derives a link from the
+two files you just wrote rather than recording them anywhere. `showcase.html` is
+a build artifact — the
 controller and the view are the source — but it is **tracked**, so a showcase
 is viewable straight from the CDN without cloning anything. Regenerate it
 whenever you change the component or its controller, or the committed page
 describes a version of the component that no longer exists.
 
-Copy the four-line `sys.path` preamble from `charts/bar/showcase_controller.py`.
-Every leaf needs it, reports included; it finds the skill root by the **marker
-`_paths.py`** rather than counting parents, because leaves sit two to four
-folders deep and a count is wrong at the next depth.
+Start the controller with the `sys.path` preamble under **The preamble every
+leaf starts with** above — every leaf needs it, reports included, and it is the
+same four lines on both sides.
 
 ## The shape of a usage.md
 
-Every component has one and every report has one — 110 files, and they are the
-only per-item documentation there is. **Follow this skeleton.** They are read
+Every component has one and every report has one — no exceptions, and they are
+the only per-item documentation there is (`usage_audit.py` counts them and
+names any that is missing). **Follow this skeleton.** They are read
 selectively, one at a time, so a reader who cannot predict where "the rules"
 live has to read the whole file to find out there were none:
 
@@ -511,6 +610,27 @@ zero because length IS the value, that a peer group is chosen rather than
 screened. A `usage.md` without it is a description, and the code was already
 that.
 
+**Rules are bullets, each led by its claim in bold, then the reason.** All the
+conforming files do this and it is what makes them skimmable one-handed; a
+paragraph beginning "Rules:" packs four rules into four sentences and is read
+as none.
+
+`usage_audit.py` is the exit code behind this section — it asserts the three
+things SKILL.md actually mandates (a `usage.md` exists, it opens with an H1, it
+carries `## Rules`) and nothing softer:
+
+```bash
+python $S/usage_audit.py           # name every file that does not conform
+python $S/usage_audit.py --check   # exit 1 if any does
+```
+
+It deliberately does **not** check `## Markup` or `## Build it`, because the
+paragraph above lets those names vary and an audit that fails correct files
+earns an ignore rule rather than a fix. This was the last convention here
+enforced by nothing, and it is the one that drifted: 62 of 110 files had no
+`## Rules` when the audit was written. That is what an unenforced convention
+converges to, not a fact about those authors.
+
 ## House rules for components
 
 - **No `style=` and no `<style>` in generated documents.** Geometry comes from
@@ -527,7 +647,7 @@ that.
 - A chart never sets its own title; captions and units go through the shared
   chart frame so every exhibit is labelled the same way.
 - **Every component declares `{# purpose: … #}`. A component declares
-  `{# data: … #}` if and only if its input IS data** — 88 do; the other 21 take
+  `{# data: … #}` if and only if its input IS data** — most do; the rest take
   a `{% call %}` block and have nothing to declare. That is the test, not a
   matter of how much effort the component looks like it deserves: a data
   contract nobody can see is the one a showcase or a report gets wrong.

@@ -10,6 +10,8 @@ The falsifier is the point of the component: it converts an opinion into
 something the next review can check, and it is what you monitor between
 reviews.
 
+## Markup
+
 ```jinja
 {{ c.thesis_pillars([
     ("Services compounds at 12%+ through FY2028",
@@ -24,9 +26,13 @@ reviews.
 ]) }}
 ```
 
-Rules: 3–5 pillars — fewer is a hunch, more is a list of everything you know.
-Every pillar carries a falsifier, and the falsifier must be observable
-(a number, a date, a ruling), never a mood. Evidence cites real figures with
-their period. If a pillar's falsifier triggers, the document is updated and the
-`recommendation` is revisited in the same edit — that is the whole point of
-writing it down.
+## Rules
+
+- **Three to five pillars.** Fewer is a hunch; more is a list of everything you
+  know.
+- **Every pillar carries a falsifier, and the falsifier must be observable** —
+  a number, a date, a ruling — never a mood.
+- **Evidence cites real figures with their period.**
+- **If a pillar's falsifier triggers, the document is updated and the
+  `recommendation` is revisited in the same edit.** That is the whole point of
+  writing it down.

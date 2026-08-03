@@ -10,6 +10,8 @@ required companion to `performance-table` in any backtest report or portfolio
 review — a strategy is only as good as the drawdown you would have had to sit
 through.
 
+## Markup
+
 ```jinja
 {{ c.risk_metrics(
     caption="Strategy statistics — 2016-01 to 2026-06, monthly, net of 0.1% round-trip",
@@ -25,10 +27,14 @@ through.
     ]) }}
 ```
 
-Rules: the caption states the sample window, the data frequency, and the cost
-assumption — a backtest without all three is marketing. Every ratio names its
-risk-free assumption in a footnote. Max drawdown states peak, trough and
-recovery dates, not just the number. The reading column is a sentence about
-what the number MEANS for the decision, and an unfavourable reading is stated
-plainly — that is the value of the component. Use the same metric set across
-every strategy in a project so they compare.
+## Rules
+
+- **The caption states the sample window, the data frequency, and the cost
+  assumption.** A backtest without all three is marketing.
+- **Every ratio names its risk-free assumption in a footnote.**
+- **Max drawdown states peak, trough and recovery dates**, not just the number.
+- **The reading column is a sentence about what the number MEANS for the
+  decision**, and an unfavourable reading is stated plainly — that is the value
+  of the component.
+- **Use the same metric set across every strategy in a project** so they
+  compare.

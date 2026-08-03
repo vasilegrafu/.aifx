@@ -9,6 +9,8 @@ cycle, with the evidence for the call written into the phase itself. It turns
 the vaguest sentence in macro writing — "we are late cycle" — into a claim with
 a position, a date, and a reason.
 
+## Markup
+
 ```jinja
 {{ c.cycle_position(
     at=2, asof="July 2026",
@@ -21,10 +23,14 @@ a position, a date, and a reason.
     ]) }}
 ```
 
-Rules: three to five phases, and the phase vocabulary stays constant across
-every document in a project so calls can be compared over time. The `note` is
-the SO WHAT — what this position implies for allocation — not a restatement of
-the phase name. Date the call: a cycle position with no date cannot be scored
-later. State the evidence in each phase note so a reader can disagree with the
-placement rather than with the conclusion. If you are genuinely between phases,
-say so in the note rather than marking two phases current.
+## Rules
+
+- **Three to five phases**, and the phase vocabulary stays constant across every
+  document in a project so calls can be compared over time.
+- **The `note` is the SO WHAT** — what this position implies for allocation —
+  not a restatement of the phase name.
+- **Date the call.** A cycle position with no date cannot be scored later.
+- **State the evidence in each phase note**, so a reader can disagree with the
+  placement rather than with the conclusion.
+- **If you are genuinely between phases, say so in the note** rather than
+  marking two phases current.

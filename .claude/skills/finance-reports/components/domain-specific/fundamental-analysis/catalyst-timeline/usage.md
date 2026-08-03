@@ -9,6 +9,8 @@ expect and how likely it is. This is the monitoring list a thesis is checked
 against between reviews — earnings dates, product cycles, rulings, patent
 expiries, lockups, index reviews, refinancing walls.
 
+## Markup
+
 ```jinja
 {{ c.catalyst_timeline([
     ("2026-08-01", "FQ3 2026 earnings", "up", "Certain",
@@ -22,10 +24,16 @@ expiries, lockups, index reviews, refinancing walls.
 ]) }}
 ```
 
-Rules: ISO dates where the date is known, a quarter where it is not — never
-"soon". Direction is your expectation for the POSITION, and `mixed` is a
-legitimate answer that beats a false directional call. Likelihood uses one
-consistent vocabulary across the project (Certain / Likely / Possible /
-Remote). Every catalyst says what it would confirm or break, tying back to a
-pillar in `thesis_pillars`. Drop catalysts once they have passed — this is a
-forward list, and the history belongs in the change log.
+## Rules
+
+- **ISO dates where the date is known, a quarter where it is not — never
+  "soon".** An undated catalyst cannot be monitored, which is the only thing
+  this exhibit is for.
+- **Direction is your expectation for the POSITION**, and `mixed` is a
+  legitimate answer that beats a false directional call.
+- **Likelihood uses one consistent vocabulary across the project** — Certain /
+  Likely / Possible / Remote.
+- **Every catalyst says what it would confirm or break**, tying back to a
+  pillar in `thesis_pillars`.
+- **Drop catalysts once they have passed.** This is a forward list; the history
+  belongs in the change log.

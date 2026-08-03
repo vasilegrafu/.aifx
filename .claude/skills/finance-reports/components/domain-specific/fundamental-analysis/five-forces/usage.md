@@ -9,6 +9,8 @@ view. Where `swot_grid` (business category) inventories what a company has,
 this examines the STRUCTURE of the industry it sits in — and structure is what
 determines whether high returns persist or get competed away.
 
+## Markup
+
 ```jinja
 {{ c.five_forces(
     caption="Smartphone and platform industry structure",
@@ -27,11 +29,17 @@ determines whether high returns persist or get competed away.
     ]) }}
 ```
 
-Rules: rate from the INCUMBENT's perspective and keep the tone consistent with
-that — "low threat of new entrants" is `good` for the company you are analysing.
-Every force carries evidence with a number, a share or a name; a force rated
-from intuition is worth nothing. Use a consistent rating vocabulary across a
-project (Low / Moderate / High). The `verdict` is the synthesis and should say
-which force actually binds — usually one does, and the other four are context.
-Where the real constraint is outside the framework (regulation, technology
-transition, capital access), say so rather than forcing it into a box.
+## Rules
+
+- **Rate from the INCUMBENT's perspective and keep the tone consistent with
+  that.** "Low threat of new entrants" is `good` for the company you are
+  analysing.
+- **Every force carries evidence with a number, a share or a name.** A force
+  rated from intuition is worth nothing.
+- **Use a consistent rating vocabulary across a project** — Low / Moderate /
+  High.
+- **The `verdict` is the synthesis and should say which force actually binds.**
+  Usually one does, and the other four are context.
+- **Where the real constraint is outside the framework** — regulation, a
+  technology transition, capital access — **say so** rather than forcing it
+  into a box.

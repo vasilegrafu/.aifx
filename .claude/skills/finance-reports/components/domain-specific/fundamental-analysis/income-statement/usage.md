@@ -10,6 +10,11 @@ subtotals that matter. Line kinds carry the structure — `section` heads a
 group, `detail` is an indented component line, `subtotal` rules above,
 `total` closes with a double rule, and `pct` renders a muted common-size line.
 
+Use `financial_table` (business category) instead for a single-period statutory
+statement with no trend and no note references.
+
+## Markup
+
 ```jinja
 {{ c.income_statement(
     caption="Consolidated statements of operations", unit="$M",
@@ -30,16 +35,20 @@ group, `detail` is an indented component line, `subtotal` rules above,
     ]) }}
 ```
 
-Rules: three periods minimum — one period is a snapshot, not an income
-statement, and a trend is what the reader is buying. State the unit ONCE in
-`unit`, never per cell. Negatives use accounting parentheses, `(1,234)`; the
-component tints them from the leading bracket or minus sign. Never break the
-ladder: every subtotal that a reader would compute must be present, so gross
-profit and operating income are rows, not something to be inferred. `pct` lines
-go directly under the subtotal they describe. Non-GAAP figures are a SEPARATE
-labelled block, never mixed into the statutory ladder. `note` numbers link to
-`footnote_disclosures` — cite the note on any line whose composition is not
-obvious. `source` names the filing and page.
+## Rules
 
-Use `financial_table` (business category) instead for a single-period statutory
-statement with no trend and no note references.
+- **Three periods minimum.** One period is a snapshot, not an income
+  statement, and the trend is what the reader is buying.
+- **Never break the ladder.** Every subtotal a reader would compute must be
+  present, so gross profit and operating income are rows — not something left
+  to be inferred.
+- **State the unit ONCE, in `unit`**, never per cell.
+- **Negatives use accounting parentheses**, `(1,234)`; the component tints them
+  from the leading bracket or minus sign.
+- **`pct` lines go directly under the subtotal they describe.** A common-size
+  line floating away from its base describes nothing.
+- **Non-GAAP figures are a SEPARATE labelled block**, never mixed into the
+  statutory ladder.
+- **`note` numbers link to `footnote_disclosures`** — cite the note on any line
+  whose composition is not obvious.
+- `source` names the filing and the page.

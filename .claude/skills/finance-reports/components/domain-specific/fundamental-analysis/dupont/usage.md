@@ -9,6 +9,8 @@ across periods. Two companies at 25% ROE are not the same company: one earns it
 on margin, the other on leverage, and only the decomposition tells you which
 return survives a downturn.
 
+## Markup
+
 ```jinja
 {{ c.dupont(
     caption="Return on equity decomposition",
@@ -22,11 +24,16 @@ return survives a downturn.
     result=("Return on equity", ["156.4%", "164.6%", "156.0%"])) }}
 ```
 
-Rules: the factors must actually multiply to the result in every column — check
-each column, and if rounding makes it miss, say so rather than adjusting a
-factor. Use the three-step decomposition (margin × turnover × leverage) unless
-the five-step version earns its complexity, and never mix the two in one
-document. Where equity is small or negative from buybacks, ROE stops being
-meaningful — use return on invested capital instead and say why in `note`. The
-`note` is the interpretation: which factor moved, and whether that is quality or
-financial engineering. Same periods as the statements in the same document.
+## Rules
+
+- **The factors must actually multiply to the result in every column.** Check
+  each column; if rounding makes it miss, say so rather than adjusting a
+  factor.
+- **Use the three-step decomposition** (margin × turnover × leverage) unless
+  the five-step version earns its complexity — and never mix the two in one
+  document.
+- **Where equity is small or negative from buybacks, ROE stops being
+  meaningful.** Use return on invested capital instead and say why in `note`.
+- **The `note` is the interpretation**: which factor moved, and whether that is
+  quality or financial engineering.
+- Same periods as the statements in the same document.

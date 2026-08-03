@@ -8,6 +8,8 @@ The subject company set against its named comparables on whatever metrics
 decide the argument — growth, margin, returns, leverage, multiple. The subject
 row is highlighted so the eye finds it without hunting.
 
+## Markup
+
 ```jinja
 {{ c.peer_comparison(
     caption="Mega-cap platforms — FY2025 reported, ordered by market cap",
@@ -20,9 +22,13 @@ row is highlighted so the eye finds it without hunting.
     ]) }}
 ```
 
-Rules: name the peer set and justify it in one line — comparables chosen after
-the fact prove whatever you want. Same period and same accounting basis for
-every row; if one peer has a different fiscal year, say so in the caption.
-Include a median row so the reader sees the reference point you are using in
-`valuation_multiples`. Six metrics is the practical maximum before the table
-needs `wide` mode. Never highlight more than one subject row.
+## Rules
+
+- **Name the peer set and justify it in one line.** Comparables chosen after
+  the fact prove whatever you want — the peer group is a choice, not a screen.
+- **Same period and same accounting basis for every row.** If one peer has a
+  different fiscal year, say so in the caption.
+- **Include a median row** so the reader sees the reference point you are using
+  in `valuation_multiples`.
+- **Six metrics is the practical maximum** before the table needs `wide` mode.
+- **Never highlight more than one subject row.**

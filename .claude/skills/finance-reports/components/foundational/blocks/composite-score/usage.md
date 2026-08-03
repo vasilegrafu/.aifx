@@ -13,6 +13,8 @@ driven by a depressed market cap.
 The `formula` is rendered as LaTeX by KaTeX at view time (it uses the `math`
 class), so write it as TeX source, never as an image.
 
+## Markup
+
 ```jinja
 {{ c.composite_score(
     name="Altman Z-score (manufacturing)",
@@ -30,12 +32,16 @@ class), so write it as TeX source, never as an image.
     ]) }}
 ```
 
-Rules: name the VARIANT — Altman has separate coefficients for manufacturing,
-non-manufacturing and emerging markets, and using the wrong one silently
-invalidates the score. Contributions must sum to the score. Never invent a
-composite: if you are weighting criteria of your own, use `scorecard`, which is
-honest about being a judgement. State in `note` which single input is carrying
-the result, because that is what a reader monitors. These scores were fitted on
-particular samples in particular decades — a bank or a software company scored
-on the manufacturing Z-score is a category error, and if you do it anyway, say
-so.
+## Rules
+
+- **Name the VARIANT.** Altman has separate coefficients for manufacturing,
+  non-manufacturing and emerging markets, and using the wrong one silently
+  invalidates the score.
+- **Contributions must sum to the score.**
+- **Never invent a composite.** If you are weighting criteria of your own, use
+  `scorecard`, which is honest about being a judgement.
+- **State in `note` which single input is carrying the result**, because that
+  is what a reader monitors.
+- **These scores were fitted on particular samples in particular decades.** A
+  bank or a software company scored on the manufacturing Z-score is a category
+  error — and if you do it anyway, say so.

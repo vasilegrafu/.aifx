@@ -9,6 +9,8 @@ the date it bottomed, the date it got back to even, and how long each leg took.
 A maximum drawdown quoted as a single number hides the only question that
 matters to someone who has to live through it: how long was I underwater?
 
+## Markup
+
 ```jinja
 {{ c.drawdown_table(
     caption="Five deepest drawdowns, 2016-01 to 2026-06",
@@ -22,11 +24,16 @@ matters to someone who has to live through it: how long was I underwater?
     ]) }}
 ```
 
-Rules: recovery date, not just depth — a 30% drawdown recovered in four months
-and one recovered in three years are different products. Use the same return
-series and frequency as `performance_table`; drawdowns computed on monthly data
-understate the intraday pain and you should say which you used. Name a cause per
-drawdown: an unattributed drawdown teaches nothing about when the next one
-comes. An ongoing drawdown shows "not recovered" in the recovery column rather
-than being omitted. State in `note` what the table implies for position sizing,
-which is the reason a reader is looking at it.
+## Rules
+
+- **Recovery date, not just depth.** A 30% drawdown recovered in four months
+  and one recovered in three years are different products.
+- **Use the same return series and frequency as `performance_table`.**
+  Drawdowns computed on monthly data understate the intraday pain — say which
+  you used.
+- **Name a cause per drawdown.** An unattributed drawdown teaches nothing about
+  when the next one comes.
+- **An ongoing drawdown shows "not recovered" in the recovery column** rather
+  than being omitted.
+- **State in `note` what the table implies for position sizing**, which is the
+  reason a reader is looking at it.

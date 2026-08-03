@@ -9,6 +9,8 @@ you would actually do about it. The response column is what separates a stress
 test from a worry list: a scenario with no pre-agreed response is a scenario you
 will improvise through at the worst possible moment.
 
+## Markup
+
 ```jinja
 {{ c.stress_test(
     caption="Portfolio stress scenarios — impact on NAV",
@@ -27,11 +29,15 @@ will improvise through at the worst possible moment.
     ]) }}
 ```
 
-Rules: every scenario has a named, observable TRIGGER — "a market crash" is not
-a scenario, "spreads above 800bp" is. The response is a decision you commit to
-now, and if the honest response is "hold and do nothing", write that: it is a
-real answer and a better one than a plan you will not follow. Magnitudes are
-scaled to the worst case so the bars compare. State your correlation assumption
-in `note` — most stress tests fail because diversification disappears exactly
-when it is needed. Include at least one idiosyncratic scenario alongside the
-macro ones; concentration risk kills more portfolios than recessions.
+## Rules
+
+- **Every scenario has a named, observable TRIGGER.** "A market crash" is not a
+  scenario; "spreads above 800bp" is.
+- **The response is a decision you commit to now.** If the honest response is
+  "hold and do nothing", write that — it is a real answer and a better one than
+  a plan you will not follow.
+- **Magnitudes are scaled to the worst case** so the bars compare.
+- **State your correlation assumption in `note`.** Most stress tests fail
+  because diversification disappears exactly when it is needed.
+- **Include at least one idiosyncratic scenario alongside the macro ones.**
+  Concentration risk kills more portfolios than recessions.

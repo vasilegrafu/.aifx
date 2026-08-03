@@ -10,6 +10,12 @@ The numbered notes to the accounts, each anchored at `id="note-<num>"` so that
 act: most disclosures are boilerplate, and marking the two or three that change
 what the statements mean is the reason to reproduce them at all.
 
+Distinct from `footnotes` (front-back-matter), which is scholarly apparatus for
+citing sources anywhere in a document. This component is the accounting
+disclosure set, and its anchors are a statement's cross-reference target.
+
+## Markup
+
 ```jinja
 {{ c.footnote_disclosures(caption="Notes cited in the statements above", items=[
     (2, "Revenue recognition",
@@ -27,15 +33,14 @@ what the statements mean is the reason to reproduce them at all.
 ]) }}
 ```
 
-Rules: reproduce only the notes a statement line actually cites — a full note
-set belongs in the filing, not in your document. Every note is SUMMARISED in
-your own words with the figures kept exact; never paste the filing's language
-and never paraphrase a number. `watch` means the note changes how a statement
-line should be read, and each flagged note says what it changes, in the note
-body. Note numbers must match the source filing's numbering — renumbering them
-to be contiguous breaks the reader's ability to check you. Notes appear after
-the statements they annotate, in ascending order.
+## Rules
 
-Distinct from `footnotes` (front-back-matter), which is scholarly apparatus for
-citing sources anywhere in a document. This component is the accounting
-disclosure set, and its anchors are a statement's cross-reference target.
+- **Reproduce only the notes a statement line actually cites.** A full note set
+  belongs in the filing, not in your document.
+- **Every note is SUMMARISED in your own words with the figures kept exact.**
+  Never paste the filing's language, and never paraphrase a number.
+- **`watch` means the note changes how a statement line should be read**, and
+  each flagged note says what it changes, in the note body.
+- **Note numbers must match the source filing's numbering.** Renumbering them
+  to be contiguous breaks the reader's ability to check you.
+- Notes appear after the statements they annotate, in ascending order.

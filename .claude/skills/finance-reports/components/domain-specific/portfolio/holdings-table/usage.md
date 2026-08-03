@@ -9,6 +9,8 @@ columns the review needs — cost, price, value, unrealised, contribution. The
 bar makes concentration visible at a glance, which a column of percentages
 never does.
 
+## Markup
+
 ```jinja
 {{ c.holdings_table(
     caption="Portfolio — 30 Jun 2026",
@@ -26,9 +28,13 @@ The weight bar width comes from a `data-pct` attribute (the contract forbids
 `style=`), consumed by CSS `attr()` in Chromium/Edge and applied by
 `attr-fallback.js` everywhere else; the numeric percentage sits beside the bar.
 
-Rules: weights sum to 100% including cash — cash is a position and hiding it
-overstates every other weight. Same valuation date for every row, named in the
-caption. `tone` colors only the LAST column, so put the number that carries the
-verdict there (unrealised or contribution, not both). Sort by weight
-descending; concentration is the point of the picture. More than about twenty
-rows belongs in `wide` mode or a grouped child document.
+## Rules
+
+- **Weights sum to 100% including cash.** Cash is a position, and hiding it
+  overstates every other weight.
+- **Same valuation date for every row**, named in the caption.
+- **`tone` colors only the LAST column**, so put the number that carries the
+  verdict there — unrealised or contribution, not both.
+- **Sort by weight descending.** Concentration is the point of the picture.
+- More than about twenty rows belongs in `wide` mode or a grouped child
+  document.

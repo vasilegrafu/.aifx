@@ -12,11 +12,11 @@ components/
   _showcase.master.html.j2  the shell every showcase view extends
   showcase_builder.py       ShowcaseBuilder.build(path) + the CLI
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
-  CATALOG.md                all 109 by purpose — generated, do not edit
-  charts/            21     engine-backed charts (Apache ECharts)
-  domain-specific/   33     one analysis discipline owns it
-  foundational/      53     any document may use these
-  diagrams/  math/    2     the two other rendering subsystems
+  CATALOG.md                every component by purpose — generated, do not edit
+  charts/                   engine-backed charts (Apache ECharts)
+  domain-specific/          one analysis discipline owns it
+  foundational/             any document may use these
+  diagrams/  math/          the two other rendering subsystems
 ```
 
 **A leading underscore marks the library half** — the files that serve
@@ -34,8 +34,18 @@ components/<category>/<name>/
   usage.md            when to use it, and the rules            (required)
   showcase_controller.py   _build_context() -> dict            (optional)
   showcase.html.j2         the states worth seeing             (optional)
-  showcase.html            build artifact, gitignored
+  showcase.html            build artifact, but TRACKED — see below
 ```
+
+**`showcase.html` is a build artifact that is nonetheless committed.** It is
+generated, never edited by hand, and regenerated whenever the component or its
+controller changes — but it is **tracked**, because jsDelivr serves what is
+committed and a showcase is meant to be viewable from the CDN without cloning
+anything. Every one is in the index; `git check-ignore` exits 1 for all of them.
+
+Do not "fix" this by adding a `.gitignore` rule. That would un-publish every
+showcase link in `CATALOG.md` at the next tag, and the pages are the only
+rendered evidence of what a component actually looks like.
 
 The **category folders exist for humans**. A component's identity is its own
 folder name, so moving one between categories touches no template. Names must
@@ -47,8 +57,9 @@ folder, `metric_trend` is what a view calls.
 ## The environment
 
 `env()` in `_showcase_controller.py`, module-level and `@cache`d. **Built once
-per process**: ~0.5s cold, ~0.001ms after, because building it parses all 109
-component templates. Per-controller it would cost that 109 times.
+per process**: ~0.5s cold, ~0.001ms after, because building it parses every
+component template in the tree. Per-controller it would cost that once per
+component.
 
 It is cached at module level rather than on an instance because **it belongs to
 the library, not to whoever is rendering** — which is also what lets `reports/`
@@ -154,8 +165,8 @@ The leaf's four-line `sys.path` preamble exists for (2). It walks up to the
 four levels deep.
 
 **Path-loading removed the old hyphen constraint.** An `import` statement cannot
-name a folder with a hyphen, which once disqualified **72 of the 109**
-components. Loading by path has no such rule.
+name a folder with a hyphen, which disqualifies **the majority of the tree** —
+61 of the components carry one today. Loading by path has no such rule.
 
 ### How a controller knows where it is
 
@@ -177,8 +188,8 @@ the same place.
 
 A showcase is two files and they divide the same way a report does: the
 controller holds data and calls no macro, the view calls macros and holds no
-data. **Follow this skeleton** — there is one per component, and 109 of them
-written freehand is 109 dialects.
+data. **Follow this skeleton** — there is one per component, and a hundred-odd
+written freehand is a hundred-odd dialects.
 
 ```python
 # showcase_controller.py — NAMED DATA, never per-state bundles.
@@ -282,14 +293,14 @@ python $S/components/catalog_builder.py    # -> components/CATALOG.md
 ```
 
 `usage.md` answers *"should I use THIS?"* once you have a candidate. Nothing
-answered *"which of the 109?"*, so choosing meant grepping the tree. `CATALOG.md`
+answered *"which one?"*, so choosing meant grepping the tree. `CATALOG.md`
 is that missing step: name, macro, what it is for, and where to read the rules.
 
 **Generated from the `{# purpose: … #}` header of each `component.html.j2`**, so
 it cannot drift — a component that changes its purpose changes the catalogue on
 the next build, and one that ships without a purpose **fails the build** rather
-than appearing blank. An index of 109 items maintained by hand is an index that
-is wrong; the previous one was deleted for exactly that reason.
+than appearing blank. An index of a hundred-odd items maintained by hand is an
+index that is wrong; the previous one was deleted for exactly that reason.
 
 It carries no parameters and no examples on purpose. Those would be a second
 copy of `usage.md`, and the second copy is the one that rots. A component with
