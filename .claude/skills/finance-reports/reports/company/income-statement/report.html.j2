@@ -57,9 +57,10 @@
        obviously R&D and obviously not.
 
        Non-operating is DECOMPOSED here, which is what separates this exhibit
-       from the same company's financial-profile: interest in, interest out,
-       other, and the part the source does not reconcile, each as its own
-       ribbon. Tall, because six stages need the room. #}
+       from the same company's financial-profile: interest in, interest out and
+       other, each as its own ribbon. What the source does NOT reconcile is not
+       among them — it is a finding, and findings belong in the reconciliation
+       exhibit, not in a shape. Tall, because six stages need the room. #}
     {% if d.flow_nodes %}
     {{ c.charts_apache_echarts_sankey(nodes=d.flow_nodes, links=d.flow_links,
                 height=620, label_room=210, unit=d.unit,

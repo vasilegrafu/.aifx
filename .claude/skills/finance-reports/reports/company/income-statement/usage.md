@@ -121,6 +121,15 @@ row, which is where a disagreement belongs: stated as a finding, not drawn as a
 shape. A picture asserts that its parts are real; a table can say "this is what
 they published and it does not add up".
 
+**And the finding says WHY when it can prove why.** A gap of 141% of pre-tax
+income reads as 195bn of missing income unless the page names the alternative.
+Where `-nonOperatingIncomeExcludingInterest - interestExpense` reproduces
+`totalOtherIncomeExpensesNet` exactly — four of GOOGL's five quarters — the note
+says the sign is reversed in the feed and shows the arithmetic. Where that
+identity does not hold it says only what it can prove: the components miss the
+subtotal by this much. "We do not know why" is the honest reading of a residual
+nothing explains, and it is a different sentence from "the feed flipped a sign".
+
 **D&A and EBITDA are memo lines, never ribbons.** Depreciation sits inside cost
 of revenue and inside operating expenses. Drawing it as its own flow counts it
 twice, and the diagram still balances, because both copies are real numbers.

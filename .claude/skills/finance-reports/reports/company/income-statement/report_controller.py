@@ -11,8 +11,8 @@ WHAT MAKES THIS REPORT DIFFERENT FROM ITS SANKEY IN financial-profile:
     financial-profile   11 nodes, one non-operating ribbon, annual or quarterly
                         by exhibit, and the statement is context for the rest
     income-statement    ~14 nodes, non-operating DECOMPOSED into interest
-                        income, interest expense and other, plus the residual
-                        the source does not reconcile drawn as its own ribbon
+                        income, interest expense and other, and a reconciliation
+                        exhibit for what the source does not tie
 
 THE RESIDUAL IS THE WHOLE PROBLEM. `totalOtherIncomeExpensesNet` is what the
 statement uses to get from operating income to pre-tax income, and it is NOT the
@@ -26,11 +26,11 @@ sum of the components the same payload publishes. QCOM Q3 FY2026:
     unreconciled                         1,931   <- 78% of pre-tax income
 
 That is not rounding. Folding it into "other non-operating" would misstate a
-real line by nearly 2bn; dropping it would break conservation and the sankey
-would draw perfectly and lie. So it is NAMED, drawn as its own ribbon, listed in
-the ladder, and stated in the basis. See endpoints.md, "Statement lines do not
-always sum to their own subtotals" — this report is the case that rule was
-written for.
+real line by nearly 2bn. So it is NAMED: its own ladder row, its own
+reconciliation row, and a line in the basis. It is NOT drawn — see the sankey
+below, where drawing it once made the diagram undrawable for GOOGL. See
+endpoints.md, "Statement lines do not always sum to their own subtotals" — this
+report is the case that rule was written for.
 
 WHAT IS ASSERTED AND WHAT IS DISCLOSED. Anything the diagram depends on to
 conserve is an assertion and stops the build. Anything the SOURCE gets wrong is
@@ -603,7 +603,18 @@ class IncomeStatementReportController(ReportController):
                      lambda k: ebitda[k] - dna[k] - ebit[k]),
         ]
 
+        # WHY THE GAP IS THERE, when the arithmetic can say. A gap of 141% of
+        # pre-tax income reads as 195bn of missing income unless the page names
+        # the alternative, and for GOOGL the alternative is checkable: negating
+        # the published field and subtracting interest expense reproduces the
+        # subtotal EXACTLY, in four of the five quarters on the page. That is a
+        # reversed sign in the feed, not a filing that fails to add up, and the
+        # two deserve different sentences. Where the identity does not hold the
+        # note says only what it can prove -- that the components miss the
+        # subtotal by this much -- because "we do not know why" is the honest
+        # reading of a residual nothing explains.
         gap = nonop_resid[-1]
+        inverted = bool(nonop[-1]) and other_net[-1] + nonop[-1] + int_exp[-1] == 0
         recon_note = ""
         if gap:
             share = abs(100 * gap / pretax[-1]) if pretax[-1] else 0
@@ -611,10 +622,19 @@ class IncomeStatementReportController(ReportController):
                 f"In {periods[-1]} the source's own non-operating components sum "
                 f"to {net_int[-1] + nonop[-1]:,}, while the statement uses "
                 f"{other_net[-1]:,} to reach pre-tax income — a gap of {gap:,} "
-                f"({share:.0f}% of pre-tax income). It is drawn as its own "
-                f"ribbon and listed as its own line rather than folded into "
-                f"other non-operating income, which would misstate a real line "
-                f"by that amount.")
+                f"({share:.0f}% of pre-tax income). ")
+            if inverted:
+                recon_note += (
+                    f"That gap is the feed's, not the filing's: negating the "
+                    f"published other non-operating figure and subtracting "
+                    f"interest expense reproduces the subtotal exactly "
+                    f"({-nonop[-1]:,} − {int_exp[-1]:,} = {other_net[-1]:,}), so "
+                    f"the field arrives with its sign reversed. ")
+            recon_note += (
+                "It keeps its own ladder row and this reconciliation row rather "
+                "than being folded into other non-operating income, which would "
+                "misstate a real line by that amount. It is not drawn: the "
+                "diagram is built only from the subtotals that tie.")
 
         # ----------------------------------------------------------- the basis
         period_end = datetime.strptime(latest["date"], "%Y-%m-%d").date()
