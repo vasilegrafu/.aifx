@@ -38,8 +38,54 @@ engine in `js/modules/`, and a document using none of them fetches none of them.
 They are separate from one another because the thing rendered differs — a
 formula, a drawn relationship, data — and each carries its own engine.
 
-`components/` is grouped the same way, so a component and the CSS that styles it
-sit in matching places.
+`components/` is grouped the same way for the disciplines and for `math/`, so in
+those a component and the CSS that styles it sit in matching places. **It is not
+a rule, it is a default**, and four folders depart from it. Know which before
+hunting for a stylesheet that does not exist:
+
+| component folder | styled by |
+|---|---|
+| `foundational/structure/` | `metadata.css` (metadata-header), `toc.css` (toc), `blocks.css` (lead) |
+| `foundational/front-back-matter/` | `blocks.css` |
+| `charts-apache-echarts/` (the engine and all its kinds) | `charts/charts.css` + `charts/charts-apache-echarts.css` |
+| `diagrams-mermaid/` (the engine and all its kinds) | `diagrams/diagrams.css` + `diagrams/diagrams-mermaid.css` |
+
+**The last two cut the subsystem differently on each side, on purpose.**
+`components/` is grouped by ENGINE, because a kind's markup is engine-specific —
+`charts-apache-echarts/bar` writes an ECharts option and a Plotly `bar` would
+write something else entirely. `css/` is grouped by SUBSYSTEM, because the
+styling is not: `.chart-figure`, `.chart-canvas` and `.chart-note` are the frame
+a chart sits in, and they look the same whichever engine drew the picture. So
+`css/charts/` keeps one shared file plus one small per-engine file, and adding
+`charts-plotly/` to `components/` adds a directory of kinds here but only a
+handful of rules there.
+
+That is also why `OWNS` in `status.py` maps every chart engine to the same
+`chart-` prefix rather than one prefix per engine — the class names belong to
+the subsystem, not to the renderer.
+
+There is no `structure.css` and no `front-back-matter.css`. Those CSS modules
+are named for what a DOCUMENT is made of — its cover block, its table of
+contents — which is a different cut from the components that emit them, and
+splitting `toc.css` and `metadata.css` to satisfy the symmetry would scatter one
+document concern across two files to make a sentence true.
+
+### Which direction dependencies run
+
+**`foundational/` never depends on `domain-specific/`.** A foundational
+component carrying a `fa-`, `portfolio-` or `macro-` class is a defect, not a
+shortcut, and the layer order is why: `domain` sits **after** `content` and
+`blocks`, so the borrowed rule cannot be overridden from the borrower's own
+stylesheet — layer order beats specificity. The reverse hurts more, because
+restyling a discipline's class then silently restyles every foundational
+component that borrowed it.
+
+Six classes had crossed that line before 11.0.0, in both directions, and one of
+them — `portfolio-rm-note`, scoped to `table.portfolio-risk-metrics` — matched
+nothing at all where it was borrowed, so a prose column rendered right-aligned
+in tabular figures on every page that used it. `status.py --check` is what
+notices now. **The fix is never an exception:** a class two disciplines want is
+telling you it is foundational.
 
 ## Module map
 
@@ -50,19 +96,19 @@ sit in matching places.
 | `metadata.css` | metadata-header (cover title block), change-history, approval-block |
 | `layout.css` | spatial primitives: `columns`/`column` (responsive flex row), `grid` (auto-fit tiles), `card` (titled surface). Collapses to one column on narrow width + print |
 | `toc.css` | the static TOC |
-| `content.css` | table, plain code, figure, collapsible, quote, comparison-table. Also **`table.fin`**, the one numeric-table skin every discipline opts into (`<table class="fin fa-multiples">`) — alignment, tabular figures and micro-headers defined once — with its `.tone-*` and `.trend-*` companions; and six table components promoted from domain-specific in 6.0.0: sensitivity-table, roll-forward, cohort-table, variance-analysis, metric-trend, expected-value |
+| `content.css` | table, plain code, figure, collapsible, quote, comparison-table. Also **`table.fin`**, the one numeric-table skin every discipline opts into (`<table class="fin fa-valuation-multiples">`) — alignment, tabular figures and micro-headers defined once — with its `.tone-*` and `.trend-*` companions; and six table components promoted from domain-specific in 6.0.0: sensitivity-table, roll-forward, cohort-table, variance-analysis, metric-trend, expected-value. Also the **furniture around a numeric table**, promoted in 11.0.0 because all three disciplines and four foundational components were already sharing it: `.fin-unit` and `.fin-asof` (caption subordinates), `.fin-source` (the note under the table), `.fin-value` (the headline number), `.fin-note` (a prose column, which must opt out of the right-alignment and tabular figures `table.fin td` imposes) |
 | `code.css` | framed code blocks (`figure.code` title bar) + the runtime syntax palette (`.token.*`, applied by bundle.js/Prism) |
 | `callouts.css` | callout, todo-marker |
 | `lists.css` | facts, steps, checklist, trace-id |
 | `blocks.css` | requirement card, acceptance-criteria (Given/When/Then), kpi-tiles, timeline, glossary, revision-note, meter, risk-matrix, footnotes, ISO front/back matter. Also the **labelled-bar figure row** — a label, a track, a value, with only the track geometry differing — and six shape components promoted from domain-specific in 6.0.0: bridge, funnel, heatmap, quadrant-map, scorecard, composite-score. Their bar widths and plot positions come from `data-` attributes via typed `attr()`, never `style=`; that syntax is Chromium-only today, so `js/modules/attr-fallback.js` applies the same geometry elsewhere |
-| `domain-specific/fundamental-analysis.css` | The company under the lens — statements, valuation, peers, solvency, thesis. 23 components, classes namespaced `fa-`. Holds `.statement`, the one skin behind income-statement, balance-sheet, cash-flow-statement and dcf-summary: they differ only in which lines are mandatory, which is guidance, not styling. |
-| `domain-specific/portfolio.css` | A book you hold rather than a company — holdings, performance, attribution, exposure, risk. 8 components, namespaced `portfolio-`. Its tables opt into the foundational `table.fin` skin; it defines no table skin of its own. |
-| `domain-specific/macro.css` | The economy with no security in view — indicators and cycle position. 2 components, namespaced `macro-`. Shares the foundational `.trend-*` glyph column with metric-trend. |
+| `domain-specific/fundamental-analysis.css` | The company under the lens — statements, valuation, peers, solvency, thesis. Classes namespaced `fa-`. Holds `.statement`, the one skin behind income-statement, balance-sheet, cash-flow-statement and dcf-summary: they differ only in which lines are mandatory, which is guidance, not styling. |
+| `domain-specific/portfolio.css` | A book you hold rather than a company — holdings, performance, attribution, exposure, risk. Namespaced `portfolio-`. Its tables opt into the foundational `table.fin` skin; it defines no table skin of its own. |
+| `domain-specific/macro.css` | The economy with no security in view — indicators and cycle position. Namespaced `macro-`. Shares the foundational `.trend-*` glyph column with metric-trend. |
 | `math.css` | formula blocks (`.math`) — spacing, overflow, and the readable-LaTeX fallback before/without KaTeX |
 | `diagrams.css` | **shared, engine-agnostic**: the `.diagram-figure` viewport, `.diagram-canvas` pan surface, `.diagram-tools` glyph toolbar, `.diagram-resize` grip, fullscreen + print |
-| `diagram-mermaid.css` | Mermaid-only: the `pre.mermaid` source-box fallback and the ✎ editor panel (surface, overlay, scrollbars). One `diagram-<engine>.css` per engine — a new engine adds a file here, it never edits `diagrams.css` |
+| `diagrams-mermaid.css` | Mermaid-only: the `pre.mermaid` source-box fallback and the ✎ editor panel (surface, overlay, scrollbars). One `diagrams-<engine>.css` per engine — named for the DIRECTORY it sits in, matching `js/modules/diagrams-mermaid.js`. A new engine adds a file here, it never edits `diagrams.css`. The `diagram-` prefix on the classes inside is the namespace rule, which is a separate thing and stays singular |
 | `charts.css` | **shared, engine-agnostic**: the `.chart-figure` card (the validated `bg-soft` surface), the `.chart-canvas` an engine draws into, the `.chart-tools` toolbar, the `pre.chart` spec block (shipped `hidden`; revealed only by `show source` on a failed chart) and the `.chart-failed` card that states what went wrong — one definition for every engine, selected by the shared `chart` marker class. The categorical palette is data, not CSS: it lives in `js/modules/charts.js` (with the sequential ramp and the semantic direction tones). Also `.chart-note`, the one-line reading under a chart |
-| `chart-apache-echarts.css` | Apache ECharts only: containment for the wrapper div the engine generates. Deliberately small — anything a second engine would also need belongs in `charts.css`. One `chart-<engine>.css` per engine, exactly as `diagram-<engine>.css` |
+| `charts-apache-echarts.css` | Apache ECharts only: containment for the wrapper div the engine generates. Deliberately small — anything a second engine would also need belongs in `charts.css`. One `charts-<engine>.css` per engine — named for the DIRECTORY it sits in, matching `js/modules/charts-apache-echarts.js`. The `chart-` prefix on the classes inside is the namespace rule, which is a separate thing and stays singular |
 
 ## Namespacing — one rule for the whole system
 
@@ -143,7 +189,7 @@ those copies won; deleting them was the fix, not adding a rule.
 
 Two exceptions are deliberate: `figure.code > figcaption` is a code header with
 a language badge rather than a title (and its `code` layer sits after
-`content`), and `.fa-disclosures-caption` / `.fa-forces-caption`
+`content`), and `.fa-footnote-disclosures-caption` / `.fa-five-forces-caption`
 sit on a `<p>`, which no element selector can reach — they share one rule in
 `fundamental-analysis.css` that mirrors this one.
 
@@ -206,7 +252,7 @@ paper size, margins and pagination come from the print dialog, not from CSS.
 
 What remains is the `@media print` block each module keeps for itself:
 `base.css` hides the floating toolbar, `diagrams.css` and
-`diagram-mermaid.css` freeze diagrams to static fully-visible images,
+`diagrams-mermaid.css` freeze diagrams to static fully-visible images,
 `layout.css` collapses columns to one, `charts.css` and
 `fundamental-analysis.css` adjust
 their own blocks. Those exist to stop screen-only UI reaching paper; they

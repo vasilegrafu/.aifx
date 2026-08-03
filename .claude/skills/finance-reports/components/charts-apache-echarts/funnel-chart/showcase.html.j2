@@ -1,0 +1,22 @@
+{# The `funnel-chart` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>four stages with a steep drop — the standard sales funnel</h3>
+      {{ c.charts_apache_echarts_funnel_chart(stages=d.pipeline,
+               caption="Enterprise pipeline, FY25",
+               unit="opportunities",
+               note="13% of qualified leads close; the largest loss is at proof of concept.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a shallow funnel — where the narrowing is slight and the numbers carry it</h3>
+      {{ c.charts_apache_echarts_funnel_chart(stages=d.design_wins,
+               caption="Design engagements to production",
+               unit="programmes",
+               height=280,
+               note="76% reach production. The bands barely narrow, so the unit does the work.") }}
+    </section>
+{% endblock %}

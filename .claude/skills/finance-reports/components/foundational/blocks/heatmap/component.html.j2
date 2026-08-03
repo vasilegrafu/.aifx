@@ -3,18 +3,18 @@
 {% macro heatmap(cols=[], rows=[], caption="", corner="", legend="") %}
   <table class="heatmap">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
-    <thead><tr><th class="hm-corner">{{ corner }}</th>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+    <thead><tr><th class="heatmap-corner">{{ corner }}</th>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.row_head }}</th>
         {% for c in r.cells %}
-        <td class="hm-cell hm-{{ 'p' if c.level > 0 else ('n' if c.level < 0 else 'z') }}{{ c.level | abs }}">{{ c.display }}</td>
+        <td class="heatmap-cell heatmap-{{ 'p' if c.level > 0 else ('n' if c.level < 0 else 'z') }}{{ c.level | abs }}">{{ c.display }}</td>
         {% endfor %}
-        {% for _ in range(cols | length - r.cells | length) %}<td class="hm-empty"></td>{% endfor %}
+        {% for _ in range(cols | length - r.cells | length) %}<td class="heatmap-empty"></td>{% endfor %}
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% if legend %}<p class="hm-legend">{{ legend }}</p>{% endif %}
+  {% if legend %}<p class="heatmap-legend">{{ legend }}</p>{% endif %}
 {% endmacro %}

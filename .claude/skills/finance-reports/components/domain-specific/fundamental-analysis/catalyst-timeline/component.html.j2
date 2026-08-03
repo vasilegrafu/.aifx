@@ -1,15 +1,15 @@
 {# purpose: dated catalysts ahead, with expected direction and likelihood #}
 {# data: items[] {date:str, event:str, direction:up|down|mixed, likelihood?:str, note?:str} #}
 {% macro catalyst_timeline(items=[]) %}
-  <ol class="fa-catalysts">
+  <ol class="fa-catalyst-timeline">
   {% for it in items %}
-    <li class="fa-catalyst fa-catalyst-{{ it.direction }}">
-      <span class="fa-catalyst-date">{{ it.date }}</span>
-      <span class="fa-catalyst-dir" aria-hidden="true">{{ {"up": "▲", "down": "▼"}.get(it.direction, "◆") }}</span>
-      <span class="fa-catalyst-body">
-        <span class="fa-catalyst-event">{{ it.event }}</span>
-        {% if it.likelihood %}<span class="fa-catalyst-likelihood">{{ it.likelihood }}</span>{% endif %}
-        {% if it.get('note') %}<span class="fa-catalyst-note">{{ it.note }}</span>{% endif %}
+    <li class="fa-catalyst-timeline-item fa-catalyst-timeline-item-{{ it.direction }}">
+      <span class="fa-catalyst-timeline-date">{{ it.date }}</span>
+      <span class="fa-catalyst-timeline-dir" aria-hidden="true">{{ {"up": "▲", "down": "▼"}.get(it.direction, "◆") }}</span>
+      <span class="fa-catalyst-timeline-body">
+        <span class="fa-catalyst-timeline-event">{{ it.event }}</span>
+        {% if it.likelihood %}<span class="fa-catalyst-timeline-likelihood">{{ it.likelihood }}</span>{% endif %}
+        {% if it.get('note') %}<span class="fa-catalyst-timeline-note">{{ it.note }}</span>{% endif %}
       </span>
     </li>
   {% endfor %}

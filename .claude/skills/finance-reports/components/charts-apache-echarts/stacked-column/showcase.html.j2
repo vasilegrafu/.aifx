@@ -1,0 +1,33 @@
+{# The `stacked-column` showcase — the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>two segments — a legend appears, columns stack to a real total</h3>
+      {{ c.charts_apache_echarts_stacked_column(series=[d.data_center, d.client], categories=d.peers,
+               caption="Data centre and client revenue",
+               unit="USD, billions",
+               note="Two very different mixes: NVDA is nearly all data centre, INTC nearly all client.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>three segments with y_name — the column height is the company</h3>
+      {{ c.charts_apache_echarts_stacked_column(series=[d.data_center, d.client, d.embedded],
+               categories=d.peers,
+               caption="Revenue by segment, latest fiscal year",
+               unit="USD, billions",
+               y_name="Revenue (USD bn)",
+               note="NVDA is one segment wearing a company; INTC is the opposite.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>wide values — the gap follows the column total, not the tallest segment</h3>
+      {{ c.charts_apache_echarts_stacked_column(series=[d.dc_m, d.client_m, d.embedded_m],
+               categories=d.peers,
+               caption="Revenue by segment, in millions",
+               unit="USD, millions",
+               y_name="Revenue (USD m)",
+               note="Identical mix to the chart above, in millions. NVDA's tallest segment is 47,500 but its column reaches 52,000 — the ticks spell out the total, so that is what the gap is derived from.") }}
+    </section>
+{% endblock %}

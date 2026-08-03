@@ -72,6 +72,58 @@ git -C <path-to>/aifx-finance checkout v8.0.0 # or pin a released version
 What a version number promises is in [Versioning](#versioning) below — worth
 reading before you pull across a major.
 
+### Check the install — `status.py`
+
+Appearing in the skills list means Claude Code found it. It does not mean it can
+build anything. One command says what is actually there, for either install:
+
+```bash
+python .claude/skills/finance-reports/status.py
+```
+
+```
+finance-reports  <path>\aifx-finance\.claude\skills\finance-reports
+
+components  …
+  charts-apache-echarts                   …
+  diagrams-mermaid                        …
+  …
+reports     …
+version     …        every generated page pins this at BUILD time
+
+checks
+  usage.md skeleton                     ok
+  class prefixes own their directory    ok
+  every class in markup is reachable    ok
+  components/CATALOG.md                 ok
+  reports/CATALOG.md                    ok
+  showcase pages                        ok
+  bundles load every module             ok
+```
+
+The counts are elided above on purpose: `status.py` reads them off the tree, so
+printing them here would only record what was true the day this was typed.
+
+Two things to read there. **The path on the first line tells you which install
+you got** — it resolves through a junction, so a *linked* skill prints the
+clone's path and a *copied* one prints your project's. **The version line is the
+copy path's usual failure**: a copied skill needs its own `version.json` beside
+`.claude/`, and without one it cannot render a single page. `status.py` says so
+in a sentence instead of a traceback.
+
+The checks that regenerate something to compare against it — both catalogues and
+every showcase page — render templates, so they need Jinja: run it with the venv
+from [Environment](#1-environment) below. On an interpreter without it they
+report `NOT RUN` and name the missing library rather than claiming anything is
+stale, because being sent to regenerate a catalogue that was already current is
+worse than being told nothing. The rest are pure file reading and always run.
+
+`--check` exits 1 if any of them fails — a stale catalogue or showcase page, a
+`usage.md` off the skeleton, a class whose prefix does not match the directory
+it lives in or that no stylesheet can reach, or a `css/bundle.css` or
+`js/bundle.js` that has stopped loading a file beside it. Useful in a pre-commit
+hook if you intend to *modify* the skill; not needed to use it.
+
 ---
 
 ## Building a report
@@ -208,33 +260,12 @@ The checks live in `reports/_report_validation.py`, one home for all reports.
 What each report expects of itself — its sections, its domain class prefix, the
 symbols the request named — is declared on its controller beside `TITLE`.
 
-If you **copy** the skill into your own project, add those two lines to that
-project's `.gitignore` yourself, exactly as you would for `secrets.*.json`.
+That is why the warnings exist at all: an endpoint returning 200 with an empty
+body passes every structural check, and the report renders beautifully with flat
+lines and no numbers. The warnings are what measure that.
 
-It exits 0 or 1 and needs no arguments: the symbol and the peer group are
-declared in the file, because a test whose inputs are typed each time is a test
-that was run differently the last time somebody ran it.
-
-The build already asserts its own arithmetic, so the test adds what only the
-finished page can show, in two tiers:
-
-- **is it well-formed** — every chart spec survives `JSON.parse`, both asset
-  halves resolve and the CDN half pins the *current* version, every in-page link
-  lands on a real section id, no half-rendered markup reached the file
-- **does it carry data** — no chart is an empty frame, no table is a header over
-  nothing, every declared section has content, every requested symbol appears,
-  and no section is mostly blanks
-
-The second tier exists because the first cannot fail on an empty page. If an
-endpoint returns a 200 with nothing in it, the derivation produces zeros — and
-its identities still hold, since `0 + 0 == 0` satisfies `cost + gross ==
-revenue`. Every structural check passes and the report renders beautifully with
-flat lines and no numbers.
-
-Tests live beside `.claude/` rather than inside it for the same reason the
-config does: they belong to this project, not to a skill copied out of it. A
-passing run still does not mean the page is right — charts draw at view time, so
-**open it**.
+**A clean report is valid, not correct.** Charts draw at view time and nothing
+in the build has seen one, so **open it**.
 
 ---
 
@@ -261,10 +292,10 @@ by tag, so moving one would silently restyle pages nobody can find any more.
 
 The MAJOR clause covers three different kinds of breakage because each one
 arrived and found the contract silent about it. A removed skill did, before
-5.0.0. A changed CLI did, at 7.0.0 — `--env` was dropped, no document was
-affected at all, and it was still a break for anyone with the old command in a
-script. **A release is major if a thing that worked stops working**, whether
-the thing is a page, a link, or a line someone typed.
+5.0.0. A changed CLI did, at 8.0.0 — `--env`, required since 6.0.0, was dropped;
+no document was affected at all, and it was still a break for anyone with the
+old command in a script. **A release is major if a thing that worked stops
+working**, whether the thing is a page, a link, or a line someone typed.
 
 **Upgrading across a major is opt-in by construction.** An existing page keeps
 pointing at the tag it was built against and keeps rendering; it moves only

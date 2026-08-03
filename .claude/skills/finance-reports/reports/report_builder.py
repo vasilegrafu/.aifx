@@ -9,7 +9,7 @@ A NAME, not a path: a report sits under its SUBJECT (`company/…`), and the
 domain is a taxonomy for readers, so nobody running one should have to know
 which folder it was filed under. Discovery is recursive, so the name must be
 unique across every domain — `all()` refuses a duplicate rather than picking
-one. (`components/showcase_builder.py` takes `charts/bar` instead, because
+one. (`components/showcase_builder.py` takes `charts-apache-echarts/bar` instead, because
 components nest two to four levels.)
 
 NOTHING IS REGISTERED. A directory holding report.html.j2 IS a report: find the

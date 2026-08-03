@@ -13,7 +13,7 @@ real components inside those.
 
 ```html
 {% raw %}{% call c.columns() %}
-  {% call c.column() %}{{ c.apache_echarts(...) }}{% endcall %}
+  {% call c.column() %}{{ c.charts_apache_echarts_chart(...) }}{% endcall %}
   {% call c.column() %}{% call c.callout("note") %}Reading of the chart…{% endcall %}{% endcall %}
 {% endcall %}{% endraw %}
 ```

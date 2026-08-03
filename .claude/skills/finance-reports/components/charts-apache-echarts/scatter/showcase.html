@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>scatter — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>scatter</h1>
+  </header>
+
+    <section>
+      <h3>labelled points, both axes named — the third slot becomes the label</h3>
+        <pre class="chart apache-echarts" hidden data-height="360">
+{
+  "grid": {
+    "bottom": 34,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 52
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AMD",
+          "value": [
+            23.4,
+            5.4
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "NVDA",
+          "value": [
+            8.6,
+            62.9
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "INTC",
+          "value": [
+            26.1,
+            -0.1
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "QCOM",
+          "value": [
+            19.8,
+            28.4
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AVGO",
+          "value": [
+            12.2,
+            31.1
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "TXN",
+          "value": [
+            15.4,
+            18.9
+          ]
+        }
+      ],
+      "name": "Semiconductors",
+      "type": "scatter"
+    }
+  ],
+  "title": {
+    "text": "R\u0026D intensity against return on capital"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "xAxis": {
+    "name": "R\u0026D / revenue (%)",
+    "nameGap": 28,
+    "nameLocation": "middle",
+    "scale": true,
+    "type": "value"
+  },
+  "yAxis": {
+    "name": "ROIC (%)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "scale": true,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">No relationship in this group: heavy R&D pays off for some and not others.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>two series — a legend appears, and the groups separate</h3>
+        <pre class="chart apache-echarts" hidden data-height="360">
+{
+  "grid": {
+    "bottom": 34,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 76
+  },
+  "legend": {
+    "top": 30
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AMD",
+          "value": [
+            23.4,
+            5.4
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "NVDA",
+          "value": [
+            8.6,
+            62.9
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "INTC",
+          "value": [
+            26.1,
+            -0.1
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "QCOM",
+          "value": [
+            19.8,
+            28.4
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AVGO",
+          "value": [
+            12.2,
+            31.1
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "TXN",
+          "value": [
+            15.4,
+            18.9
+          ]
+        }
+      ],
+      "name": "Semiconductors",
+      "type": "scatter"
+    },
+    {
+      "data": [
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "MSFT",
+          "value": [
+            17.1,
+            34.2
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "CRM",
+          "value": [
+            21.9,
+            12.6
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "ORCL",
+          "value": [
+            14.4,
+            41.8
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "NOW",
+          "value": [
+            26.8,
+            8.1
+          ]
+        }
+      ],
+      "name": "Software",
+      "type": "scatter"
+    }
+  ],
+  "title": {
+    "text": "Semiconductors against software"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "xAxis": {
+    "name": "R\u0026D / revenue (%)",
+    "nameGap": 28,
+    "nameLocation": "middle",
+    "scale": true,
+    "type": "value"
+  },
+  "yAxis": {
+    "name": "ROIC (%)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "scale": true,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Software spends slightly more on R&D as a share, but its returns cluster far tighter.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>no labels — when the cloud is the finding, not the members</h3>
+        <pre class="chart apache-echarts" hidden data-height="320">
+{
+  "grid": {
+    "bottom": 34,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 52
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "value": [
+            4.2,
+            11.1
+          ]
+        },
+        {
+          "value": [
+            6.8,
+            14.3
+          ]
+        },
+        {
+          "value": [
+            9.1,
+            8.7
+          ]
+        },
+        {
+          "value": [
+            11.4,
+            19.2
+          ]
+        },
+        {
+          "value": [
+            13.9,
+            16.8
+          ]
+        },
+        {
+          "value": [
+            15.2,
+            24.1
+          ]
+        },
+        {
+          "value": [
+            17.8,
+            21.5
+          ]
+        },
+        {
+          "value": [
+            19.4,
+            29.7
+          ]
+        },
+        {
+          "value": [
+            22.1,
+            26.3
+          ]
+        },
+        {
+          "value": [
+            24.6,
+            33.8
+          ]
+        },
+        {
+          "value": [
+            27.2,
+            30.1
+          ]
+        },
+        {
+          "value": [
+            29.8,
+            38.4
+          ]
+        },
+        {
+          "value": [
+            7.3,
+            6.2
+          ]
+        },
+        {
+          "value": [
+            12.6,
+            12.9
+          ]
+        },
+        {
+          "value": [
+            18.1,
+            17.4
+          ]
+        },
+        {
+          "value": [
+            23.7,
+            22.8
+          ]
+        }
+      ],
+      "name": "Russell 1000",
+      "type": "scatter"
+    }
+  ],
+  "title": {
+    "text": "Return against R\u0026D intensity, Russell 1000"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "xAxis": {
+    "name": "R\u0026D / revenue (%)",
+    "nameGap": 28,
+    "nameLocation": "middle",
+    "scale": true,
+    "type": "value"
+  },
+  "yAxis": {
+    "name": "ROIC (%)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "scale": true,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Naming sixteen points would bury the one thing visible here: the slope.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>wide values — the y gap is derived from the pairs, not from a flat list</h3>
+        <pre class="chart apache-echarts" hidden data-height="320">
+{
+  "grid": {
+    "bottom": 34,
+    "containLabel": true,
+    "left": 66,
+    "right": 16,
+    "top": 52
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AMD",
+          "value": [
+            23.4,
+            22680
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "NVDA",
+          "value": [
+            8.6,
+            60922
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "INTC",
+          "value": [
+            26.1,
+            54228
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "QCOM",
+          "value": [
+            19.8,
+            35820
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "AVGO",
+          "value": [
+            12.2,
+            35819
+          ]
+        },
+        {
+          "label": {
+            "fontSize": 10,
+            "formatter": "{b}",
+            "position": "right",
+            "show": true
+          },
+          "name": "TXN",
+          "value": [
+            15.4,
+            17519
+          ]
+        }
+      ],
+      "name": "Semiconductors",
+      "type": "scatter"
+    }
+  ],
+  "title": {
+    "text": "Revenue against R\u0026D intensity"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "xAxis": {
+    "name": "R\u0026D / revenue (%)",
+    "nameGap": 28,
+    "nameLocation": "middle",
+    "scale": true,
+    "type": "value"
+  },
+  "yAxis": {
+    "name": "Revenue (USD m)",
+    "nameGap": 66,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "scale": true,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Same six companies as the first chart, with revenue on y instead of ROIC. The ticks now read 60,000 rather than 62.9, and the axis name moves out to clear them.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

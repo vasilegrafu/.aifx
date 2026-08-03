@@ -1,4 +1,4 @@
-/* finance-reports/chart-apache-echarts — declarative charts rendered at view time by
+/* finance-reports/charts-apache-echarts — declarative charts rendered at view time by
    Apache ECharts. ONE engine behind the shared chart frame (charts.js).
 
    Markup (a JSON ECharts `option` as plain text in the document — no images,

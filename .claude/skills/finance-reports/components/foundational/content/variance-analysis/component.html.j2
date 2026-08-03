@@ -1,15 +1,15 @@
 {# purpose: budget versus actual with the variance and whether it is favourable #}
 {# data: rows[] {line:str, budget:str, actual:str, variance:str, pct:str, verdict:favourable|adverse|neutral}  total_row? {label, cells} #}
 {% macro variance_analysis(rows=[], caption="", unit="", period="", total_row=none, note="") %}
-  <table class="fin variance">
-  {% if caption or period or unit %}<caption>{{ caption }}{% if period %} <span class="macro-macro-asof">{{ period }}</span>{% endif %}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin variance-analysis">
+  {% if caption or period or unit %}<caption>{{ caption }}{% if period %} <span class="fin-asof">{{ period }}</span>{% endif %}{% if unit %} <span class="fin-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
     <thead><tr><th>Line</th><th>Budget</th><th>Actual</th><th>Variance</th><th>%</th><th>Verdict</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.line }}</th>
         <td>{{ r.budget }}</td>
-        <td class="var-actual">{{ r.actual }}</td>
+        <td class="variance-analysis-actual">{{ r.actual }}</td>
         <td{% if r.variance is string and (r.variance.startswith("(") or r.variance.startswith("-") or r.variance.startswith("−")) %} class="neg"{% endif %}>{{ r.variance }}</td>
         <td>{{ r.pct }}</td>
         <td>{% if r.get('verdict') %}<span class="badge badge-{{ {"favourable": "good", "adverse": "bad"}.get(r.verdict, "info") }}">{{ r.verdict }}</span>{% endif %}</td>
@@ -20,5 +20,5 @@
     <tfoot><tr class="total"><th scope="row">{{ total_row.label }}</th>{% for v in total_row.cells %}<td>{{ v }}</td>{% endfor %}</tr></tfoot>
     {% endif %}
   </table>
-  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fin-source">{{ note }}</p>{% endif %}
 {% endmacro %}

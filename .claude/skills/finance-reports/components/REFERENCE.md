@@ -13,10 +13,21 @@ components/
   showcase_builder.py       ShowcaseBuilder.build(path) + the CLI
   catalog_builder.py        CatalogBuilder.build() -> CATALOG.md
   CATALOG.md                every component by purpose — generated, do not edit
-  charts/                   engine-backed charts (Apache ECharts)
   domain-specific/          one analysis discipline owns it
   foundational/             any document may use these
-  diagrams/  math/          the two other rendering subsystems
+  math/                     the formula subsystem (KaTeX)
+
+  ONE DIRECTORY PER ENGINE, holding that engine's kinds. The engine is part of
+  every macro inside it, because another engine's `bar` is a different macro:
+  charts-apache-echarts/    c.charts_apache_echarts_<kind>(...)
+    _render.html.j2           ECharts-specific tail, shared by the kinds here
+    chart/                    the generic one — a raw spec, for what the
+                              named kinds do not cover
+    bar/ line/ pie/ …         one folder per kind
+  charts-plotly/            reserved, empty (.gitkeep)
+  charts-bokeh/             reserved, empty (.gitkeep)
+  diagrams-mermaid/         c.diagrams_mermaid_<kind>(...)
+    diagram/                  the generic one — Mermaid source directly
 ```
 
 **A leading underscore marks the library half** — the files that serve
@@ -30,7 +41,7 @@ registered anywhere, so adding one means adding files.
 
 ```
 components/<category>/<name>/
-  component.html.j2   the macro. {# purpose #}, {# unit #}, {# data #} headers
+  component.html.j2   the macro. {# purpose #} always; {# data #}, {# unit #} when they apply
   usage.md            when to use it, and the rules            (required)
   showcase_controller.py   _build_context() -> dict            (optional)
   showcase.html.j2         the states worth seeing             (optional)
@@ -47,12 +58,31 @@ Do not "fix" this by adding a `.gitignore` rule. That would un-publish every
 showcase link in `CATALOG.md` at the next tag, and the pages are the only
 rendered evidence of what a component actually looks like.
 
-The **category folders exist for humans**. A component's identity is its own
-folder name, so moving one between categories touches no template. Names must
-be unique across the whole tree — the builder raises on a duplicate.
+**Most category folders exist for humans.** `foundational/` and
+`domain-specific/` nest to organise the tree; a component's identity is its own
+folder name, so moving one between them touches no template. Those names must be
+unique across the whole tree — the builder raises on a duplicate.
 
-`<name>` maps to the macro as `name.replace("-", "_")`: `metric-trend` is the
-folder, `metric_trend` is what a view calls.
+**An engine folder is different: it NAMESPACES its members.** Every chart engine
+has a `bar` and every diagram engine a `diagram`, so a kind's leaf name
+identifies it only within its engine. `macro_name()` takes the path, not the
+leaf, and qualifies anything under a `charts-` or `diagrams-` directory:
+
+| path under `components/` | macro a view calls |
+|---|---|
+| `foundational/content/metric-trend` | `c.metric_trend(...)` |
+| `charts-apache-echarts/bar` | `c.charts_apache_echarts_bar(...)` |
+| `charts-plotly/bar` | `c.charts_plotly_bar(...)` |
+| `diagrams-mermaid/diagram` | `c.diagrams_mermaid_diagram(...)` |
+
+The two `bar`s are different macros writing different specs, and one flat
+attribute cannot hold both — which is why the engine is in the name rather than
+being resolved by whichever sorted first. The qualified form is verbose on
+purpose: a view that says `charts_apache_echarts_bar` cannot be silently
+repointed at another engine by a change somewhere else.
+
+`NAMESPACED` in `_showcase_controller.py` is the list of prefixes this applies
+to. Everything outside it keys on the leaf, so `c.badge` stays `c.badge`.
 
 ## The environment
 
@@ -72,20 +102,21 @@ FileSystemLoader([str(COMPONENTS_DIR), str(SKILL_DIR)])
 ```
 
 One root cannot resolve everything. A view extends `_showcase.master.html.j2`
-and `charts/bar/component.html.j2` imports `charts/_render.html.j2` — both named
+and `charts-apache-echarts/bar/component.html.j2` imports `charts-apache-echarts/_render.html.j2` — both named
 from `components/`. The master then includes `css/css.loader.html.j2` and
 `js/js.loader.html.j2`, which live at the **skill root**.
 
 ### The `c` namespace
 
-Every component's macro on one object, so a view calls `{{ c.bar(...) }}` with
+Every component's macro on one object, so a view calls `{{ c.charts_apache_echarts_bar(...) }}` with
 no import of its own:
 
 ```python
 c = SimpleNamespace()
 for markup in sorted(COMPONENTS_DIR.rglob("component.html.j2")):
+    macro = macro_name(markup.parent.relative_to(COMPONENTS_DIR).as_posix())
     module = environment.get_template(...).module
-    if hasattr(module, macro_name(markup.parent.name)):
+    if hasattr(module, macro):
         setattr(c, macro, getattr(module, macro))
 environment.globals["c"] = c
 ```
@@ -94,9 +125,15 @@ environment.globals["c"] = c
 reaches for `c.metadata_header`, which lives in `foundational/structure/`. That
 is why one showcase costs the full parse.
 
-A file that defines no macro matching its folder name is skipped silently. A
-file not named `component.html.j2` is never seen at all — which is what
-`charts/_render.html.j2` relies on.
+**A file that defines no macro matching its computed name is skipped silently** —
+no error, the component simply never reaches `c`, and the first sign is
+`StrictUndefined` firing in whatever view called it. So the `{% macro %}` inside
+must match what `macro_name()` produces, qualifier included:
+`charts-apache-echarts/bar/component.html.j2` declares
+`{% macro charts_apache_echarts_bar(...) %}`.
+
+A file not named `component.html.j2` is never seen at all — which is what
+`charts-apache-echarts/_render.html.j2` relies on.
 
 ### Filters
 
@@ -125,9 +162,9 @@ time the failure costs nothing and reaches no reader.
 ```bash
 S=.claude/skills/finance-reports        # from the PROJECT ROOT — see ../SKILL.md
 
-python $S/components/showcase_builder.py charts/bar
-python $S/components/charts/bar/showcase_controller.py   # a leaf runs alone
-(cd $S && python -m components.showcase_builder charts/bar)
+python $S/components/showcase_builder.py charts-apache-echarts/bar
+python $S/components/charts-apache-echarts/bar/showcase_controller.py   # a leaf runs alone
+(cd $S && python -m components.showcase_builder charts-apache-echarts/bar)
 ```
 
 The `-m` form is the only one that needs a working directory: it names a
@@ -143,7 +180,7 @@ It **raises** rather than returning a code; `main()` owns the exit code.
 
 ### It finds the class, not the name
 
-`charts/bar` holding `ChartBarShowcaseController` is a convention worth keeping,
+`charts-apache-echarts/bar` holding `ChartBarShowcaseController` is a convention worth keeping,
 but computing one from the other would make the convention load-bearing — and a
 category that pluralizes (`charts` → `Chart`) shows how that goes wrong. A
 subclass of `ShowcaseController` in the module is unambiguous. Zero matches and
@@ -166,7 +203,7 @@ four levels deep.
 
 **Path-loading removed the old hyphen constraint.** An `import` statement cannot
 name a folder with a hyphen, which disqualifies **the majority of the tree** —
-61 of the components carry one today. Loading by path has no such rule.
+`status.py` counts how many carry one. Loading by path has no such rule.
 
 ### How a controller knows where it is
 
@@ -204,7 +241,7 @@ class ChartBarShowcaseController(ShowcaseController):
 {% block content %}
     <section>
       <h3>two series — a legend appears, colour is never the only cue</h3>
-      {{ c.bar(series=[d.fy24, d.fy23], categories=d.quarters, ...) }}
+      {{ c.charts_apache_echarts_bar(series=[d.fy24, d.fy23], categories=d.quarters, ...) }}
     </section>
 {% endblock %}
 ```
@@ -232,7 +269,7 @@ controller and the render. It does the half `StrictUndefined` cannot: a key
 present and **wrong**. The checks worth writing are about agreement between
 values.
 
-`charts/bar` is the worked example. Its `CALLS` map is one entry per `<section>`
+`charts-apache-echarts/bar` is the worked example. Its `CALLS` map is one entry per `<section>`
 of the view — per section rather than grouped by axis, because both checks that
 matter are relative:
 
@@ -310,27 +347,28 @@ undocumented is the state the catalogue exists to make visible.
 
 ## Adding a component
 
-1. `components/<cat>/<name>/component.html.j2` — one macro named for the folder,
-   with `{# purpose #}`, `{# unit #}` and `{# data #}` headers. **The purpose
-   header is required** — `catalog_builder.py` fails without it.
-2. `components/<cat>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
-   `## Rules` is not optional.
-3. Style it in the matching `css/` directory. **No `style=`, no `<style>`, no
-   component sets its own colour.**
-4. Optionally add `showcase_controller.py` + `showcase.html.j2`.
-5. **`python $S/components/catalog_builder.py`** — nothing calls it for you.
+**The procedure is in `../SKILL.md`, under "Adding a component" — all of it,
+including the parts this file used to leave out.** It is not repeated here.
 
-Nothing to *register*, in any step. Step 5 is not registration: the catalogue
-is derived from what you already wrote, and regenerating it only publishes what
-the tree already says.
+That is the split this file already declares in its own first paragraph: the
+authoring contract lives in `SKILL.md` and this is the on-demand detail. The
+procedure was written down twice anyway, and the report side shows what that
+costs — the two copies of "Adding a report" drifted, and the shorter one omitted
+the step that declares what a report validates about itself, so a report written
+from it passed a validation that was checking almost nothing.
+
+What the procedure needs from this file it names directly: the showcase skeleton
+under **The shape of a showcase**, and the checks under **`_contracts.py`**.
 
 **Nothing runs the catalogue automatically.** There is no CI and no git hook in
-this repository, so a component added without step 5 leaves `CATALOG.md`
-quietly short by one — the exact way the previous catalogue died. `--check`
-exists to make that loud:
+this repository, so a component added without regenerating it leaves
+`CATALOG.md` quietly short by one — the exact way the previous catalogue died.
+`--check` makes that loud, on its own or through `status.py`:
 
 ```bash
 python $S/components/catalog_builder.py --check   # exit 1 if stale, writes nothing
+python $S/status.py --check                       # this and the three others
 ```
 
-Wire it into a pre-commit hook if you want it enforced rather than remembered.
+Wire either into a pre-commit hook if you want it enforced rather than
+remembered.

@@ -9,20 +9,20 @@
    the figure, which no assertion in the macro will tell you about. #}
 {% macro valuation_range(rows=[], scale_min=0, scale_max=100, price=none, price_label="", caption="", unit="") %}
   {% set span = (scale_max - scale_min) if (scale_max - scale_min) else 1 %}
-  <figure class="fa-valrange">
+  <figure class="fa-valuation-range">
   {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
-    <div class="fa-valrange-rows">
+    <div>
     {% for r in rows %}
-      <div class="fa-valrange-row">
-        <span class="fa-valrange-method">{{ r.method }}</span>
-        <span class="fa-valrange-track">
-          <span class="fa-valrange-bar" data-lo="{{ (100 * (r.low - scale_min) / span) | round(2) }}%" data-span="{{ (100 * (r.high - r.low) / span) | round(2) }}%"></span>
-          {% if price is not none %}<span class="fa-valrange-mark" data-at="{{ (100 * (price - scale_min) / span) | round(2) }}%"></span>{% endif %}
+      <div class="fa-valuation-range-row">
+        <span class="fa-valuation-range-method">{{ r.method }}</span>
+        <span class="fa-valuation-range-track">
+          <span class="fa-valuation-range-bar" data-lo="{{ (100 * (r.low - scale_min) / span) | round(2) }}%" data-span="{{ (100 * (r.high - r.low) / span) | round(2) }}%"></span>
+          {% if price is not none %}<span class="fa-valuation-range-mark" data-at="{{ (100 * (price - scale_min) / span) | round(2) }}%"></span>{% endif %}
         </span>
-        <span class="fa-valrange-value">{{ r.label }}</span>
+        <span class="fa-valuation-range-value">{{ r.label }}</span>
       </div>
     {% endfor %}
     </div>
-    <p class="fa-valrange-axis"><span>{{ unit }}{{ scale_min }}</span>{% if price is not none %}<span class="fa-valrange-price">{{ price_label }}</span>{% endif %}<span>{{ unit }}{{ scale_max }}</span></p>
+    <p class="fa-valuation-range-axis"><span>{{ unit }}{{ scale_min }}</span>{% if price is not none %}<span class="fa-valuation-range-price">{{ price_label }}</span>{% endif %}<span>{{ unit }}{{ scale_max }}</span></p>
   </figure>
 {% endmacro %}

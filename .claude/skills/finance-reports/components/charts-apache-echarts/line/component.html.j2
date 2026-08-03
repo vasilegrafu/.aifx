@@ -1,0 +1,45 @@
+{# purpose: a measure over time — the default form for anything with a date axis #}
+{# unit: axis — one measured axis; name it with y_name #}
+{# data: series[] {name:str, points:num[]}   categories: str[] #}
+{% import "charts-apache-echarts/_render.html.j2" as r %}
+
+{% macro charts_apache_echarts_line(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
+{# The spec is built as a DATA STRUCTURE and serialised once. Hand-written JSON
+   needs manual comma bookkeeping, and a missed comma fails silently — the chart
+   simply never appears and the source box shows instead, which looks exactly
+   like an unreachable CDN. #}
+{% set built = [] %}
+{% for s in series %}
+{# Symbols stop being readable once the points crowd; past 24 the line alone
+   carries the shape. #}
+{%   set _ = built.append({"type": "line", "name": s.name,
+                           "showSymbol": categories | length <= 24,
+                           "data": s.points}) %}
+{% endfor %}
+{# A named value axis sits MID-axis and rotated: ECharts puts the name at the
+   END by default, which is exactly where the title is. containLabel reserves
+   room for tick labels but NOT for an axis name, so the left margin has to
+   widen too — otherwise the name renders off the card and disappears. #}
+{# The axis NAME sits at a fixed offset and `containLabel` does NOT
+   reserve room for it, so a hardcoded gap collides with the tick labels the
+   moment the values get wide. Derived from the widest tick instead --
+   `axis_gap` in _showcase_controller.py has the reasoning. #}
+{% set _gap = series | axis_gap %}
+{% set y_axis = {"type": "value"} %}
+{% if y_name %}
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
+                            "nameGap": _gap, "nameRotate": 90}) %}
+{% endif %}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "line"}},
+     "grid": {"left": (_gap if y_name else 8), "right": 16, "bottom": 8, "containLabel": true},
+     "xAxis": {"type": "category", "data": categories},
+     "yAxis": y_axis,
+     "series": built,
+   } %}
+{# Identity is never colour alone: from two series up, name them in a legend. #}
+{% if built | length > 1 %}
+{%   set _ = option.update({"legend": {}}) %}
+{% endif %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

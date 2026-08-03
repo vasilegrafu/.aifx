@@ -42,7 +42,7 @@
        disclosure often lags the statements by a year, and splicing two periods
        into one diagram would make it silently wrong. Segments get their own
        exhibits below, on their own dates. #}
-    {{ c.sankey(nodes=d.inc_nodes, links=d.inc_links, height=460, unit=d.unit,
+    {{ c.charts_apache_echarts_sankey(nodes=d.inc_nodes, links=d.inc_links, height=460, unit=d.unit,
                 caption=d.inc_caption) }}
     {# No profit columns: the product-segmentation feed publishes revenue only,
        and the macro renders a narrower table rather than a fabricated one. #}
@@ -58,7 +58,7 @@
        Buybacks, dividends and debt repayment consume real money and appear
        nowhere on the income statement. Investing is grossed up rather than
        netted, so capital expenditure stays a visible node. #}
-    {{ c.sankey(nodes=d.cash_nodes, links=d.cash_links, height=400, unit=d.unit,
+    {{ c.charts_apache_echarts_sankey(nodes=d.cash_nodes, links=d.cash_links, height=400, unit=d.unit,
                 caption=d.cash_caption) }}
   {% endcall %}
 
@@ -67,7 +67,7 @@
        the roles encode direction and there is no direction here. The picture
        shows composition and claim — a reader trained by the two sankeys above
        must not read movement into it. #}
-    {{ c.sankey(nodes=d.bs_nodes, links=d.bs_links, height=380, label_room=190,
+    {{ c.charts_apache_echarts_sankey(nodes=d.bs_nodes, links=d.bs_links, height=380, label_room=190,
                 unit=d.bs_unit, caption=d.bs_sankey_caption) }}
     {{ c.balance_sheet(periods=d.bs_periods, rows=d.bs_rows, unit=d.unit,
                        caption=d.bs_caption, check=d.bs_check) }}
@@ -99,9 +99,9 @@
        cannot tell growth from substitution.
        In a stacked area only the BOTTOM band and the TOTAL are readable by eye,
        which is exactly why the normalised chart follows rather than replaces. #}
-    {{ c.stacked_area(series=d.seg_series, categories=d.seg_years, unit=d.unit,
+    {{ c.charts_apache_echarts_stacked_area(series=d.seg_series, categories=d.seg_years, unit=d.unit,
                       caption="Revenue by segment — total and composition") }}
-    {{ c.stacked_normalized(series=d.seg_series, categories=d.seg_years,
+    {{ c.charts_apache_echarts_stacked_normalized(series=d.seg_series, categories=d.seg_years,
                             caption="Revenue mix — each year as 100%") }}
     {# The bridge prices the mix shift: growth is rarely spread evenly, and one
        segment usually paid for all of it. #}

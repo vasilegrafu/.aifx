@@ -1,8 +1,8 @@
 """Build a component's showcase page, addressed by its DIRECTORY PATH.
 
-    ShowcaseBuilder().build("charts/bar")  ->  Path to showcase.html
+    ShowcaseBuilder().build("charts-apache-echarts/bar")  ->  Path to showcase.html
 
-    python .claude/skills/finance-reports/components/showcase_builder.py charts/bar
+    python .claude/skills/finance-reports/components/showcase_builder.py charts-apache-echarts/bar
 
 A path rather than a name, because that is the whole address: it says where
 the controller is, where the view is, and where the page goes. Nothing here
@@ -10,7 +10,7 @@ holds a registry, and nothing has to be listed before it can be built — a
 directory with a controller and a view IS a showcase.
 
 The builder finds the controller class rather than being told its name.
-`charts/bar` holding ChartBarShowcaseController is a convention worth keeping,
+`charts-apache-echarts/bar` holding ChartBarShowcaseController is a convention worth keeping,
 but deriving one from the other would make the convention load-bearing, and a
 category that pluralizes (charts -> Chart) already shows how that goes wrong.
 A subclass of ShowcaseController in the module is unambiguous.
@@ -108,7 +108,7 @@ class ShowcaseBuilder:
         return controller.render()
 
     def build(self, path: str) -> Path:
-        """Render the showcase at `path` — "charts/bar" — and return the page.
+        """Render the showcase at `path` — "charts-apache-echarts/bar" — and return the page.
 
         Raises rather than returning a code: a showcase asked for by name and
         not built is a mistake worth stopping for."""
@@ -116,7 +116,7 @@ class ShowcaseBuilder:
 
     @staticmethod
     def _directory(path: str) -> Path:
-        """`charts/bar` -> the component folder, checked before it is used."""
+        """`charts-apache-echarts/bar` -> the component folder, checked before it is used."""
         directory = (COMPONENTS_DIR / path).resolve()
         try:
             directory.relative_to(COMPONENTS_DIR)
@@ -172,13 +172,13 @@ def main(argv: list[str] | None = None) -> int:
         prog="showcase_builder.py",
         description="render a component's showcase.html from its controller "
                     "and view",
-        epilog=f"example: {COMMAND} charts/bar")
+        epilog=f"example: {COMMAND} charts-apache-echarts/bar")
     # Plain hyphens in anything PRINTED: stdout is cp1252 on Windows, where an
     # em dash encodes to 0x97 and the console shows a replacement character.
     # Docstrings keep theirs — those are read in an editor, which is UTF-8.
     parser.add_argument("path", nargs="?",
                         help="component directory, relative to components/ "
-                             "- e.g. charts/bar")
+                             "- e.g. charts-apache-echarts/bar")
     parser.add_argument("--all", action="store_true",
                         help="rebuild every showcase in the tree")
     parser.add_argument("--check", action="store_true",

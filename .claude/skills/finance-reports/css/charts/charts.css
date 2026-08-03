@@ -4,7 +4,7 @@
    Owns the card every chart renders onto, the canvas an engine draws into, the
    icon toolbar, and the source-block fallback that keeps a document readable
    when an engine's CDN is unreachable or a spec is invalid. One engine CSS file
-   sits beside this one per engine (chart-apache-echarts.css) and adds only what
+   sits beside this one per engine (charts-apache-echarts.css) and adds only what
    is specific to it — this file must never name an engine.
 
    The card background IS the surface the categorical palette was chosen

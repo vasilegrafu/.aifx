@@ -1,17 +1,17 @@
 {# purpose: where the economy or a market sits in a multi-phase cycle #}
 {# data: phases[] {label:str, note?:str}   at: 0-based index of the current phase #}
 {% macro cycle_position(phases=[], at=0, asof="", note="") %}
-  <figure class="macro-cycle">
-    <ol class="macro-cycle-band">
+  <figure class="macro-cycle-position">
+    <ol class="macro-cycle-position-band">
     {% for ph in phases %}
-      <li class="macro-cycle-phase{% if loop.index0 == at %} macro-current{% endif %}"{% if loop.index0 == at %} aria-current="true"{% endif %}>
-        <span class="macro-cycle-label">{{ ph.label }}</span>
-        {% if ph.get('note') %}<span class="macro-cycle-note">{{ ph.note }}</span>{% endif %}
+      <li class="macro-cycle-position-phase{% if loop.index0 == at %} macro-current{% endif %}"{% if loop.index0 == at %} aria-current="true"{% endif %}>
+        <span class="macro-cycle-position-label">{{ ph.label }}</span>
+        {% if ph.get('note') %}<span class="macro-cycle-position-note">{{ ph.note }}</span>{% endif %}
       </li>
     {% endfor %}
     </ol>
     {% if note or asof %}
-    <figcaption>{{ note }}{% if asof %} <span class="macro-cycle-asof">{{ asof }}</span>{% endif %}</figcaption>
+    <figcaption>{{ note }}{% if asof %} <span class="macro-cycle-position-asof">{{ asof }}</span>{% endif %}</figcaption>
     {% endif %}
   </figure>
 {% endmacro %}

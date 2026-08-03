@@ -1,11 +1,11 @@
 {# purpose: numbered footnotes list with back-links #}
-{# data: notes: str[] -- rendered 1..n; pair each with its own <sup class="fn"> in the prose #}
+{# data: notes: str[] -- rendered 1..n; pair each with its own <sup class="footnotes-item"> in the prose #}
 {# notes render numbered; pair each with an inline
-   <sup class="fn"><a id="fnref-N" href="#fn-N">N</a></sup> in the prose #}
+   <sup class="footnotes-item"><a id="fnref-N" href="#fn-N">N</a></sup> in the prose #}
 {% macro footnotes(notes=[]) %}
   <ol class="footnotes">
   {% for note in notes %}
-    <li id="fn-{{ loop.index }}">{{ note }} <a class="fn-back" href="#fnref-{{ loop.index }}" aria-label="back to text">↩</a></li>
+    <li id="fn-{{ loop.index }}">{{ note }} <a class="footnotes-back" href="#fnref-{{ loop.index }}" aria-label="back to text">↩</a></li>
   {% endfor %}
   </ol>
 {% endmacro %}

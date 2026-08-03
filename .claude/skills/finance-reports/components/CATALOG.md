@@ -7,7 +7,7 @@ _header of each `component.html.j2` — do not edit; run `python .claude/skills/
 for the rules and its parameters. The macro name is the folder name with hyphens
 turned to underscores; a view calls it as `c.<macro>(...)`.
 
-[foundational](#foundational) 53 · [charts](#charts) 21 · [domain-specific](#domain-specific) 33 · [diagrams](#diagrams) 1 · [math](#math) 1
+[foundational](#foundational) 53 · [charts-apache-echarts](#charts-apache-echarts) 21 · [domain-specific](#domain-specific) 33 · [diagrams-mermaid](#diagrams-mermaid) 1 · [math](#math) 1
 
 
 ## foundational
@@ -70,33 +70,33 @@ Any document may use these. Nothing here knows a discipline.
 | `variance-analysis` | `variance_analysis` | budget versus actual with the variance and whether it is favourable | [usage](foundational/content/variance-analysis/usage.md) · [showcase](foundational/content/variance-analysis/showcase.html) |
 | `width` | `width` | constrain any component(s) to a fixed width; optional align left/center/right | [usage](foundational/layout/width/usage.md) · [showcase](foundational/layout/width/showcase.html) |
 
-## charts
+## charts-apache-echarts
 
-Engine-backed charts (Apache ECharts). A chart is data; a table is the same data you can read.
+Chart kinds rendered by Apache ECharts. A chart is data; a table is the same data you can read. Each kind writes a spec and hands it to the engine; `chart` is the generic one, for a spec the named kinds do not cover (candlestick/OHLC, boxplot, heatmap). **The engine is part of the macro** — `c.charts_apache_echarts_bar(...)`, because another engine's `bar` is a different macro.
 
 | component | macro | what it is for | docs |
 |---|---|---|---|
-| `apache-echarts` | `apache_echarts` | declarative data chart (bar/line/pie/scatter/candlestick…) via Apache ECharts, view-time SVG | [usage](charts/apache-echarts/usage.md) · [showcase](charts/apache-echarts/showcase.html) |
-| `area` | `area` | a measure over time with the region beneath filled — magnitude, not just direction | [usage](charts/area/usage.md) · [showcase](charts/area/showcase.html) |
-| `bar` | `bar` | a measure across categories — the workhorse comparison | [usage](charts/bar/usage.md) · [showcase](charts/bar/showcase.html) |
-| `bar-negative` | `bar_negative` | a measure that crosses zero — variance, surprise, contribution | [usage](charts/bar-negative/usage.md) · [showcase](charts/bar-negative/showcase.html) |
-| `correlation-matrix` | `correlation_matrix` | pairwise relationships across a set — a heatmap on the sequential ramp, not the categorical palette | [usage](charts/correlation-matrix/usage.md) · [showcase](charts/correlation-matrix/showcase.html) |
-| `drawdown-curve` | `drawdown_curve` | peak-to-trough decline over time — the shape of the losing periods, not the gains | [usage](charts/drawdown-curve/usage.md) · [showcase](charts/drawdown-curve/showcase.html) |
-| `funnel-chart` | `funnel_chart` | stage-to-stage narrowing — a rendered funnel with proportional bands | [usage](charts/funnel-chart/usage.md) · [showcase](charts/funnel-chart/showcase.html) |
-| `gauge` | `gauge` | one value against a range — a dial, for a single bounded measure | [usage](charts/gauge/usage.md) · [showcase](charts/gauge/showcase.html) |
-| `line` | `line` | a measure over time — the default form for anything with a date axis | [usage](charts/line/usage.md) · [showcase](charts/line/showcase.html) |
-| `pie` | `pie` | composition of a single whole — a donut, for a handful of parts | [usage](charts/pie/usage.md) · [showcase](charts/pie/showcase.html) |
-| `price-history` | `price_history` | price action over time — candlestick with volume beneath, one shared time axis | [usage](charts/price-history/usage.md) · [showcase](charts/price-history/showcase.html) |
-| `radar` | `radar` | several attributes of a few entities at once — profile shape, not precise values | [usage](charts/radar/usage.md) · [showcase](charts/radar/showcase.html) |
-| `sankey` | `sankey` | flow decomposition — how a total splits, merges or converts across stages | [usage](charts/sankey/usage.md) · [showcase](charts/sankey/showcase.html) |
-| `scatter` | `scatter` | two measures per entity — where the relationship between them is the finding | [usage](charts/scatter/usage.md) · [showcase](charts/scatter/showcase.html) |
-| `smoothed-line` | `smoothed_line` | a measure over time drawn as a smooth curve — trend over tick-by-tick detail | [usage](charts/smoothed-line/usage.md) · [showcase](charts/smoothed-line/showcase.html) |
-| `stacked-area` | `stacked_area` | parts summing to a whole over time — composition and total in one figure | [usage](charts/stacked-area/usage.md) · [showcase](charts/stacked-area/showcase.html) |
-| `stacked-column` | `stacked_column` | parts summing to a whole across categories — vertical stacked bars | [usage](charts/stacked-column/usage.md) · [showcase](charts/stacked-column/showcase.html) |
-| `stacked-horizontal-bar` | `stacked_horizontal_bar` | parts summing to a whole, laid on their side — for long category names | [usage](charts/stacked-horizontal-bar/usage.md) · [showcase](charts/stacked-horizontal-bar/showcase.html) |
-| `stacked-line` | `stacked_line` | several series summed at each point, drawn as lines — the total and its parts | [usage](charts/stacked-line/usage.md) · [showcase](charts/stacked-line/showcase.html) |
-| `stacked-normalized` | `stacked_normalized` | each category as 100% — composition when the shares matter and the totals do not | [usage](charts/stacked-normalized/usage.md) · [showcase](charts/stacked-normalized/showcase.html) |
-| `waterfall` | `waterfall` | how a total became another total — a bridge of additive steps | [usage](charts/waterfall/usage.md) · [showcase](charts/waterfall/showcase.html) |
+| `area` | `charts_apache_echarts_area` | a measure over time with the region beneath filled — magnitude, not just direction | [usage](charts-apache-echarts/area/usage.md) · [showcase](charts-apache-echarts/area/showcase.html) |
+| `bar` | `charts_apache_echarts_bar` | a measure across categories — the workhorse comparison | [usage](charts-apache-echarts/bar/usage.md) · [showcase](charts-apache-echarts/bar/showcase.html) |
+| `bar-negative` | `charts_apache_echarts_bar_negative` | a measure that crosses zero — variance, surprise, contribution | [usage](charts-apache-echarts/bar-negative/usage.md) · [showcase](charts-apache-echarts/bar-negative/showcase.html) |
+| `chart` | `charts_apache_echarts_chart` | declarative data chart (bar/line/pie/scatter/candlestick…) via Apache ECharts, view-time SVG | [usage](charts-apache-echarts/chart/usage.md) · [showcase](charts-apache-echarts/chart/showcase.html) |
+| `correlation-matrix` | `charts_apache_echarts_correlation_matrix` | pairwise relationships across a set — a heatmap on the sequential ramp, not the categorical palette | [usage](charts-apache-echarts/correlation-matrix/usage.md) · [showcase](charts-apache-echarts/correlation-matrix/showcase.html) |
+| `drawdown-curve` | `charts_apache_echarts_drawdown_curve` | peak-to-trough decline over time — the shape of the losing periods, not the gains | [usage](charts-apache-echarts/drawdown-curve/usage.md) · [showcase](charts-apache-echarts/drawdown-curve/showcase.html) |
+| `funnel-chart` | `charts_apache_echarts_funnel_chart` | stage-to-stage narrowing — a rendered funnel with proportional bands | [usage](charts-apache-echarts/funnel-chart/usage.md) · [showcase](charts-apache-echarts/funnel-chart/showcase.html) |
+| `gauge` | `charts_apache_echarts_gauge` | one value against a range — a dial, for a single bounded measure | [usage](charts-apache-echarts/gauge/usage.md) · [showcase](charts-apache-echarts/gauge/showcase.html) |
+| `line` | `charts_apache_echarts_line` | a measure over time — the default form for anything with a date axis | [usage](charts-apache-echarts/line/usage.md) · [showcase](charts-apache-echarts/line/showcase.html) |
+| `pie` | `charts_apache_echarts_pie` | composition of a single whole — a donut, for a handful of parts | [usage](charts-apache-echarts/pie/usage.md) · [showcase](charts-apache-echarts/pie/showcase.html) |
+| `price-history` | `charts_apache_echarts_price_history` | price action over time — candlestick with volume beneath, one shared time axis | [usage](charts-apache-echarts/price-history/usage.md) · [showcase](charts-apache-echarts/price-history/showcase.html) |
+| `radar` | `charts_apache_echarts_radar` | several attributes of a few entities at once — profile shape, not precise values | [usage](charts-apache-echarts/radar/usage.md) · [showcase](charts-apache-echarts/radar/showcase.html) |
+| `sankey` | `charts_apache_echarts_sankey` | flow decomposition — how a total splits, merges or converts across stages | [usage](charts-apache-echarts/sankey/usage.md) · [showcase](charts-apache-echarts/sankey/showcase.html) |
+| `scatter` | `charts_apache_echarts_scatter` | two measures per entity — where the relationship between them is the finding | [usage](charts-apache-echarts/scatter/usage.md) · [showcase](charts-apache-echarts/scatter/showcase.html) |
+| `smoothed-line` | `charts_apache_echarts_smoothed_line` | a measure over time drawn as a smooth curve — trend over tick-by-tick detail | [usage](charts-apache-echarts/smoothed-line/usage.md) · [showcase](charts-apache-echarts/smoothed-line/showcase.html) |
+| `stacked-area` | `charts_apache_echarts_stacked_area` | parts summing to a whole over time — composition and total in one figure | [usage](charts-apache-echarts/stacked-area/usage.md) · [showcase](charts-apache-echarts/stacked-area/showcase.html) |
+| `stacked-column` | `charts_apache_echarts_stacked_column` | parts summing to a whole across categories — vertical stacked bars | [usage](charts-apache-echarts/stacked-column/usage.md) · [showcase](charts-apache-echarts/stacked-column/showcase.html) |
+| `stacked-horizontal-bar` | `charts_apache_echarts_stacked_horizontal_bar` | parts summing to a whole, laid on their side — for long category names | [usage](charts-apache-echarts/stacked-horizontal-bar/usage.md) · [showcase](charts-apache-echarts/stacked-horizontal-bar/showcase.html) |
+| `stacked-line` | `charts_apache_echarts_stacked_line` | several series summed at each point, drawn as lines — the total and its parts | [usage](charts-apache-echarts/stacked-line/usage.md) · [showcase](charts-apache-echarts/stacked-line/showcase.html) |
+| `stacked-normalized` | `charts_apache_echarts_stacked_normalized` | each category as 100% — composition when the shares matter and the totals do not | [usage](charts-apache-echarts/stacked-normalized/usage.md) · [showcase](charts-apache-echarts/stacked-normalized/showcase.html) |
+| `waterfall` | `charts_apache_echarts_waterfall` | how a total became another total — a bridge of additive steps | [usage](charts-apache-echarts/waterfall/usage.md) · [showcase](charts-apache-echarts/waterfall/showcase.html) |
 
 ## domain-specific
 
@@ -138,13 +138,13 @@ One analysis discipline owns these — fundamental-analysis, portfolio, macro. C
 | `valuation-range` | `valuation_range` | valuation ranges by method with the current price marked — the football field | [usage](domain-specific/fundamental-analysis/valuation-range/usage.md) · [showcase](domain-specific/fundamental-analysis/valuation-range/showcase.html) |
 | `working-capital` | `working_capital` | working capital efficiency: days sales, inventory and payables, and the cash conversion cycle | [usage](domain-specific/fundamental-analysis/working-capital/usage.md) · [showcase](domain-specific/fundamental-analysis/working-capital/showcase.html) |
 
-## diagrams
+## diagrams-mermaid
 
-The diagram subsystem: a shared viewport and one engine.
+Diagram kinds rendered by Mermaid, over a shared engine-agnostic viewport. `diagram` is the generic one, taking Mermaid source directly. **The engine is part of the macro** — `c.diagrams_mermaid_diagram(...)`.
 
 | component | macro | what it is for | docs |
 |---|---|---|---|
-| `mermaid` | `mermaid` | interactive Mermaid diagram: pan, zoom, live editor | [usage](diagrams/mermaid/usage.md) · [showcase](diagrams/mermaid/showcase.html) |
+| `diagram` | `diagrams_mermaid_diagram` | interactive Mermaid diagram: pan, zoom, live editor | [usage](diagrams-mermaid/diagram/usage.md) · [showcase](diagrams-mermaid/diagram/showcase.html) |
 
 ## math
 

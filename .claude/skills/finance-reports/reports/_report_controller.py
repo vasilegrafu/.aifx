@@ -59,8 +59,8 @@ def blame(exc: BaseException) -> str:
 
     Jinja rewrites tracebacks so template frames appear as real frames whose
     filename is the .j2 path; the DEEPEST one is the culprit. A report view
-    calls 25 macros across 15 components, so "something in the render failed"
-    is not an answer anyone can act on."""
+    calls dozens of macros across as many components, so "something in the
+    render failed" is not an answer anyone can act on."""
     frames = [f for f in traceback.extract_tb(exc.__traceback__)
               if f.filename.endswith(".j2")]
     if not frames:

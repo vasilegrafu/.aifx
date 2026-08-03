@@ -1,14 +1,14 @@
 {# purpose: economic indicators with latest, prior, consensus, surprise and direction #}
 {# data: rows[] {indicator:str, latest:str, prior:str, consensus:str, surprise:str, dir:up|down|flat} #}
 {% macro macro_indicators(rows=[], caption="", asof="") %}
-  <table class="fin macro">
-  {% if caption or asof %}<caption>{{ caption }}{% if asof %} <span class="macro-macro-asof">as of {{ asof }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin">
+  {% if caption or asof %}<caption>{{ caption }}{% if asof %} <span class="fin-asof">as of {{ asof }}</span>{% endif %}</caption>{% endif %}
     <thead><tr><th>Indicator</th><th>Latest</th><th>Prior</th><th>Consensus</th><th>Surprise</th><th class="trend-head">Trend</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.indicator }}</th>
-        <td class="macro-macro-latest">{{ r.latest }}</td>
+        <td class="macro-indicators-latest">{{ r.latest }}</td>
         <td>{{ r.prior }}</td>
         <td>{{ r.consensus }}</td>
         <td{% if r.surprise is string and (r.surprise.startswith("-") or r.surprise.startswith("−")) %} class="neg"{% endif %}>{{ r.surprise }}</td>

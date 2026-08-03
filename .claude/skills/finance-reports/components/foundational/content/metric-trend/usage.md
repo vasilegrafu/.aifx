@@ -32,5 +32,5 @@ returns on capital, cash conversion, share count.
 - **CAGR states its own basis** — % for values, pp for margins.
 - **Restated figures carry the restatement in a footnote**, not a silent
   overwrite.
-- For more than about seven periods use `apache_echarts` — a table stops being
+- For more than about seven periods use `charts_apache_echarts_chart` — a table stops being
   readable.

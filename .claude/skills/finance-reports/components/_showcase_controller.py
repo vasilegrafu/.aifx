@@ -30,7 +30,7 @@ import json
 import os
 import sys
 from functools import cache
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from types import SimpleNamespace
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
@@ -218,7 +218,7 @@ def env() -> Environment:
     rendering — which is what lets reports/ borrow this exact one.
 
     TWO ROOTS, components/ FIRST. A view extends _showcase.master.html.j2 and a
-    component.html.j2 imports charts/_render.html.j2 — both named from here.
+    component.html.j2 imports charts-apache-echarts/_render.html.j2 — both named from here.
     The master then includes css/css.loader.html.j2 and js/js.loader.html.j2,
     which live at the skill root. One root cannot resolve both.
 
@@ -235,8 +235,8 @@ def env() -> Environment:
     environment.filters.update(FILTERS)
 
     # `c` — every component's macro on one namespace, so a view calls
-    # {{ c.bar(...) }} with no import of its own. The WHOLE tree, not just the
-    # component being shown: _showcase.master.html.j2 reaches for
+    # {{ c.charts_apache_echarts_bar(...) }} with no import of its own. The
+    # WHOLE tree, not just the component being shown: _showcase.master.html.j2 reaches for
     # c.metadata_header, which lives in foundational/structure/.
     #
     # ONE FLAT NAMESPACE, so the tree's category folders buy no room: two
@@ -250,7 +250,7 @@ def env() -> Environment:
     c = SimpleNamespace()
     source: dict[str, Path] = {}
     for markup in sorted(COMPONENTS_DIR.rglob(MARKUP)):
-        macro = macro_name(markup.parent.name)
+        macro = macro_name(markup.parent.relative_to(COMPONENTS_DIR).as_posix())
         if macro in source:
             raise SystemExit(
                 f"duplicate component name: {macro!r} is claimed by both "
@@ -267,9 +267,30 @@ def env() -> Environment:
     return environment
 
 
-def macro_name(name: str) -> str:
-    """`metric-trend` is the folder; `metric_trend` is what a view calls."""
-    return name.replace("-", "_")
+#: Top-level directories that NAMESPACE their members. Every chart engine has a
+#: `bar` and every diagram engine a `diagram`, so a kind's leaf name identifies
+#: it only WITHIN its engine -- `charts-apache-echarts/bar` and
+#: `charts-plotly/bar` are two macros writing two different specs, and one flat
+#: attribute cannot hold both. Nowhere else needs this: `foundational/` and
+#: `domain-specific/` nest for the benefit of whoever edits the tree, and their
+#: leaf names are unique library-wide, so `c.badge` stays `c.badge`.
+NAMESPACED = ("charts-", "diagrams-")
+
+
+def macro_name(relative) -> str:
+    """The attribute a view calls, from a component's path under components/.
+
+    `foundational/blocks/metric-trend` -> `metric_trend`: the leaf, because it
+    is unique. `charts-apache-echarts/bar` -> `charts_apache_echarts_bar`:
+    qualified by its engine, because the leaf alone is not.
+
+    Takes the path rather than the folder name so the two callers -- the `c`
+    namespace and the catalogue -- cannot disagree about what a view types.
+    """
+    parts = PurePosixPath(relative).parts
+    if len(parts) > 1 and parts[0].startswith(NAMESPACED):
+        return f"{parts[0]}_{parts[-1]}".replace("-", "_")
+    return parts[-1].replace("-", "_")
 
 
 class ShowcaseController:

@@ -3,16 +3,16 @@
 
 {% macro risk_matrix(items=[]) %}
   <div class="risk-matrix" role="img" aria-label="probability by impact risk matrix">
-    <span class="rm-corner">P \ I</span>
+    <span class="risk-matrix-corner">P \ I</span>
   {% for i in range(1, 6) %}
-    <span class="rm-axis">{{ i }}</span>
+    <span class="risk-matrix-axis">{{ i }}</span>
   {% endfor %}
   {% for p in range(5, 0, -1) %}
-    <span class="rm-axis">{{ p }}</span>
+    <span class="risk-matrix-axis">{{ p }}</span>
     {% for i in range(1, 6) %}
       {% set score = p * i %}
-      <span class="rm-cell {{ 'rm-high' if score > 12 else ('rm-med' if score > 4 else 'rm-low') }}">
-      {% for it in items %}{% if it.probability == p and it.impact == i %}<span class="rm-chip" title="{{ it.label }}">{{ it.id }}</span>{% endif %}{% endfor %}
+      <span class="risk-matrix-cell {{ 'risk-matrix-high' if score > 12 else ('risk-matrix-med' if score > 4 else 'risk-matrix-low') }}">
+      {% for it in items %}{% if it.probability == p and it.impact == i %}<span class="risk-matrix-chip" title="{{ it.label }}">{{ it.id }}</span>{% endif %}{% endfor %}
       </span>
     {% endfor %}
   {% endfor %}

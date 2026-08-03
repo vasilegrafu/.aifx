@@ -14,7 +14,7 @@
    support typed attr() yet. */
 
 /* ---------- security-header: the instrument under analysis ---------- */
-.fa-sec-header {
+.fa-security-header {
   margin: var(--block-gap) 0;
   padding: .75rem .9rem .8rem;
   background: var(--bg-soft);
@@ -22,32 +22,32 @@
   border-left: 3px solid var(--accent);
   border-radius: 8px;
 }
-.fa-sec-id { margin: 0; display: flex; flex-wrap: wrap; gap: .55rem; align-items: baseline; }
-.fa-sec-ticker {
+.fa-security-header-id { margin: 0; display: flex; flex-wrap: wrap; gap: .55rem; align-items: baseline; }
+.fa-security-header-ticker {
   font-family: var(--font-mono); font-weight: 600;
   font-size: 1.15rem; color: var(--accent); letter-spacing: .02em;
 }
-.fa-sec-name { font-size: 1.05rem; font-weight: 650; }
-.fa-sec-exchange {
+.fa-security-header-name { font-size: 1.05rem; font-weight: 650; }
+.fa-security-header-exchange {
   font-size: .7rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   color: var(--fg-soft);
 }
-.fa-sec-facts {
+.fa-security-header-facts {
   display: flex; flex-wrap: wrap; gap: .3rem 1.8rem;
   margin: .6rem 0 0;
 }
-.fa-sec-facts div { display: flex; flex-direction: column; }
-.fa-sec-facts dt {
+.fa-security-header-facts div { display: flex; flex-direction: column; }
+.fa-security-header-facts dt {
   font-size: .68rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   color: var(--fg-soft);
 }
-.fa-sec-facts dd { margin: 0; font-size: .95rem; font-weight: 600; font-variant-numeric: tabular-nums; }
-.fa-sec-asof { margin: .55rem 0 0; font-size: .78rem; color: var(--fg-soft); }
+.fa-security-header-facts dd { margin: 0; font-size: .95rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fa-security-header-asof { margin: .55rem 0 0; font-size: .78rem; color: var(--fg-soft); }
 
 /* ---------- recommendation: the call ---------- */
-.fa-reco {
+.fa-recommendation {
   margin: var(--block-gap) 0;
   padding: .75rem .9rem .8rem;
   border: 1px solid var(--border);
@@ -55,45 +55,45 @@
   border-radius: 8px;
   background: var(--bg);
 }
-.fa-reco-good    { border-left-color: var(--decision); background: var(--decision-bg); }
-.fa-reco-neutral { border-left-color: var(--accent);   background: var(--accent-soft); }
-.fa-reco-bad     { border-left-color: var(--risk);     background: var(--risk-bg); }
-.fa-reco-action {
+.fa-recommendation-good    { border-left-color: var(--decision); background: var(--decision-bg); }
+.fa-recommendation-neutral { border-left-color: var(--accent);   background: var(--accent-soft); }
+.fa-recommendation-bad     { border-left-color: var(--risk);     background: var(--risk-bg); }
+.fa-recommendation-action {
   margin: 0;
   font-size: 1.25rem; font-weight: 800; letter-spacing: -.01em;
 }
-.fa-reco-good .fa-reco-action    { color: var(--decision); }
-.fa-reco-neutral .fa-reco-action { color: var(--accent); }
-.fa-reco-bad .fa-reco-action     { color: var(--risk); }
-.fa-reco-facts { display: flex; flex-wrap: wrap; gap: .3rem 1.8rem; margin: .55rem 0 0; }
-.fa-reco-facts div { display: flex; flex-direction: column; }
-.fa-reco-facts dt {
+.fa-recommendation-good .fa-recommendation-action    { color: var(--decision); }
+.fa-recommendation-neutral .fa-recommendation-action { color: var(--accent); }
+.fa-recommendation-bad .fa-recommendation-action     { color: var(--risk); }
+.fa-recommendation-facts { display: flex; flex-wrap: wrap; gap: .3rem 1.8rem; margin: .55rem 0 0; }
+.fa-recommendation-facts div { display: flex; flex-direction: column; }
+.fa-recommendation-facts dt {
   font-size: .68rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   color: var(--fg-soft);
 }
-.fa-reco-facts dd { margin: 0; font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.fa-reco-rationale {
+.fa-recommendation-facts dd { margin: 0; font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fa-recommendation-rationale {
   margin: .6rem 0 0; padding-top: .5rem;
   border-top: 1px dashed var(--border);
   font-size: .92rem;
 }
 
 /* ---------- thesis-pillars: claim / evidence / falsifier ---------- */
-ol.fa-pillars {
+ol.fa-thesis-pillars {
   margin: var(--block-gap) 0;
   padding-left: 0;
   list-style: none;
   counter-reset: pillar;
 }
-.fa-pillar {
+.fa-thesis-pillars-item {
   position: relative;
   counter-increment: pillar;
   padding: .55rem 0 .65rem 2.4rem;
   border-bottom: 1px solid var(--border);
 }
-.fa-pillar:last-child { border-bottom: none; }
-.fa-pillar::before {
+.fa-thesis-pillars-item:last-child { border-bottom: none; }
+.fa-thesis-pillars-item::before {
   content: counter(pillar);
   position: absolute; left: 0; top: .6rem;
   width: 1.6rem; height: 1.6rem;
@@ -103,10 +103,10 @@ ol.fa-pillars {
   font-size: .8rem; font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.fa-pillar-claim { margin: 0; font-weight: 650; font-size: 1rem; }
-.fa-pillar-evidence { margin: .25rem 0 0; font-size: .92rem; color: var(--fg-soft); }
-.fa-pillar-falsifier { margin: .35rem 0 0; font-size: .9rem; }
-.fa-pillar-tag {
+.fa-thesis-pillars-claim { margin: 0; font-weight: 650; font-size: 1rem; }
+.fa-thesis-pillars-evidence { margin: .25rem 0 0; font-size: .92rem; color: var(--fg-soft); }
+.fa-thesis-pillars-falsifier { margin: .35rem 0 0; font-size: .9rem; }
+.fa-thesis-pillars-tag {
   display: inline-block; margin-right: .4rem;
   padding: .05em .5em;
   border-radius: 999px;
@@ -116,8 +116,8 @@ ol.fa-pillars {
 }
 
 /* ---------- valuation-multiples ---------- */
-.fa-mult-current { font-weight: 700; }
-table.fa-multiples td:last-child { text-align: right; }
+.fa-valuation-multiples-current { font-weight: 700; }
+table.fa-valuation-multiples td:last-child { text-align: right; }
 
 /* ---------- peer-comparison ---------- */
 table.fa-peers tr.fa-subject { background: var(--accent-soft); }
@@ -125,21 +125,21 @@ table.fa-peers tr.fa-subject th, table.fa-peers tr.fa-subject td { font-weight: 
 table.fa-peers tr.fa-subject th:first-child { box-shadow: inset 3px 0 0 var(--accent); padding-left: .55rem; }
 
 /* ---------- earnings-surprise ---------- */
-.fa-surprise-period { font-weight: 500; text-transform: none; letter-spacing: 0; }
-.fa-surprise-actual { font-weight: 700; }
-.fa-surprise-delta  { font-variant-numeric: tabular-nums; }
+.fa-earnings-surprise-period { font-weight: 500; text-transform: none; letter-spacing: 0; }
+.fa-earnings-surprise-actual { font-weight: 700; }
+.fa-earnings-surprise-delta  { font-variant-numeric: tabular-nums; }
 
 /* ---------- valuation-range: the football field ---------- */
-.fa-valrange { margin: var(--block-gap) 0; padding: 0; }
-.fa-valrange-row {
+.fa-valuation-range { margin: var(--block-gap) 0; padding: 0; }
+.fa-valuation-range-row {
   display: grid;
   grid-template-columns: minmax(8rem, 14rem) 1fr minmax(6rem, auto);
   align-items: center;
   gap: .75rem;
   padding: .28rem 0;
 }
-.fa-valrange-method { font-size: .88rem; }
-.fa-valrange-track {
+.fa-valuation-range-method { font-size: .88rem; }
+.fa-valuation-range-track {
   position: relative;
   display: block;
   height: 1.05rem;
@@ -147,7 +147,7 @@ table.fa-peers tr.fa-subject th:first-child { box-shadow: inset 3px 0 0 var(--ac
   border: 1px solid var(--border);
   border-radius: 4px;
 }
-.fa-valrange-bar {
+.fa-valuation-range-bar {
   display: block;
   height: 100%;
   background: var(--accent);
@@ -158,24 +158,24 @@ table.fa-peers tr.fa-subject th:first-child { box-shadow: inset 3px 0 0 var(--ac
   margin-left: attr(data-lo type(<percentage>), 0%);
   width: attr(data-span type(<percentage>), 0%);
 }
-.fa-valrange-mark {
+.fa-valuation-range-mark {
   position: absolute; top: -2px; bottom: -2px;
   width: 2px;
   background: var(--risk);
   left: attr(data-at type(<percentage>), 0%);
 }
-.fa-valrange-value { font-size: .88rem; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
-.fa-valrange-axis {
+.fa-valuation-range-value { font-size: .88rem; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.fa-valuation-range-axis {
   display: flex; justify-content: space-between;
   margin: .35rem 0 0;
   font-size: .75rem; color: var(--fg-soft);
   font-variant-numeric: tabular-nums;
 }
-.fa-valrange-price { color: var(--risk); font-weight: 700; }
+.fa-valuation-range-price { color: var(--risk); font-weight: 700; }
 
 /* ---------- catalyst-timeline ---------- */
-ol.fa-catalysts { margin: var(--block-gap) 0; padding-left: 0; list-style: none; }
-.fa-catalyst {
+ol.fa-catalyst-timeline { margin: var(--block-gap) 0; padding-left: 0; list-style: none; }
+.fa-catalyst-timeline-item {
   display: grid;
   grid-template-columns: 6.5rem 1.2rem 1fr;
   gap: .1rem .6rem;
@@ -183,18 +183,18 @@ ol.fa-catalysts { margin: var(--block-gap) 0; padding-left: 0; list-style: none;
   padding: .5rem 0;
   border-bottom: 1px solid var(--border);
 }
-.fa-catalyst:last-child { border-bottom: none; }
-.fa-catalyst-date {
+.fa-catalyst-timeline-item:last-child { border-bottom: none; }
+.fa-catalyst-timeline-date {
   font-family: var(--font-mono); font-size: .8rem;
   color: var(--fg-soft); padding-top: .1rem;
 }
-.fa-catalyst-dir { font-size: .8rem; text-align: center; padding-top: .1rem; }
-.fa-catalyst-up .fa-catalyst-dir    { color: var(--decision); }
-.fa-catalyst-down .fa-catalyst-dir  { color: var(--risk); }
-.fa-catalyst-mixed .fa-catalyst-dir { color: var(--warning); }
-.fa-catalyst-body { display: block; }
-.fa-catalyst-event { font-weight: 600; font-size: .95rem; }
-.fa-catalyst-likelihood {
+.fa-catalyst-timeline-dir { font-size: .8rem; text-align: center; padding-top: .1rem; }
+.fa-catalyst-timeline-item-up .fa-catalyst-timeline-dir    { color: var(--decision); }
+.fa-catalyst-timeline-item-down .fa-catalyst-timeline-dir  { color: var(--risk); }
+.fa-catalyst-timeline-item-mixed .fa-catalyst-timeline-dir { color: var(--warning); }
+.fa-catalyst-timeline-body { display: block; }
+.fa-catalyst-timeline-event { font-weight: 600; font-size: .95rem; }
+.fa-catalyst-timeline-likelihood {
   display: inline-block; margin-left: .45rem;
   padding: .05em .5em;
   border-radius: 999px;
@@ -203,7 +203,7 @@ ol.fa-catalysts { margin: var(--block-gap) 0; padding-left: 0; list-style: none;
   font-size: .66rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .06em;
 }
-.fa-catalyst-note { display: block; margin-top: .18rem; font-size: .88rem; color: var(--fg-soft); }
+.fa-catalyst-timeline-note { display: block; margin-top: .18rem; font-size: .88rem; color: var(--fg-soft); }
 
 /* ---------- statements: income, balance sheet, cash flow ----------
    ONE skin for all three (they differ only in which lines are mandatory,
@@ -211,44 +211,38 @@ ol.fa-catalysts { margin: var(--block-gap) 0; padding-left: 0; list-style: none;
    st-section / st-detail / st-line / st-subtotal / st-total / st-pct. */
 table.fa-statement { font-variant-numeric: tabular-nums; }
 table.fa-statement thead th:first-child { width: 40%; }
-/* The unit rides inside the caption, so it must read as subordinate to it —
-   lighter and softer, not a second title. It used to also reset
-   `text-transform` and `letter-spacing`, which were only needed while the
-   caption was uppercase and tracked; both are dead now. */
-.fa-st-unit { font-weight: 500; font-size: .85rem; color: var(--fg-soft); }
-
-table.fa-statement tr.fa-st-section th {
+table.fa-statement tr.fa-statement-section th {
   padding-top: .85rem;
   font-size: .72rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .1em;
   color: var(--fg-soft);
   border-bottom: 1px solid var(--border);
 }
-table.fa-statement tr.fa-st-detail th { padding-left: 1.1rem; font-weight: 400; color: var(--fg-soft); }
-table.fa-statement tr.fa-st-detail td { color: var(--fg-soft); }
-table.fa-statement tr.fa-st-subtotal th, table.fa-statement tr.fa-st-subtotal td {
+table.fa-statement tr.fa-statement-detail th { padding-left: 1.1rem; font-weight: 400; color: var(--fg-soft); }
+table.fa-statement tr.fa-statement-detail td { color: var(--fg-soft); }
+table.fa-statement tr.fa-statement-subtotal th, table.fa-statement tr.fa-statement-subtotal td {
   font-weight: 650;
   border-top: 1px solid var(--fg-soft);
 }
-table.fa-statement tr.fa-st-total th, table.fa-statement tr.fa-st-total td {
+table.fa-statement tr.fa-statement-total th, table.fa-statement tr.fa-statement-total td {
   font-weight: 700;
   border-top: 3px double var(--fg);
   border-bottom: none;
 }
 /* Common-size line: hangs off the subtotal above it, deliberately quiet. */
-table.fa-statement tr.fa-st-pct th {
+table.fa-statement tr.fa-statement-pct th {
   padding-left: 1.1rem;
   font-size: .82rem; font-style: italic; font-weight: 400;
   color: var(--fg-soft);
   border-bottom: none;
 }
-table.fa-statement tr.fa-st-pct td {
+table.fa-statement tr.fa-statement-pct td {
   font-size: .82rem; font-style: italic;
   color: var(--fg-soft);
   border-bottom: none;
 }
 /* Disclosure cross-reference: a superscript link into footnote-disclosures. */
-.fa-st-note {
+.fa-statement-note {
   display: inline-block;
   margin-left: .3rem;
   padding: 0 .3em;
@@ -259,11 +253,10 @@ table.fa-statement tr.fa-st-pct td {
   vertical-align: super;
   text-decoration: none;
 }
-.fa-st-note:hover { background: var(--accent); color: var(--bg); }
-.fa-st-source { margin: .35rem 0 0; font-size: .78rem; color: var(--fg-soft); }
+.fa-statement-note:hover { background: var(--accent); color: var(--bg); }
 
 /* The arithmetic strips: the balance check and the FCF derivation. */
-.fa-st-check, .fa-st-fcf {
+.fa-statement-check, .fa-statement-fcf {
   display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline;
   margin: .5rem 0 0;
   padding: .45rem .7rem;
@@ -272,22 +265,22 @@ table.fa-statement tr.fa-st-pct td {
   background: var(--decision-bg);
   border-left: 3px solid var(--decision);
 }
-.fa-st-check-tag, .fa-st-fcf-tag {
+.fa-statement-check-tag, .fa-statement-fcf-tag {
   font-size: .66rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .07em;
   color: var(--decision);
 }
-.fa-st-check-fail { background: var(--risk-bg); border-left-color: var(--risk); }
-.fa-st-check-fail .fa-st-check-tag { color: var(--risk); }
-.fa-st-fcf { background: var(--accent-soft); border-left-color: var(--accent); }
-.fa-st-fcf-tag { color: var(--accent); }
+.fa-statement-check-fail { background: var(--risk-bg); border-left-color: var(--risk); }
+.fa-statement-check-fail .fa-statement-check-tag { color: var(--risk); }
+.fa-statement-fcf { background: var(--accent-soft); border-left-color: var(--accent); }
+.fa-statement-fcf-tag { color: var(--accent); }
 
 /* ---------- segment-reporting: revenue share vs profit share ---------- */
-.fa-seg-share-head { width: 8.5rem; }
-.fa-seg-share {
+.fa-segment-reporting-share-head { width: 8.5rem; }
+.fa-segment-reporting-share {
   display: flex; align-items: center; justify-content: flex-end; gap: .45rem;
 }
-.fa-seg-track {
+.fa-segment-reporting-track {
   flex: 1 1 auto;
   min-width: 2.5rem; max-width: 4.5rem;
   height: .45rem;
@@ -296,7 +289,7 @@ table.fa-statement tr.fa-st-pct td {
   border-radius: 999px;
   overflow: hidden;
 }
-.fa-seg-fill {
+.fa-segment-reporting-fill {
   display: block; height: 100%; max-width: 100%;
   background: var(--accent);
   border-radius: 999px;
@@ -304,51 +297,51 @@ table.fa-statement tr.fa-st-pct td {
 }
 /* The profit bar is deliberately a different colour: the reader is meant to
    compare the two bars on the same row, not read them as one series. */
-.fa-seg-fill-profit { background: var(--decision); }
-.fa-seg-pct { flex: 0 0 auto; font-weight: 600; }
+.fa-segment-reporting-fill-profit { background: var(--decision); }
+.fa-segment-reporting-pct { flex: 0 0 auto; font-weight: 600; }
 
 /* ---------- footnote-disclosures ---------- */
-.fa-disclosures { margin: var(--block-gap) 0; }
-.fa-disclosure {
+.fa-footnote-disclosures { margin: var(--block-gap) 0; }
+.fa-footnote-disclosures-item {
   padding: .55rem 0 .6rem;
   border-bottom: 1px solid var(--border);
 }
-.fa-disclosure:last-child { border-bottom: none; }
+.fa-footnote-disclosures-item:last-child { border-bottom: none; }
 /* Scroll-margin so a note landed on from an st-note link is not hidden under
    the fixed doc-toolbar. */
-.fa-disclosure { scroll-margin-top: 3.5rem; }
-.fa-disclosure-watch {
+.fa-footnote-disclosures-item { scroll-margin-top: 3.5rem; }
+.fa-footnote-disclosures-item-watch {
   padding-left: .7rem;
   border-left: 3px solid var(--warning);
 }
-.fa-disclosure-head {
+.fa-footnote-disclosures-head {
   margin: 0;
   display: flex; flex-wrap: wrap; gap: .55rem; align-items: baseline;
 }
-.fa-disclosure-num {
+.fa-footnote-disclosures-num {
   font-size: .68rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .07em;
   color: var(--accent);
 }
-.fa-disclosure-title { font-weight: 650; font-size: .98rem; }
-.fa-disclosure-flag {
+.fa-footnote-disclosures-title { font-weight: 650; font-size: .98rem; }
+.fa-footnote-disclosures-flag {
   padding: .05em .5em;
   border-radius: 999px;
   background: var(--warning-bg); color: var(--warning);
   font-size: .64rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .07em;
 }
-.fa-disclosure-body { margin: .25rem 0 0; font-size: .9rem; color: var(--fg-soft); }
+.fa-footnote-disclosures-body { margin: .25rem 0 0; font-size: .9rem; color: var(--fg-soft); }
 
 /* =======================================================================
    Decomposition, valuation and analysis components
    ======================================================================= */
 
 /* ---------- capital-allocation ---------- */
-.fa-ca-share-head { width: 9rem; }
-.fa-ca-cum { font-weight: 650; }
-.fa-ca-share { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
-.fa-ca-track {
+.fa-capital-allocation-share-head { width: 9rem; }
+.fa-capital-allocation-cum { font-weight: 650; }
+.fa-capital-allocation-share { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+.fa-capital-allocation-track {
   flex: 1 1 auto; min-width: 2.5rem; max-width: 5rem;
   height: .45rem;
   background: var(--bg-soft);
@@ -356,21 +349,21 @@ table.fa-statement tr.fa-st-pct td {
   border-radius: 999px;
   overflow: hidden;
 }
-.fa-ca-fill {
+.fa-capital-allocation-fill {
   display: block; height: 100%; max-width: 100%;
   background: var(--accent);
   border-radius: 999px;
   width: attr(data-pct type(<percentage>), 0%);
 }
-.fa-ca-pct { flex: 0 0 auto; font-weight: 600; }
-tbody.fa-ca-source th, tbody.fa-ca-source td {
+.fa-capital-allocation-pct { flex: 0 0 auto; font-weight: 600; }
+tbody.fa-capital-allocation-source th, tbody.fa-capital-allocation-source td {
   font-weight: 700;
   background: var(--accent-soft);
   border-bottom: 2px solid var(--accent);
 }
 
 /* ---------- dupont ---------- */
-.fa-dp-op {
+.fa-dupont-op {
   display: inline-block;
   width: 1.1rem;
   color: var(--accent);
@@ -378,7 +371,7 @@ tbody.fa-ca-source th, tbody.fa-ca-source td {
 }
 
 /* ---------- dcf-summary ---------- */
-.fa-dcf-assumptions, .fa-own-summary, .fa-unit-headline {
+.fa-dcf-summary-assumptions, .fa-ownership-table-summary, .fa-unit-economics-headline {
   display: flex; flex-wrap: wrap; gap: .3rem 1.8rem;
   margin: var(--block-gap) 0 0;
   padding: .55rem .8rem;
@@ -387,22 +380,22 @@ tbody.fa-ca-source th, tbody.fa-ca-source td {
   border-left: 3px solid var(--accent);
   border-radius: 6px;
 }
-.fa-dcf-assumptions div, .fa-own-summary div, .fa-unit-headline div { display: flex; flex-direction: column; }
-.fa-dcf-assumptions dt, .fa-own-summary dt, .fa-unit-headline dt {
+.fa-dcf-summary-assumptions div, .fa-ownership-table-summary div, .fa-unit-economics-headline div { display: flex; flex-direction: column; }
+.fa-dcf-summary-assumptions dt, .fa-ownership-table-summary dt, .fa-unit-economics-headline dt {
   font-size: .66rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   color: var(--fg-soft);
 }
-.fa-dcf-assumptions dd, .fa-own-summary dd, .fa-unit-headline dd {
+.fa-dcf-summary-assumptions dd, .fa-ownership-table-summary dd, .fa-unit-economics-headline dd {
   margin: 0; font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.fa-unit-headline dd { font-size: 1.05rem; }
-.fa-unit-good { border-left-color: var(--decision); background: var(--decision-bg); }
-.fa-unit-bad  { border-left-color: var(--risk);     background: var(--risk-bg); }
+.fa-unit-economics-headline dd { font-size: 1.05rem; }
+.fa-unit-economics-good { border-left-color: var(--decision); background: var(--decision-bg); }
+.fa-unit-economics-bad  { border-left-color: var(--risk);     background: var(--risk-bg); }
 
 /* ---------- debt-maturity ---------- */
-.fa-maturity-row {
+.fa-debt-maturity-row {
   display: grid;
   grid-template-columns: 5.5rem 1fr 6rem 3.5rem minmax(6rem, auto);
   align-items: center;
@@ -410,35 +403,35 @@ tbody.fa-ca-source th, tbody.fa-ca-source td {
   padding: .25rem 0;
   font-size: .88rem;
 }
-.fa-maturity-period { font-weight: 600; }
-.fa-maturity-track {
+.fa-debt-maturity-period { font-weight: 600; }
+.fa-debt-maturity-track {
   display: block; height: .8rem;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 3px;
   overflow: hidden;
 }
-.fa-maturity-fill {
+.fa-debt-maturity-fill {
   display: block; height: 100%; max-width: 100%;
   background: var(--warning);
   border-radius: 2px;
   width: attr(data-pct type(<percentage>), 0%);
 }
-.fa-maturity-amount { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
-.fa-maturity-rate { text-align: right; font-variant-numeric: tabular-nums; color: var(--fg-soft); }
-.fa-maturity-instrument { font-size: .82rem; color: var(--fg-soft); }
+.fa-debt-maturity-amount { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
+.fa-debt-maturity-rate { text-align: right; font-variant-numeric: tabular-nums; color: var(--fg-soft); }
+.fa-debt-maturity-instrument { font-size: .82rem; color: var(--fg-soft); }
 
 /* ---------- working-capital ---------- */
-table.fa-workcap tr.fa-wc-total th, table.fa-workcap tr.fa-wc-total td {
+table.fa-working-capital tr.fa-working-capital-total th, table.fa-working-capital tr.fa-working-capital-total td {
   font-weight: 700;
   border-top: 1px solid var(--fg-soft);
 }
 
 /* ---------- ownership-table ---------- */
-.fa-own-stake-head { width: 8.5rem; }
-.fa-own-type { font-size: .8rem; color: var(--fg-soft); text-align: left !important; }
-.fa-own-stake { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
-.fa-own-track {
+.fa-ownership-table-stake-head { width: 8.5rem; }
+.fa-ownership-table-type { font-size: .8rem; color: var(--fg-soft); text-align: left !important; }
+.fa-ownership-table-stake { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+.fa-ownership-table-track {
   flex: 1 1 auto; min-width: 2.5rem; max-width: 4.5rem;
   height: .45rem;
   background: var(--bg-soft);
@@ -446,19 +439,19 @@ table.fa-workcap tr.fa-wc-total th, table.fa-workcap tr.fa-wc-total td {
   border-radius: 999px;
   overflow: hidden;
 }
-.fa-own-fill {
+.fa-ownership-table-fill {
   display: block; height: 100%; max-width: 100%;
   background: var(--accent);
   border-radius: 999px;
   width: attr(data-pct type(<percentage>), 0%);
 }
-.fa-own-pct { flex: 0 0 auto; font-weight: 600; }
+.fa-ownership-table-pct { flex: 0 0 auto; font-weight: 600; }
 
 /* ---------- aging-schedule ---------- */
-.fa-aging-share-head { width: 8rem; }
-.fa-aging-total { font-weight: 700; }
-.fa-aging-share { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
-.fa-aging-track {
+.fa-aging-schedule-share-head { width: 8rem; }
+.fa-aging-schedule-total { font-weight: 700; }
+.fa-aging-schedule-share { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+.fa-aging-schedule-track {
   flex: 1 1 auto; min-width: 2.5rem; max-width: 4rem;
   height: .45rem;
   background: var(--bg-soft);
@@ -466,43 +459,43 @@ table.fa-workcap tr.fa-wc-total th, table.fa-workcap tr.fa-wc-total td {
   border-radius: 999px;
   overflow: hidden;
 }
-.fa-aging-fill {
+.fa-aging-schedule-fill {
   display: block; height: 100%; max-width: 100%;
   background: var(--fg-soft);
   border-radius: 999px;
   width: attr(data-pct type(<percentage>), 0%);
 }
-.fa-aging-fill-good { background: var(--decision); }
-.fa-aging-fill-bad  { background: var(--risk); }
-.fa-aging-pct { flex: 0 0 auto; font-weight: 600; }
+.fa-aging-schedule-fill-good { background: var(--decision); }
+.fa-aging-schedule-fill-bad  { background: var(--risk); }
+.fa-aging-schedule-pct { flex: 0 0 auto; font-weight: 600; }
 
 /* ---------- covenant-table ---------- */
-.fa-cov-test { font-size: .82rem; color: var(--fg-soft); text-align: left !important; }
-.fa-cov-actual { font-weight: 700; }
-table.fa-covenants tr.fa-cov-breach { background: var(--risk-bg); }
-table.fa-covenants tr.fa-cov-tight  { background: var(--warning-bg); }
-table.fa-covenants td:last-child { text-align: right; }
+.fa-covenant-table-test { font-size: .82rem; color: var(--fg-soft); text-align: left !important; }
+.fa-covenant-table-actual { font-weight: 700; }
+table.fa-covenant-table tr.fa-covenant-table-breach { background: var(--risk-bg); }
+table.fa-covenant-table tr.fa-covenant-table-tight  { background: var(--warning-bg); }
+table.fa-covenant-table td:last-child { text-align: right; }
 
 /* ---------- five-forces ---------- */
-.fa-forces { margin: var(--block-gap) 0; }
-.fa-forces-grid {
+.fa-five-forces { margin: var(--block-gap) 0; }
+.fa-five-forces-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: .7rem;
 }
-.fa-force {
+.fa-five-forces-item {
   padding: .6rem .8rem .7rem;
   border: 1px solid var(--border);
   border-top: 3px solid var(--fg-soft);
   border-radius: 8px;
   background: var(--bg);
 }
-.fa-force-good    { border-top-color: var(--decision); }
-.fa-force-neutral { border-top-color: var(--accent); }
-.fa-force-bad     { border-top-color: var(--risk); }
-.fa-force-head { margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; justify-content: space-between; }
-.fa-force-name { font-weight: 650; font-size: .95rem; }
-.fa-force-rating {
+.fa-five-forces-item-good    { border-top-color: var(--decision); }
+.fa-five-forces-item-neutral { border-top-color: var(--accent); }
+.fa-five-forces-item-bad     { border-top-color: var(--risk); }
+.fa-five-forces-head { margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; justify-content: space-between; }
+.fa-five-forces-name { font-weight: 650; font-size: .95rem; }
+.fa-five-forces-rating {
   padding: .05em .55em;
   border-radius: 999px;
   font-size: .66rem; font-weight: 700;
@@ -510,11 +503,11 @@ table.fa-covenants td:last-child { text-align: right; }
   background: var(--bg-soft); color: var(--fg-soft);
   border: 1px solid var(--border);
 }
-.fa-force-good .fa-force-rating    { background: var(--decision-bg); color: var(--decision); border-color: transparent; }
-.fa-force-neutral .fa-force-rating { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
-.fa-force-bad .fa-force-rating     { background: var(--risk-bg); color: var(--risk); border-color: transparent; }
-.fa-force-evidence { margin: .35rem 0 0; font-size: .88rem; color: var(--fg-soft); }
-.fa-forces-verdict {
+.fa-five-forces-item-good .fa-five-forces-rating    { background: var(--decision-bg); color: var(--decision); border-color: transparent; }
+.fa-five-forces-item-neutral .fa-five-forces-rating { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.fa-five-forces-item-bad .fa-five-forces-rating     { background: var(--risk-bg); color: var(--risk); border-color: transparent; }
+.fa-five-forces-evidence { margin: .35rem 0 0; font-size: .88rem; color: var(--fg-soft); }
+.fa-five-forces-verdict {
   margin: .7rem 0 0;
   padding: .5rem .8rem;
   background: var(--accent-soft);
@@ -524,8 +517,8 @@ table.fa-covenants td:last-child { text-align: right; }
 }
 
 /* ---------- unit-economics ---------- */
-table.fa-uniteco thead th:last-child { text-align: left; }
-.fa-unit-verdict {
+table.fa-unit-economics thead th:last-child { text-align: left; }
+.fa-unit-economics-verdict {
   margin: .5rem 0 0;
   padding: .45rem .7rem;
   border-radius: 6px;
@@ -533,20 +526,20 @@ table.fa-uniteco thead th:last-child { text-align: left; }
   background: var(--bg-soft);
   border-left: 3px solid var(--fg-soft);
 }
-.fa-unit-verdict-good { background: var(--decision-bg); border-left-color: var(--decision); }
-.fa-unit-verdict-bad  { background: var(--risk-bg);     border-left-color: var(--risk); }
+.fa-unit-economics-verdict-good { background: var(--decision-bg); border-left-color: var(--decision); }
+.fa-unit-economics-verdict-bad  { background: var(--risk-bg);     border-left-color: var(--risk); }
 
 /* ---------- print ---------- */
 @media print {
-  .fa-sec-header, .fa-reco, .fa-pillar, .fa-catalyst, .fa-valrange-row, .fa-disclosure, .fa-maturity-row, .fa-force { break-inside: avoid; }
-  .fa-st-check, .fa-st-fcf { break-inside: avoid; break-before: avoid; }
+  .fa-security-header, .fa-recommendation, .fa-thesis-pillars-item, .fa-catalyst-timeline-item, .fa-valuation-range-row, .fa-footnote-disclosures-item, .fa-debt-maturity-row, .fa-five-forces-item { break-inside: avoid; }
+  .fa-statement-check, .fa-statement-fcf { break-inside: avoid; break-before: avoid; }
 }
 
 /* These two exhibit titles sit on a <p>, not a caption or figcaption, so the
    element rule in foundational/content.css cannot reach them. One rule for
    both, matching that treatment — if the exhibit title changes there, change
    it here too. */
-.fa-disclosures-caption, .fa-forces-caption {
+.fa-footnote-disclosures-caption, .fa-five-forces-caption {
   margin: 0 0 .45rem;
   font-size: .95rem; font-weight: 700; line-height: 1.35;
   letter-spacing: -.004em; color: var(--fg);

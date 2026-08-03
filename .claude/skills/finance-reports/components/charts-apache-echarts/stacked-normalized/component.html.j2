@@ -1,0 +1,73 @@
+{# purpose: each category as 100% — composition when the shares matter and the totals do not #}
+{# unit: none — every column is 100% by construction #}
+{# data: series[] {name:str, points:num[]}   categories: str[] — RAW values, not shares #}
+{% import "charts-apache-echarts/_render.html.j2" as r %}
+
+{% macro charts_apache_echarts_stacked_normalized(series=[], categories=[], caption="", height=340, note="", y_name="", unit="") %}
+{# The shares are computed HERE so the rendered spec carries the percentages and
+   a reader can check them against the source numbers. Pass raw values;
+   converting them upstream is the one step that silently produces a chart which
+   draws perfectly and means nothing.
+
+   Totals use the ABSOLUTE value, so a category containing a negative still
+   sums to a whole rather than to something smaller than its parts. #}
+{% set totals = [] %}
+{% for index in range(categories | length) %}
+{%   set ns = namespace(total=0) %}
+{%   for s in series %}
+{%     set ns.total = ns.total + (s.points[index] | abs) %}
+{%   endfor %}
+{%   set _ = totals.append(ns.total) %}
+{% endfor %}
+{% set built = [] %}
+{% set widest = namespace(chars=0) %}
+{% for s in series %}
+{%   set shares = [] %}
+{%   for index in range(categories | length) %}
+{# One decimal, because the share IS the label. Carrying more precision does
+   not make the chart more honest, it makes it unreadable — "52.4779" inside a
+   bar is four characters of noise around the one digit that matters. #}
+{%     set share = (100 * s.points[index] / totals[index]) | round(1)
+                   if totals[index] else 0 %}
+{%     set _ = shares.append(share) %}
+{%     set widest.chars = [widest.chars, (share | string | length)] | max %}
+{%   endfor %}
+{# Labels are not optional here: once every column is the same height the only
+   way to read a segment is its number. #}
+{%   set _ = built.append({"type": "bar", "name": s.name, "stack": "total",
+                           "label": {"show": true, "position": "inside"},
+                           "data": shares}) %}
+{% endfor %}
+{# The theme caps bars at 44px so a two-category chart does not draw two slabs,
+   and that cap is right for a bar you read by LENGTH. This chart is read by
+   its labels, which sit inside the segments — so the column must hold the
+   widest one, and no wider. Derived from the text about to be drawn rather
+   than picked: with one-decimal shares it lands back on the theme's 44. #}
+{% set bar_width = [44, 7 * widest.chars + 14] | max %}
+{% for series_option in built %}
+{%   set _ = series_option.update({"barMaxWidth": bar_width}) %}
+{% endfor %}
+{# `max: 100` pins the axis. Without it ECharts fits the axis to the data, and
+   a column that rounds to 99.99 quietly rescales the whole chart. #}
+{# 46 STAYS HARDCODED HERE, and that is deliberate: `max: 100` pins the axis,
+   so the widest tick this chart can ever print is "100" -- three characters,
+   comfortably inside the floor. Deriving a constant would only hide that the
+   constant is safe. #}
+{% set y_axis = {"type": "value", "max": 100} %}
+{% if y_name %}
+{%   set _ = y_axis.update({"name": y_name, "nameLocation": "middle",
+                            "nameGap": 46, "nameRotate": 90}) %}
+{% endif %}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+     "grid": {"left": (46 if y_name else 8), "right": 16,
+              "bottom": 8, "containLabel": true},
+     "xAxis": {"type": "category", "data": categories},
+     "yAxis": y_axis,
+     "series": built,
+   } %}
+{% if built | length > 1 %}
+{%   set _ = option.update({"legend": {}}) %}
+{% endif %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

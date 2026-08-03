@@ -20,7 +20,7 @@ article.requirement > header {
   gap: .7rem;
   margin-bottom: .7rem;
 }
-article.requirement .req-id {
+article.requirement .requirement-id {
   font-family: var(--font-mono);
   font-size: .78rem; font-weight: 700;
   color: var(--accent); background: var(--accent-soft);
@@ -28,7 +28,7 @@ article.requirement .req-id {
 }
 article.requirement > header h3 { margin: 0; font-size: 1.05rem; flex: 1 1 auto; }
 
-.req-priority {
+.requirement-priority {
   font-size: .66rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   padding: .12em .55em; border-radius: 999px;
@@ -54,7 +54,7 @@ article.requirement dt {
 article.requirement dd { margin: 0; }
 
 /* ---------- acceptance-criteria: Given / When / Then scenario ---------- */
-.acceptance {
+.acceptance-criteria {
   margin: var(--block-gap) 0;
   padding: .7rem 1rem .8rem;
   background: var(--bg);
@@ -62,49 +62,49 @@ article.requirement dd { margin: 0; }
   border-left: 3px solid var(--decision);
   border-radius: 8px;
 }
-.acceptance .ac-head {
+.acceptance-criteria .acceptance-criteria-head {
   display: flex; align-items: baseline; flex-wrap: wrap; gap: .6rem;
   margin-bottom: .55rem;
 }
-.acceptance .ac-id {
+.acceptance-criteria .acceptance-criteria-id {
   font-family: var(--font-mono);
   font-size: .78rem; font-weight: 700;
   color: var(--decision); background: var(--decision-bg);
   padding: .1em .5em; border-radius: 4px;
 }
-.acceptance .ac-title { font-size: 1rem; font-weight: 600; }
-.acceptance dl.gwt {
+.acceptance-criteria .acceptance-criteria-title { font-size: 1rem; font-weight: 600; }
+.acceptance-criteria dl.gwt {
   display: grid;
   grid-template-columns: max-content 1fr;
   gap: .3rem .9rem;
   margin: 0; font-size: .95rem;
 }
-.acceptance dl.gwt dt {
+.acceptance-criteria dl.gwt dt {
   font-family: var(--font-mono);
   font-size: .72rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .06em;
   text-align: right;
   padding-top: .1rem;
 }
-.acceptance dl.gwt dd { margin: 0; }
-.acceptance .kw-given { color: var(--fg-soft); }
-.acceptance .kw-when  { color: var(--accent); }
-.acceptance .kw-then  { color: var(--decision); }
+.acceptance-criteria dl.gwt dd { margin: 0; }
+.acceptance-criteria .kw-given { color: var(--fg-soft); }
+.acceptance-criteria .kw-when  { color: var(--accent); }
+.acceptance-criteria .kw-then  { color: var(--decision); }
 
 /* ---------- kpi-tiles: dashboard metric grid ---------- */
-.kpi-tiles {
+.kpi-tiles-tiles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   gap: .85rem;
   margin: var(--block-gap) 0;
 }
-.kpi {
+.kpi-tiles {
   padding: .9rem 1rem;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 10px;
 }
-.kpi-value {
+.kpi-tiles-value {
   display: block;
   /* A headline metric, not a poster: big enough to scan a row of tiles at a
      glance, small enough that a long value ("$1,001,000") still fits one line
@@ -112,16 +112,16 @@ article.requirement dd { margin: 0; }
   font-size: 1.25rem; font-weight: 800; line-height: 1.2;
   letter-spacing: -.02em;
 }
-.kpi-label {
+.kpi-tiles-label {
   display: block; margin-top: .35rem;
   font-size: .72rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   color: var(--fg-soft);
 }
-.kpi-trend { display: inline-block; margin-top: .5rem; font-size: .78rem; font-weight: 600; }
-.kpi-trend.up   { color: var(--decision); }
-.kpi-trend.down { color: var(--risk); }
-.kpi-trend.flat { color: var(--fg-soft); }
+.kpi-tiles-trend { display: inline-block; margin-top: .5rem; font-size: .78rem; font-weight: 600; }
+.kpi-tiles-trend.up   { color: var(--decision); }
+.kpi-tiles-trend.down { color: var(--risk); }
+.kpi-tiles-trend.flat { color: var(--fg-soft); }
 
 /* ---------- timeline: milestones / roadmap / release history ---------- */
 ol.timeline {
@@ -257,22 +257,22 @@ ol.references > li::before {
   margin: var(--block-gap) 0;
   max-width: 34rem;
 }
-.rm-corner, .rm-axis {
+.risk-matrix-corner, .risk-matrix-axis {
   display: flex; align-items: center; justify-content: center;
   font-size: .68rem; font-weight: 700; color: var(--fg-soft);
   font-family: var(--font-mono);
 }
-.rm-cell {
+.risk-matrix-cell {
   min-height: 2.3rem;
   border-radius: 4px;
   display: flex; flex-wrap: wrap; gap: .2rem;
   align-items: center; justify-content: center;
   padding: .15rem;
 }
-.rm-low  { background: var(--decision-bg); }
-.rm-med  { background: var(--warning-bg); }
-.rm-high { background: var(--risk-bg); }
-.rm-chip {
+.risk-matrix-low  { background: var(--decision-bg); }
+.risk-matrix-med  { background: var(--warning-bg); }
+.risk-matrix-high { background: var(--risk-bg); }
+.risk-matrix-chip {
   font-family: var(--font-mono);
   font-size: .68rem; font-weight: 600;
   background: var(--bg);
@@ -283,7 +283,7 @@ ol.references > li::before {
 }
 
 /* ---------- footnotes: numbered end-notes with back-links ---------- */
-sup.fn a {
+sup.footnotes-item a {
   font-family: var(--font-mono);
   font-size: .72em;
   padding: 0 .1em;
@@ -295,7 +295,7 @@ ol.footnotes {
   font-size: .85rem; color: var(--fg-soft);
 }
 ol.footnotes li { margin: .25rem 0; }
-ol.footnotes .fn-back { font-size: .8em; }
+ol.footnotes .footnotes-back { font-size: .8em; }
 
 /* ---------- badge: generic status/rating pill ----------
    Foundational, not domain-specific: it carries no domain meaning, and both
@@ -325,7 +325,7 @@ ol.footnotes .fn-back { font-size: .8em; }
 
 /* ---------- scorecard: weighted criteria ---------- */
 table.scorecard td:last-child, table.scorecard th:last-child { text-align: left; }
-.score-track {
+.scorecard-track {
   display: inline-block;
   width: 5rem; height: .45rem;
   vertical-align: middle;
@@ -334,7 +334,7 @@ table.scorecard td:last-child, table.scorecard th:last-child { text-align: left;
   border-radius: 999px;
   overflow: hidden;
 }
-.score-fill {
+.scorecard-fill {
   display: block; height: 100%; max-width: 100%;
   background: var(--accent);
   border-radius: 999px;
@@ -348,8 +348,8 @@ table.scorecard td:last-child, table.scorecard th:last-child { text-align: left;
 /* ---------- shared: a labelled bar row inside a figure ----------
    bridge, debt-maturity and funnel all draw a label, a track and a value.
    Only the track geometry differs, so the row grammar is defined once. */
-.bridge, .maturity, .funnel, .quadrant { margin: var(--block-gap) 0; padding: 0; }
-.bridge-note, .maturity-summary, .funnel-summary, .quadrant-note, .sens-note {
+.bridge, .maturity, .funnel, .quadrant-map { margin: var(--block-gap) 0; padding: 0; }
+.bridge-note, .maturity-summary, .funnel-summary, .quadrant-map-note, .sensitivity-table-note {
   margin: .5rem 0 0;
   font-size: .85rem;
   color: var(--fg-soft);
@@ -414,30 +414,30 @@ table.heatmap thead th, table.heatmap tbody th {
   border-radius: 3px;
 }
 table.heatmap tbody th { text-align: left; padding-left: .5rem; }
-.hm-cell { border-radius: 3px; }
-.hm-z0 { background: var(--bg-soft); color: var(--fg-soft); }
+.heatmap-cell { border-radius: 3px; }
+.heatmap-z0 { background: var(--bg-soft); color: var(--fg-soft); }
 /* A diverging ramp: two sequential scales meeting at a neutral zero. Values
    come from the active theme, which reverses the direction on dark (stronger
    = lighter there, darker here) while keeping each side monotonic. */
-.hm-p1 { background: var(--heat-pos-1-bg); color: var(--heat-pos-1-fg); }
-.hm-p2 { background: var(--heat-pos-2-bg); color: var(--heat-pos-2-fg); }
-.hm-p3 { background: var(--heat-pos-3-bg); color: var(--heat-pos-3-fg); font-weight: 700; }
-.hm-n1 { background: var(--heat-neg-1-bg); color: var(--heat-neg-1-fg); }
-.hm-n2 { background: var(--heat-neg-2-bg); color: var(--heat-neg-2-fg); }
-.hm-n3 { background: var(--heat-neg-3-bg); color: var(--heat-neg-3-fg); font-weight: 700; }
-.hm-empty { background: transparent; }
-.hm-legend { margin: .4rem 0 0; font-size: .78rem; color: var(--fg-soft); }
+.heatmap-p1 { background: var(--heat-pos-1-bg); color: var(--heat-pos-1-fg); }
+.heatmap-p2 { background: var(--heat-pos-2-bg); color: var(--heat-pos-2-fg); }
+.heatmap-p3 { background: var(--heat-pos-3-bg); color: var(--heat-pos-3-fg); font-weight: 700; }
+.heatmap-n1 { background: var(--heat-neg-1-bg); color: var(--heat-neg-1-fg); }
+.heatmap-n2 { background: var(--heat-neg-2-bg); color: var(--heat-neg-2-fg); }
+.heatmap-n3 { background: var(--heat-neg-3-bg); color: var(--heat-neg-3-fg); font-weight: 700; }
+.heatmap-empty { background: transparent; }
+.heatmap-legend { margin: .4rem 0 0; font-size: .78rem; color: var(--fg-soft); }
 
 /* ---------- composite-score ---------- */
-.composite { margin: var(--block-gap) 0; }
-.composite-head {
+.composite-score { margin: var(--block-gap) 0; }
+.composite-score-head {
   margin: 0;
   display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: baseline;
 }
-.composite-name { font-weight: 700; font-size: 1rem; }
-.composite-inputs { margin-top: .5rem !important; }
-.composite-inputs td:last-child, .composite-inputs th:last-child { font-weight: 650; }
-.composite-band {
+.composite-score-name { font-weight: 700; font-size: 1rem; }
+.composite-score-inputs { margin-top: .5rem !important; }
+.composite-score-inputs td:last-child, .composite-score-inputs th:last-child { font-weight: 650; }
+.composite-score-band {
   display: flex; flex-wrap: wrap; gap: .5rem .9rem; align-items: center;
   margin: .5rem 0 0;
   padding: .45rem .7rem;
@@ -445,47 +445,47 @@ table.heatmap tbody th { text-align: left; padding-left: .5rem; }
   background: var(--bg-soft);
   border-left: 3px solid var(--fg-soft);
 }
-.composite-band-tag {
+.composite-score-band-tag {
   font-size: .72rem; font-weight: 800;
   text-transform: uppercase; letter-spacing: .08em;
 }
-.composite-good { background: var(--decision-bg); border-left-color: var(--decision); }
-.composite-good .composite-band-tag { color: var(--decision); }
-.composite-warn { background: var(--warning-bg); border-left-color: var(--warning); }
-.composite-warn .composite-band-tag { color: var(--warning); }
-.composite-bad  { background: var(--risk-bg); border-left-color: var(--risk); }
-.composite-bad .composite-band-tag { color: var(--risk); }
-.composite-scale { display: flex; flex-wrap: wrap; gap: .35rem; }
-.composite-step {
+.composite-score-good { background: var(--decision-bg); border-left-color: var(--decision); }
+.composite-score-good .composite-score-band-tag { color: var(--decision); }
+.composite-score-warn { background: var(--warning-bg); border-left-color: var(--warning); }
+.composite-score-warn .composite-score-band-tag { color: var(--warning); }
+.composite-score-bad  { background: var(--risk-bg); border-left-color: var(--risk); }
+.composite-score-bad .composite-score-band-tag { color: var(--risk); }
+.composite-score-scale { display: flex; flex-wrap: wrap; gap: .35rem; }
+.composite-score-step {
   padding: .1em .5em;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--bg);
   font-size: .7rem; color: var(--fg-soft);
 }
-.composite-step em { font-style: normal; font-variant-numeric: tabular-nums; }
+.composite-score-step em { font-style: normal; font-variant-numeric: tabular-nums; }
 /* A band's own tone. The macro has always emitted composite-step-{tone} and
    nothing styled it, so bands[].tone was inert whatever it was set to -- the
    scale read as three identical pills whether the band meant safe or
    distress. Same three tokens the outer band uses, so a band and its pill
    cannot disagree about what a tone means. */
-.composite-step-good { border-color: var(--decision); color: var(--decision); }
-.composite-step-warn { border-color: var(--warning);  color: var(--warning); }
-.composite-step-bad  { border-color: var(--risk);     color: var(--risk); }
+.composite-score-step-good { border-color: var(--decision); color: var(--decision); }
+.composite-score-step-warn { border-color: var(--warning);  color: var(--warning); }
+.composite-score-step-bad  { border-color: var(--risk);     color: var(--risk); }
 /* Specificity puts this above the tone rules, so the current band still reads
    as the current one rather than as its colour. */
-.composite-step.macro-current { border-color: var(--fg); color: var(--fg); font-weight: 700; }
+.composite-score-step.macro-current { border-color: var(--fg); color: var(--fg); font-weight: 700; }
 
 /* ---------- quadrant-map ---------- */
-.quadrant-frame { display: grid; grid-template-columns: 1.4rem 1fr; gap: .3rem; }
-.quadrant-y-label {
+.quadrant-map-frame { display: grid; grid-template-columns: 1.4rem 1fr; gap: .3rem; }
+.quadrant-map-y-label {
   grid-column: 1; grid-row: 1;
   writing-mode: vertical-rl; transform: rotate(180deg);
   justify-self: center; align-self: center;
   font-size: .7rem; text-transform: uppercase; letter-spacing: .06em;
   color: var(--fg-soft);
 }
-.quadrant-plot {
+.quadrant-map-plot {
   grid-column: 2; grid-row: 1;
   position: relative;
   aspect-ratio: 3 / 2;
@@ -495,31 +495,31 @@ table.heatmap tbody th { text-align: left; padding-left: .5rem; }
 }
 /* The crosshair. Pseudo-elements rather than subpixel background gradients,
    which round away inconsistently between the two axes. */
-.quadrant-plot::before, .quadrant-plot::after {
+.quadrant-map-plot::before, .quadrant-map-plot::after {
   content: "";
   position: absolute;
   background: var(--border);
 }
-.quadrant-plot::before { left: 50%; top: 0; bottom: 0; width: 1px; }
-.quadrant-plot::after  { top: 50%; left: 0; right: 0; height: 1px; }
-.quadrant-x-label {
+.quadrant-map-plot::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+.quadrant-map-plot::after  { top: 50%; left: 0; right: 0; height: 1px; }
+.quadrant-map-x-label {
   grid-column: 2; grid-row: 2;
   text-align: center;
   font-size: .7rem; text-transform: uppercase; letter-spacing: .06em;
   color: var(--fg-soft);
 }
-.quadrant-zone {
+.quadrant-map-zone {
   position: absolute;
   font-size: .64rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .06em;
   color: var(--fg-soft);
   opacity: .7;
 }
-.quadrant-z1 { top: .4rem; left: .5rem; }
-.quadrant-z2 { top: .4rem; right: .5rem; }
-.quadrant-z3 { bottom: .4rem; left: .5rem; }
-.quadrant-z4 { bottom: .4rem; right: .5rem; }
-.quadrant-item {
+.quadrant-map-z1 { top: .4rem; left: .5rem; }
+.quadrant-map-z2 { top: .4rem; right: .5rem; }
+.quadrant-map-z3 { bottom: .4rem; left: .5rem; }
+.quadrant-map-z4 { bottom: .4rem; right: .5rem; }
+.quadrant-map-item {
   position: absolute;
   display: flex; align-items: center; gap: .28rem;
   /* placement computed at compose time; attr() keeps style= out of documents */
@@ -528,15 +528,15 @@ table.heatmap tbody th { text-align: left; padding-left: .5rem; }
   transform: translate(-50%, 50%);
   white-space: nowrap;
 }
-.quadrant-dot {
+.quadrant-map-dot {
   width: .5rem; height: .5rem;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 2px var(--bg);
 }
-.quadrant-good .quadrant-dot { background: var(--decision); }
-.quadrant-bad .quadrant-dot  { background: var(--risk); }
-.quadrant-label {
+.quadrant-map-good .quadrant-map-dot { background: var(--decision); }
+.quadrant-map-bad .quadrant-map-dot  { background: var(--risk); }
+.quadrant-map-label {
   font-size: .72rem; font-weight: 600;
   background: var(--bg);
   padding: 0 .18rem;
@@ -563,6 +563,6 @@ table.heatmap tbody th { text-align: left; padding-left: .5rem; }
 
 /* ---------- print ---------- */
 @media print {
-  .bridge-row, .funnel-stage, .quadrant, .composite { break-inside: avoid; }
+  .bridge-row, .funnel-stage, .quadrant-map, .composite-score { break-inside: avoid; }
   table.heatmap { break-inside: auto; }
 }

@@ -1,12 +1,12 @@
 {# purpose: the load-bearing arguments of a thesis: claim, evidence, and what would break it #}
 {# data: items[] {claim:str, evidence?:str, falsifier?:str} #}
 {% macro thesis_pillars(items=[]) %}
-  <ol class="fa-pillars">
+  <ol class="fa-thesis-pillars">
   {% for it in items %}
-    <li class="fa-pillar">
-      <p class="fa-pillar-claim">{{ it.claim }}</p>
-      {% if it.get('evidence') %}<p class="fa-pillar-evidence">{{ it.evidence }}</p>{% endif %}
-      {% if it.get('falsifier') %}<p class="fa-pillar-falsifier"><span class="fa-pillar-tag">Breaks if</span> {{ it.falsifier }}</p>{% endif %}
+    <li class="fa-thesis-pillars-item">
+      <p class="fa-thesis-pillars-claim">{{ it.claim }}</p>
+      {% if it.get('evidence') %}<p class="fa-thesis-pillars-evidence">{{ it.evidence }}</p>{% endif %}
+      {% if it.get('falsifier') %}<p class="fa-thesis-pillars-falsifier"><span class="fa-thesis-pillars-tag">Breaks if</span> {{ it.falsifier }}</p>{% endif %}
     </li>
   {% endfor %}
   </ol>

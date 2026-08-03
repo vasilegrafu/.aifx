@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>variance-analysis — showcase</title>
   <link rel="stylesheet" href="../../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -18,13 +18,13 @@
 
     <section>
       <h3>budget against actual, where the sign and the verdict come apart</h3>
-        <table class="fin variance">
-<caption>Budget variance <span class="macro-macro-asof">FY25</span> <span class="fa-st-unit">$m</span></caption>    <thead><tr><th>Line</th><th>Budget</th><th>Actual</th><th>Variance</th><th>%</th><th>Verdict</th></tr></thead>
+        <table class="fin variance-analysis">
+<caption>Budget variance <span class="fin-asof">FY25</span> <span class="fin-unit">$m</span></caption>    <thead><tr><th>Line</th><th>Budget</th><th>Actual</th><th>Variance</th><th>%</th><th>Verdict</th></tr></thead>
     <tbody>
       <tr>
         <th scope="row">Revenue</th>
         <td>37,800</td>
-        <td class="var-actual">38,549</td>
+        <td class="variance-analysis-actual">38,549</td>
         <td>+749</td>
         <td>+2.0%</td>
         <td><span class="badge badge-good">favourable</span></td>
@@ -32,7 +32,7 @@
       <tr>
         <th scope="row">Cost of sales</th>
         <td>18,900</td>
-        <td class="var-actual">19,468</td>
+        <td class="variance-analysis-actual">19,468</td>
         <td class="neg">(568)</td>
         <td>+3.0%</td>
         <td><span class="badge badge-bad">adverse</span></td>
@@ -40,7 +40,7 @@
       <tr>
         <th scope="row">Operating expenses</th>
         <td>13,200</td>
-        <td class="var-actual">13,333</td>
+        <td class="variance-analysis-actual">13,333</td>
         <td class="neg">(133)</td>
         <td>+1.0%</td>
         <td><span class="badge badge-bad">adverse</span></td>
@@ -48,7 +48,7 @@
       <tr>
         <th scope="row">Operating income</th>
         <td>5,700</td>
-        <td class="var-actual">5,748</td>
+        <td class="variance-analysis-actual">5,748</td>
         <td>+48</td>
         <td>+0.8%</td>
         <td><span class="badge badge-good">favourable</span></td>
@@ -56,7 +56,7 @@
     </tbody>
     <tfoot><tr class="total"><th scope="row">Net income</th><td>4,760</td><td>5,136</td><td>+376</td><td>+7.9%</td><td></td></tr></tfoot>
   </table>
-<p class="fa-st-source">Cost of sales and operating expenses are adverse at a positive variance: over budget on a cost line is not good news.</p>
+<p class="fin-source">Cost of sales and operating expenses are adverse at a positive variance: over budget on a cost line is not good news.</p>
     </section>
   </main>
 </body>

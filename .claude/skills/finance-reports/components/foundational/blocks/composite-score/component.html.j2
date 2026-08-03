@@ -7,13 +7,13 @@
    opinion wearing a decimal point — and these scores are dominated by one term
    far more often than a reader expects. #}
 {% macro composite_score(name="", formula="", inputs=[], score="", band="", tone="neutral", bands=[], caption="", note="", fmt="num") %}
-  <div class="composite">
-    <p class="composite-head">
-      <span class="composite-name">{{ name }}</span>
+  <div class="composite-score">
+    <p class="composite-score-head">
+      <span class="composite-score-name">{{ name }}</span>
       {% if formula %}<span class="math">{{ formula }}</span>{% endif %}
     </p>
     {% if inputs %}
-    <table class="fin composite-inputs">
+    <table class="fin composite-score-inputs">
     {% if caption %}<caption>{{ caption }}</caption>{% endif %}
       <thead><tr><th>Component</th><th>Coefficient</th><th>Value</th><th>Contribution</th></tr></thead>
       <tbody>
@@ -29,16 +29,16 @@
       <tfoot><tr class="total"><th scope="row">Score</th><td></td><td></td><td>{{ score | fmt(fmt) }}</td></tr></tfoot>
     </table>
     {% endif %}
-    <p class="composite-band composite-{{ tone }}">
-      <span class="composite-band-tag">{{ band }}</span>
+    <p class="composite-score-band composite-score-{{ tone }}">
+      <span class="composite-score-band-tag">{{ band }}</span>
       {% if bands %}
-      <span class="composite-scale">
+      <span class="composite-score-scale">
         {% for b in bands %}
-        <span class="composite-step composite-step-{{ b.tone }}{% if b.label == band %} macro-current{% endif %}">{{ b.label }} <em>{{ b.range }}</em></span>
+        <span class="composite-score-step composite-score-step-{{ b.tone }}{% if b.label == band %} macro-current{% endif %}">{{ b.label }} <em>{{ b.range }}</em></span>
         {% endfor %}
       </span>
       {% endif %}
     </p>
-    {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
+    {% if note %}<p class="fin-source">{{ note }}</p>{% endif %}
   </div>
 {% endmacro %}

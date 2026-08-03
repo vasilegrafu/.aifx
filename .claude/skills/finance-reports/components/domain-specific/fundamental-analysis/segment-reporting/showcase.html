@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>segment-reporting — showcase</title>
   <link rel="stylesheet" href="../../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -18,46 +18,46 @@
 
     <section>
       <h3>revenue only, with a total row — the common case</h3>
-        <table class="fin segments">
-<caption>Revenue by segment, FY25 <span class="fa-st-unit">USD millions</span></caption>    <thead><tr>
+        <table class="fin">
+<caption>Revenue by segment, FY25 <span class="fin-unit">USD millions</span></caption>    <thead><tr>
       <th>Segment</th>
-      <th>Revenue</th><th class="fa-seg-share-head">% of revenue</th>
+      <th>Revenue</th><th class="fa-segment-reporting-share-head">% of revenue</th>
       <th>y/y</th>
     </tr></thead>
     <tbody>
       <tr>
         <th scope="row">Data Center</th>
         <td>16,635</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="43.2%"></span></span>
-          <span class="fa-seg-pct">43.2%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="43.2%"></span></span>
+          <span class="fa-segment-reporting-pct">43.2%</span>
         </td>
         <td>32.2%</td>
       </tr>
       <tr>
         <th scope="row">Client and Gaming</th>
         <td>14,550</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="37.7%"></span></span>
-          <span class="fa-seg-pct">37.7%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="37.7%"></span></span>
+          <span class="fa-segment-reporting-pct">37.7%</span>
         </td>
         <td>0.0%</td>
       </tr>
       <tr>
         <th scope="row">Gaming</th>
         <td>3,910</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="10.1%"></span></span>
-          <span class="fa-seg-pct">10.1%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="10.1%"></span></span>
+          <span class="fa-segment-reporting-pct">10.1%</span>
         </td>
         <td>50.7%</td>
       </tr>
       <tr>
         <th scope="row">Embedded</th>
         <td>3,454</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="9.0%"></span></span>
-          <span class="fa-seg-pct">9.0%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="9.0%"></span></span>
+          <span class="fa-segment-reporting-pct">9.0%</span>
         </td>
         <td class="neg">-2.9%</td>
       </tr>
@@ -71,11 +71,11 @@
     <hr>
     <section>
       <h3>with profit and margin — where share of revenue and share of profit diverge</h3>
-        <table class="fin segments">
-<caption>Segment revenue and profitability, FY25 <span class="fa-st-unit">USD millions</span></caption>    <thead><tr>
+        <table class="fin">
+<caption>Segment revenue and profitability, FY25 <span class="fin-unit">USD millions</span></caption>    <thead><tr>
       <th>Segment</th>
-      <th>Revenue</th><th class="fa-seg-share-head">% of revenue</th>
-      <th>Profit</th><th class="fa-seg-share-head">% of profit</th>
+      <th>Revenue</th><th class="fa-segment-reporting-share-head">% of revenue</th>
+      <th>Profit</th><th class="fa-segment-reporting-share-head">% of profit</th>
       <th>Margin</th>
       <th>y/y</th>
     </tr></thead>
@@ -83,14 +83,14 @@
       <tr>
         <th scope="row">Data Center</th>
         <td>16,635</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="43.2%"></span></span>
-          <span class="fa-seg-pct">43.2%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="43.2%"></span></span>
+          <span class="fa-segment-reporting-pct">43.2%</span>
         </td>
         <td>3,510</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill fa-seg-fill-profit" data-pct="61.1%"></span></span>
-          <span class="fa-seg-pct">61.1%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill fa-segment-reporting-fill-profit" data-pct="61.1%"></span></span>
+          <span class="fa-segment-reporting-pct">61.1%</span>
         </td>
         <td>21.1%</td>
         <td>32.2%</td>
@@ -98,14 +98,14 @@
       <tr>
         <th scope="row">Client and Gaming</th>
         <td>14,550</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="37.7%"></span></span>
-          <span class="fa-seg-pct">37.7%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="37.7%"></span></span>
+          <span class="fa-segment-reporting-pct">37.7%</span>
         </td>
         <td>1,420</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill fa-seg-fill-profit" data-pct="24.7%"></span></span>
-          <span class="fa-seg-pct">24.7%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill fa-segment-reporting-fill-profit" data-pct="24.7%"></span></span>
+          <span class="fa-segment-reporting-pct">24.7%</span>
         </td>
         <td>9.8%</td>
         <td>0.0%</td>
@@ -113,14 +113,14 @@
       <tr>
         <th scope="row">Gaming</th>
         <td>3,910</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="10.1%"></span></span>
-          <span class="fa-seg-pct">10.1%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="10.1%"></span></span>
+          <span class="fa-segment-reporting-pct">10.1%</span>
         </td>
         <td>490</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill fa-seg-fill-profit" data-pct="8.5%"></span></span>
-          <span class="fa-seg-pct">8.5%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill fa-segment-reporting-fill-profit" data-pct="8.5%"></span></span>
+          <span class="fa-segment-reporting-pct">8.5%</span>
         </td>
         <td>12.5%</td>
         <td>50.7%</td>
@@ -128,14 +128,14 @@
       <tr>
         <th scope="row">Embedded</th>
         <td>3,454</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="9.0%"></span></span>
-          <span class="fa-seg-pct">9.0%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="9.0%"></span></span>
+          <span class="fa-segment-reporting-pct">9.0%</span>
         </td>
         <td>326</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill fa-seg-fill-profit" data-pct="5.7%"></span></span>
-          <span class="fa-seg-pct">5.7%</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill fa-segment-reporting-fill-profit" data-pct="5.7%"></span></span>
+          <span class="fa-segment-reporting-pct">5.7%</span>
         </td>
         <td>9.4%</td>
         <td class="neg">-2.9%</td>

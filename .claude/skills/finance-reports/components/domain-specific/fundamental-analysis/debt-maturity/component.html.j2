@@ -2,15 +2,15 @@
 {# data: items[] {period:str, amount:str, share:num, rate:str, instrument:str} — share % of total debt #}
 {% macro debt_maturity(items=[], caption="", unit="", summary="") %}
   <figure class="maturity">
-  {% if caption or unit %}<figcaption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</figcaption>{% endif %}
-    <div class="fa-maturity-rows">
+  {% if caption or unit %}<figcaption>{{ caption }}{% if unit %} <span class="fin-unit">{{ unit }}</span>{% endif %}</figcaption>{% endif %}
+    <div>
     {% for it in items %}
-      <div class="fa-maturity-row">
-        <span class="fa-maturity-period">{{ it.period }}</span>
-        <span class="fa-maturity-track"><span class="fa-maturity-fill" data-pct="{{ it.share }}%"></span></span>
-        <span class="fa-maturity-amount">{{ it.amount }}</span>
-        <span class="fa-maturity-rate">{{ it.rate }}</span>
-        <span class="fa-maturity-instrument">{{ it.instrument }}</span>
+      <div class="fa-debt-maturity-row">
+        <span class="fa-debt-maturity-period">{{ it.period }}</span>
+        <span class="fa-debt-maturity-track"><span class="fa-debt-maturity-fill" data-pct="{{ it.share }}%"></span></span>
+        <span class="fa-debt-maturity-amount">{{ it.amount }}</span>
+        <span class="fa-debt-maturity-rate">{{ it.rate }}</span>
+        <span class="fa-debt-maturity-instrument">{{ it.instrument }}</span>
       </div>
     {% endfor %}
     </div>

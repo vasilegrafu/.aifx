@@ -61,15 +61,15 @@
 }
 
 /* ---------- approval-block: signature grid for sign-off documents ---------- */
-table.approvals { border-collapse: collapse; width: 100%; margin: var(--block-gap) 0; }
-table.approvals th {
+table.approval-block { border-collapse: collapse; width: 100%; margin: var(--block-gap) 0; }
+table.approval-block th {
   border: none; border-bottom: 2px solid var(--border);
   padding: .45rem .6rem .45rem 0; text-align: left;
   font-size: .68rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .1em;
   color: var(--fg-soft);
 }
-table.approvals td {
+table.approval-block td {
   border: none; border-bottom: 1px solid var(--border);
   padding: 1.4rem .6rem .45rem 0;
   vertical-align: bottom;

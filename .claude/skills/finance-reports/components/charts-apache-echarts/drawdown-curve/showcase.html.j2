@@ -1,0 +1,20 @@
+{# The `drawdown-curve` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>three years of monthly levels — three episodes, one deep</h3>
+      {{ c.charts_apache_echarts_drawdown_curve(series=d.index,
+               caption="Drawdown from running peak, monthly",
+               note="Three episodes; only the second passes 25%, and it took twelve months to recover.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>a single episode — where the trough is unambiguous</h3>
+      {{ c.charts_apache_echarts_drawdown_curve(series=d.fund,
+               caption="Fund drawdown, quarterly",
+               height=260,
+               note="One trough at -16%, recovered inside a year.") }}
+    </section>
+{% endblock %}

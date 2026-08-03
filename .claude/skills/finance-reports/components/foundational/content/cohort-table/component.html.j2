@@ -1,19 +1,19 @@
 {# purpose: cohort retention or vintage performance: cohorts down, periods since start across #}
 {# data: rows[] {cohort:str, size:str, cells[] {display:str, level:0-5}} #}
 {% macro cohort_table(periods=[], rows=[], caption="", size_label="Size", note="") %}
-  <table class="cohorts">
+  <table class="cohort-table">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead><tr><th>Cohort</th><th>{{ size_label }}</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.cohort }}</th>
-        <td class="cohort-size">{{ r.size }}</td>
-        {% for c in r.cells %}<td class="cohort-cell cohort-l{{ c.level }}">{{ c.display }}</td>{% endfor %}
-        {% for _ in range(periods | length - r.cells | length) %}<td class="cohort-empty"></td>{% endfor %}
+        <td class="cohort-table-size">{{ r.size }}</td>
+        {% for c in r.cells %}<td class="cohort-table-cell cohort-table-l{{ c.level }}">{{ c.display }}</td>{% endfor %}
+        {% for _ in range(periods | length - r.cells | length) %}<td class="cohort-table-empty"></td>{% endfor %}
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fin-source">{{ note }}</p>{% endif %}
 {% endmacro %}

@@ -36,5 +36,5 @@ everywhere else; the percentage is also printed as text.
   ratings, maturity buckets.
 - **The `value` slot is where the LIMIT goes.** An exposure with no stated
   limit cannot be breached, which is how concentration accumulates.
-- Use `apache_echarts` with a donut instead when the composition itself is the
+- Use `charts_apache_echarts_chart` with a donut instead when the composition itself is the
   finding and there are fewer than six slices.

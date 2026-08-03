@@ -5,16 +5,16 @@
    which read wrongly the first time this was used in a single-stock thesis. #}
 {% macro risk_metrics(rows=[], benchmark_label="Benchmark", caption="",
                       subject_label="Strategy") %}
-  <table class="fin portfolio-riskmetrics">
+  <table class="fin portfolio-risk-metrics">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead><tr><th>Metric</th><th>{{ subject_label }}</th><th>{{ benchmark_label }}</th><th>Reading</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.metric }}</th>
-        <td class="portfolio-rm-value">{{ r.value }}</td>
+        <td class="fin-value">{{ r.value }}</td>
         <td>{{ r.benchmark }}</td>
-        <td class="portfolio-rm-note">{{ r.note }}</td>
+        <td class="fin-note">{{ r.note }}</td>
       </tr>
     {% endfor %}
     </tbody>

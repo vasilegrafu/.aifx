@@ -27,11 +27,11 @@ aside.decision::before { content: "Decision"; color: var(--decision); }
 aside.risk::before     { content: "Risk";     color: var(--risk); }
 
 /* ---------- todo-marker ---------- */
-mark.todo {
+mark.todo-marker {
   background: var(--todo-bg);
   color: inherit;
   padding: .1em .4em;
   border-radius: 4px;
   border: 1px dashed var(--warning);
 }
-mark.todo::before { content: "TODO: "; font-weight: 700; color: var(--warning); }
+mark.todo-marker::before { content: "TODO: "; font-weight: 700; color: var(--warning); }

@@ -52,9 +52,9 @@ PURPOSE = re.compile(r"\{#\s*purpose:\s*(.+?)\s*#\}", re.S)
 #: added and this map was not.
 CATEGORIES = {
     "foundational": "Any document may use these. Nothing here knows a discipline.",
-    "charts": "Engine-backed charts (Apache ECharts). A chart is data; a table is the same data you can read.",
+    "charts-apache-echarts": "Chart kinds rendered by Apache ECharts. A chart is data; a table is the same data you can read. Each kind writes a spec and hands it to the engine; `chart` is the generic one, for a spec the named kinds do not cover (candlestick/OHLC, boxplot, heatmap). **The engine is part of the macro** — `c.charts_apache_echarts_bar(...)`, because another engine's `bar` is a different macro.",
     "domain-specific": "One analysis discipline owns these — fundamental-analysis, portfolio, macro. Classes are namespaced after the directory that owns them (`fa-`, `portfolio-`, `macro-`).",
-    "diagrams": "The diagram subsystem: a shared viewport and one engine.",
+    "diagrams-mermaid": "Diagram kinds rendered by Mermaid, over a shared engine-agnostic viewport. `diagram` is the generic one, taking Mermaid source directly. **The engine is part of the macro** — `c.diagrams_mermaid_diagram(...)`.",
     "math": "The formula subsystem: KaTeX, with a readable-LaTeX fallback.",
 }
 
@@ -141,7 +141,7 @@ class CatalogBuilder:
 
             by_category.setdefault(category, []).append({
                 "name": directory.name,
-                "macro": macro_name(directory.name),
+                "macro": macro_name(relative.as_posix()),
                 "purpose": purpose.replace("|", "\\|"),
                 "docs": self._docs(directory, relative),
             })

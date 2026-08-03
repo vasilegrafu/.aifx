@@ -1,0 +1,41 @@
+{# purpose: parts summing to a whole, laid on their side — for long category names #}
+{# unit: axis — one measured axis (horizontal); y_name names it #}
+{# data: series[] {name:str, points:num[]}   categories: str[] #}
+{% import "charts-apache-echarts/_render.html.j2" as r %}
+
+{% macro charts_apache_echarts_stacked_horizontal_bar(series=[], categories=[], caption="", height=340, note="", y_name="", unit="", label_room=8) %}
+{# Built as data and serialised once — see the note in line/component.html.j2. #}
+{% set built = [] %}
+{% for s in series %}
+{%   set _ = built.append({"type": "bar", "name": s.name, "stack": "total",
+                           "data": s.points}) %}
+{% endfor %}
+{# The axes are swapped, so `y_name` names the HORIZONTAL value axis. It must
+   not be rotated — a rotated name on a horizontal axis reads sideways — and
+   the bottom margin widens instead of the left. #}
+{% set value_axis = {"type": "value"} %}
+{% if y_name %}
+{%   set _ = value_axis.update({"name": y_name, "nameLocation": "middle",
+                                "nameGap": 28}) %}
+{% endif %}
+{# Without `inverse` the FIRST category lands at the bottom and the whole
+   ranking reads upside-down. A horizontal bar chart is read top-to-bottom.
+
+   `containLabel` reserves room for the category labels and then CAPS what it
+   will give, so a long label has its first characters clipped off outside the
+   SVG -- and the chart still draws. This component exists FOR long labels, so
+   it needs the same escape hatch sankey has: `label_room` reserves the left
+   margin explicitly. Default 8 keeps the automatic behaviour. #}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+     "grid": {"left": label_room, "right": 16,
+              "bottom": (34 if y_name else 8), "containLabel": true},
+     "xAxis": value_axis,
+     "yAxis": {"type": "category", "data": categories, "inverse": true},
+     "series": built,
+   } %}
+{% if built | length > 1 %}
+{%   set _ = option.update({"legend": {}}) %}
+{% endif %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

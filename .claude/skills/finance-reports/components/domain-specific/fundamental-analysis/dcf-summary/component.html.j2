@@ -2,24 +2,24 @@
 {# data: rows[] {label:str, cells:num[], kind?:str, note?:str}   assumptions[] {label:str, value:str} — rows raw numbers #}
 {% macro dcf_summary(periods=[], rows=[], assumptions=[], caption="", unit="", note="", fmt="money") %}
   {% if assumptions %}
-  <dl class="fa-dcf-assumptions">
+  <dl class="fa-dcf-summary-assumptions">
     {% for a in assumptions %}
     <div><dt>{{ a.label }}</dt><dd>{{ a.value }}</dd></div>
     {% endfor %}
   </dl>
   {% endif %}
-  <table class="fin fa-statement st-dcf">
-  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin fa-statement">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fin-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
     <thead><tr><th>{{ "" }}</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}
-      <tr class="fa-st-{{ r.get('kind') or 'line' }}">
-        <th scope="row">{{ r.label }}{% if r.get('note') %} <a class="fa-st-note" href="#note-{{ r.note }}">{{ r.note }}</a>{% endif %}</th>
+      <tr class="fa-statement-{{ r.get('kind') or 'line' }}">
+        <th scope="row">{{ r.label }}{% if r.get('note') %} <a class="fa-statement-note" href="#note-{{ r.note }}">{{ r.note }}</a>{% endif %}</th>
         {% for v in r.cells %}<td{% if v is number and v < 0 %} class="neg"{% endif %}>{{ v | fmt(fmt) }}</td>{% endfor %}
         {% for _ in range(periods | length - r.cells | length) %}<td></td>{% endfor %}
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fin-source">{{ note }}</p>{% endif %}
 {% endmacro %}

@@ -16,9 +16,9 @@ structure, inside a [[section]].
 ## Rules
 
 - **The `id` is a permanent address.** The table of contents and every in-page
-  link resolve against it, and a report test fails on a link that lands
-  nowhere. Renaming a heading is free; renaming its `id` breaks whatever
-  already points at it.
+  link resolve against it, and a report reports an **error** on its own first
+  screen for a link that lands nowhere. Renaming a heading is free; renaming its
+  `id` breaks whatever already points at it.
 - **Give it an `id` that names the finding, not the position.** `margin-mix`
   survives a reordering; `section-3` is wrong the moment anything moves.
 - **A subsection needs a sibling.** One subsection inside a section is a

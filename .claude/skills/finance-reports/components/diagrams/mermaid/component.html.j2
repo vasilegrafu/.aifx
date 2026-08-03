@@ -1,6 +1,0 @@
-{# purpose: interactive Mermaid diagram: pan, zoom, live editor #}
-{% macro mermaid(code="") %}
-  <pre class="mermaid">
-{{ caller() if caller is defined else code }}
-  </pre>
-{% endmacro %}

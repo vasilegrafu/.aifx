@@ -3,14 +3,14 @@
          heterogeneous (a price, a market cap, a sector name) and no single
          numeric format fits them #}
 {% macro security_header(ticker="", name="", exchange="", asof="", facts=[]) %}
-  <header class="fa-sec-header">
-    <p class="fa-sec-id">
-      <span class="fa-sec-ticker">{{ ticker }}</span>
-      <span class="fa-sec-name">{{ name }}</span>
-      {% if exchange %}<span class="fa-sec-exchange">{{ exchange }}</span>{% endif %}
+  <header class="fa-security-header">
+    <p class="fa-security-header-id">
+      <span class="fa-security-header-ticker">{{ ticker }}</span>
+      <span class="fa-security-header-name">{{ name }}</span>
+      {% if exchange %}<span class="fa-security-header-exchange">{{ exchange }}</span>{% endif %}
     </p>
     {% if facts %}
-    <dl class="fa-sec-facts">
+    <dl class="fa-security-header-facts">
       {% for f in facts %}
       <div><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></div>
       {% endfor %}
@@ -18,6 +18,6 @@
     {% endif %}
     {# `asof` is a MARKET data date and is not the filing date, the period end,
        or the build date. Reports conflate those four routinely. #}
-    {% if asof %}<p class="fa-sec-asof">Market data as of {{ asof }}</p>{% endif %}
+    {% if asof %}<p class="fa-security-header-asof">Market data as of {{ asof }}</p>{% endif %}
   </header>
 {% endmacro %}

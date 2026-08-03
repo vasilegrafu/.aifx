@@ -310,7 +310,7 @@ Addressed by **name**, not path — and the two no longer coincide, since a
 report sits under its domain. The name stays the address because the domain is
 shelving for a reader, and making it part of the address would force whoever
 runs a report to know how it was filed. (`components/showcase_builder.py` takes
-`charts/bar` because components nest two to four levels — same idea at two
+`charts-apache-echarts/bar` because components nest two to four levels — same idea at two
 depths.)
 
 ### Two levels of CLI, and why
@@ -344,9 +344,9 @@ raises *"is a built-in class"* for a path-loaded controller.
 
 `blame(exc)` returns the **deepest `.j2` frame** in a Jinja traceback — Jinja
 rewrites tracebacks so template frames appear as real frames whose filename is
-the `.j2` path. A report view calls 25 macros across 15 components, so *"the
-render failed"* is not an answer anyone can act on. `build()` wraps the render
-and re-raises with `<component>:<line>` attached.
+the `.j2` path. A report view calls dozens of macros across as many components,
+so *"the render failed"* is not an answer anyone can act on. `build()` wraps the
+render and re-raises with `<component>:<line>` attached.
 
 ## Where the guarantees come from
 
@@ -396,27 +396,29 @@ with one report and expensive to backfill across a dozen.
 
 ## Adding a report
 
-0. **Choose the domain by SUBJECT** — `company`, `portfolio`, `market`,
-   `economy`. What the report is about, not the method it uses or the
-   endpoints it happens to call. A new domain is a new directory; nothing
-   registers one.
-1. `reports/<domain>/<name>/report_controller.py` — subclass `ReportController`,
-   set `TITLE`, write `_fetch(**args)` and `_build_context(payloads)`. Declare
-   the endpoints in one table at the top; assert every identity.
-2. `reports/<domain>/<name>/report.html.j2` — `{% extends "reports/_report.master.html.j2" %}`,
-   `c.<macro>(...)` calls carrying `d.*`. No arithmetic, no I/O. **The
-   `{# purpose: … #}` header is required** — the build checks it.
-3. `reports/<domain>/<name>/usage.md` — see the skeleton in `../SKILL.md`.
-4. **`python $S/reports/catalog_builder.py`** — nothing calls it for you.
-5. `python $S/reports/report_builder.py <name> … --out DIR`
+**The procedure is in `../SKILL.md`, under "Adding a report". It is not
+repeated here** — and this section is the reason the rule now exists.
 
-Nothing to register. Building requires the network and `FMP_API_KEY` — see
+There were two copies, and they drifted exactly where it mattered: this one
+stopped at "run it" and never mentioned `SECTIONS`, `PREFIX` or
+`_expected_text`. Each of those **skips** its check when undeclared rather than
+failing, so a report written from the shorter copy validated itself, printed a
+clean banner, and was checking almost nothing. Two statements of one procedure
+are two claims about it, free to disagree — the argument
+`components/_contracts.py` settled one level down, applied to prose.
+
+What the procedure needs from this file it names directly: the controller
+contract under **The contract**, what each report declares under **What each
+report declares about itself**, and the domain table at the top.
+
+Building requires the network and `FMP_API_KEY` — see
 `../service_providers/REFERENCE.md` for the client and the credential order.
 
 **Nothing runs the catalogue automatically.** There is no CI and no git hook
-here, so a report added without step 4 leaves `CATALOG.md` short by one.
-`--check` makes that loud:
+here, so a report added without regenerating it leaves `CATALOG.md` short by
+one. `--check` makes that loud, on its own or through `status.py`:
 
 ```bash
 python $S/reports/catalog_builder.py --check   # exit 1 if stale, writes nothing
+python $S/status.py --check                    # this and the three others
 ```

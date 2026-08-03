@@ -3,7 +3,7 @@
 {% macro funnel(stages=[], caption="", note="") %}
   <figure class="funnel">
   {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
-    <div class="funnel-stages">
+    <div>
     {% for st in stages %}
       <div class="funnel-stage">
         <span class="funnel-bar" data-pct="{{ st.pct }}%">

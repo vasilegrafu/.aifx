@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>funnel-chart — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>funnel-chart</h1>
+  </header>
+
+    <section>
+      <h3>four stages with a steep drop — the standard sales funnel</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "name": "Qualified leads",
+          "value": 12400
+        },
+        {
+          "name": "Proof of concept",
+          "value": 6850
+        },
+        {
+          "name": "Contract issued",
+          "value": 2910
+        },
+        {
+          "name": "Closed won",
+          "value": 1640
+        }
+      ],
+      "gap": 2,
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "left": "12%",
+      "right": "12%",
+      "sort": "descending",
+      "top": 94,
+      "type": "funnel"
+    }
+  ],
+  "title": {
+    "subtext": "opportunities",
+    "text": "Enterprise pipeline, FY25"
+  },
+  "tooltip": {
+    "trigger": "item"
+  }
+}
+  </pre>
+  <p class="chart-note">13% of qualified leads close; the largest loss is at proof of concept.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>a shallow funnel — where the narrowing is slight and the numbers carry it</h3>
+        <pre class="chart apache-echarts" hidden data-height="280">
+{
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "name": "Design engagements",
+          "value": 480
+        },
+        {
+          "name": "Design wins",
+          "value": 412
+        },
+        {
+          "name": "In production",
+          "value": 366
+        }
+      ],
+      "gap": 2,
+      "label": {
+        "position": "inside",
+        "show": true
+      },
+      "left": "12%",
+      "right": "12%",
+      "sort": "descending",
+      "top": 94,
+      "type": "funnel"
+    }
+  ],
+  "title": {
+    "subtext": "programmes",
+    "text": "Design engagements to production"
+  },
+  "tooltip": {
+    "trigger": "item"
+  }
+}
+  </pre>
+  <p class="chart-note">76% reach production. The bands barely narrow, so the unit does the work.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

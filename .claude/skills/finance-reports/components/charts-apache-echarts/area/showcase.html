@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>area — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>area</h1>
+  </header>
+
+    <section>
+      <h3>single series — the fill is the quantity, not decoration</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "areaStyle": {},
+      "data": [
+        8.2,
+        9.6,
+        11.3,
+        12.1
+      ],
+      "name": "Cash and equivalents",
+      "showSymbol": true,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Cash and equivalents"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">A level, so the area beneath the line is money actually held.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>two series — a legend appears, and this is the documented maximum</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "areaStyle": {},
+      "data": [
+        8.2,
+        9.6,
+        11.3,
+        12.1
+      ],
+      "name": "FY24",
+      "showSymbol": true,
+      "type": "line"
+    },
+    {
+      "areaStyle": {},
+      "data": [
+        6.9,
+        7.4,
+        8.8,
+        9.2
+      ],
+      "name": "FY23",
+      "showSymbol": true,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "This year vs last"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Two translucent fills still read; a third would hide one of these.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>named axis — y_name labels the axis, unit names the measure</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "areaStyle": {},
+      "data": [
+        1.4,
+        3.1,
+        4.9,
+        7.2
+      ],
+      "name": "Capex, cumulative",
+      "showSymbol": true,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Capital expenditure, cumulative"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "USD (billions)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">A cumulative flow only rises; the area is the total spent to date.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>36 points — past the cutoff the symbols drop and the shape carries it</h3>
+        <pre class="chart apache-echarts" hidden data-height="380">
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "areaStyle": {},
+      "data": [
+        14.0,
+        15.07,
+        16.02,
+        16.78,
+        17.27,
+        17.49,
+        17.48,
+        17.3,
+        17.06,
+        16.87,
+        16.83,
+        17.03,
+        17.51,
+        18.24,
+        19.18,
+        20.25,
+        21.32,
+        22.29,
+        23.06,
+        23.58,
+        23.82,
+        23.82,
+        23.65,
+        23.41,
+        23.21,
+        23.16,
+        23.34,
+        23.79,
+        24.51,
+        25.44,
+        26.49,
+        27.57,
+        28.55,
+        29.34,
+        29.88,
+        30.14
+      ],
+      "name": "Backlog",
+      "showSymbol": false,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Backlog by month"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "2022-01",
+      "2022-02",
+      "2022-03",
+      "2022-04",
+      "2022-05",
+      "2022-06",
+      "2022-07",
+      "2022-08",
+      "2022-09",
+      "2022-10",
+      "2022-11",
+      "2022-12",
+      "2023-01",
+      "2023-02",
+      "2023-03",
+      "2023-04",
+      "2023-05",
+      "2023-06",
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "USD (billions)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Beyond 24 categories the macro hides the point markers, so
+                      the filled band is what a reader follows.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

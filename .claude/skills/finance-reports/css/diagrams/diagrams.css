@@ -4,7 +4,7 @@
    Every diagram — whatever renders it — is an <svg> inside .diagram-figure:
    a bounded box with a pan/zoom canvas, an icon toolbar, and a resize grip,
    all injected by js/modules/diagrams.js. Engine-specific styling (each
-   source-block fallback, Mermaid's ✎ editor) lives in diagram-<engine>.css.
+   source-block fallback, Mermaid's ✎ editor) lives in diagrams-<engine>.css.
 
    The figure's height is set inline by the Viewer (the diagram's natural height,
    capped at 70vh) so the resize grip can grow the box — a CSS max-height would

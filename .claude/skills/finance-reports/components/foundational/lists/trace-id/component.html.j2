@@ -1,3 +1,3 @@
 {# purpose: anchorable traceable identifier #}
 {# data: id: str -- becomes the element id, so it must be unique in the document #}
-{% macro trace_id(id) %}<span class="req" id="{{ id }}">{{ id }}</span>{% endmacro %}
+{% macro trace_id(id) %}<span class="trace-id" id="{{ id }}">{{ id }}</span>{% endmacro %}

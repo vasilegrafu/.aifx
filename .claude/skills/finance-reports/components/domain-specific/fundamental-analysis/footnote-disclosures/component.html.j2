@@ -1,16 +1,16 @@
 {# purpose: the numbered accounting disclosures that statement lines cite, with the ones that matter flagged #}
 {# data: items[] {num:int, title:str, body:str, flag?:watch} — anchors at id=note-<num> #}
 {% macro footnote_disclosures(items=[], caption="") %}
-  <div class="fa-disclosures">
-  {% if caption %}<p class="fa-disclosures-caption">{{ caption }}</p>{% endif %}
+  <div class="fa-footnote-disclosures">
+  {% if caption %}<p class="fa-footnote-disclosures-caption">{{ caption }}</p>{% endif %}
   {% for it in items %}
-    <section class="fa-disclosure{% if it.get('flag') %} fa-disclosure-{{ it.flag }}{% endif %}" id="note-{{ it.num }}">
-      <p class="fa-disclosure-head">
-        <span class="fa-disclosure-num">Note {{ it.num }}</span>
-        <span class="fa-disclosure-title">{{ it.title }}</span>
-        {% if it.get('flag') %}<span class="fa-disclosure-flag">{{ it.flag }}</span>{% endif %}
+    <section class="fa-footnote-disclosures-item{% if it.get('flag') %} fa-footnote-disclosures-item-{{ it.flag }}{% endif %}" id="note-{{ it.num }}">
+      <p class="fa-footnote-disclosures-head">
+        <span class="fa-footnote-disclosures-num">Note {{ it.num }}</span>
+        <span class="fa-footnote-disclosures-title">{{ it.title }}</span>
+        {% if it.get('flag') %}<span class="fa-footnote-disclosures-flag">{{ it.flag }}</span>{% endif %}
       </p>
-      <p class="fa-disclosure-body">{{ it.body }}</p>
+      <p class="fa-footnote-disclosures-body">{{ it.body }}</p>
     </section>
   {% endfor %}
   </div>

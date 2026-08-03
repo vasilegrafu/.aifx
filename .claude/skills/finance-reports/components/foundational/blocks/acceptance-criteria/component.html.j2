@@ -1,10 +1,10 @@
 {# purpose: Given/When/Then acceptance test for a requirement #}
 {# data: id: str   title: str   given: str[]   when: str[]   then: str[] #}
 {% macro acceptance_criteria(id="AC-1", title="", given=[], when=[], then=[]) %}
-  <div class="acceptance" id="{{ id }}">
-    <div class="ac-head">
-      <span class="ac-id">{{ id }}</span>
-      {% if title %}<span class="ac-title">{{ title }}</span>{% endif %}
+  <div class="acceptance-criteria" id="{{ id }}">
+    <div class="acceptance-criteria-head">
+      <span class="acceptance-criteria-id">{{ id }}</span>
+      {% if title %}<span class="acceptance-criteria-title">{{ title }}</span>{% endif %}
     </div>
     <dl class="gwt">
     {% for clause in (given or ["{{precondition that holds before the action}}"]) %}

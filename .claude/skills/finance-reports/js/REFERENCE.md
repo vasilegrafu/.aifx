@@ -50,18 +50,23 @@ deliberate — `diagrams.js` is the viewport, `diagrams-mermaid.js` is *one* eng
 beside it. A second engine is five mechanical steps, and touches nothing that
 exists:
 
-1. `js/modules/diagram-<name>.js` — `docsHtml.register({name, selector:
+1. `js/modules/diagrams-<name>.js` — `docsHtml.register({name, selector:
    "pre.<name>", init})`; turn each block's source into an `<svg>` (offscreen if
    the engine needs a host element) and call `new docsHtml.diagram.Viewer({ pre,
    svg, index, source, copyTitle, extraButtons })`. Load the engine lazily with
    `docsHtml.util.loadScript(<pinned CDN url>)`, inside `init`.
-2. `css/diagrams/diagram-<name>.css` — style `pre.<name>` as a readable code box
+2. `css/diagrams/diagrams-<name>.css` — style `pre.<name>` as a readable code box
    (the CDN-down fallback) and `pre.<name>[hidden] { display: none }`.
-3. Add `"diagram-<name>"` to `MODULES` in `js/bundle.js`, after `"diagrams"`.
-4. Add `@import url("modules/diagram-<name>.css") layer(diagrams);` to
+3. Add `"diagrams-<name>"` to `MODULES` in `js/bundle.js`, after `"diagrams"`.
+   That string is also the `name` the module passes to `docsHtml.register` —
+   they are the same identifier and must stay equal.
+4. Add `@import url("diagrams/diagrams-<name>.css") layer(diagrams);` to
    `css/bundle.css`.
-5. `components/diagrams/diagram-<name>/` (`component.html.j2` + `usage.md`) so
-   the builder and the catalog know about it.
+5. `components/diagrams-<name>/` (`component.html.j2` + `usage.md`) so
+   the builder and the catalog know about it. **Flat, and carrying the prefix**
+   — there is no `components/diagrams/` category folder. The folder name is the
+   macro key, so the `{% macro %}` inside must be `diagrams_<name>` to match;
+   a mismatch is not an error, it just never lands on `c`.
 
 The viewport, toolbar, pan/zoom, fullscreen, download and copy come free; an
 engine-specific tool goes in via `extraButtons` (Mermaid's ✎ editor is the
@@ -73,39 +78,72 @@ supported, the engine chooses.
 frame, `charts-apache-echarts.js` is *one* engine beside it. Five mechanical
 steps, touching nothing that exists:
 
-1. `js/modules/chart-<name>.js` — `docsHtml.register({name, selector:
+1. `js/modules/charts-<name>.js` — `docsHtml.register({name, selector:
    "pre.chart.<name>", init})`; parse each block's spec, then
    `const frame = new docsHtml.chart.Frame({ pre, index, source })`, draw into
    `frame.canvas`, and register a redraw with `frame.onResize(...)`. Load the
    engine lazily with `docsHtml.util.loadScript(<pinned CDN url>)`, inside
    `init`. Build the engine's theme from `docsHtml.chart.PALETTE` / `.TOKENS` —
    never re-pick colors.
-2. `css/charts/chart-<name>.css` — engine specifics ONLY. The card, the
+2. `css/charts/charts-<name>.css` — engine specifics ONLY. The card, the
    toolbar, and the `pre.chart` fallback box are already shared, selected by the
    `chart` marker class every engine wears.
-3. Add `"chart-<name>"` to `MODULES` in `js/bundle.js`, after `"charts"`.
-4. Add `@import url("modules/chart-<name>.css") layer(charts);` to
+3. Add `"charts-<name>"` to `MODULES` in `js/bundle.js`, after `"charts"`.
+4. Add `@import url("charts/charts-<name>.css") layer(charts);` to
    `css/bundle.css`.
-5. `components/charts/<name>/` (`component.html.j2` + `usage.md`) — the
-   macro emits `<pre class="chart <name>">` — so the builder and catalog know
-   about it. (The component drops the `chart-` prefix that the JS/CSS modules
-   carry: inside the `charts` category it would only repeat the category name.
-   `diagrams` does the same — `mermaid`, not `diagram-mermaid`.)
+5. `components/charts-<name>/` — the engine's own directory, holding its kinds.
+   Start it with `chart/` (`component.html.j2` + `usage.md`), the generic kind
+   that takes a raw spec and emits `<pre class="chart <name>">`, so the builder
+   and catalog know about it.
+6. `components/charts-<name>/_render.html.j2` — the shared tail for THIS
+   engine's kinds, importing `chart/` and holding whatever clearance and title
+   arithmetic the engine's spec format needs. The ECharts one is the model, and
+   it is engine-specific by nature: it reads `option.grid`, `option.radar`,
+   `option.legend`. There is nothing to reuse across engines here.
+
+**ONE DIRECTORY PER ENGINE, holding that engine's kinds.**
+
+```
+components/
+  charts-apache-echarts/     c.charts_apache_echarts_<kind>(...)
+    _render.html.j2          this engine's shared tail
+    chart/                   the generic kind — a raw spec
+    bar/ line/ pie/ …        one folder per kind
+  charts-plotly/             reserved, empty
+  diagrams-mermaid/          c.diagrams_mermaid_<kind>(...)
+    diagram/                 the generic kind — Mermaid source
+```
+
+**The engine is part of every macro under it**, because a kind's leaf name
+identifies it only within its engine: `charts-apache-echarts/bar` and
+`charts-plotly/bar` are two macros writing two different specs, and the flat `c`
+namespace cannot hold both under one name. `NAMESPACED` in
+`_showcase_controller.py` is what turns a path into that qualified name — see
+`components/REFERENCE.md`.
+
+**Three different names are in play, and the steps above use all three.** A
+MODULE file is named for its directory (`charts-<name>`, matching
+`js/modules/` and `css/charts/`); a COMPONENT folder is the macro key; a CLASS
+carries the singular namespace (`chart-…`). They are not meant to converge, and
+each is checked by something different — `js/bundle.js` and `css/bundle.css`
+fail loudly on a wrong module name, `status.py` owns the class prefixes, and the
+component folder IS its own registration.
 
 **Adding a chart KIND — the far more common job.** A kind is not an engine: it
-is a macro that writes a spec for an engine that already exists. There are
-twenty-one of them in `components/charts/`; `bar` is the simplest model and
-`waterfall` the most involved.
+is a macro that writes a spec for an engine that already exists. They fill
+`components/charts-apache-echarts/`; `bar` is the simplest model and `waterfall` the most
+involved.
 
-1. `components/charts/<kind>/component.html.j2` — one self-contained macro that
+1. `components/charts-apache-echarts/<kind>/component.html.j2` — one self-contained macro that
    builds its own option and hands it to `r.out`. It never writes the `<pre>`
    itself:
    ```jinja
    {# purpose: one line — read by builder.py catalog #}
    {# sample: series=[("A",[1,2])], categories=["x","y"], caption="s" #}
-   {% import "components/charts/_render.html.j2" as r %}
+   {% import "charts-apache-echarts/_render.html.j2" as r %}
 
-   {% macro bar(series=[], categories=[], caption="", height=340, note="", y_name="") %}
+   {% macro charts_apache_echarts_bar(series=[], categories=[], caption="",
+                                      height=340, note="", y_name="") %}
    {% set built = [] %}
    {% for name, values in series %}
    {%   set _ = built.append({"type": "bar", "name": name, "data": values}) %}
@@ -124,6 +162,13 @@ twenty-one of them in `components/charts/`; `bar` is the simplest model and
    {{ r.out(option, height, note) }}
    {% endmacro %}
    ```
+   The macro name carries the engine because `macro_name()` derives it from the
+   PATH — `charts-apache-echarts/bar` → `charts_apache_echarts_bar`. Get it
+   wrong and nothing raises; the kind simply never reaches `c`.
+
+   Template paths are named from `components/`, which is a loader root — so it
+   is `"charts-apache-echarts/_render.html.j2"`, with no `components/` prefix.
+
    `_render.html.j2` owns the engine call, so the engine is named in ONE place
    for the whole family rather than once per kind. It is `_`-prefixed because it
    is not a component — see `../components/REFERENCE.md`.
@@ -144,7 +189,7 @@ twenty-one of them in `components/charts/`; `bar` is the simplest model and
 3. Colours by reference, never by hex — `"palette:1"`, `"token:positive"`,
    `"ramp:2"` (`docsHtml.chart.resolveColors` substitutes them). Colouring by
    ROLE rather than by item is why a 15-node sankey does not run out of colours;
-   see `components/charts/sankey/usage.md`.
+   see `components/charts-apache-echarts/sankey/usage.md`.
 4. Add a `{# sample: <kwargs> #}` header — a real call, real enough to exercise
    every loop. Nothing executes it; it is the worked example the next author
    copies, and the arguments you would use to try the kind yourself.
@@ -156,7 +201,7 @@ twenty-one of them in `components/charts/`; `bar` is the simplest model and
    (`drawdown-curve` derives the running peak, `waterfall` the cumulative
    placeholder, `stacked-normalized` the column shares — so the document carries
    the inputs and the arithmetic is inspectable).
-6. Write `components/charts/<name>/usage.md` — the question the kind answers,
+6. Write `components/charts-apache-echarts/<name>/usage.md` — the question the kind answers,
    and its CSS twin if one exists (`waterfall`/`bridge`, `funnel-chart`/`funnel`,
    `gauge`/`meter`). A twin that needs no engine and prints is often the better
    answer, and its own usage.md is the only place that can say so.

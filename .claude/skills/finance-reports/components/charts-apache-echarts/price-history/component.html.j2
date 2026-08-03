@@ -1,0 +1,44 @@
+{# purpose: price action over time — candlestick with volume beneath, one shared time axis #}
+{# unit: required — the chart is ABOUT price, and neither panel names its axis #}
+{# data: bars[] {date:str, open:num, close:num, low:num, high:num, volume:num} — a six-tuple is the worst shift risk in the set; named keys remove it #}
+
+{% import "charts-apache-echarts/_render.html.j2" as r %}
+
+{% macro charts_apache_echarts_price_history(bars=[], caption="", height=420, note="", unit="") %}
+{# Built as data, serialised once — see the note in sankey/component.html.j2. #}
+{% set dates = [] %}{% set candles = [] %}{% set volumes = [] %}
+{% for b in bars %}
+{%   set _ = dates.append(b.date) %}
+{#   ECharts wants [open, close, low, high]; the macro takes OHLCV as a human
+     reads it and reorders here, so the call site never has to remember. #}
+{%   set _ = candles.append([b.open, b.close, b.low, b.high]) %}
+{%   set _ = volumes.append(b.volume) %}
+{% endfor %}
+{# Two panels sharing a time axis, NOT two y-axes on one panel: unrelated
+   scales on a shared axis let any correlation be implied by choosing them.
+   Only the FIRST grid takes the title clearance — the shared tail sets it, and
+   the volume panel below stays anchored to the bottom.
+   No axis names: the legend already says which panel is price and which is
+   volume, and `unit` states the units. containLabel reserves room for tick
+   labels but NOT for an axis name, so one would clip off the card. #}
+{% set option = {
+     "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
+     "axisPointer": {"link": [{"xAxisIndex": "all"}]},
+     "grid": [
+       {"left": 8, "right": 16, "height": "52%", "containLabel": true},
+       {"left": 8, "right": 16, "bottom": 8, "height": "18%", "containLabel": true}],
+     "xAxis": [
+       {"type": "category", "gridIndex": 0, "axisLabel": {"show": false}, "data": dates},
+       {"type": "category", "gridIndex": 1, "data": dates}],
+     "yAxis": [
+       {"type": "value", "gridIndex": 0, "scale": true},
+       {"type": "value", "gridIndex": 1, "splitLine": {"show": false}, "splitNumber": 2}],
+     "series": [
+       {"type": "candlestick", "name": "price", "xAxisIndex": 0, "yAxisIndex": 0,
+        "data": candles},
+       {"type": "bar", "name": "volume", "xAxisIndex": 1, "yAxisIndex": 1,
+        "itemStyle": {"color": "token:muted", "opacity": 0.55, "borderRadius": 0},
+        "data": volumes}],
+   } %}
+{{ r.out(option, height, note, caption, unit) }}
+{% endmacro %}

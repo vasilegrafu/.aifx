@@ -13,6 +13,36 @@ not repeat them.
 
 Bare `python` on this machine has no `jinja2` and fails on the first import.
 
+## Adding a component or a report — follow the written procedure
+
+Both are in `.claude/skills/finance-reports/SKILL.md`, under **Adding a
+component** and **Adding a report**. Each is one numbered list covering
+everything: the files, the CSS or JS manifest line, the version bump, what to
+regenerate, and opening the page. **They live in one place each** — the copies
+that used to sit in the REFERENCEs drifted, and the short one omitted the step
+that declares what a report validates about itself.
+
+Neither list ends at "it built". Both end at *look at it* and *leave it
+uncommitted*.
+
+```bash
+./.venv/Scripts/python.exe .claude/skills/finance-reports/status.py           # what is in here
+./.venv/Scripts/python.exe .claude/skills/finance-reports/status.py --check   # exit 1 if anything is stale
+```
+
+`--check` is the last step of both procedures. Three of its checks are run by
+the engine that owns them — both catalogues, every showcase page. The rest have
+no engine and live in `status.py` itself: every `usage.md` against the skeleton,
+both class rules (a prefix that matches the directory, a class some stylesheet
+can reach), and whether `css/bundle.css` and `js/bundle.js` actually load every
+file beside them.
+
+**Do not put a count of the tree in any document.** How many components exist,
+how many carry a hyphen, how many a stylesheet namespaces — `status.py` reads
+those off the tree, and `CATALOG.md` may state one because it is generated. A
+count typed into prose is true the day it is typed and cannot say when it
+stopped being.
+
 ## This repository is PUBLIC and served by a CDN
 
 jsDelivr publishes every tag at `cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@<version>/…`,

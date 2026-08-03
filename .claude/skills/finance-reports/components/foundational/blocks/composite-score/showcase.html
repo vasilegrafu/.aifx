@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>composite-score — showcase</title>
   <link rel="stylesheet" href="../../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -18,11 +18,11 @@
 
     <section>
       <h3>the score with its workings, and the band it falls in</h3>
-        <div class="composite">
-    <p class="composite-head">
-      <span class="composite-name">Altman Z-score</span>
+        <div class="composite-score">
+    <p class="composite-score-head">
+      <span class="composite-score-name">Altman Z-score</span>
 <span class="math">Z = 1.2·X₁ + 1.4·X₂ + 3.3·X₃ + 0.6·X₄ + 1.0·X₅</span>    </p>
-    <table class="fin composite-inputs">
+    <table class="fin composite-score-inputs">
 <caption>Altman Z-score, FY25</caption>      <thead><tr><th>Component</th><th>Coefficient</th><th>Value</th><th>Contribution</th></tr></thead>
       <tbody>
         <tr>
@@ -58,30 +58,30 @@
       </tbody>
       <tfoot><tr class="total"><th scope="row">Score</th><td></td><td></td><td>3.99</td></tr></tfoot>
     </table>
-    <p class="composite-band composite-good">
-      <span class="composite-band-tag">Safe</span>
-      <span class="composite-scale">
-        <span class="composite-step composite-step-bad">Distress <em>< 1.81</em></span>
-        <span class="composite-step composite-step-warn">Grey <em>1.81 - 2.99</em></span>
-        <span class="composite-step composite-step-good macro-current">Safe <em>> 2.99</em></span>
+    <p class="composite-score-band composite-score-good">
+      <span class="composite-score-band-tag">Safe</span>
+      <span class="composite-score-scale">
+        <span class="composite-score-step composite-score-step-bad">Distress <em>< 1.81</em></span>
+        <span class="composite-score-step composite-score-step-warn">Grey <em>1.81 - 2.99</em></span>
+        <span class="composite-score-step composite-score-step-good macro-current">Safe <em>> 2.99</em></span>
       </span>
     </p>
-<p class="fa-st-source">One term supplies 1.72 of the 3.99 — 43% of the score comes from market value of equity, which moves with the share price rather than with the business.</p>  </div>
+<p class="fin-source">One term supplies 1.72 of the 3.99 — 43% of the score comes from market value of equity, which moves with the share price rather than with the business.</p>  </div>
 
     </section>
     <hr>
     <section>
       <h3>the band alone — the form to avoid, and why the header says so</h3>
-        <div class="composite">
-    <p class="composite-head">
-      <span class="composite-name">Altman Z-score</span>
+        <div class="composite-score">
+    <p class="composite-score-head">
+      <span class="composite-score-name">Altman Z-score</span>
     </p>
-    <p class="composite-band composite-good">
-      <span class="composite-band-tag">Safe</span>
-      <span class="composite-scale">
-        <span class="composite-step composite-step-bad">Distress <em>< 1.81</em></span>
-        <span class="composite-step composite-step-warn">Grey <em>1.81 - 2.99</em></span>
-        <span class="composite-step composite-step-good macro-current">Safe <em>> 2.99</em></span>
+    <p class="composite-score-band composite-score-good">
+      <span class="composite-score-band-tag">Safe</span>
+      <span class="composite-score-scale">
+        <span class="composite-score-step composite-score-step-bad">Distress <em>< 1.81</em></span>
+        <span class="composite-score-step composite-score-step-warn">Grey <em>1.81 - 2.99</em></span>
+        <span class="composite-score-step composite-score-step-good macro-current">Safe <em>> 2.99</em></span>
       </span>
     </p>
   </div>

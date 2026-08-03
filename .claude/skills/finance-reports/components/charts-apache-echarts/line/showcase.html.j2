@@ -1,0 +1,30 @@
+{# The `line` showcase — the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>one series — no legend; the line alone carries the reading</h3>
+      {{ c.charts_apache_echarts_line(series=[d.revenue], categories=d.quarters,
+               caption="Revenue by quarter",
+               unit="USD, billions",
+               note="Up in all eight quarters, 12.4 to 18.9 — but unevenly; the pace does not build.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>two series — a legend appears, colour is never the only cue</h3>
+      {{ c.charts_apache_echarts_line(series=[d.fy25, d.fy24], categories=d.half,
+               caption="FY25 against FY24",
+               unit="USD, billions",
+               note="Ahead in every quarter, by a steady 3.5 to 3.7 — growth, not acceleration.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>y_name — the axis is named, and the unit names the measure</h3>
+      {{ c.charts_apache_echarts_line(series=[d.gross_margin], categories=d.quarters,
+               caption="Gross margin",
+               unit="percent",
+               y_name="Gross margin (%)",
+               note="A rate, so nothing is filled beneath it: no area implies a quantity.") }}
+    </section>
+{% endblock %}

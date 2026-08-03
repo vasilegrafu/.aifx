@@ -1,4 +1,4 @@
-/* finance-reports/diagram-mermaid — Mermaid diagrams, auto-laid-out from text.
+/* finance-reports/diagrams-mermaid — Mermaid diagrams, auto-laid-out from text.
 
    Markup (plain Mermaid text in the document, no per-document JS):
      <pre class="mermaid">flowchart LR
@@ -12,7 +12,7 @@
    Mermaid runs with useMaxWidth:false, so the SVG comes out at natural pixel
    size — a node's box is the same across every diagram, and 100% means natural
    size. If the CDN is unreachable the source stays visible as a readable code
-   box (diagram-mermaid.css). */
+   box (diagrams-mermaid.css). */
 
 "use strict";
 

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>stress-test — showcase</title>
   <link rel="stylesheet" href="../../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -18,48 +18,48 @@
 
     <section>
       <h3>four scenarios — two fully toned, two where only the bar colours</h3>
-        <table class="fin portfolio-stress">
-<caption>Stress scenarios against $2,450m</caption>    <thead><tr><th>Scenario</th><th>Trigger</th><th class="portfolio-stress-impact-head">Impact</th><th>Response</th></tr></thead>
+        <table class="fin portfolio-stress-test">
+<caption>Stress scenarios against $2,450m</caption>    <thead><tr><th>Scenario</th><th>Trigger</th><th class="portfolio-stress-test-impact-head">Impact</th><th>Response</th></tr></thead>
     <tbody>
       <tr>
         <th scope="row">Rates +200bp</th>
-        <td class="portfolio-stress-trigger">Parallel shift across the curve</td>
-        <td class="portfolio-stress-impact">
-          <span class="portfolio-stress-value tone-bad">-12.4%</span>
-          <span class="portfolio-stress-track"><span class="portfolio-stress-fill portfolio-stress-fill-bad" data-pct="12.4%"></span></span>
+        <td class="portfolio-stress-test-trigger">Parallel shift across the curve</td>
+        <td class="portfolio-stress-test-impact">
+          <span class="portfolio-stress-test-value tone-bad">-12.4%</span>
+          <span class="portfolio-stress-test-track"><span class="portfolio-stress-test-fill portfolio-stress-test-fill-bad" data-pct="12.4%"></span></span>
         </td>
-        <td class="portfolio-stress-response">Duration cut to 3.1 years; add 4% to floating-rate credit</td>
+        <td class="portfolio-stress-test-response">Duration cut to 3.1 years; add 4% to floating-rate credit</td>
       </tr>
       <tr>
         <th scope="row">Equity -20%</th>
-        <td class="portfolio-stress-trigger">Broad drawdown, correlations to 0.9</td>
-        <td class="portfolio-stress-impact">
-          <span class="portfolio-stress-value tone-bad">-18.6%</span>
-          <span class="portfolio-stress-track"><span class="portfolio-stress-fill portfolio-stress-fill-bad" data-pct="18.6%"></span></span>
+        <td class="portfolio-stress-test-trigger">Broad drawdown, correlations to 0.9</td>
+        <td class="portfolio-stress-test-impact">
+          <span class="portfolio-stress-test-value tone-bad">-18.6%</span>
+          <span class="portfolio-stress-test-track"><span class="portfolio-stress-test-fill portfolio-stress-test-fill-bad" data-pct="18.6%"></span></span>
         </td>
-        <td class="portfolio-stress-response">Hedge overlay covers the first 8%; no forced selling</td>
+        <td class="portfolio-stress-test-response">Hedge overlay covers the first 8%; no forced selling</td>
       </tr>
       <tr>
         <th scope="row">Credit spreads +150bp</th>
-        <td class="portfolio-stress-trigger">High yield reprices, IG follows</td>
-        <td class="portfolio-stress-impact">
-          <span class="portfolio-stress-value tone-warn">-7.2%</span>
-          <span class="portfolio-stress-track"><span class="portfolio-stress-fill portfolio-stress-fill-warn" data-pct="7.2%"></span></span>
+        <td class="portfolio-stress-test-trigger">High yield reprices, IG follows</td>
+        <td class="portfolio-stress-test-impact">
+          <span class="portfolio-stress-test-value tone-warn">-7.2%</span>
+          <span class="portfolio-stress-test-track"><span class="portfolio-stress-test-fill portfolio-stress-test-fill-warn" data-pct="7.2%"></span></span>
         </td>
-        <td class="portfolio-stress-response">Rotate 3% from BB into short-dated IG</td>
+        <td class="portfolio-stress-test-response">Rotate 3% from BB into short-dated IG</td>
       </tr>
       <tr>
         <th scope="row">USD +10%</th>
-        <td class="portfolio-stress-trigger">Flight to quality</td>
-        <td class="portfolio-stress-impact">
-          <span class="portfolio-stress-value tone-warn">-4.1%</span>
-          <span class="portfolio-stress-track"><span class="portfolio-stress-fill portfolio-stress-fill-warn" data-pct="4.1%"></span></span>
+        <td class="portfolio-stress-test-trigger">Flight to quality</td>
+        <td class="portfolio-stress-test-impact">
+          <span class="portfolio-stress-test-value tone-warn">-4.1%</span>
+          <span class="portfolio-stress-test-track"><span class="portfolio-stress-test-fill portfolio-stress-test-fill-warn" data-pct="4.1%"></span></span>
         </td>
-        <td class="portfolio-stress-response">Unhedged sleeve is 22% of assets; hedge ratio raised to 60%</td>
+        <td class="portfolio-stress-test-response">Unhedged sleeve is 22% of assets; hedge ratio raised to 60%</td>
       </tr>
     </tbody>
   </table>
-<p class="fa-st-source">Impacts are one-year mark-to-market on the current book, applied independently rather than jointly.</p>
+<p class="fin-source">Impacts are one-year mark-to-market on the current book, applied independently rather than jointly.</p>
     </section>
   </main>
 </body>

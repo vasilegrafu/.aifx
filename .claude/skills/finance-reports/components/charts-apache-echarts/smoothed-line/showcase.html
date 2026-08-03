@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>smoothed-line — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>smoothed-line</h1>
+  </header>
+
+    <section>
+      <h3>one series — the curve reads as trend, the month-to-month noise recedes</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        42.0,
+        39.0,
+        45.0,
+        51.0,
+        48.0,
+        55.0,
+        61.0,
+        58.0,
+        64.0,
+        60.0,
+        67.0,
+        72.0,
+        69.0,
+        75.0,
+        71.0,
+        79.0,
+        84.0,
+        80.0,
+        88.0,
+        92.0,
+        87.0,
+        95.0,
+        99.0,
+        104.0
+      ],
+      "name": "Units shipped",
+      "showSymbol": true,
+      "smooth": true,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "thousands",
+    "text": "Units shipped by month"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Up through both years; the monthly zig-zag is not the story.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>two series — a legend appears, and two curves stay separable</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        42.0,
+        39.0,
+        45.0,
+        51.0,
+        48.0,
+        55.0,
+        61.0,
+        58.0,
+        64.0,
+        60.0,
+        67.0,
+        72.0,
+        69.0,
+        75.0,
+        71.0,
+        79.0,
+        84.0,
+        80.0,
+        88.0,
+        92.0,
+        87.0,
+        95.0,
+        99.0,
+        104.0
+      ],
+      "name": "North America",
+      "showSymbol": true,
+      "smooth": true,
+      "type": "line"
+    },
+    {
+      "data": [
+        30.0,
+        28.2,
+        31.9,
+        35.6,
+        33.8,
+        38.1,
+        41.8,
+        40.0,
+        43.7,
+        41.2,
+        45.5,
+        48.6,
+        46.8,
+        50.5,
+        48.0,
+        53.0,
+        56.1,
+        53.6,
+        58.6,
+        61.0,
+        57.9,
+        62.9,
+        65.4,
+        68.5
+      ],
+      "name": "EMEA",
+      "showSymbol": true,
+      "smooth": true,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "thousands",
+    "text": "Shipments by region"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">EMEA tracks North America at roughly two thirds the volume.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>y_name — a bounded rate, where the axis must say what it measures</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        69.2,
+        65.0,
+        73.4,
+        58.0,
+        77.6,
+        63.6,
+        72.0,
+        67.8,
+        76.2,
+        70.6,
+        80.4,
+        63.6,
+        59.4,
+        67.8,
+        62.2,
+        73.4,
+        80.4,
+        74.8,
+        62.2,
+        67.8,
+        60.8,
+        72.0,
+        77.6,
+        60.8
+      ],
+      "name": "Utilisation",
+      "showSymbol": true,
+      "smooth": true,
+      "type": "line"
+    }
+  ],
+  "title": {
+    "subtext": "percent",
+    "text": "Capacity utilisation"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "line"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "Utilisation (%)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Range-bound: the smoothing shows the band, not a direction.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

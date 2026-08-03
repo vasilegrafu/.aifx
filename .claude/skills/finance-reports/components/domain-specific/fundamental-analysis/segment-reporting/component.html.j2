@@ -15,13 +15,13 @@
    one. #}
 {% macro segment_reporting(rows=[], caption="", unit="", revenue_label="Revenue", profit_label="Profit", total_row=none, source="", fmt="money") %}
 {% set has_profit = rows and rows[0].get('profit') is not none %}
-  <table class="fin segments">
-  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fa-st-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
+  <table class="fin">
+  {% if caption or unit %}<caption>{{ caption }}{% if unit %} <span class="fin-unit">{{ unit }}</span>{% endif %}</caption>{% endif %}
     <thead><tr>
       <th>Segment</th>
-      <th>{{ revenue_label }}</th><th class="fa-seg-share-head">% of {{ revenue_label | lower }}</th>
+      <th>{{ revenue_label }}</th><th class="fa-segment-reporting-share-head">% of {{ revenue_label | lower }}</th>
       {% if has_profit %}
-      <th>{{ profit_label }}</th><th class="fa-seg-share-head">% of {{ profit_label | lower }}</th>
+      <th>{{ profit_label }}</th><th class="fa-segment-reporting-share-head">% of {{ profit_label | lower }}</th>
       <th>Margin</th>
       {% endif %}
       <th>y/y</th>
@@ -31,15 +31,15 @@
       <tr>
         <th scope="row">{{ r.segment }}</th>
         <td>{{ r.revenue | fmt(fmt) }}</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill" data-pct="{{ r.rev_share | round(1) }}%"></span></span>
-          <span class="fa-seg-pct">{{ r.rev_share | pct }}</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill" data-pct="{{ r.rev_share | round(1) }}%"></span></span>
+          <span class="fa-segment-reporting-pct">{{ r.rev_share | pct }}</span>
         </td>
         {% if has_profit %}
         <td>{{ r.profit | fmt(fmt) }}</td>
-        <td class="fa-seg-share">
-          <span class="fa-seg-track"><span class="fa-seg-fill fa-seg-fill-profit" data-pct="{{ r.profit_share | round(1) }}%"></span></span>
-          <span class="fa-seg-pct">{{ r.profit_share | pct }}</span>
+        <td class="fa-segment-reporting-share">
+          <span class="fa-segment-reporting-track"><span class="fa-segment-reporting-fill fa-segment-reporting-fill-profit" data-pct="{{ r.profit_share | round(1) }}%"></span></span>
+          <span class="fa-segment-reporting-pct">{{ r.profit_share | pct }}</span>
         </td>
         <td>{{ r.margin | pct }}</td>
         {% endif %}
@@ -54,5 +54,5 @@
     </tr></tfoot>
     {% endif %}
   </table>
-  {% if source %}<p class="fa-st-source">{{ source }}</p>{% endif %}
+  {% if source %}<p class="fin-source">{{ source }}</p>{% endif %}
 {% endmacro %}

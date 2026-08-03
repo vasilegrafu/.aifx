@@ -2,7 +2,7 @@
 {# data: headers: str[]   rows: cell[][] — positional matrix; a cell of "yes"|"no"|"part" renders a mark, anything else renders as text #}
 {# cells: "yes" | "no" | "part" render as marks; anything else renders as text #}
 {% macro comparison_table(headers=[], rows=[]) %}
-  <table class="comparison">
+  <table class="comparison-table">
     <thead><tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for row in rows %}

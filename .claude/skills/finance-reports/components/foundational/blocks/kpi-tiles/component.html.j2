@@ -1,12 +1,12 @@
 {# purpose: row of headline metric tiles with trend #}
 {# data: tiles[] {value:str, label:str, dir:up|down|flat, delta:str} #}
 {% macro kpi_tiles(tiles=[]) %}
-  <div class="kpi-tiles">
+  <div class="kpi-tiles-tiles">
   {% for t in tiles %}
-    <div class="kpi">
-      <span class="kpi-value">{{ t.value }}</span>
-      <span class="kpi-label">{{ t.label }}</span>
-      <span class="kpi-trend {{ t.dir }}">{{ t.delta }}</span>
+    <div class="kpi-tiles">
+      <span class="kpi-tiles-value">{{ t.value }}</span>
+      <span class="kpi-tiles-label">{{ t.label }}</span>
+      <span class="kpi-tiles-trend {{ t.dir }}">{{ t.delta }}</span>
     </div>
   {% endfor %}
   </div>

@@ -1,19 +1,19 @@
 {# purpose: Porter's five forces, each rated from the incumbent's point of view with its evidence #}
 {# data: forces[] {name:str, rating:str, tone:good|neutral|bad, evidence:str} #}
 {% macro five_forces(forces=[], caption="", verdict="") %}
-  <div class="fa-forces">
-  {% if caption %}<p class="fa-forces-caption">{{ caption }}</p>{% endif %}
-    <div class="fa-forces-grid">
+  <div class="fa-five-forces">
+  {% if caption %}<p class="fa-five-forces-caption">{{ caption }}</p>{% endif %}
+    <div class="fa-five-forces-grid">
     {% for f in forces %}
-      <article class="fa-force fa-force-{{ f.tone }}">
-        <p class="fa-force-head">
-          <span class="fa-force-name">{{ f.name }}</span>
-          <span class="fa-force-rating">{{ f.rating }}</span>
+      <article class="fa-five-forces-item fa-five-forces-item-{{ f.tone }}">
+        <p class="fa-five-forces-head">
+          <span class="fa-five-forces-name">{{ f.name }}</span>
+          <span class="fa-five-forces-rating">{{ f.rating }}</span>
         </p>
-        <p class="fa-force-evidence">{{ f.evidence }}</p>
+        <p class="fa-five-forces-evidence">{{ f.evidence }}</p>
       </article>
     {% endfor %}
     </div>
-    {% if verdict %}<p class="fa-forces-verdict">{{ verdict }}</p>{% endif %}
+    {% if verdict %}<p class="fa-five-forces-verdict">{{ verdict }}</p>{% endif %}
   </div>
 {% endmacro %}

@@ -86,12 +86,12 @@ S=.claude/skills/finance-reports
 
 python $S/reports/report_builder.py financial-profile INTC --peers AMD,NVDA --out DIR
 python $S/reports/catalog_builder.py                  # -> reports/CATALOG.md
-python $S/components/showcase_builder.py charts/bar
+python $S/components/showcase_builder.py charts-apache-echarts/bar
 python $S/components/showcase_builder.py --all        # rebuild every showcase
 python $S/components/showcase_builder.py --check      # verify each is current
 python $S/components/showcase_builder.py --missing    # components with none yet
 python $S/components/catalog_builder.py               # -> components/CATALOG.md
-python $S/usage_audit.py                              # every usage.md vs the skeleton
+python $S/status.py                                   # what is in the tree, and every check
 ```
 
 **Only the script path is relative to where you stand.** Everything inside the
@@ -105,7 +105,7 @@ rather than opening the file, since a showcase links its assets relatively:
 
 ```bash
 python -m http.server 8000
-# http://localhost:8000/.claude/skills/finance-reports/components/charts/bar/showcase.html
+# http://localhost:8000/.claude/skills/finance-reports/components/charts-apache-echarts/bar/showcase.html
 ```
 
 There is **no top-level dispatcher**. Each directory owns the engine that
@@ -182,7 +182,7 @@ components/     _showcase.master.html.j2  showcase_controller.py  showcase.html.
 
 **Python files use underscores so they can be imported; templates keep the
 dots.** A **leading underscore** marks the library half of `components/` —
-`_showcase_controller.py`, `_showcase.master.html.j2`, `charts/_render.html.j2`
+`_showcase_controller.py`, `_showcase.master.html.j2`, `charts-apache-echarts/_render.html.j2`
 — the files that serve components without being one. It also disambiguates:
 `_showcase_controller.py` is the base class, `showcase_controller.py` is a
 component's own.
@@ -257,7 +257,7 @@ holds `showcase_controller.py` and `showcase.html.j2` **has** a showcase.
 Nothing is listed anywhere, so adding any of the three means adding files and
 nothing else.
 
-`ShowcaseBuilder.build("charts/bar")` therefore does no lookup: check the three
+`ShowcaseBuilder.build("charts-apache-echarts/bar")` therefore does no lookup: check the three
 files are present, path-load the controller, find the `ShowcaseController`
 subclass in it, call `build()`. It **raises** rather than returning a code,
 because a showcase asked for by name and not built is a mistake worth stopping
@@ -277,7 +277,7 @@ one produces.
 ### The preamble every leaf starts with
 
 Copy this rather than reconstructing it. It is the same four lines in a showcase
-controller and in a report controller — `charts/bar/showcase_controller.py` and
+controller and in a report controller — `charts-apache-echarts/bar/showcase_controller.py` and
 `company/financial-profile/report_controller.py` carry it character for
 character, and a new leaf on either side is a copy of those four lines and
 nothing else:
@@ -318,13 +318,24 @@ components/                    the library: macros, filters, env, assets, showca
   _showcase_controller.py      ShowcaseController + env() + FILTERS + the asset pair
   _showcase.master.html.j2     the shell every showcase view extends
   showcase_builder.py          ShowcaseBuilder.build(path) + the CLI
-  charts/                      engine-backed charts (Apache ECharts)
   domain-specific/             one discipline owns each; prefixed after it
     fundamental-analysis/        `fa-`         the company under the lens
     portfolio/                   `portfolio-`  a book you hold
     macro/                       `macro-`      the economy, no security in view
   foundational/                any document may use these; NO prefix
-  diagrams/  math/             the two other rendering subsystems
+  math/                        the formula subsystem (KaTeX)
+
+  ONE DIRECTORY PER ENGINE, holding that engine's kinds. The engine is part of
+  every macro inside it, because another engine's `bar` is a different macro:
+  charts-apache-echarts/       c.charts_apache_echarts_<kind>(...)
+    _render.html.j2              ECharts-specific tail, shared by the kinds here
+    chart/                       the generic one — a raw spec, for what the
+                                 named kinds do not cover
+    bar/ line/ pie/ …            one folder per kind
+  charts-plotly/               reserved, empty (.gitkeep)
+  charts-bokeh/                reserved, empty (.gitkeep)
+  diagrams-mermaid/            c.diagrams_mermaid_<kind>(...)
+    diagram/                     the generic one — Mermaid source directly
 
 reports/
   _report_controller.py        ReportController; borrows env() AND the asset pair
@@ -490,10 +501,10 @@ those assets exist and resolve. What it actually means is that another project's
 tag now controls your documents' appearance, and a version you never published
 is what they name.
 
-**Nothing catches this.** The `assets_resolve` check in a report test builds its
-expectation *from* the local `version.json`, so a copy that kept the original
-value agrees with itself and passes. The check catches a stale *version*, never
-a wrong *repository*. Set `cdn` to wherever the copy is actually published, at
+**Nothing catches this.** The asset check in `reports/_report_validation.py`
+builds its expectation *from* the local `version.json`, so a copy that kept the
+original value agrees with itself and passes. It catches a stale *version*,
+never a wrong *repository*. Set `cdn` to wherever the copy is actually published, at
 the same time you create the file — a **linked** skill has no such problem,
 since `resolve()` walks the junction back to this clone and reads this
 `version.json`.
@@ -521,6 +532,60 @@ is tracked.
 Why declared rather than passed, why two environments, why per-FILE rather than
 per-field — **`service_providers/REFERENCE.md`**. It is written down once.
 
+## Adding a component
+
+A component is a directory holding `component.html.j2`. **Nothing is
+registered**, so every step below either writes a file or runs something that
+reads one — there is no list anywhere to append to.
+
+1. `components/<cat>/<name>/component.html.j2` — one macro named for the folder
+   (`name.replace("-", "_")`), opening with `{# purpose: … #}`. **That header is
+   required** — `catalog_builder.py` refuses a component without one. Add
+   `{# data: … #}` if and only if the input IS data — most components, but one
+   taking a `{% call %}` block has nothing to declare — and `{# unit: … #}` only
+   where the component displays a quantity whose unit is not obvious from the
+   value. Only `purpose` is universal; the other two answer a question the
+   component may not raise.
+2. `components/<cat>/<name>/usage.md` — skeleton under **The shape of a
+   usage.md** below. `## Rules` is not optional.
+3. **Style it in the matching `css/` directory**, under the prefix that names
+   that directory. No `style=`, no `<style>`, no component sets its own colour.
+   A category with no stylesheet yet needs a new file **and one `@import` in
+   `css/bundle.css`**; a new JS feature needs its name in `js/bundle.js`. Both
+   bundles are hand-maintained manifests on purpose, so a file nothing loads is
+   a component that renders unstyled — which reads as a CSS bug and is a missing
+   line in a list. `status.py` is what notices.
+4. `showcase_controller.py` + `showcase.html.j2` — one `<section>` per state
+   where the component **decides** something. Nominally optional; in practice
+   every component in the tree has one, and a component without one is
+   choosable with no rendered evidence of what it looks like. Follow the
+   skeleton in `components/REFERENCE.md` — a hundred-odd written freehand is a
+   hundred-odd dialects. **This step is also how an EXISTING component gets its
+   first showcase**, which is a catalogue change (step 6) and not only a page.
+5. **Bump `version.json` BEFORE rebuilding anything.** A new component is
+   additive — MINOR, by the table in `README.md`. Every generated page pins its
+   asset version **at build time**, so a rebuild that runs first pins the old
+   one and `--check` will say so.
+6. Rebuild, then check — in this order:
+
+```bash
+python $S/components/showcase_builder.py --all   # step 3 touched css/: EVERY page is stale
+python $S/components/catalog_builder.py          # nothing calls it for you
+python $S/status.py --check                      # the four exit codes, one command
+```
+
+7. **Serve the repo root over `http://` and open the showcase.** Nothing above
+   renders a page, so overflow, clipping, bars out of their track and glued
+   text are invisible to all of it. This is not optional and it is not covered
+   by a green `--check`.
+8. **Leave it uncommitted** unless you were asked to commit. A push is a
+   separate go-ahead: a published tag is immutable.
+
+Step 6 is not registration. Both catalogues are **derived** — from the purpose
+header you already wrote, and from the two files step 4 created — so running
+them publishes what the tree already says. Skip them and the index is quietly
+short by one, which is exactly how the previous hand-maintained one died.
+
 ## Adding a report
 
 0. **Choose the domain by SUBJECT** — `company` (one business), `portfolio` (a
@@ -543,69 +608,77 @@ per-field — **`service_providers/REFERENCE.md`**. It is written down once.
    costs, the exhibits in order, and what the assertions guarantee. Same
    obligation a component has, and for the same reason: the next person to run
    it needs the editorial rules, not the code.
-4. **`python $S/reports/catalog_builder.py`** — nothing calls it for you. This
-   is not registration: the catalogue is derived from the header, the `TITLE`
-   and the parser you already wrote, and regenerating it only publishes what the
-   tree already says. Skip it and `reports/CATALOG.md` is short by one, which
-   means the next session choosing a report cannot see yours.
-5. `python $S/reports/report_builder.py <name> … --out DIR`
-6. **Declare what the page must contain**, on the controller beside `TITLE` —
+4. **Declare what the page must contain**, on the controller beside `TITLE` —
    `SECTIONS` (what the view lays out, written by hand so a section that stops
    rendering is a finding rather than an expectation quietly agreeing with it),
    `PREFIX` (the domain class family: `fa-`, `portfolio-`, `macro-`), and
    `_expected_text(**args)` if the request names things that must appear, such
-   as a symbol and its peers. Each is optional; declaring nothing skips that
-   check rather than inventing an expectation.
+   as a symbol and its peers. Each is optional; declaring nothing **skips** that
+   check rather than inventing an expectation — which is why a report written
+   without this step passes its own validation while checking almost nothing.
 
    **There is no test to write.** `build()` validates the page it rendered and
    puts what it found at the top of the document — see **Report validation**
-   below. A check that applies to any generated page belongs in
+   above. A check that applies to any generated page belongs in
    `reports/_report_validation.py`, never copied into a report: ten reports
    carrying their own reading of the blank-cell threshold are ten claims about
    one number, free to disagree the moment one of them learns something. That is
    the argument `components/_contracts.py` already settled.
+5. **`python $S/reports/catalog_builder.py`** — nothing calls it for you. This
+   is not registration: the catalogue is derived from the header, the `TITLE`
+   and the parser you already wrote, and regenerating it only publishes what the
+   tree already says. Skip it and `reports/CATALOG.md` is short by one, which
+   means the next session choosing a report cannot see yours.
+6. **Bump `version.json`** — a new report is additive, so MINOR. Nothing under
+   `css/` or `js/` changed, so no showcase is invalidated and there is nothing
+   to rebuild; the bump is what publishes the report at a tag someone can pin.
+7. `python $S/status.py --check` — the four exit codes in one command.
+8. **Run it**, and ask for both arguments rather than choosing either:
+
+```bash
+python $S/reports/report_builder.py <name> … --peers … --out DIR
+```
+
+9. **Open the page.** It costs ~13 live calls and validates itself, but a clean
+   validation means the markup is valid, not that the page is right — charts
+   draw at view time and nothing here has seen one.
+10. **Never commit the output.** A built report carries live market data and
+    differs on every run; it is an artifact, wherever it was written. The source
+    (controller, view, `usage.md`) is what gets committed, and only when asked.
 
 There is no step registering it, and no `{# report-name: … #}` header any more —
 the title is `TITLE` on the class. Jinja discards comments before rendering, so
 reading one meant regex-parsing the template you were about to render.
 
-## Adding a component showcase
+Start every controller — both sides — with the `sys.path` preamble under **The
+preamble every leaf starts with** above.
 
-1. `components/<cat>/<name>/showcase_controller.py` — subclass
-   `ShowcaseController` and write `_build_context() -> dict`, line by line. No
-   markup, no macro calls. Optionally add `_validate_context(d)`.
-2. `components/<cat>/<name>/showcase.html.j2` —
-   `{% extends "_showcase.master.html.j2" %}`, one `<section>` per state worth
-   seeing: the default, and the ones where the component has to make a decision
-   (a legend appears past one series, an axis name widens the margin).
-3. `python $S/components/showcase_builder.py <cat>/<name>`
-4. **`python $S/components/catalog_builder.py`** — nothing calls it for you. A
-   showcase is a **column in the catalogue**, not just a page: the row for a
-   component with both `showcase_controller.py` and `showcase.html.j2` carries a
-   `[showcase]` link and the row for one without carries nothing. So this step
-   is needed when you give an EXISTING component its first showcase, not only
-   when you add a component.
+## Knowing what is in here, without counting it in prose
 
-**Follow the skeleton in `components/REFERENCE.md`** — there is one showcase per
-component, and a hundred-odd written freehand is a hundred-odd dialects.
+```bash
+python $S/status.py           # components per category, reports per domain, version, checks
+python $S/status.py --check   # exit 1 if any generated file is stale
+```
 
-There is no step registering it — step 4 included, which derives a link from the
-two files you just wrote rather than recording them anywhere. `showcase.html` is
-a build artifact — the
-controller and the view are the source — but it is **tracked**, so a showcase
-is viewable straight from the CDN without cloning anything. Regenerate it
-whenever you change the component or its controller, or the committed page
-describes a version of the component that no longer exists.
+`--check` covers five things. Three have an engine that already decides them —
+both `catalog_builder.py` and `showcase_builder.py --all --check` — so it runs
+those commands and reports their exit codes rather than forming a second opinion
+about what "stale" means. Two have no engine and are computed there: the
+`usage.md` skeleton, and whether `css/bundle.css` imports every stylesheet and
+`js/bundle.js` lists every module.
 
-Start the controller with the `sys.path` preamble under **The preamble every
-leaf starts with** above — every leaf needs it, reports included, and it is the
-same four lines on both sides.
+**No document here states a count of the tree.** A sentence saying how many
+components carry a hyphen, or how many a stylesheet namespaces, is true when it
+is typed and cannot announce that it stopped being — `CATALOG.md` may state one
+because it is generated, and a REFERENCE may not. A number describing the tree
+**now** is read from `status.py`; a number arguing that something happened at a
+moment stays in prose and dates itself.
 
 ## The shape of a usage.md
 
 Every component has one and every report has one — no exceptions, and they are
-the only per-item documentation there is (`usage_audit.py` counts them and
-names any that is missing). **Follow this skeleton.** They are read
+the only per-item documentation there is (`status.py` names any that is
+missing). **Follow this skeleton.** They are read
 selectively, one at a time, so a reader who cannot predict where "the rules"
 live has to read the whole file to find out there were none:
 
@@ -639,21 +712,27 @@ conforming files do this and it is what makes them skimmable one-handed; a
 paragraph beginning "Rules:" packs four rules into four sentences and is read
 as none.
 
-`usage_audit.py` is the exit code behind this section — it asserts the three
+**`status.py` is the exit code behind this section** — it asserts the three
 things SKILL.md actually mandates (a `usage.md` exists, it opens with an H1, it
 carries `## Rules`) and nothing softer:
 
 ```bash
-python $S/usage_audit.py           # name every file that does not conform
-python $S/usage_audit.py --check   # exit 1 if any does
+python $S/status.py           # name every file that does not conform
+python $S/status.py --check   # exit 1 if any does
 ```
 
 It deliberately does **not** check `## Markup` or `## Build it`, because the
-paragraph above lets those names vary and an audit that fails correct files
+paragraph above lets those names vary and a check that fails correct files
 earns an ignore rule rather than a fix. This was the last convention here
 enforced by nothing, and it is the one that drifted: 62 of 110 files had no
-`## Rules` when the audit was written. That is what an unenforced convention
+`## Rules` when it was first measured. That is what an unenforced convention
 converges to, not a fact about those authors.
+
+It is one of the two checks `status.py` performs itself rather than delegating,
+and for a reason worth keeping: the catalogues and the showcase pages each have
+a builder that can say whether they are current, and this has no engine behind
+it at all. A check with a possible owner belongs to that owner; only a check
+with none is written into `status.py`.
 
 ## House rules for components
 
@@ -668,6 +747,13 @@ converges to, not a fact about those authors.
   the name of the directory it lives in — `fa-`, `portfolio-`, `macro-`,
   `chart-`, `diagram-`. A class that resists its prefix is telling you it is
   foundational. The prefix names the DIRECTORY, never the skill.
+  **`status.py --check` enforces this**, in both directions and including
+  doubled prefixes. It is not a tidiness preference: `domain` is a later
+  `@layer` than `content` and `blocks`, so a foundational component that
+  borrows a domain class cannot restyle it, and a discipline that restyles its
+  own class silently restyles every foundational borrower. Six classes had
+  crossed the line before 11.0.0 and one rendered visibly wrong for it — see
+  `css/REFERENCE.md`, **Which direction dependencies run**.
 - A chart never sets its own title; captions and units go through the shared
   chart frame so every exhibit is labelled the same way.
 - **Every component declares `{# purpose: … #}`. A component declares

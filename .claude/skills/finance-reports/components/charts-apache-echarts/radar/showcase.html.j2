@@ -1,0 +1,20 @@
+{# The `radar` showcase -- the VIEW. It receives `d` from
+   showcase_controller.py and is the only place a macro is called. Each
+   <section> is one state worth seeing. #}
+{% extends "_showcase.master.html.j2" %}
+{% block content %}
+    <section>
+      <h3>one polygon — the silhouette of a single company</h3>
+      {{ c.charts_apache_echarts_radar(indicators=d.indicators, series=[d.amd],
+               caption="AMD, factor scores",
+               height=340,
+               note="Strong on growth and balance sheet, weak on returns. Read the vertices, never the area.") }}
+    </section>
+    <hr>
+    <section>
+      <h3>three polygons — the documented maximum, and a legend appears</h3>
+      {{ c.charts_apache_echarts_radar(indicators=d.indicators, series=[d.nvda, d.amd, d.intc],
+               caption="Factor scores, three semiconductor designers",
+               note="Three shapes is the cap; a fourth would make this a web. Axis order is fixed across both figures.") }}
+    </section>
+{% endblock %}

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sensitivity-table — showcase</title>
   <link rel="stylesheet" href="../../../../css/bundle.css"
-        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/css/bundle.css'">
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
   <script src="../../../../js/bundle.js" defer
-          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@10.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
 </head>
 <body>
   <main>
@@ -18,56 +18,56 @@
 
     <section>
       <h3>value per share across discount rate and terminal growth</h3>
-        <table class="sens">
+        <table class="sensitivity-table">
 <caption>DCF value per share, USD</caption>    <thead>
       <tr>
-        <th class="sens-corner"><span class="sens-row-label">WACC</span><span class="sens-col-label">Terminal growth</span></th>
+        <th class="sensitivity-table-corner"><span class="sensitivity-table-row-label">WACC</span><span class="sensitivity-table-col-label">Terminal growth</span></th>
 <th>1.5%</th><th>2.0%</th><th>2.5%</th><th>3.0%</th><th>3.5%</th>      </tr>
     </thead>
     <tbody>
       <tr>
         <th scope="row">8.0%</th>
-        <td class="sens-cell sens-low">$117</td>
-        <td class="sens-cell sens-mid">$127</td>
-        <td class="sens-cell sens-mid">$139</td>
-        <td class="sens-cell sens-high">$154</td>
-        <td class="sens-cell sens-high">$172</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$117</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$127</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$139</td>
+        <td class="sensitivity-table-cell sensitivity-table-high">$154</td>
+        <td class="sensitivity-table-cell sensitivity-table-high">$172</td>
       </tr>
       <tr>
         <th scope="row">8.5%</th>
-        <td class="sens-cell sens-low">$108</td>
-        <td class="sens-cell sens-mid">$117</td>
-        <td class="sens-cell sens-mid">$128</td>
-        <td class="sens-cell sens-mid">$140</td>
-        <td class="sens-cell sens-high">$155</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$108</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$117</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$128</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$140</td>
+        <td class="sensitivity-table-cell sensitivity-table-high">$155</td>
       </tr>
       <tr>
         <th scope="row">9.0%</th>
-        <td class="sens-cell sens-low">$101</td>
-        <td class="sens-cell sens-low">$109</td>
-        <td class="sens-cell sens-mid sens-base">$118</td>
-        <td class="sens-cell sens-mid">$128</td>
-        <td class="sens-cell sens-mid">$141</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$101</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$109</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid sensitivity-table-base">$118</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$128</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$141</td>
       </tr>
       <tr>
         <th scope="row">9.5%</th>
-        <td class="sens-cell sens-low">$95</td>
-        <td class="sens-cell sens-low">$102</td>
-        <td class="sens-cell sens-low">$110</td>
-        <td class="sens-cell sens-mid">$119</td>
-        <td class="sens-cell sens-mid">$129</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$95</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$102</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$110</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$119</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$129</td>
       </tr>
       <tr>
         <th scope="row">10.0%</th>
-        <td class="sens-cell sens-low">$89</td>
-        <td class="sens-cell sens-low">$95</td>
-        <td class="sens-cell sens-low">$102</td>
-        <td class="sens-cell sens-low">$110</td>
-        <td class="sens-cell sens-mid">$119</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$89</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$95</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$102</td>
+        <td class="sensitivity-table-cell sensitivity-table-low">$110</td>
+        <td class="sensitivity-table-cell sensitivity-table-mid">$119</td>
       </tr>
     </tbody>
   </table>
-<p class="sens-note">The outlined cell is the base case at 9.0% and 2.5%. A half-point on either assumption moves the value by roughly $9.</p>
+<p class="sensitivity-table-note">The outlined cell is the base case at 9.0% and 2.5%. A half-point on either assumption moves the value by roughly $9.</p>
     </section>
   </main>
 </body>

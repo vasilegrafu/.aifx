@@ -13,7 +13,7 @@
 
    ONE NAMING RULE, EVERYWHERE: a class is unprefixed ONLY in foundational/ —
    anywhere else it carries the name of the directory it lives in. So
-   `.fa-dcf-value`, `.portfolio-holdings-weight`, `.macro-indicator-row`,
+   `.fa-dcf-summary-value`, `.portfolio-holdings-table-weight`, `.macro-indicator-row`,
    `.chart-figure`, `.diagram-canvas`, and a bare `.bridge-row` because bridge
    is foundational. Markup then says which directory owns a rule, and where to
    go to change it. (Until 6.0.0 the domain prefix was `investing-`, the name
@@ -73,11 +73,11 @@
 
 /* ---------- diagrams ---------- */
 @import url("diagrams/diagrams.css")        layer(diagrams);   /* shared viewport */
-@import url("diagrams/diagram-mermaid.css") layer(diagrams);   /* one engine */
+@import url("diagrams/diagrams-mermaid.css") layer(diagrams);  /* one engine */
 
 /* ---------- charts ---------- */
 @import url("charts/charts.css")               layer(charts);  /* shared frame */
-@import url("charts/chart-apache-echarts.css") layer(charts);  /* one engine */
+@import url("charts/charts-apache-echarts.css") layer(charts); /* one engine */
 
 /* There is no print module. Ctrl+P uses the browser's own defaults; the only
    print CSS left is the `@media print` block each module keeps for itself —

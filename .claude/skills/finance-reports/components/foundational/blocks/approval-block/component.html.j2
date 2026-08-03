@@ -1,7 +1,7 @@
 {# purpose: sign-off table of names and roles #}
 {# data: rows[] {name:str, role:str} #}
 {% macro approval_block(rows=[]) %}
-  <table class="approvals">
+  <table class="approval-block">
     <thead><tr><th>Name</th><th>Role</th><th>Date</th><th>Signature</th></tr></thead>
     <tbody>
     {% for r in rows %}

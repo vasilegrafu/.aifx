@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bar-negative — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>bar-negative</h1>
+  </header>
+
+    <section>
+      <h3>one series crossing zero — misses fall below the axis, beats above</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 8,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.04
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -0.02
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.07
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -0.11
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.03
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.09
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -0.05
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.12
+        }
+      ],
+      "name": "EPS surprise",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD per share",
+    "text": "EPS surprise against consensus"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5",
+      "Q6",
+      "Q7",
+      "Q8"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Five beats, three misses; the zero line is the verdict.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>y_name — a contribution, where the axis has to say what it measures</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 70
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 3.9
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 1.2
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -2.4
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.8
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -0.6
+        }
+      ],
+      "name": "Contribution to growth",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Contribution to revenue growth"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Cloud",
+      "License",
+      "Hardware",
+      "Services",
+      "Support"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "Contribution (USD bn)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Hardware subtracted; Cloud paid for it and more.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>two series — a legend appears, and both cross zero independently</h3>
+        <pre class="chart apache-echarts" hidden>
+{
+  "grid": {
+    "bottom": 8,
+    "containLabel": true,
+    "left": 46,
+    "right": 16,
+    "top": 94
+  },
+  "legend": {
+    "top": 48
+  },
+  "series": [
+    {
+      "data": [
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 3.9
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 1.2
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -2.4
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.8
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -0.6
+        }
+      ],
+      "name": "FY25",
+      "type": "bar"
+    },
+    {
+      "data": [
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 2.1
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -0.4
+        },
+        {
+          "itemStyle": {
+            "color": "token:negative"
+          },
+          "value": -1.1
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 1.6
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "value": 0.3
+        }
+      ],
+      "name": "FY24",
+      "type": "bar"
+    }
+  ],
+  "title": {
+    "subtext": "USD, billions",
+    "text": "Contribution by year"
+  },
+  "tooltip": {
+    "axisPointer": {
+      "type": "shadow"
+    },
+    "trigger": "axis"
+  },
+  "xAxis": {
+    "data": [
+      "Cloud",
+      "License",
+      "Hardware",
+      "Services",
+      "Support"
+    ],
+    "type": "category"
+  },
+  "yAxis": {
+    "name": "Contribution (USD bn)",
+    "nameGap": 46,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "type": "value"
+  }
+}
+  </pre>
+  <p class="chart-note">Hardware has subtracted in both years; License only in FY24.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>

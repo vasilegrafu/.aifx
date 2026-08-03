@@ -89,10 +89,10 @@ blockquote.pull p { margin: .3rem 0; font-size: 1.02rem; font-style: italic; }
 blockquote.pull footer { font-size: .85rem; color: var(--fg-soft); font-style: normal; padding-bottom: .2rem; }
 
 /* ---------- comparison-table: ✓ / ✗ / ◐ option matrix ---------- */
-table.comparison td:not(:first-child), table.comparison th:not(:first-child) { text-align: center; }
-table.comparison .mark-yes  { color: var(--decision); font-weight: 700; }
-table.comparison .mark-no   { color: var(--risk); font-weight: 700; }
-table.comparison .mark-part { color: var(--warning); font-weight: 700; }
+table.comparison-table td:not(:first-child), table.comparison-table th:not(:first-child) { text-align: center; }
+table.comparison-table .mark-yes  { color: var(--decision); font-weight: 700; }
+table.comparison-table .mark-no   { color: var(--risk); font-weight: 700; }
+table.comparison-table .mark-part { color: var(--warning); font-weight: 700; }
 
 /* ---------- neg: a negative number ----------
    Foundational, not domain-specific. It says "this figure is negative", which
@@ -140,6 +140,32 @@ table.fin tfoot tr.total td, table.fin tfoot tr.total th {
   border-bottom: none;
 }
 
+/* ---------- shared: the furniture around a numeric table ----------
+   What a numeric table needs whoever is reading it, so none of it is a
+   discipline's — the same test that promoted the shapes above. */
+
+/* The unit and the as-of date ride inside the caption, so both must read as
+   subordinate to it — lighter and softer, never a second title. */
+.fin-unit { font-weight: 500; font-size: .85rem; color: var(--fg-soft); }
+.fin-asof { font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+/* The source note sits under the table, not in it. */
+.fin-source { margin: .35rem 0 0; font-size: .78rem; color: var(--fg-soft); }
+
+/* The headline number in a row, against the context columns beside it. */
+.fin-value { font-weight: 700; }
+
+/* A PROSE column inside a numeric table: a reading, a comment, a rationale.
+   It opts out of the right alignment and tabular figures `table.fin td`
+   imposes for numbers. KEEP IT UNSCOPED — scoping it to one table is how the
+   previous version silently matched nothing everywhere else. */
+.fin-note {
+  text-align: left;
+  font-size: .88rem;
+  color: var(--fg-soft);
+  font-variant-numeric: normal;
+}
+
 /* Sign tinting. `.neg` is applied by the macros from the leading minus and is
    FOUNDATIONAL — see foundational/content.css; it is arithmetic, not a domain
    concept, and both domains defined it before 4.0.0. `tone-*` is an explicit
@@ -156,32 +182,32 @@ table.fin tfoot tr.total td, table.fin tfoot tr.total th {
 .trend-flat { color: var(--fg-soft); }
 
 /* ---------- expected-value ---------- */
-table.ev tbody th:first-child { font-weight: 500; }
-.ev-dot {
+table.expected-value tbody th:first-child { font-weight: 500; }
+.expected-value-dot {
   display: inline-block;
   width: .55rem; height: .55rem;
   margin-right: .45rem;
   border-radius: 50%;
   vertical-align: baseline;
 }
-.ev-good    { background: var(--decision); }
-.ev-neutral { background: var(--accent); }
-.ev-bad     { background: var(--risk); }
-table.ev td:last-child { font-weight: 650; }
+.expected-value-good    { background: var(--decision); }
+.expected-value-neutral { background: var(--accent); }
+.expected-value-bad     { background: var(--risk); }
+table.expected-value td:last-child { font-weight: 650; }
 
 /* ---------- sensitivity-table: the two-way grid ---------- */
-table.sens {
+table.sensitivity-table {
   border-collapse: separate; border-spacing: 2px;
   width: 100%;
   margin: var(--block-gap) 0;
   font-size: .88rem;
 }
-table.sens th, table.sens td {
+table.sensitivity-table th, table.sensitivity-table td {
   padding: .35rem .5rem;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-table.sens thead th, table.sens tbody th {
+table.sensitivity-table thead th, table.sensitivity-table tbody th {
   font-size: .72rem; font-weight: 700;
   color: var(--fg-soft);
   background: var(--bg-soft);
@@ -189,65 +215,65 @@ table.sens thead th, table.sens tbody th {
 }
 /* Keep the label column narrow: the two-line corner would otherwise stretch it
    and leave the row headers stranded far from the grid. */
-table.sens th:first-child { width: 8rem; }
-.sens-corner { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; font-size: .66rem; }
-.sens-row-label::after { content: " ↓"; }
-.sens-col-label { color: var(--accent); }
-.sens-col-label::after { content: " →"; }
-.sens-cell { background: var(--bg-soft); border-radius: 3px; }
-.sens-low  { background: var(--risk-bg);     color: var(--risk); }
-.sens-mid  { background: var(--warning-bg);  color: var(--warning); }
-.sens-high { background: var(--decision-bg); color: var(--decision); }
-.sens-base {
+table.sensitivity-table th:first-child { width: 8rem; }
+.sensitivity-table-corner { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; font-size: .66rem; }
+.sensitivity-table-row-label::after { content: " ↓"; }
+.sensitivity-table-col-label { color: var(--accent); }
+.sensitivity-table-col-label::after { content: " →"; }
+.sensitivity-table-cell { background: var(--bg-soft); border-radius: 3px; }
+.sensitivity-table-low  { background: var(--risk-bg);     color: var(--risk); }
+.sensitivity-table-mid  { background: var(--warning-bg);  color: var(--warning); }
+.sensitivity-table-high { background: var(--decision-bg); color: var(--decision); }
+.sensitivity-table-base {
   outline: 2px solid var(--fg);
   outline-offset: -2px;
   font-weight: 800;
 }
 
 /* ---------- roll-forward ---------- */
-table.rollfwd tr.rf-opening th, table.rollfwd tr.rf-opening td { font-weight: 650; }
-table.rollfwd tr.rf-movement th { padding-left: 1.1rem; font-weight: 400; color: var(--fg-soft); }
-table.rollfwd tr.rf-movement td { color: var(--fg-soft); }
-table.rollfwd tr.rf-closing th, table.rollfwd tr.rf-closing td {
+table.roll-forward tr.roll-forward-opening th, table.roll-forward tr.roll-forward-opening td { font-weight: 650; }
+table.roll-forward tr.roll-forward-movement th { padding-left: 1.1rem; font-weight: 400; color: var(--fg-soft); }
+table.roll-forward tr.roll-forward-movement td { color: var(--fg-soft); }
+table.roll-forward tr.roll-forward-closing th, table.roll-forward tr.roll-forward-closing td {
   font-weight: 700;
   border-top: 3px double var(--fg);
   border-bottom: none;
 }
 
 /* ---------- variance-analysis ---------- */
-.var-actual { font-weight: 700; }
-table.variance td:last-child { text-align: right; }
+.variance-analysis-actual { font-weight: 700; }
+table.variance-analysis td:last-child { text-align: right; }
 
 /* ---------- cohort-table ---------- */
-table.cohorts {
+table.cohort-table {
   border-collapse: separate; border-spacing: 2px;
   width: 100%;
   margin: var(--block-gap) 0;
   font-size: .82rem;
 }
-table.cohorts th, table.cohorts td {
+table.cohort-table th, table.cohort-table td {
   padding: .3rem .35rem;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-table.cohorts thead th, table.cohorts tbody th {
+table.cohort-table thead th, table.cohort-table tbody th {
   font-size: .7rem; font-weight: 700;
   color: var(--fg-soft);
   background: var(--bg-soft);
   border-radius: 3px;
 }
-table.cohorts tbody th { text-align: left; padding-left: .5rem; }
-.cohort-size { color: var(--fg-soft); }
-.cohort-cell { border-radius: 3px; }
-.cohort-l0 { background: var(--bg-soft);  color: var(--fg-soft); }
-.cohort-l1 { background: var(--cohort-1-bg); color: var(--cohort-1-fg); font-weight: 700; }
-.cohort-l2 { background: var(--cohort-2-bg); color: var(--cohort-2-fg); }
-.cohort-l3 { background: var(--bg-soft); color: var(--fg); }
-.cohort-l4 { background: var(--cohort-4-bg); color: var(--cohort-4-fg); }
-.cohort-l5 { background: var(--cohort-5-bg); color: var(--cohort-5-fg); font-weight: 700; }
-.cohort-empty { background: transparent; }
+table.cohort-table tbody th { text-align: left; padding-left: .5rem; }
+.cohort-table-size { color: var(--fg-soft); }
+.cohort-table-cell { border-radius: 3px; }
+.cohort-table-l0 { background: var(--bg-soft);  color: var(--fg-soft); }
+.cohort-table-l1 { background: var(--cohort-1-bg); color: var(--cohort-1-fg); font-weight: 700; }
+.cohort-table-l2 { background: var(--cohort-2-bg); color: var(--cohort-2-fg); }
+.cohort-table-l3 { background: var(--bg-soft); color: var(--fg); }
+.cohort-table-l4 { background: var(--cohort-4-bg); color: var(--cohort-4-fg); }
+.cohort-table-l5 { background: var(--cohort-5-bg); color: var(--cohort-5-fg); font-weight: 700; }
+.cohort-table-empty { background: transparent; }
 
 /* ---------- print ---------- */
 @media print {
-  table.fin, table.cohorts, table.sens { break-inside: auto; }
+  table.fin, table.cohort-table, table.sensitivity-table { break-inside: auto; }
 }

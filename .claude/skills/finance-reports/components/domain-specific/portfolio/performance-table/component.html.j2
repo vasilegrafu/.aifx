@@ -5,7 +5,7 @@
    prefix. Passing a bare "benchmark" is not an error: the row renders
    unstyled and reads as another portfolio line. #}
 {% macro performance_table(periods=[], rows=[], caption="") %}
-  <table class="fin portfolio-perf">
+  <table class="fin portfolio-performance-table">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead><tr><th>Series</th>{% for p in periods %}<th>{{ p }}</th>{% endfor %}</tr></thead>
     <tbody>

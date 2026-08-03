@@ -50,11 +50,11 @@ ul.checklist > li[data-state="blocked"]::before { content: "✕"; color: var(--r
 ul.checklist > li[data-state="blocked"] { color: var(--risk); }
 
 /* ---------- trace-id ---------- */
-.req, a[data-trace] {
+.trace-id, a[data-trace] {
   font-family: var(--font-mono);
   font-size: .82em; font-weight: 600;
 }
-.req {
+.trace-id {
   background: var(--accent-soft); color: var(--accent);
   padding: .06em .45em; border-radius: 4px;
 }

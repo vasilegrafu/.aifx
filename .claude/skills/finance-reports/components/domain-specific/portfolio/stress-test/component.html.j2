@@ -2,26 +2,26 @@
 {# data: rows[] {scenario:str, trigger:str, impact:str, magnitude:num, tone:bad|warn, response:str} — magnitude % for the bar #}
 {# `tone` LANDS ON TWO ELEMENTS with different vocabularies: tone-{tone} on the
    figure, which portfolio.css defines for good, bad and neutral, and
-   portfolio-stress-fill-{tone} on the bar, which it defines for bad and warn
+   portfolio-stress-test-fill-{tone} on the bar, which it defines for bad and warn
    only. USE bad OR warn. "warn" colours the bar and leaves the figure plain;
    "good" and "neutral" do the reverse. Only "bad" styles both. #}
 {% macro stress_test(rows=[], caption="", note="") %}
-  <table class="fin portfolio-stress">
+  <table class="fin portfolio-stress-test">
   {% if caption %}<caption>{{ caption }}</caption>{% endif %}
-    <thead><tr><th>Scenario</th><th>Trigger</th><th class="portfolio-stress-impact-head">Impact</th><th>Response</th></tr></thead>
+    <thead><tr><th>Scenario</th><th>Trigger</th><th class="portfolio-stress-test-impact-head">Impact</th><th>Response</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
         <th scope="row">{{ r.scenario }}</th>
-        <td class="portfolio-stress-trigger">{{ r.trigger }}</td>
-        <td class="portfolio-stress-impact">
-          <span class="portfolio-stress-value tone-{{ r.tone }}">{{ r.impact }}</span>
-          <span class="portfolio-stress-track"><span class="portfolio-stress-fill portfolio-stress-fill-{{ r.tone }}" data-pct="{{ r.magnitude }}%"></span></span>
+        <td class="portfolio-stress-test-trigger">{{ r.trigger }}</td>
+        <td class="portfolio-stress-test-impact">
+          <span class="portfolio-stress-test-value tone-{{ r.tone }}">{{ r.impact }}</span>
+          <span class="portfolio-stress-test-track"><span class="portfolio-stress-test-fill portfolio-stress-test-fill-{{ r.tone }}" data-pct="{{ r.magnitude }}%"></span></span>
         </td>
-        <td class="portfolio-stress-response">{{ r.response }}</td>
+        <td class="portfolio-stress-test-response">{{ r.response }}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% if note %}<p class="fa-st-source">{{ note }}</p>{% endif %}
+  {% if note %}<p class="fin-source">{{ note }}</p>{% endif %}
 {% endmacro %}

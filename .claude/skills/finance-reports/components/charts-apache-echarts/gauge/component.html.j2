@@ -1,0 +1,29 @@
+{# purpose: one value against a range — a dial, for a single bounded measure #}
+{# unit: required, and a SYMBOL — "%", "x", "bps". It is set beside the value
+   at the centre of the dial rather than as a caption subtext, because on a
+   gauge the number IS the chart; a phrase like "percent of net income" belongs
+   in `caption` or `note`. #}
+{# data: value:num, minimum:num, maximum:num — scalars, no collection #}
+{% import "charts-apache-echarts/_render.html.j2" as r %}
+
+{% macro charts_apache_echarts_gauge(value=0, minimum=0, maximum=100, caption="", height=280, note="", unit="") %}
+{# Deliberately plain: no coloured danger bands. A gauge already spends a great
+   deal of ink on a single number (see this component's usage.md), and banding
+   it would add a judgement the number itself does not carry. #}
+{% set option = {
+     "series": [{"type": "gauge", "min": minimum, "max": maximum,
+                 "progress": {"show": true, "width": 12},
+                 "axisLine": {"lineStyle": {"width": 12}},
+                 "axisTick": {"show": false},
+                 "splitLine": {"length": 8},
+                 "axisLabel": {"fontSize": 10},
+                 "pointer": {"width": 4},
+                 "detail": {"fontSize": 22, "offsetCenter": [0, "70%"],
+                            "formatter": "{value}" ~ unit},
+                 "data": [{"value": value}]}],
+   } %}
+{# The unit is NOT passed on as a subtext: it is already beside the value, and
+   every other chart's subtext sits under the caption where this one would
+   repeat itself. #}
+{{ r.out(option, height, note, caption) }}
+{% endmacro %}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sankey — showcase</title>
+  <link rel="stylesheet" href="../../../css/bundle.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/css/bundle.css'">
+  <script src="../../../js/bundle.js" defer
+          onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/vasilegrafu/aifx-finance@11.0.0/.claude/skills/finance-reports/js/bundle.js';document.head.appendChild(s)"></script>
+</head>
+<body>
+  <main>
+  <header class="doc-meta">
+    <p class="doc-type">component showcase</p>
+    <h1>sankey</h1>
+  </header>
+
+    <section>
+      <h3>the smallest sankey that is still one — a single split</h3>
+        <pre class="chart apache-echarts" hidden data-height="260">
+{
+  "series": [
+    {
+      "bottom": 14,
+      "data": [
+        {
+          "itemStyle": {
+            "color": "palette:1"
+          },
+          "name": "Operating cash flow"
+        },
+        {
+          "itemStyle": {
+            "color": "token:caution"
+          },
+          "name": "Capital expenditure"
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "name": "Free cash flow"
+        }
+      ],
+      "draggable": false,
+      "emphasis": {
+        "focus": "adjacency"
+      },
+      "label": {
+        "fontSize": 12,
+        "textBorderColor": "#ffffff",
+        "textBorderWidth": 3
+      },
+      "left": 8,
+      "links": [
+        {
+          "source": "Operating cash flow",
+          "target": "Capital expenditure",
+          "value": 1420
+        },
+        {
+          "source": "Operating cash flow",
+          "target": "Free cash flow",
+          "value": 4980
+        }
+      ],
+      "nodeAlign": "left",
+      "nodeGap": 18,
+      "nodeWidth": 14,
+      "right": 150,
+      "top": 70,
+      "type": "sankey"
+    }
+  ],
+  "title": {
+    "subtext": "USD millions",
+    "text": "Operating cash flow, deployed"
+  },
+  "tooltip": {
+    "trigger": "item",
+    "triggerOn": "mousemove"
+  }
+}
+  </pre>
+  <p class="chart-note">Capex takes 22%; the rest is free cash flow. 1,420 + 4,980 = 6,400.</p>
+
+
+    </section>
+    <hr>
+    <section>
+      <h3>three stages — where conservation stops being checkable by eye</h3>
+        <pre class="chart apache-echarts" hidden data-height="420">
+{
+  "series": [
+    {
+      "bottom": 14,
+      "data": [
+        {
+          "itemStyle": {
+            "color": "palette:1"
+          },
+          "name": "Revenue"
+        },
+        {
+          "itemStyle": {
+            "color": "token:caution"
+          },
+          "name": "Cost of revenue"
+        },
+        {
+          "itemStyle": {
+            "color": "token:muted"
+          },
+          "name": "Gross profit"
+        },
+        {
+          "itemStyle": {
+            "color": "token:caution"
+          },
+          "name": "R\u0026D"
+        },
+        {
+          "itemStyle": {
+            "color": "token:caution"
+          },
+          "name": "SG\u0026A"
+        },
+        {
+          "itemStyle": {
+            "color": "token:caution"
+          },
+          "name": "Other operating"
+        },
+        {
+          "itemStyle": {
+            "color": "token:muted"
+          },
+          "name": "Operating income"
+        },
+        {
+          "itemStyle": {
+            "color": "token:caution"
+          },
+          "name": "Tax"
+        },
+        {
+          "itemStyle": {
+            "color": "token:positive"
+          },
+          "name": "Net income"
+        }
+      ],
+      "draggable": false,
+      "emphasis": {
+        "focus": "adjacency"
+      },
+      "label": {
+        "fontSize": 12,
+        "textBorderColor": "#ffffff",
+        "textBorderWidth": 3
+      },
+      "left": 8,
+      "links": [
+        {
+          "source": "Revenue",
+          "target": "Cost of revenue",
+          "value": 19468
+        },
+        {
+          "source": "Revenue",
+          "target": "Gross profit",
+          "value": 19081
+        },
+        {
+          "source": "Gross profit",
+          "target": "R\u0026D",
+          "value": 9019
+        },
+        {
+          "source": "Gross profit",
+          "target": "SG\u0026A",
+          "value": 3210
+        },
+        {
+          "source": "Gross profit",
+          "target": "Other operating",
+          "value": 1104
+        },
+        {
+          "source": "Gross profit",
+          "target": "Operating income",
+          "value": 5748
+        },
+        {
+          "source": "Operating income",
+          "target": "Tax",
+          "value": 612
+        },
+        {
+          "source": "Operating income",
+          "target": "Net income",
+          "value": 5136
+        }
+      ],
+      "nodeAlign": "left",
+      "nodeGap": 18,
+      "nodeWidth": 14,
+      "right": 170,
+      "top": 70,
+      "type": "sankey"
+    }
+  ],
+  "title": {
+    "subtext": "USD millions",
+    "text": "FY25 income statement"
+  },
+  "tooltip": {
+    "trigger": "item",
+    "triggerOn": "mousemove"
+  }
+}
+  </pre>
+  <p class="chart-note">Every intermediate node balances; R&D alone takes 47% of gross profit.</p>
+
+
+    </section>
+  </main>
+</body>
+</html>
