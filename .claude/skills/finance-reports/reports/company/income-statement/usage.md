@@ -92,12 +92,34 @@ totalOtherIncomeExpensesNet         +  836
 unreconciled                         1,931   ← 78% of pre-tax income
 ```
 
-That is not rounding. Folding it into "other non-operating" would misstate a
-real line by nearly 2bn; dropping it would break conservation and the sankey
-would draw perfectly and lie. So it is named, drawn as its own ribbon, listed as
-its own ladder line, and stated in the basis. See
-`service_providers/fmp/endpoints.md`, *"Statement lines do not always sum to
-their own subtotals"* — this report is the case that rule was written for.
+That is not rounding, and it is not one company: QCOM shows a gap in all five
+quarters. It gets its own ladder row, its own reconciliation row and a line in
+the basis. See `service_providers/fmp/endpoints.md`, *"Statement lines do not
+always sum to their own subtotals"* — this report is the case that rule was
+written for.
+
+**But the residual is not drawn, and that distinction cost a rebuild.** The
+first version drew `nonOperatingIncomeExcludingInterest` as published and made
+up the difference with an "unreconciled" ribbon. GOOGL Q2 FY2026 shows why that
+was wrong:
+
+```
+nonOperatingIncomeExcludingInterest -98,244
+totalOtherIncomeExpensesNet         +97,983
+interest expense                        261      98,244 - 261 = 97,983 exactly
+```
+
+The field's **sign is inverted** in the feed. The plug was therefore measuring
+the feed's bug rather than the filing, and at 195,438 it made the diagram
+undrawable for one of the most profitable companies there is.
+
+**So the diagram is built only from quantities that tie.** `operating income +
+totalOtherIncomeExpensesNet == income before tax` holds in every period and is
+asserted, so the other-non-operating ribbon is *derived* from that subtotal. The
+published-but-inconsistent field keeps its ladder row and its reconciliation
+row, which is where a disagreement belongs: stated as a finding, not drawn as a
+shape. A picture asserts that its parts are real; a table can say "this is what
+they published and it does not add up".
 
 **D&A and EBITDA are memo lines, never ribbons.** Depreciation sits inside cost
 of revenue and inside operating expenses. Drawing it as its own flow counts it

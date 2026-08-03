@@ -385,15 +385,32 @@ class IncomeStatementReportController(ReportController):
         # node, what consumes operating income leaves as a cost. Forcing either
         # into the other direction would draw a negative ribbon, which a sankey
         # renders as nothing at all.
+        #
+        # ONLY QUANTITIES THAT TIE ARE DRAWN, and this cost a rebuild to learn.
+        # The first version drew `nonOperatingIncomeExcludingInterest` as
+        # published and made up the difference with an "unreconciled" ribbon.
+        # GOOGL Q2 FY2026 shows why that was wrong: the feed reports -98,244
+        # against a totalOtherIncomeExpensesNet of +97,983, and 98,244 - 261 of
+        # interest expense IS 97,983 exactly -- the field's SIGN is inverted.
+        # The plug was therefore not measuring the filing, it was measuring the
+        # feed's bug, and at 195,438 it made the diagram undrawable for one of
+        # the most profitable companies there is.
+        #
+        # So the diagram takes the subtotal that ties (operating income +
+        # totalOther == pre-tax, asserted for every period) and derives the
+        # residual line from it. The published-but-inconsistent field keeps its
+        # ladder row and its reconciliation row, which is where a disagreement
+        # belongs: stated as a finding, not drawn as a shape.
+        other_derived = other_net[i] - (int_inc[i] - int_exp[i])
         parts = [("Interest income", int_inc[i]),
                  ("Interest expense", -int_exp[i]),
-                 ("Other non-operating", nonop[i]),
-                 ("Unreconciled, as reported", nonop_resid[i])]
+                 ("Other non-operating", other_derived)]
         parts = [(name, value) for name, value in parts if value]
+        # Exact by construction now, not by luck -- the derivation above cancels.
+        # Kept as an assertion anyway: "by construction" has a short half-life.
         assert sum(value for _, value in parts) == other_net[i], (
             f"{symbol}: the non-operating parts sum to "
-            f"{sum(v for _, v in parts)}, not {other_net[i]} -- the residual is "
-            f"supposed to make up exactly that difference")
+            f"{sum(v for _, v in parts)}, not {other_net[i]}")
 
         drains = sum(-value for _, value in parts if value < 0)
         carried = opinc[i] - drains
@@ -653,6 +670,15 @@ class IncomeStatementReportController(ReportController):
                  "value": (recon_note or
                            "the statement's components sum to its own subtotals in "
                            "every period shown")},
+                {"term": "How the diagram is built",
+                 "value": "from the subtotals that tie — operating income plus "
+                          "total other income equals pre-tax income in every "
+                          "period, so the other non-operating ribbon is derived "
+                          "from that subtotal rather than read from "
+                          "nonOperatingIncomeExcludingInterest, which the feed "
+                          "reports inconsistently. That field keeps its own row "
+                          "in the statement and in the reconciliation, where a "
+                          "disagreement is a finding rather than a shape"},
                 {"term": "Source",
                  "value": "company filings via Financial Modeling Prep; every line "
                           "is as published and none is derived"},
