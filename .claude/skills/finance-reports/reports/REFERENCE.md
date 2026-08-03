@@ -268,9 +268,27 @@ prevents is not "unstated" but "unnoticed" — including a stale `ENVIRONMENT` i
 some shell silently overriding this checkout's own file, which it names. See
 `service_providers/REFERENCE.md` for why the file is not called `.env`.
 
-`_filename(d)` defaults to `<name>.html`; `financial-profile` overrides it to
-`<slug>-financial-profile.html`, because the report is *about* a company and two
-symbols must not land on the same file.
+`_filename(d)` is the base class's and no report overrides it:
+`[<slug>_]<name>_<utc>.html`, where the slug comes from the view model, so a
+report *about* a company is named for it and one about nothing simply is not.
+Both company reports composed that identically until 13.0.0 moved it up.
+
+The UTC stamp is what makes every build a new file. A report carries live market
+data, so two builds of one symbol are two different documents, and the second
+silently replacing the first destroyed evidence — the page a reader was sent no
+longer said what it said. Basic ISO 8601 (`20260803T204512Z`) because the
+extended form spends colons, which Windows forbids in a filename.
+
+The three fields are joined with `_` and not `-` because report names are
+themselves hyphenated: `googl-income-statement-2026…` is one undifferentiated
+run, and nothing in it says where the ticker ends and the report begins. Two
+separators at two levels — `googl_income-statement_20260803T173843Z.html` — and
+the name splits on `_` into exactly three parts.
+
+Square brackets around each field were considered and rejected. They read well,
+but they are glob metacharacters (`ls [googl]*` matches nothing) and they
+percent-encode in URLs, which this workflow hits on every build: the page is
+meant to be served over `http://` and opened.
 
 ### Why there is no --force
 

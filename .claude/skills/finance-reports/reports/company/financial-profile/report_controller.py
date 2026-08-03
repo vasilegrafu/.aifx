@@ -145,10 +145,10 @@ class FinancialProfileReportController(ReportController):
     """Where a company's money comes from, where it goes, what it owns, and
     how that shape changed.
 
-    The three hooks are the three stages: _fetch is the only thing that
-    touches the network, _build_context is pure arithmetic that asserts every
-    identity before a single component is called, and _filename says what the
-    file is called once the data has named the company."""
+    The two hooks are two of the three stages: _fetch is the only thing that
+    touches the network, and _build_context is pure arithmetic that asserts
+    every identity before a single component is called. The third, naming the
+    file, is the base class's -- every report names itself the same way."""
 
     TITLE = "Financial Profile"
 
@@ -173,12 +173,6 @@ class FinancialProfileReportController(ReportController):
         if peers and peers.lower() != "none":
             wanted += [p.strip() for p in peers.split(",") if p.strip()]
         return wanted
-
-    def _filename(self, d):
-        """<symbol>-financial-profile.html. The report is ABOUT a company, so
-        the company belongs in the name; two builds for two symbols must not
-        land on the same file."""
-        return f"{d['slug']}-{self.name}.html"
 
     def _add_args(self, parser):
         """No defaults. Every argument is stated, including the one that says

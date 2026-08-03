@@ -32,10 +32,14 @@ python $S/reports/report_builder.py income-statement --help
 | `--basis` | **yes** | `annual` or `quarter`. No default: the two describe different things and every number on the page depends on which was asked for |
 | `--periods` | no | how many periods, newest last (default 5). One call whatever the number |
 | `--out` | yes | no default. **Ask if you were not told it** |
-| `--asset-bundles` | no | `cdn` unless you say otherwise, so the page renders anywhere. `local` links this tree relative to `--out` and breaks once the file moves |
+| `--asset-bundles` | no | `cdn` unless you say otherwise, so the page renders anywhere. `local` links this tree relative to `--out` and breaks once the file moves. **Use `local` while iterating** — a cdn page renders only after its tag is pushed |
 
-The file lands at `<symbol-lower>-income-statement.html` and **overwrites**
-without asking.
+The file lands at `<symbol-lower>_income-statement_<utc>.html` — for example
+`googl_income-statement_20260803T173843Z.html`. Underscore between the three fields,
+hyphen inside them, so the report name stays legible as one unit. **Nothing is overwritten.** A report
+carries live market data, so two builds of one symbol are two different
+documents, and a directory of them sorts into a history. Old builds are yours
+to delete.
 
 **Do not choose `--out` yourself.** If the destination was not given, ask before
 running anything — a report is a deliverable and where it lands is the reader's
@@ -68,7 +72,8 @@ asks about a single statement.
    splits its selling costs, where depreciation is, and what does not reconcile.
 2. **The statement** — the full ladder, ~24 rows, subtotals kept as published
    rather than recomputed, with a memo block for D&A, EBITDA and EBIT.
-3. **Where the money stops** — the sankey, ~14 nodes over six stages.
+3. **Where the money stops** — the sankey, ~13 nodes over six stages,
+   drawn from the same decomposition the ladder shows.
 4. **The same statement as ratios** — every line as a share of revenue.
 5. **What a share got** — basic and diluted EPS, share counts, the dilution gap.
 6. **Does it tie?** — one row per identity, showing what it leaves over.
@@ -79,56 +84,48 @@ everything above it, and an audit printed first is a disclaimer.
 
 ## Rules
 
-**The residual is drawn, not hidden.** `totalOtherIncomeExpensesNet` is what the
-statement uses to get from operating income to pre-tax income, and it is **not**
-the sum of the components the same payload publishes. QCOM Q3 FY2026:
+**The ladder decomposes the subtotal the FILING carries.** Alphabet's condensed
+income statement has exactly one non-operating line — XBRL
+`nonoperatingincomeexpense`, 97,983 for Q2 FY2026 — and
+`totalOtherIncomeExpensesNet` reproduces it to the dollar. Interest is disclosed
+in the notes rather than on the face of the statement, and the feed surfaces it
+correctly: interest income less interest expense equals net interest in every
+period. So the statement shows interest, then a derived remainder, then the
+subtotal, and each row sums into the one below it.
+
+**`nonOperatingIncomeExcludingInterest` is not used.** It is computed by the feed
+rather than filed, and computed wrongly. GOOGL Q2 FY2026:
 
 ```
-netInterestIncome                     -81
-nonOperatingIncomeExcludingInterest -1,014
-                                    ------
-sum of components                   -1,095
-totalOtherIncomeExpensesNet         +  836
-unreconciled                         1,931   ← 78% of pre-tax income
+filed (XBRL nonoperatingincomeexpense)   +97,983
+totalOtherIncomeExpensesNet              +97,983   agrees
+nonOperatingIncomeExcludingInterest      -98,244   sign reversed
+                                                   98,244 - 261 = 97,983 exactly
 ```
 
-That is not rounding, and it is not one company: QCOM shows a gap in all five
-quarters. It gets its own ladder row, its own reconciliation row and a line in
-the basis. See `service_providers/fmp/endpoints.md`, *"Statement lines do not
-always sum to their own subtotals"* — this report is the case that rule was
-written for.
+The identity holds in four of GOOGL's five quarters and **five of five for
+MSFT**, so this is systemic in the feed rather than one bad company record. The
+field is disclosed once, in the basis, and appears nowhere else on the page.
 
-**But the residual is not drawn, and that distinction cost a rebuild.** The
-first version drew `nonOperatingIncomeExcludingInterest` as published and made
-up the difference with an "unreconciled" ribbon. GOOGL Q2 FY2026 shows why that
-was wrong:
+**Two earlier designs died here and both are worth remembering.** The first drew
+the residual as its own sankey ribbon — which measured the feed's bug rather
+than the filing, and at 195,438 made the diagram undrawable for one of the most
+profitable companies there is. The second printed the broken field in the ladder
+beside an "Unreconciled" row whose only job was to measure how wrong its
+neighbour was, plus a warning callout to explain the pair. Two rows that between
+them said nothing about the company. Deleting the cause deleted all three.
 
-```
-nonOperatingIncomeExcludingInterest -98,244
-totalOtherIncomeExpensesNet         +97,983
-interest expense                        261      98,244 - 261 = 97,983 exactly
-```
+**One row is derived, and the basis names it.** The basis used to promise "every
+line is as published and none is derived", and that promise is exactly what made
+printing a broken published field feel obligatory. It was worth less than the
+accuracy it cost. A derived number that ties beats a published one that does
+not — but only if the page says which is which.
 
-The field's **sign is inverted** in the feed. The plug was therefore measuring
-the feed's bug rather than the filing, and at 195,438 it made the diagram
-undrawable for one of the most profitable companies there is.
-
-**So the diagram is built only from quantities that tie.** `operating income +
-totalOtherIncomeExpensesNet == income before tax` holds in every period and is
-asserted, so the other-non-operating ribbon is *derived* from that subtotal. The
-published-but-inconsistent field keeps its ladder row and its reconciliation
-row, which is where a disagreement belongs: stated as a finding, not drawn as a
-shape. A picture asserts that its parts are real; a table can say "this is what
-they published and it does not add up".
-
-**And the finding says WHY when it can prove why.** A gap of 141% of pre-tax
-income reads as 195bn of missing income unless the page names the alternative.
-Where `-nonOperatingIncomeExcludingInterest - interestExpense` reproduces
-`totalOtherIncomeExpensesNet` exactly — four of GOOGL's five quarters — the note
-says the sign is reversed in the feed and shows the arithmetic. Where that
-identity does not hold it says only what it can prove: the components miss the
-subtotal by this much. "We do not know why" is the honest reading of a residual
-nothing explains, and it is a different sentence from "the feed flipped a sign".
+**An identity that cannot fail is not an audit.** The reconciliation row that
+measured the removed field went with it, because it would now tie by
+construction in every period. The interest identity stays: it reads three
+independent fields and it genuinely fails, in GOOGL Q4 FY2025, where the feed
+scrambles both interest signs.
 
 **D&A and EBITDA are memo lines, never ribbons.** Depreciation sits inside cost
 of revenue and inside operating expenses. Drawing it as its own flow counts it

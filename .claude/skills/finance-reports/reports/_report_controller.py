@@ -32,6 +32,7 @@ extra here is a consequence of that one sentence.
 
 import sys
 import traceback
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -52,6 +53,15 @@ from components._showcase_controller import (                # noqa: E402
 from reports._report_validation import NOT_YET, validate     # noqa: E402
 
 VIEW = "report.html.j2"
+
+
+def _stamp() -> str:
+    """UTC now as `20260803T203045Z`, for the filename.
+
+    Seconds, not minutes: two builds a minute apart are common while iterating
+    on a symbol, and a stamp that cannot tell them apart brings back the
+    overwrite it exists to prevent."""
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
 def blame(exc: BaseException) -> str:
@@ -131,8 +141,32 @@ class ReportController:
         does not is a key present and WRONG."""
 
     def _filename(self, d: dict) -> str:
-        """What the file is called. Override when the data names it."""
-        return f"{self.name}.html"
+        """`[<slug>_]<report>_<utc>.html` — e.g. `googl_income-statement_20260803T173843Z.html`.
+
+        UNDERSCORE BETWEEN THE FIELDS, hyphen inside them. Report names are
+        hyphenated (`income-statement`, `financial-profile`), so joining the
+        three fields with a hyphen too made `googl-income-statement-2026…` one
+        undifferentiated run: nothing in it says where the ticker ends and the
+        report begins. Two separators at two levels, and both halves are
+        readable by eye and splittable by machine.
+
+        THE TIMESTAMP MAKES EVERY BUILD A NEW FILE. A report carries live
+        market data, so two builds of one symbol are two different documents
+        and the second silently replacing the first destroyed evidence: the
+        page a reader was sent no longer says what it said. Now nothing
+        overwrites, and a directory of builds sorts into a history.
+
+        UTC, and basic ISO 8601 — `20260803T203045Z`. Not local time, because a
+        file naming itself 14:30 is unreadable to anyone in another timezone and
+        indistinguishable from another build 14:30 somewhere else. Basic format
+        because the extended one spends colons, which Windows does not allow in
+        a filename at all.
+
+        The slug is taken from the view model rather than declared, so a report
+        ABOUT something is named for it and one about nothing simply is not.
+        Both company reports composed this identically before it moved here."""
+        parts = [p for p in (d.get("slug"), self.name, _stamp()) if p]
+        return "_".join(parts) + ".html"
 
     # ---------------------------------------------------------------- where
     @property

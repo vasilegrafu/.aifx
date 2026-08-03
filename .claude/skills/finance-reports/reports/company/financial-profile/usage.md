@@ -29,10 +29,14 @@ python $S/reports/report_builder.py financial-profile --help
 | `symbol` | yes | ticker, upper-cased for you |
 | `--peers` | **yes** | tickers, or `none`. No default: choosing nobody is still choosing. One extra call each |
 | `--out` | yes | no default. **Ask if you were not told it** — see below |
-| `--asset-bundles` | no | `cdn` unless you say otherwise, so the page renders anywhere. `local` links this tree relative to `--out` and breaks once the file moves |
+| `--asset-bundles` | no | `cdn` unless you say otherwise, so the page renders anywhere. `local` links this tree relative to `--out` and breaks once the file moves. **Use `local` while iterating** — a cdn page renders only after its tag is pushed |
 
-The file lands at `<symbol-lower>-financial-profile.html` and **overwrites**
-without asking. Two symbols never collide; the same symbol twice is the same
+The file lands at `<symbol-lower>_financial-profile_<utc>.html` — for example
+`googl_financial-profile_20260803T173843Z.html`. Underscore between the three fields,
+hyphen inside them, so the report name stays legible as one unit. **Nothing is overwritten.** A report
+carries live market data, so two builds of one symbol are two different
+documents, and a directory of them sorts into a history. Old builds are yours
+to delete. Two symbols never collide; the same symbol twice is the same
 report with newer numbers.
 
 **Do not choose `--out` yourself.** If the destination was not given, ask for

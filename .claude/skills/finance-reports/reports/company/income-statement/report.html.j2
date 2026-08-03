@@ -47,7 +47,7 @@
        nothing", which is a different claim from "they did not break it out". #}
     {{ c.income_statement(periods=d.periods, rows=d.ladder_rows,
                           caption=d.ladder_caption, unit=d.unit,
-                          source="As published. The memo block at the foot is already inside the lines above it.") }}
+                          source="As published, except the derived row named in the basis. The memo block at the foot is already inside the lines above it.") }}
   {% endcall %}
 
   {% call c.section("flow", "Where the money stops") %}
@@ -109,11 +109,13 @@
        Zero is the answer here rather than missing data, but a wall of zeros is
        ceremony, not detail. A tick says the same thing and leaves the eye free
        to land on the one cell that is a number. #}
+    {# NO WARNING BELOW THE TABLE ANY MORE. It existed to explain a residual the
+       ladder printed, and the ladder no longer prints it: the statement now
+       decomposes the subtotal the filing actually carries, so every identity
+       here is a genuine check rather than an apology. What remains to be said
+       about the source is one line in the basis, at the top, where a fact about
+       the DATA belongs rather than at the foot of an exhibit about the
+       COMPANY. #}
     {{ c.comparison_table(headers=d.recon_headers, rows=d.recon_rows) }}
-    {% if d.recon_note %}
-    {% call c.callout("warning") %}
-      <p>{{ d.recon_note }}</p>
-    {% endcall %}
-    {% endif %}
   {% endcall %}
 {% endblock %}

@@ -14,23 +14,29 @@ WHAT MAKES THIS REPORT DIFFERENT FROM ITS SANKEY IN financial-profile:
                         income, interest expense and other, and a reconciliation
                         exhibit for what the source does not tie
 
-THE RESIDUAL IS THE WHOLE PROBLEM. `totalOtherIncomeExpensesNet` is what the
-statement uses to get from operating income to pre-tax income, and it is NOT the
-sum of the components the same payload publishes. QCOM Q3 FY2026:
+THE STATEMENT DECOMPOSES THE SUBTOTAL THE FILING CARRIES. A condensed income
+statement has exactly ONE non-operating line -- GOOGL Q2 FY2026 tags
+`nonoperatingincomeexpense` at 97,983 and stops -- and
+`totalOtherIncomeExpensesNet` reproduces it to the dollar. Interest sits in the
+notes, and the feed surfaces it correctly. So: interest income, interest
+expense, net interest, a DERIVED remainder, then the subtotal, each row summing
+into the one below it.
 
-    netInterestIncome                    -81
-    nonOperatingIncomeExcludingInterest -1,014
-                                        ------
-    sum of components                   -1,095
-    totalOtherIncomeExpensesNet         +  836
-    unreconciled                         1,931   <- 78% of pre-tax income
+`nonOperatingIncomeExcludingInterest` IS NOT USED. It is computed by the feed
+rather than filed, and computed wrongly:
 
-That is not rounding. Folding it into "other non-operating" would misstate a
-real line by nearly 2bn. So it is NAMED: its own ladder row, its own
-reconciliation row, and a line in the basis. It is NOT drawn — see the sankey
-below, where drawing it once made the diagram undrawable for GOOGL. See
-endpoints.md, "Statement lines do not always sum to their own subtotals" — this
-report is the case that rule was written for.
+    filed (XBRL nonoperatingincomeexpense)   +97,983
+    totalOtherIncomeExpensesNet              +97,983   agrees
+    nonOperatingIncomeExcludingInterest      -98,244   sign reversed
+                                                       98,244 - 261 = 97,983
+
+Four of GOOGL's five quarters and five of five for MSFT, so this is systemic in
+the feed, not one bad record. It is disclosed once in the basis and appears
+nowhere else. Printing it cost two designs: drawn as a sankey ribbon it measured
+the feed's bug and made the diagram undrawable, and printed in the ladder it
+needed a companion "Unreconciled" row to measure how wrong it was -- two rows
+that between them said nothing about the company. See endpoints.md, "Statement
+lines do not always sum to their own subtotals".
 
 WHAT IS ASSERTED AND WHAT IS DISCLOSED. Anything the diagram depends on to
 conserve is an assertion and stops the build. Anything the SOURCE gets wrong is
@@ -149,10 +155,6 @@ class IncomeStatementReportController(ReportController):
         """The subject must appear in the finished page. There is no peer group
         here, so the symbol is the whole expectation."""
         return [symbol.upper()]
-
-    def _filename(self, d):
-        """<symbol>-income-statement.html. Two symbols must not collide."""
-        return f"{d['slug']}-{self.name}.html"
 
     def _add_args(self, parser):
         """`--basis` is required and `--periods` is not, and the difference is
@@ -296,17 +298,34 @@ class IncomeStatementReportController(ReportController):
         ]
         if any(op_resid):
             ladder.append(row("Unreconciled operating", op_resid))
+        # NON-OPERATING, DECOMPOSED FROM THE SUBTOTAL THAT THE FILING CARRIES.
+        # The condensed statement has exactly ONE non-operating line -- GOOGL Q2
+        # FY2026 tags `nonoperatingincomeexpense` at 97,983 and stops -- and
+        # `totalOtherIncomeExpensesNet` reproduces it to the dollar. Interest is
+        # in the notes, and the feed surfaces it correctly: interest income less
+        # interest expense equals net interest in every period, which the
+        # reconciliation exhibit still checks.
+        #
+        # What is NOT shown here any more is the feed's own
+        # `nonOperatingIncomeExcludingInterest`. It is computed, not filed, and
+        # it is computed wrongly -- GOOGL published +97,983 and the field says
+        # -98,244. Printing it forced a companion "Unreconciled" row whose only
+        # job was to measure how wrong its neighbour was, so the statement
+        # carried two rows that between them said nothing about the company.
+        # Deleting the cause deleted the symptom.
+        #
+        # The replacement is DERIVED and labelled as derived, which is a real
+        # departure for a report whose basis used to say every line is as
+        # published. The basis now says which one is not, because a derived
+        # number that ties beats a published one that does not.
+        other_derived_col = [other_net[i] - net_int[i] for i in range(n)]
         ladder += [
             row("Operating income", opinc, "subtotal"),
             row("Non-operating", [], "section"),
             row("Interest income", int_inc),
             row("Interest expense", [-v for v in int_exp]),
             row("Net interest income", net_int, "subtotal"),
-            row("Other non-operating income", nonop),
-        ]
-        if any(nonop_resid):
-            ladder.append(row("Unreconciled, as reported", nonop_resid))
-        ladder += [
+            row("Other non-operating, derived", other_derived_col),
             row("Total other income and expenses", other_net, "subtotal"),
             row("Income before tax", pretax, "subtotal"),
             row("Income tax expense", [-v for v in tax]),
@@ -593,8 +612,13 @@ class IncomeStatementReportController(ReportController):
                      lambda k: op_resid[k]),
             residual("Interest income − interest expense − net interest",
                      lambda k: int_inc[k] - int_exp[k] - net_int[k]),
-            residual("Net interest + other non-operating − total other",
-                     lambda k: -nonop_resid[k]),
+            # The row that measured `nonOperatingIncomeExcludingInterest`
+            # against the subtotal is gone with the field itself. It would now
+            # tie by construction in every period, and an identity that cannot
+            # fail is not an audit -- it is decoration that makes the exhibit
+            # look more thorough than it is. The interest identity above stays:
+            # it reads three INDEPENDENT fields and it genuinely fails, in
+            # GOOGL Q4 FY2025, where the feed scrambles both interest signs.
             residual("Operating income + total other − pre-tax income",
                      lambda k: opinc[k] + other_net[k] - pretax[k]),
             residual("Pre-tax income − tax − continuing operations",
@@ -603,38 +627,45 @@ class IncomeStatementReportController(ReportController):
                      lambda k: ebitda[k] - dna[k] - ebit[k]),
         ]
 
-        # WHY THE GAP IS THERE, when the arithmetic can say. A gap of 141% of
-        # pre-tax income reads as 195bn of missing income unless the page names
-        # the alternative, and for GOOGL the alternative is checkable: negating
-        # the published field and subtracting interest expense reproduces the
-        # subtotal EXACTLY, in four of the five quarters on the page. That is a
-        # reversed sign in the feed, not a filing that fails to add up, and the
-        # two deserve different sentences. Where the identity does not hold the
-        # note says only what it can prove -- that the components miss the
-        # subtotal by this much -- because "we do not know why" is the honest
-        # reading of a residual nothing explains.
-        gap = nonop_resid[-1]
-        inverted = bool(nonop[-1]) and other_net[-1] + nonop[-1] + int_exp[-1] == 0
-        recon_note = ""
-        if gap:
-            share = abs(100 * gap / pretax[-1]) if pretax[-1] else 0
-            recon_note = (
-                f"In {periods[-1]} the source's own non-operating components sum "
-                f"to {net_int[-1] + nonop[-1]:,}, while the statement uses "
-                f"{other_net[-1]:,} to reach pre-tax income — a gap of {gap:,} "
-                f"({share:.0f}% of pre-tax income). ")
-            if inverted:
-                recon_note += (
-                    f"That gap is the feed's, not the filing's: negating the "
-                    f"published other non-operating figure and subtracting "
-                    f"interest expense reproduces the subtotal exactly "
-                    f"({-nonop[-1]:,} − {int_exp[-1]:,} = {other_net[-1]:,}), so "
-                    f"the field arrives with its sign reversed. ")
-            recon_note += (
-                "It keeps its own ladder row and this reconciliation row rather "
-                "than being folded into other non-operating income, which would "
-                "misstate a real line by that amount. It is not drawn: the "
-                "diagram is built only from the subtotals that tie.")
+        # THE FINDING MOVED OFF THE PAGE AND INTO THE BASIS, because the
+        # statement no longer prints the field it was about. The ladder shows
+        # what the filing shows -- one non-operating subtotal -- decomposed into
+        # interest, which the notes disclose and the feed gets right, and a
+        # derived remainder. Everything ties, so there is no gap to warn about
+        # and the warning callout is gone.
+        #
+        # What survives is DISCLOSURE, one line in the basis: which row is
+        # derived, and why the published alternative was not used. A reader who
+        # pulls this company from FMP themselves will meet the broken field, and
+        # a report that silently routed around it would leave them to rediscover
+        # it. Stating it once, quietly, is the right weight -- it is a fact
+        # about the data source, not a finding about the company.
+        ties = other_net[-1] - net_int[-1]
+        # WHETHER the published field is provably reversed, and how often. One
+        # period landing exactly could be coincidence; four of five is a bug.
+        agree = sum(1 for k in range(n)
+                    if nonop[k] and other_net[k] + nonop[k] + int_exp[k] == 0)
+        if agree:
+            derived_why = (
+                f"total other income less net interest — {other_net[-1]:,} less "
+                f"{net_int[-1]:,} = {ties:+,} for {periods[-1]}. The feed also "
+                f"publishes nonOperatingIncomeExcludingInterest, which is not "
+                f"used: it reads {nonop[-1]:,}, and negating it and subtracting "
+                f"interest expense reproduces the subtotal exactly in {agree} of "
+                f"the {n} periods shown, so its sign is reversed")
+        elif any(nonop_resid):
+            derived_why = (
+                f"total other income less net interest — {other_net[-1]:,} less "
+                f"{net_int[-1]:,} = {ties:+,} for {periods[-1]}. The feed also "
+                f"publishes nonOperatingIncomeExcludingInterest, which is not "
+                f"used: it misses the statement's own subtotal by "
+                f"{nonop_resid[-1]:,} and the payload does not say why")
+        else:
+            derived_why = (
+                f"total other income less net interest — {other_net[-1]:,} less "
+                f"{net_int[-1]:,} = {ties:+,} for {periods[-1]}. It is derived "
+                f"rather than read so that the row always sums into the subtotal "
+                f"above it")
 
         # ----------------------------------------------------------- the basis
         period_end = datetime.strptime(latest["date"], "%Y-%m-%d").date()
@@ -686,22 +717,23 @@ class IncomeStatementReportController(ReportController):
                  "value": "sits inside cost of revenue and operating expenses. It "
                           "is a memo line in the ladder and appears nowhere in the "
                           "diagram, where it would be counted twice"},
-                {"term": "Unreconciled",
-                 "value": (recon_note or
-                           "the statement's components sum to its own subtotals in "
-                           "every period shown")},
+                # THE ONE DERIVED ROW, named out loud. This used to read "every
+                # line is as published and none is derived", and that promise is
+                # what made printing a broken published field feel obligatory.
+                # The promise was worth less than the accuracy it cost.
+                {"term": "Other non-operating",
+                 "value": f"the one derived row on the page. It is {derived_why}"},
                 {"term": "How the diagram is built",
                  "value": "from the subtotals that tie — operating income plus "
                           "total other income equals pre-tax income in every "
-                          "period, so the other non-operating ribbon is derived "
-                          "from that subtotal rather than read from "
-                          "nonOperatingIncomeExcludingInterest, which the feed "
-                          "reports inconsistently. That field keeps its own row "
-                          "in the statement and in the reconciliation, where a "
-                          "disagreement is a finding rather than a shape"},
+                          "period, and the ladder decomposes that same subtotal, "
+                          "so the picture and the statement agree line for line"},
                 {"term": "Source",
-                 "value": "company filings via Financial Modeling Prep; every line "
-                          "is as published and none is derived"},
+                 "value": "company filings via Financial Modeling Prep. Every line "
+                          "is as published except the one named above, and the "
+                          "condensed statement carries a single non-operating "
+                          "subtotal, which is what Total other income and "
+                          "expenses reproduces"},
             ],
             # ladder
             "ladder_rows": ladder,
@@ -718,7 +750,6 @@ class IncomeStatementReportController(ReportController):
             "share_rows": share_rows,
             "recon_headers": ["Identity"] + periods,
             "recon_rows": recon_rows,
-            "recon_note": recon_note,
         }
         return d
 
@@ -729,7 +760,7 @@ class IncomeStatementReportController(ReportController):
         "basis_facts", "company", "exchange", "flow_caption", "flow_links",
         "flow_nodes", "flow_note", "header_facts", "ladder_caption", "ladder_rows",
         "margin_rows", "period", "periods", "pershare_rows", "price_date",
-        "recon_headers", "recon_note", "recon_rows", "share_rows", "ticker",
+        "recon_headers", "recon_rows", "share_rows", "ticker",
         "unit",
     )
 
