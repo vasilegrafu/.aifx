@@ -1,0 +1,118 @@
+{# purpose: one income statement read all the way down — every published line, the flow that produced the bottom line, and what the source does not reconcile #}
+{#
+   THE RECIPE. This file decides WHICH exhibits appear and IN WHAT ORDER, and
+   nothing else. It holds no arithmetic — every number arrives already derived
+   and already asserted by report_controller.py — and it performs no I/O.
+
+   Reading it top to bottom should tell you what the report argues:
+     what this is -> the statement itself -> the same statement as a flow ->
+     the same statement as ratios -> what a share got -> whether it ties.
+
+   THE ORDER IS THE ARGUMENT. The ladder comes before the diagram because the
+   numbers are the evidence and the picture is the reading; a reader shown the
+   sankey first takes the shape on trust. The reconciliation comes LAST because
+   it is the audit of everything above it, and an audit printed first is a
+   disclaimer.
+
+   FULLY GENERATED. There are no prose slots: every exhibit is built from data,
+   so the output carries no `{{...}}` prompts and needs no hand editing.
+#}
+{% extends "reports/_report.master.html.j2" %}
+{% block content %}
+  {{ c.toc([
+      {"id": "basis",          "label": "What this is"},
+      {"id": "ladder",         "label": "The statement"},
+      {"id": "flow",           "label": "Where the money stops"},
+      {"id": "margins",        "label": "The same statement as ratios"},
+      {"id": "per-share",      "label": "What a share got"},
+      {"id": "reconciliation", "label": "Does it tie?"},
+  ]) }}
+
+  {% call c.section("basis", "What this is") %}
+    {{ c.security_header(ticker=d.ticker, name=d.company, exchange=d.exchange,
+                         asof=d.price_date, facts=d.header_facts) }}
+    {# BASIS OF PREPARATION. One statement, one series of periods — so unlike a
+       profile there is no mixing of annual and quarterly exhibits to disclose.
+       What DOES need saying is which basis was asked for, whether the filing
+       splits its selling costs, and where depreciation is (and is not). #}
+    {% call c.callout("note") %}
+      {{ c.facts(d.basis_facts) }}
+    {% endcall %}
+  {% endcall %}
+
+  {% call c.section("ladder", "The statement") %}
+    {# EVERY PUBLISHED LINE, in the order the statement builds them, with the
+       subtotals kept as subtotals rather than recomputed. Lines the filing does
+       not disclose are absent, not zero: a zero row reads as "they spent
+       nothing", which is a different claim from "they did not break it out". #}
+    {{ c.income_statement(periods=d.periods, rows=d.ladder_rows,
+                          caption=d.ladder_caption, unit=d.unit,
+                          source="As published. The memo block at the foot is already inside the lines above it.") }}
+  {% endcall %}
+
+  {% call c.section("flow", "Where the money stops") %}
+    {# THE SAME NUMBERS AS THE LADDER, drawn. A sankey answers one question a
+       table cannot: which costs are large relative to each other. Reading down
+       a column, 2,607 and 976 are two numbers; side by side as ribbons they are
+       obviously R&D and obviously not.
+
+       Non-operating is DECOMPOSED here, which is what separates this exhibit
+       from the same company's financial-profile: interest in, interest out,
+       other, and the part the source does not reconcile, each as its own
+       ribbon. Tall, because six stages need the room. #}
+    {% if d.flow_nodes %}
+    {{ c.charts_apache_echarts_sankey(nodes=d.flow_nodes, links=d.flow_links,
+                height=620, label_room=210, unit=d.unit,
+                caption=d.flow_caption) }}
+    {% else %}
+    {# A LOSS HAS NO WIDTH. Rather than drop the section silently — which reads
+       as a report that forgot an exhibit — say what could not be drawn and why.
+       Every other section covers the period normally. #}
+    {% call c.callout("warning") %}
+      <p>{{ d.flow_note }}</p>
+    {% endcall %}
+    {% endif %}
+  {% endcall %}
+
+  {% call c.section("margins", "The same statement as ratios") %}
+    {# Absolute numbers say how big; ratios say whether the shape moved. The
+       tax rate is the one row measured against something other than revenue,
+       and its label says so rather than leaving it to be assumed. #}
+    {{ c.metric_trend(periods=d.periods, rows=d.margin_rows, fmt="pct",
+                      caption="Every line as a share of revenue",
+                      unit="per cent of revenue") }}
+  {% endcall %}
+
+  {% call c.section("per-share", "What a share got") %}
+    {# Basic and diluted, both, and the gap between them. A company can hold
+       earnings flat and still shrink earnings per share by issuing stock; the
+       ladder above cannot show that and this is where it becomes visible. #}
+    {{ c.metric_trend(periods=d.periods, rows=d.pershare_rows, fmt="num",
+                      caption="Earnings per share", unit="$ per share") }}
+    {{ c.metric_trend(periods=d.periods, rows=d.share_rows, fmt="num",
+                      caption="Share count and dilution", unit="millions") }}
+  {% endcall %}
+
+  {% call c.section("reconciliation", "Does it tie?") %}
+    {# THE AUDIT OF EVERY EXHIBIT ABOVE. Each row is one identity the statement
+       claims about itself, and the cells are what it LEAVES OVER in each
+       period. A row of zeros is the filing agreeing with itself.
+
+       This exists because the answer is routinely no. A reader who is shown a
+       clean-looking ladder and a clean-looking diagram has no way to know that
+       the source's own components missed its own subtotal by most of pre-tax
+       income — so it is stated here, per period, as a number. #}
+    {# A MARK WHERE IT TIES, THE GAP WHERE IT DOES NOT. Printing the residual in
+       every cell was the first draft, and a healthy statement rendered forty
+       zeros — the validator called it an 88% blank section and was right to.
+       Zero is the answer here rather than missing data, but a wall of zeros is
+       ceremony, not detail. A tick says the same thing and leaves the eye free
+       to land on the one cell that is a number. #}
+    {{ c.comparison_table(headers=d.recon_headers, rows=d.recon_rows) }}
+    {% if d.recon_note %}
+    {% call c.callout("warning") %}
+      <p>{{ d.recon_note }}</p>
+    {% endcall %}
+    {% endif %}
+  {% endcall %}
+{% endblock %}
